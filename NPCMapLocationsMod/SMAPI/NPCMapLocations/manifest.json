@@ -1,7 +1,0 @@
-﻿{
-  "Name": "NPC Map Locations Mod",
-  "Authour": "Bouhm",
-  "Version": "1.0",
-  "Description": "Show locations of villagers on map",
-  "EntryDll":  "MapMod.dll"
-}
