@@ -1,0 +1,1 @@
+Go to the directory containing "StardewModdingAPI" and place in "Mods" directory 
