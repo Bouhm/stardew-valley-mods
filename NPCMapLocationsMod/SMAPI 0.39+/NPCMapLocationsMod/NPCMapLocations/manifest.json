@@ -1,0 +1,14 @@
+{
+  "Name": "NPC Map Locations Mod",
+  "Authour": "Bouhm",
+  "Version": {
+    "MajorVersion": 0,
+    "MinorVersion": 0,
+    "PatchVersion": 0,
+    "Build": ""
+  },
+  "Description": "Shows NPC locations on the map real-time",
+  "UniqueID": "5edb8bc3-8e01-45d8-8fab-5bfbfba3df7a",
+  "PerSaveConfigs": false,
+  "EntryDll": "MapMod.dll"
+}
