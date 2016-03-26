@@ -8,7 +8,7 @@
     "Build": ""
   },
   "Description": "Shows NPC locations on the map real-time",
-  "UniqueID": "5edb8bc3-8e01-45d8-8fab-5bfbfba3df7a",
+  "UniqueID": "idontreallyunderstandhowtogeneratethis",
   "PerSaveConfigs": false,
   "EntryDll": "MapMod.dll"
 }
