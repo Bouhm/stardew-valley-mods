@@ -1,6 +1,6 @@
 Installation:
 Download "NPCMarkers" and "NPCMapLocations" for your version of SMAPI.
-To download, click on the directory you want to download and click on the "Raw" button. 
+To download, click on the file you want to download and click on the "Raw" button. 
 
 Go to the directory containing "StardewModdingAPI" and place "NPCMapLocations" in the "Mods" directory 
 
