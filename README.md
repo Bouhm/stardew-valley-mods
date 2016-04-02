@@ -1,6 +1,8 @@
 # StardewValleyMods
 My mods for Stardew Valley
 
-Shiba Inu v1.0
+Installation:
+Place "NPCMapLocations" in {Directiory containing StardewValley.exe}/Mods/
 
-NPC Map Locations v1.0
+Get SMAPI here:
+https://github.com/ClxS/SMAPI/releases
