@@ -68,7 +68,7 @@ namespace NPCMapLocations
 
             foreach (NPC npc in Utility.getAllCharacters())
             {
-                if (npc.Schedule != null)
+                if (npc.Schedule != null || npc.isMarried())
                 {
                     int offsetX = 0;
                     int offsetY = 0;
@@ -287,9 +287,10 @@ namespace NPCMapLocations
         // Draw event (when Map Page is opened)
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
         {
-            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu && npcMarkers.Count > 27)
+            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
             {
                 drawMarkers((GameMenu)Game1.activeClickableMenu);
+
             }
         }
 
@@ -301,7 +302,8 @@ namespace NPCMapLocations
                 foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
                 {
                     Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[entry.Key], 16, 15)), Color.White);
-                }   
+                }
+
                 toolTips.draw(Game1.spriteBatch);
                 Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
             }
@@ -334,7 +336,6 @@ namespace NPCMapLocations
 
         public MapPageTooltips(string names, int nameTooltipMode)
         {
-            //this tooltipButton = new ClickableTextureComponent(new Rectangle((int)Game1.activeClickableMenu.xPositionOnScreen + 825, Game1.activeClickableMenu.yPositionOnScreen + 800, (int)Math.Max(60, Game1.smallFont.MeasureString("Corner").Y), Game1.tileSize), "Hover", "Name Tooltip config.nameTooltipMode", Game1.mouseCursors, new Rectangle(128, 256, 64, 64), (float)Game1.pixelZoom / 6f);
             this.nameTooltipMode = nameTooltipMode;
             this.names = names;
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
