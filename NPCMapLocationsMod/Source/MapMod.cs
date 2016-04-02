@@ -462,6 +462,14 @@ namespace NPCMapLocations
                     }
                     offsetY = height - 4;
                 }
+                else
+                {
+                    if (y + height > Game1.viewport.Height)
+                    {
+                        x += Game1.tileSize / 4;
+                        y = Game1.viewport.Height - height;
+                    }
+                }
 
                 drawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
@@ -507,7 +515,7 @@ namespace NPCMapLocations
                     if (y + height > Game1.viewport.Height)
                     {
                         x = Game1.getOldMouseX() + Game1.tileSize / 2;
-                        y += -relocate + 4 - Game1.tileSize;
+                        y += -relocate + 8 - Game1.tileSize;
                     }
                 }
                 else
