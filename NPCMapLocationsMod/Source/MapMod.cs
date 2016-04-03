@@ -81,7 +81,7 @@ namespace NPCMapLocations
 
                     // At the start of a new game, for some reason NPCs locations are null until 6:30 AM
                     if (npc.currentLocation == null)
-                    {
+                    {   
                         currentLocation = startingLocations[npc.name];
                     }
                     else
@@ -192,6 +192,7 @@ namespace NPCMapLocations
                             mapScaleX = 3.2;
                             mapScaleY = 1.8;
                             offsetX = 15;
+                            offsetY = -10;
                         }
                         else if (npc.getTileX() < 120 && npc.getTileY() < 101)
                         {
@@ -299,6 +300,184 @@ namespace NPCMapLocations
         {
             if (menu.currentTab == 3)
             {
+                /*
+                // Player testing
+                int offsetX = 0;
+                int offsetY = 0;
+                int x = 0;
+                int y = 0;
+                int width = 0;
+                int height = 0;
+                double[] npcLocation;
+                string currentLocation = Game1.player.currentLocation.name;
+
+                locationVectors.TryGetValue(currentLocation, out npcLocation);
+                double mapScaleX = npcLocation[2];
+                double mapScaleY = npcLocation[3];
+
+                // Partitioning large areas because map page sucks
+                // In addition to all the locations on the map, all of these values were meticulously calculated to make
+                // real-time tracking accurate with a badly scaling map page (only on NPC paths). DO NOT MESS WITH THESE UNLESS YOU CAN DO IT BETTER.
+
+                // Partitions for Town
+                if (currentLocation.Equals("Town"))
+                {
+                    if (Game1.player.getTileX() < 28 && Game1.player.getTileY() < 58 && Game1.player.getTileY() > 53)
+                    {
+                        offsetX = 5;
+                        offsetY = -30;
+                    }
+                    else if (Game1.player.getTileX() < 31 && Game1.player.getTileX() > 26 && Game1.player.getTileY() > 74 && Game1.player.getTileY() < 90)
+                    {
+                        offsetX = 10;
+                    }
+                    else if (Game1.player.getTileX() < 30 && Game1.player.getTileY() > 89 && Game1.player.getTileY() < 98)
+                    {
+                        offsetY = -5;
+                        offsetX = 5;
+                    }
+                    else if (Game1.player.getTileX() < 57 && Game1.player.getTileY() > 98 && Game1.player.getTileY() < 109)
+                    {
+                        offsetX = 30;
+                    }
+                    else if (Game1.player.getTileX() < 78 && Game1.player.getTileY() < 103 && Game1.player.getTileY() > 40)
+                    {
+                        mapScaleX = 3.01;
+                        mapScaleY = 2.94;
+                        offsetY = -10;
+                    }
+                    else if (Game1.player.getTileX() < 85 && Game1.player.getTileY() < 43)
+                    {
+                        mapScaleX = 2.48;
+                        mapScaleY = 2.52;
+                        offsetX = -15;
+                    }
+
+                    else if (Game1.player.getTileX() > 90 && Game1.player.getTileY() < 41)
+                    {
+                        offsetX = -20;
+                        offsetY = 25;
+                    }
+                    else if (Game1.player.getTileX() > 77 && Game1.player.getTileY() < 61)
+                    {
+                        mapScaleX = 3.21;
+                        mapScaleY = 2.64;
+                        offsetX = -3;
+                        offsetY = -3;
+                    }
+                    else if (Game1.player.getTileX() > 78 && Game1.player.getTileY() > 60)
+                    {
+                        mapScaleX = 3.21;
+                        mapScaleY = 3.34;
+                        offsetX = -22;
+                        offsetY = -35;
+                    }
+                }
+
+                // Partitions for Forest ------------------------------------------------------------------------------------
+                else if (currentLocation.Equals("Forest"))
+                {
+                    if (Game1.player.getTileX() < 20)
+                    {
+                        mapScaleX = 3.152;
+                        mapScaleY = 1.82;
+                        offsetX = 47;
+                        offsetY = -35;
+                    }
+                    else if (Game1.player.getTileX() < 66 && Game1.player.getTileY() < 51)
+                    {
+                        mapScaleX = 3.152;
+                        mapScaleY = 1.82;
+                        offsetX = 50;
+                        offsetY = -10;
+                    }
+                    else if (Game1.player.getTileX() > 60 && Game1.player.getTileX() < 90 && Game1.player.getTileY() < 23)
+                    {
+                        mapScaleX = 2.152;
+                        mapScaleY = 1.82;
+                        offsetX = 110;
+                    }
+                    else if (Game1.player.getTileX() < 74 && Game1.player.getTileY() < 49)
+                    {
+                        mapScaleX = 3.152;
+                        mapScaleY = 1.82;
+                        offsetX = 30;
+                    }
+                    else if (Game1.player.getTileX() < 120 && Game1.player.getTileY() < 52)
+                    {
+                        mapScaleX = 3.2;
+                        mapScaleY = 1.8;
+                        offsetX = 15;
+                        offsetY = -10;
+                    }
+                    else if (Game1.player.getTileX() < 120 && Game1.player.getTileY() < 101)
+                    {
+                        mapScaleX = 2.101;
+                        mapScaleY = 2.208;
+                    }
+                }
+
+                // Partitions for Beach ------------------------------------------------------------------------------------
+                else if (currentLocation.Equals("Beach"))
+                {
+                    if (Game1.player.getTileY() < 7)
+                    {
+                        offsetX = -50;
+                        offsetY = 10;
+                    }
+                    else if (Game1.player.getTileX() < 39 && Game1.player.getTileY() < 22)
+                    {
+                        mapScaleX = 1.21;
+                        mapScaleY = 2.33;
+                        offsetX = -20;
+                    }
+                    else if (Game1.player.getTileX() < 58 && Game1.player.getTileX() > 28 && Game1.player.getTileY() < 27)
+                    {
+                        mapScaleX = 1.11;
+                        mapScaleY = 2.33;
+                        offsetX = 15;
+                    }
+
+                    else if (Game1.player.getTileX() < 58 && Game1.player.getTileY() < 37)
+                    {
+                        mapScaleX = 2.745;
+                        mapScaleY = 2.833;
+                        offsetX = -20;
+                    }
+                }
+
+                // Partitions for Mountain ------------------------------------------------------------------------------------
+                else if (currentLocation.Equals("Mountain"))
+                {
+                    if (Game1.player.getTileX() < 41 && Game1.player.getTileY() < 16)
+                    {
+                        mapScaleX = 2.9;
+                        mapScaleY = 2.46;
+                        offsetX = -10;
+
+                    }
+                    else if (Game1.player.getTileX() < 41 && Game1.player.getTileY() < 41)
+                    {
+                        mapScaleX = 2.9;
+                        mapScaleY = 1.825;
+                    }
+                    else if (Game1.player.getTileX() < 61 && Game1.player.getTileY() < 41)
+                    {
+                        mapScaleX = 2.5;
+                        mapScaleY = 2.3;
+                    }
+                }
+
+                x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + Game1.player.getTileX() * mapScaleX + offsetX)));
+                y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + Game1.player.getTileY() * mapScaleY + offsetY)));
+                width = 32;
+                height = 30;
+                Game1.spriteBatch.Draw(Game1.getCharacterFromName("Kent").sprite.Texture, 
+                                       new Rectangle(x, y, width, height), 
+                                       new Rectangle?(new Rectangle(0, -1, 16, 15)), 
+                                       Color.White);
+                */
+
                 foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
                 {
                     Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[entry.Key], 16, 15)), Color.White);

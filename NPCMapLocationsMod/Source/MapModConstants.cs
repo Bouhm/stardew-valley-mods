@@ -126,20 +126,20 @@ public static class MapModConstants
                 { "Farm", new Double[]{288, 249, 2.655, 1.81} },
                 { "Mine", new Double[]{912, 92, 0, 0} },
                 { "SandyHouse", new Double[]{111, 23, 0, 0} },
-                { "FarmHouse", new Double[]{457, 263, 0, 0} },
+                { "FarmHouse", new Double[]{457, 259, 0, 0} },
                 { "Desert", new Double[]{111, 23, 0, 0} },
                 { "Sewer", new Double[]{680, 329, 0, 0} },
                 { "WizardHouse", new Double[]{173, 328, 0, 0}},
-                { "Barn", new Double[]{400, 300, 0, 0} },
-                { "Barn2", new Double[]{400, 300, 0, 0} },
-                { "Big Barn", new Double[]{400, 300, 0, 0} },
-                { "Barn3", new Double[]{400, 300, 0, 0} },
-                { "Coop", new Double[]{400, 300, 0, 0} },
-                { "Coop2", new Double[]{400, 300, 0, 0} },
-                { "Coop3", new Double[]{400, 300, 0, 0} },
+                { "Barn", new Double[]{400, 280, 0, 0} },
+                { "Barn2", new Double[]{400, 280, 0, 0} },
+                { "Big Barn", new Double[]{400, 280, 0, 0} },
+                { "Barn3", new Double[]{400, 280, 0, 0} },
+                { "Coop", new Double[]{400, 280, 0, 0} },
+                { "Coop2", new Double[]{400, 280, 0, 0} },
+                { "Coop3", new Double[]{400, 280, 0, 0} },
                 { "Greenhouse", new Double[]{390, 263, 0, 0} },
                 { "FarmCave", new Double[]{390, 223, 0, 0} },
-                { "SlimeHutch", new Double[]{400, 300, 0, 0} }
+                { "SlimeHutch", new Double[]{400, 280, 0, 0} }
             };
         }
     }
