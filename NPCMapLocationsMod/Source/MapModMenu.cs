@@ -54,9 +54,9 @@ namespace NPCMapLocations
             tooltipButton1 = new MapModButton("Above location tooltip", 1, -1, -1, -1, -1);
             tooltipButton2 = new MapModButton("Below location tooltip", 2, -1, -1, -1, -1);
             tooltipButton3 = new MapModButton("Bottom-left corner", 3, -1, -1, -1, -1);
-            immersionButton1 = new MapModButton("Always show all villagers", 4, -1, -1, -1, -1);
+            immersionButton1 = new MapModButton("Always show villagers", 4, -1, -1, -1, -1);
             immersionButton2 = new MapModButton("Reset map in the beginning", 5, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("Reset map each day", 6, -1, -1, -1, -1);
+            immersionButton3 = new MapModButton("Reset map everyday", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
             this.options.Add(new OptionsElement("Villagers Tooltip Placement:"));
@@ -309,12 +309,13 @@ namespace NPCMapLocations
 
         public override void draw(SpriteBatch b)
         {
+            if (Game1.options.showMenuBackground)
+            {
+                drawBackground(b);
+            }
             Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, (this.map.Bounds.Height + 32) * Game1.pixelZoom, false, true, null, false);
             b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(this.map.Bounds), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
-            if (!Game1.options.showMenuBackground)
-            {
-                b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
-            }
+            b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
             this.okButton.draw(b);
             if (!GameMenu.forcePreventClose)
