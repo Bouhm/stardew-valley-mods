@@ -22,6 +22,7 @@ namespace NPCMapLocations
         private static Dictionary<string, int> spriteCrop;
         private static Dictionary<string, string> startingLocations;
         private static Dictionary<string, Double[]> locationVectors;
+        private static Dictionary<string, string> indoorLocations;
         private List<ClickableComponent> points = new List<ClickableComponent>();
         private static MapPageTooltips toolTips;
         private static string npcNames;
@@ -30,7 +31,7 @@ namespace NPCMapLocations
         {
             config = ConfigExtensions.InitializeConfig<Configuration>(new Configuration(), base.BaseConfigPath);
             GameEvents.UpdateTick += GameEvents_UpdateTick;
-            GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+            GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderEvent;
             KeyboardInput.KeyDown += KeyboardInput_KeyDown;
         }
 
@@ -46,14 +47,9 @@ namespace NPCMapLocations
         private void changeKey(string key, GameMenu menu)
         {
             if (menu.currentTab != 3) { return; }
-            if (key.Equals(config.modeChangeKey))
+            if (key.Equals(config.menuKey))
             {
-                config.nameTooltipMode++;
-                if (config.nameTooltipMode > 3)
-                {
-                    config.nameTooltipMode = 1;
-                }
-                ConfigExtensions.WriteConfig<Configuration>(config);
+                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2);
             }
         }
 
@@ -63,6 +59,7 @@ namespace NPCMapLocations
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
             locationVectors = MapModConstants.locationVectors;
+            indoorLocations = MapModConstants.indoorLocations;
             List<string> npcNamesHovered = new List<String>();
             npcNames = "";
 
@@ -70,205 +67,229 @@ namespace NPCMapLocations
             {
                 if (npc.Schedule != null || npc.isMarried())
                 {
-                    int offsetX = 0;
-                    int offsetY = 0;
-                    int x = 0;
-                    int y = 0;
-                    int width = 0;
-                    int height = 0;
-                    double[] npcLocation;
-                    string currentLocation;
+                    bool sameLocation = false;
+                    if (config.onlySameLocation)
+                    {
+                        string indoorLocationNPC;
+                        string indoorLocationPlayer;
+                        indoorLocations.TryGetValue(npc.currentLocation.name, out indoorLocationNPC);
+                        indoorLocations.TryGetValue(Game1.player.currentLocation.name, out indoorLocationPlayer);
+                        if (indoorLocationPlayer == null || indoorLocationNPC == null)
+                        {
+                            sameLocation = false;
+                        }
+                        else 
+                        {
+                            sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
+                        }
+                    }
+                    if ((sameLocation || !config.onlySameLocation) && ((config.immersionLevel == 2) ? Game1.player.friendships.ContainsKey(npc.name) : true) &&
+                       ((config.immersionLevel == 3) ? Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
+                       (showNPC(npc.name)))
+                    {
+                        int offsetX = 0;
+                        int offsetY = 0;
+                        int x = 0;
+                        int y = 0;
+                        int width = 0;
+                        int height = 0;
+                        double[] npcLocation;
+                        string currentLocation;
+                        // At the start of a new game, for some reason NPCs locations are null until 6:30 AM
+                        if (npc.currentLocation == null)
+                        {
+                            currentLocation = startingLocations[npc.name];
+                        }
+                        else
+                        {
+                            currentLocation = npc.currentLocation.name;
+                        }
 
-                    // At the start of a new game, for some reason NPCs locations are null until 6:30 AM
-                    if (npc.currentLocation == null)
-                    {   
-                        currentLocation = startingLocations[npc.name];
+                        locationVectors.TryGetValue(currentLocation, out npcLocation);
+                        // So game doesn't crash if I missed a location
+                        if (npcLocation == null)
+                        {
+                            double[] unknown = { -5000, -5000, 0, 0 };
+                            npcLocation = unknown;
+                        }
+                        double mapScaleX = npcLocation[2];
+                        double mapScaleY = npcLocation[3];
+
+                        // Partitioning large areas because map page sucks
+                        // In addition to all the locations on the map, all of these values were meticulously calculated to make
+                        // real-time tracking accurate with a badly scaling map page (only on NPC paths). DO NOT MESS WITH THESE UNLESS YOU CAN DO IT BETTER.
+
+                        // Partitions for Town
+                        if (currentLocation.Equals("Town"))
+                        {
+                            if (npc.getTileX() < 28 && npc.getTileY() < 58 && npc.getTileY() > 53)
+                            {
+                                offsetX = 5;
+                                offsetY = -30;
+                            }
+                            else if (npc.getTileX() < 31 && npc.getTileX() > 26 && npc.getTileY() > 74 && npc.getTileY() < 90)
+                            {
+                                offsetX = 10;
+                            }
+                            else if (npc.getTileX() < 30 && npc.getTileY() > 89 && npc.getTileY() < 98)
+                            {
+                                offsetY = -5;
+                                offsetX = 5;
+                            }
+                            else if (npc.getTileX() < 57 && npc.getTileY() > 98 && npc.getTileY() < 109)
+                            {
+                                offsetX = 30;
+                            }
+                            else if (npc.getTileX() < 78 && npc.getTileY() < 103 && npc.getTileY() > 40)
+                            {
+                                mapScaleX = 3.01;
+                                mapScaleY = 2.94;
+                                offsetY = -10;
+                            }
+                            else if (npc.getTileX() < 85 && npc.getTileY() < 43)
+                            {
+                                mapScaleX = 2.48;
+                                mapScaleY = 2.52;
+                                offsetX = -15;
+                            }
+
+                            else if (npc.getTileX() > 90 && npc.getTileY() < 41)
+                            {
+                                offsetX = -20;
+                                offsetY = 25;
+                            }
+                            else if (npc.getTileX() > 77 && npc.getTileY() < 61)
+                            {
+                                mapScaleX = 3.21;
+                                mapScaleY = 2.64;
+                                offsetX = -3;
+                                offsetY = -3;
+                            }
+                            else if (npc.getTileX() > 78 && npc.getTileY() > 60)
+                            {
+                                mapScaleX = 3.21;
+                                mapScaleY = 3.34;
+                                offsetX = -22;
+                                offsetY = -35;
+                            }
+                        }
+
+                        // Partitions for Forest ------------------------------------------------------------------------------------
+                        else if (currentLocation.Equals("Forest"))
+                        {
+                            if (Game1.player.getTileX() < 20)
+                            {
+                                mapScaleX = 3.152;
+                                mapScaleY = 1.82;
+                                offsetX = 47;
+                                offsetY = -35;
+                            }
+                            else if (npc.getTileX() < 66 && npc.getTileY() < 51)
+                            {
+                                mapScaleX = 3.152;
+                                mapScaleY = 1.82;
+                                offsetX = 50;
+                                offsetY = -10;
+                            }
+                            else if (npc.getTileX() > 60 && npc.getTileX() < 90 && npc.getTileY() < 23)
+                            {
+                                mapScaleX = 2.152;
+                                mapScaleY = 1.82;
+                                offsetX = 110;
+                            }
+                            else if (npc.getTileX() < 74 && npc.getTileY() < 49)
+                            {
+                                mapScaleX = 3.152;
+                                mapScaleY = 1.82;
+                                offsetX = 30;
+                            }
+                            else if (npc.getTileX() < 120 && npc.getTileY() < 52)
+                            {
+                                mapScaleX = 3.2;
+                                mapScaleY = 1.8;
+                                offsetX = 15;
+                                offsetY = -10;
+                            }
+                            else if (npc.getTileX() < 120 && npc.getTileY() < 101)
+                            {
+                                mapScaleX = 2.101;
+                                mapScaleY = 2.208;
+                            }
+                        }
+
+                        // Partitions for Beach ------------------------------------------------------------------------------------
+                        else if (currentLocation.Equals("Beach"))
+                        {
+                            if (npc.getTileY() < 7)
+                            {
+                                offsetX = -50;
+                                offsetY = 10;
+                            }
+                            else if (npc.getTileX() < 39 && npc.getTileY() < 22)
+                            {
+                                mapScaleX = 1.21;
+                                mapScaleY = 2.33;
+                                offsetX = -20;
+                            }
+                            else if (npc.getTileX() < 58 && npc.getTileX() > 28 && npc.getTileY() < 27)
+                            {
+                                mapScaleX = 1.11;
+                                mapScaleY = 2.33;
+                                offsetX = 15;
+                            }
+
+                            else if (npc.getTileX() < 58 && npc.getTileY() < 37)
+                            {
+                                mapScaleX = 2.745;
+                                mapScaleY = 2.833;
+                                offsetX = -20;
+                            }
+                        }
+
+                        // Partitions for Mountain ------------------------------------------------------------------------------------
+                        else if (currentLocation.Equals("Mountain"))
+                        {
+                            if (npc.getTileX() < 41 && npc.getTileY() < 16)
+                            {
+                                mapScaleX = 2.9;
+                                mapScaleY = 2.46;
+                                offsetX = -10;
+
+                            }
+                            else if (npc.getTileX() < 41 && npc.getTileY() < 41)
+                            {
+                                mapScaleX = 2.9;
+                                mapScaleY = 1.825;
+                            }
+                            else if (npc.getTileX() < 61 && npc.getTileY() < 41)
+                            {
+                                mapScaleX = 2.5;
+                                mapScaleY = 2.3;
+                            }
+                        }
+
+                        x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + npc.getTileX() * mapScaleX + offsetX)));
+                        y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + npc.getTileY() * mapScaleY + offsetY)));
+                        width = 32;
+                        height = 30;
+
+                        if (npcMarkers.ContainsKey(npc.name))
+                        {
+                            npcMarkers[npc.name].position = new Rectangle(x, y, width, height);
+                        }
+                        else
+                        {
+                            npcMarkers.Add(npc.name, new NPCMarker(npc.sprite.Texture, new Rectangle(x, y, width, height)));
+                        }
+
+                        if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
+                        {
+                            npcNamesHovered.Add(npc.name);
+                        }
                     }
                     else
                     {
-                        currentLocation = npc.currentLocation.name;
-                    }
-
-                    locationVectors.TryGetValue(currentLocation, out npcLocation);
-                    // So game doesn't crash if I missed a location
-                    if (npcLocation == null)
-                    {
-                        double[] unknown = { -5000, -5000, 0, 0 };
-                        npcLocation = unknown;
-                    }
-                    double mapScaleX = npcLocation[2];
-                    double mapScaleY = npcLocation[3];
-
-                    // Partitioning large areas because map page sucks
-                    // In addition to all the locations on the map, all of these values were meticulously calculated to make
-                    // real-time tracking accurate with a badly scaling map page (only on NPC paths). DO NOT MESS WITH THESE UNLESS YOU CAN DO IT BETTER.
-
-                    // Partitions for Town
-                    if (currentLocation.Equals("Town"))
-                    {
-                        if (npc.getTileX() < 28 && npc.getTileY() < 58 && npc.getTileY() > 53)
-                        {
-                            offsetX = 5;
-                            offsetY = -30;
-                        }
-                        else if (npc.getTileX() < 31 && npc.getTileX() > 26 && npc.getTileY() > 74 && npc.getTileY() < 90)
-                        {
-                            offsetX = 10;
-                        }
-                        else if (npc.getTileX() < 30 && npc.getTileY() > 89 && npc.getTileY() < 98)
-                        {
-                            offsetY = -5;
-                            offsetX = 5;
-                        }
-                        else if (npc.getTileX() < 57 && npc.getTileY() > 98 && npc.getTileY() < 109)
-                        {
-                            offsetX = 30;
-                        }
-                        else if (npc.getTileX() < 78 && npc.getTileY() < 103 && npc.getTileY() > 40)
-                        {
-                            mapScaleX = 3.01;
-                            mapScaleY = 2.94;
-                            offsetY = -10;
-                        }
-                        else if (npc.getTileX() < 85 && npc.getTileY() < 43)
-                        {
-                            mapScaleX = 2.48;
-                            mapScaleY = 2.52;
-                            offsetX = -15;
-                        }
-
-                        else if (npc.getTileX() > 90 && npc.getTileY() < 41)
-                        {
-                            offsetX = -20;
-                            offsetY = 25;
-                        }
-                        else if (npc.getTileX() > 77 && npc.getTileY() < 61)
-                        {
-                            mapScaleX = 3.21;
-                            mapScaleY = 2.64;
-                            offsetX = -3;
-                            offsetY = -3;
-                        }
-                        else if (npc.getTileX() > 78 && npc.getTileY() > 60)
-                        {
-                            mapScaleX = 3.21;
-                            mapScaleY = 3.34;
-                            offsetX = -22;
-                            offsetY = -35;
-                        }
-                    }
-
-                    // Partitions for Forest ------------------------------------------------------------------------------------
-                    else if (currentLocation.Equals("Forest"))
-                    {
-                        if (Game1.player.getTileX() < 20)
-                        {
-                            mapScaleX = 3.152;
-                            mapScaleY = 1.82;
-                            offsetX = 47;
-                            offsetY = -35;
-                        }
-                        else if (npc.getTileX() < 66 && npc.getTileY() < 51)
-                        {
-                            mapScaleX = 3.152;
-                            mapScaleY = 1.82;
-                            offsetX = 50;
-                            offsetY = -10;
-                        }
-                        else if (npc.getTileX() > 60 && npc.getTileX() < 90 && npc.getTileY() < 23)
-                        {
-                            mapScaleX = 2.152;
-                            mapScaleY = 1.82;
-                            offsetX = 110;
-                        }
-                        else if (npc.getTileX() < 74 && npc.getTileY() < 49)
-                        {
-                            mapScaleX = 3.152;
-                            mapScaleY = 1.82;
-                            offsetX = 30;
-                        }
-                        else if (npc.getTileX() < 120 && npc.getTileY() < 52)
-                        {
-                            mapScaleX = 3.2;
-                            mapScaleY = 1.8;
-                            offsetX = 15;
-                            offsetY = -10;
-                        }
-                        else if (npc.getTileX() < 120 && npc.getTileY() < 101)
-                        {
-                            mapScaleX = 2.101;
-                            mapScaleY = 2.208;
-                        }
-                    }
-
-                    // Partitions for Beach ------------------------------------------------------------------------------------
-                    else if (currentLocation.Equals("Beach"))
-                    {
-                        if (npc.getTileY() < 7)
-                        {
-                            offsetX = -50;
-                            offsetY = 10;
-                        }
-                        else if (npc.getTileX() < 39 && npc.getTileY() < 22)
-                        {
-                            mapScaleX = 1.21;
-                            mapScaleY = 2.33;
-                            offsetX = -20;
-                        }
-                        else if (npc.getTileX() < 58 && npc.getTileX() > 28 && npc.getTileY() < 27)
-                        {
-                            mapScaleX = 1.11;
-                            mapScaleY = 2.33;
-                            offsetX = 15;
-                        }
-
-                        else if (npc.getTileX() < 58 && npc.getTileY() < 37)
-                        {
-                            mapScaleX = 2.745;
-                            mapScaleY = 2.833;
-                            offsetX = -20;
-                        }
-                    }
-
-                    // Partitions for Mountain ------------------------------------------------------------------------------------
-                    else if (currentLocation.Equals("Mountain"))
-                    {
-                        if (npc.getTileX() < 41 && npc.getTileY() < 16)
-                        {
-                            mapScaleX = 2.9;
-                            mapScaleY = 2.46;
-                            offsetX = -10;
-
-                        }
-                        else if (npc.getTileX() < 41 && npc.getTileY() < 41)
-                        {
-                            mapScaleX = 2.9;
-                            mapScaleY = 1.825;
-                        }
-                        else if (npc.getTileX() < 61 && npc.getTileY() < 41)
-                        {
-                            mapScaleX = 2.5;
-                            mapScaleY = 2.3;
-                        }
-                    }
-
-                    x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + npc.getTileX() * mapScaleX + offsetX)));
-                    y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + npc.getTileY() * mapScaleY + offsetY)));
-                    width = 32;
-                    height = 30;
-
-                    if (npcMarkers.ContainsKey(npc.name))
-                    {
-                        npcMarkers[npc.name].position = new Rectangle(x, y, width, height);
-                    }
-                    else
-                    {
-                        npcMarkers.Add(npc.name, new NPCMarker(npc.sprite.Texture, new Rectangle(x, y, width, height)));
-                    }
-
-                    if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
-                    {
-                        npcNamesHovered.Add(npc.name);
+                        npcMarkers.Remove(npc.name);
                     }
                 }
             }
@@ -482,10 +503,43 @@ namespace NPCMapLocations
                 {
                     Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[entry.Key], 16, 15)), Color.White);
                 }
-
-                toolTips.draw(Game1.spriteBatch);
+                toolTips.draw(Game1.spriteBatch);   
                 Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
             }
+        }
+
+        private static bool showNPC(string npc) 
+        {
+            if (npc.Equals("Abigail")) { return config.showAbigail; }
+            if (npc.Equals("Alex")) { return config.showAlex; }
+            if (npc.Equals("Caroline")) { return config.showCaroline; }
+            if (npc.Equals("Clint")) { return config.showClint; }
+            if (npc.Equals("Demetrius")) { return config.showDemetrius; }
+            if (npc.Equals("Elliott")) { return config.showElliott; }
+            if (npc.Equals("Emily")) { return config.showEmily; }
+            if (npc.Equals("Evelyn")) { return config.showEvelyn; }
+            if (npc.Equals("George")) { return config.showGeorge; }
+            if (npc.Equals("Gus")) { return config.showGus; }
+            if (npc.Equals("Haley")) { return config.showHaley; }
+            if (npc.Equals("Harvey")) { return config.showHarvey; }
+            if (npc.Equals("Jas")) { return config.showJas; }
+            if (npc.Equals("Jodi")) { return config.showJodi; }
+            if (npc.Equals("Kent")) { return config.showKent; }
+            if (npc.Equals("Leah")) { return config.showLeah; }
+            if (npc.Equals("Lewis")) { return config.showLewis; }
+            if (npc.Equals("Linus")) { return config.showLinus; }
+            if (npc.Equals("Marnie")) { return config.showMarnie; }
+            if (npc.Equals("Maru")) { return config.showMaru; }
+            if (npc.Equals("Pam")) { return config.showPam; }
+            if (npc.Equals("Penny")) { return config.showPenny; }
+            if (npc.Equals("Pierre")) { return config.showPierre; }
+            if (npc.Equals("Robin")) { return config.showRobin; }
+            if (npc.Equals("Sam")) { return config.showSam; }
+            if (npc.Equals("Sebastian")) { return config.showSebastian; }
+            if (npc.Equals("Shane")) { return config.showShane; }
+            if (npc.Equals("Vincent")) { return config.showVincent; }
+            if (npc.Equals("Willy")) { return config.showWilly; }
+            return true;
         }
     }
 
@@ -495,7 +549,7 @@ namespace NPCMapLocations
         public Texture2D marker;
         public Rectangle position;
 
-        public NPCMarker(Texture2D marker, Rectangle position)
+        public NPCMarker(Texture2D marker, Rectangle position)     
         {
             this.marker = marker;
             this.position = position;

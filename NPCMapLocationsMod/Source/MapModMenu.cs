@@ -1,0 +1,731 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+
+namespace NPCMapLocations
+{
+    public class MapModMenu : IClickableMenu
+    {
+        private Texture2D map;
+        private int mapX;
+        private int mapY;
+        public const int itemsPerPage = 7;
+        public const int indexOfGraphicsPage = 6;
+        private List<ClickableComponent> optionSlots = new List<ClickableComponent>();
+        public int currentItemIndex;
+        private ClickableTextureComponent upArrow;
+        private ClickableTextureComponent downArrow;
+        private ClickableTextureComponent scrollBar;
+        private MapModButton tooltipButton1;
+        private MapModButton tooltipButton2;
+        private MapModButton tooltipButton3;
+        private MapModButton immersionButton1;
+        private MapModButton immersionButton2;
+        private MapModButton immersionButton3;
+        private bool scrolling;
+        private bool canClose;
+        private List<OptionsElement> options = new List<OptionsElement>();
+        private Rectangle scrollBarRunner;
+        private int optionsSlotHeld = -1;
+        private ClickableTextureComponent okButton;
+
+        public MapModMenu(int x, int y, int width, int height) : base(x, y, width, height, false)
+        {
+            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+            Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, this.map.Bounds.Height * Game1.pixelZoom, 0, 0);
+            this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
+            this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
+            this.okButton = new ClickableTextureComponent(new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), "OK", null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false, false);
+            this.upArrow = new ClickableTextureComponent(new Rectangle(this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom), "", "", Game1.mouseCursors, new Rectangle(421, 459, 11, 12), (float)Game1.pixelZoom);
+            this.downArrow = new ClickableTextureComponent(new Rectangle(this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom), "", "", Game1.mouseCursors, new Rectangle(421, 472, 11, 12), (float)Game1.pixelZoom);
+            this.scrollBar = new ClickableTextureComponent(new Rectangle(this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom), "", "", Game1.mouseCursors, new Rectangle(435, 463, 6, 10), (float)Game1.pixelZoom);
+            this.scrollBarRunner = new Rectangle(this.scrollBar.bounds.X, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, this.scrollBar.bounds.Width, height - Game1.tileSize * 2 - this.upArrow.bounds.Height - Game1.pixelZoom * 2);
+            for (int i = 0; i < 7; i++)
+            {
+                this.optionSlots.Add(new ClickableComponent(new Rectangle(this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7), width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
+            }
+            tooltipButton1 = new MapModButton("Above location tooltip", 1, -1, -1, -1, -1);
+            tooltipButton2 = new MapModButton("Below location tooltip", 2, -1, -1, -1, -1);
+            tooltipButton3 = new MapModButton("Bottom-left corner", 3, -1, -1, -1, -1);
+            immersionButton1 = new MapModButton("Always show all villagers", 4, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("Reset map in the beginning", 5, -1, -1, -1, -1);
+            immersionButton3 = new MapModButton("Reset map each day", 6, -1, -1, -1, -1);
+            //this.options.Add(new OptionsElement("Menu Key:"));
+            //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
+            this.options.Add(new OptionsElement("Villagers Tooltip Placement:"));
+            this.options.Add(tooltipButton1);
+            this.options.Add(tooltipButton2);
+            this.options.Add(tooltipButton3);
+            this.options.Add(new OptionsElement("Immersion Settings:"));
+            this.options.Add(immersionButton1);
+            this.options.Add(immersionButton2);
+            this.options.Add(immersionButton3);
+            this.options.Add(new MapModCheckbox("Only show villagers in player's location", 36, -1, -1));
+            this.options.Add(new OptionsElement("Include/Exclude Villagers:"));
+            this.options.Add(new MapModCheckbox("Abigail", 7, -1, -1));
+            this.options.Add(new MapModCheckbox("Alex", 8, -1, -1));
+            this.options.Add(new MapModCheckbox("Caroline", 9, -1, -1));
+            this.options.Add(new MapModCheckbox("Clint", 10, -1, -1));
+            this.options.Add(new MapModCheckbox("Demetrius", 11, -1, -1));
+            this.options.Add(new MapModCheckbox("Elliott", 12, -1, -1));
+            this.options.Add(new MapModCheckbox("Emily", 13, -1, -1));
+            this.options.Add(new MapModCheckbox("Evelyn", 14, -1, -1));
+            this.options.Add(new MapModCheckbox("George", 15, -1, -1));
+            this.options.Add(new MapModCheckbox("Gus", 16, -1, -1));
+            this.options.Add(new MapModCheckbox("Haley", 17, -1, -1));
+            this.options.Add(new MapModCheckbox("Harvey", 18, -1, -1));
+            this.options.Add(new MapModCheckbox("Jas", 19, -1, -1));
+            this.options.Add(new MapModCheckbox("Jodi", 20, -1, -1));
+            this.options.Add(new MapModCheckbox("Kent", 21, -1, -1));
+            this.options.Add(new MapModCheckbox("Leah", 22, -1, -1));
+            this.options.Add(new MapModCheckbox("Lewis", 23, -1, -1));
+            this.options.Add(new MapModCheckbox("Linus", 24, -1, -1));
+            this.options.Add(new MapModCheckbox("Marnie", 25, -1, -1));
+            this.options.Add(new MapModCheckbox("Maru", 26, -1, -1));
+            this.options.Add(new MapModCheckbox("Pam", 27, -1, -1));
+            this.options.Add(new MapModCheckbox("Penny", 28, -1, -1));
+            this.options.Add(new MapModCheckbox("Pierre", 29, -1, -1));
+            this.options.Add(new MapModCheckbox("Robin", 30, -1, -1));
+            this.options.Add(new MapModCheckbox("Sam", 31, -1, -1));
+            this.options.Add(new MapModCheckbox("Sebastian", 32, -1, -1));
+            this.options.Add(new MapModCheckbox("Shane", 33, -1, -1));
+            this.options.Add(new MapModCheckbox("Vincent", 34, -1, -1));
+            this.options.Add(new MapModCheckbox("Willy", 35, -1, -1));
+
+        }
+
+        private void setScrollBarToCurrentIndex()
+        {
+            if (this.options.Count<OptionsElement>() > 0)
+            {
+                this.scrollBar.bounds.Y = this.scrollBarRunner.Height / Math.Max(1, this.options.Count - 7 + 1) * this.currentItemIndex + this.upArrow.bounds.Bottom + Game1.pixelZoom;
+                if (this.currentItemIndex == this.options.Count<OptionsElement>() - 7)
+                {
+                    this.scrollBar.bounds.Y = this.downArrow.bounds.Y - this.scrollBar.bounds.Height - Game1.pixelZoom;
+                }
+            }
+        }
+
+        public override void leftClickHeld(int x, int y)
+        {
+            if (GameMenu.forcePreventClose)
+            {
+                return;
+            }
+            base.leftClickHeld(x, y);
+            if (this.scrolling)
+            {
+                int y2 = this.scrollBar.bounds.Y;
+                this.scrollBar.bounds.Y = Math.Min(this.yPositionOnScreen + this.height - Game1.tileSize - Game1.pixelZoom * 3 - this.scrollBar.bounds.Height, Math.Max(y, this.yPositionOnScreen + this.upArrow.bounds.Height + Game1.pixelZoom * 5));
+                float num = (float)(y - this.scrollBarRunner.Y) / (float)this.scrollBarRunner.Height;
+                this.currentItemIndex = Math.Min(this.options.Count - 7, Math.Max(0, (int)((float)this.options.Count * num)));
+                this.setScrollBarToCurrentIndex();
+                if (y2 != this.scrollBar.bounds.Y)
+                {
+                    Game1.playSound("shiny4");
+                    return;
+                }
+            }
+            else if (this.optionsSlotHeld != -1 && this.optionsSlotHeld + this.currentItemIndex < this.options.Count)
+            {
+                this.options[this.currentItemIndex + this.optionsSlotHeld].leftClickHeld(x - this.optionSlots[this.optionsSlotHeld].bounds.X, y - this.optionSlots[this.optionsSlotHeld].bounds.Y);
+            }
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            if ((Game1.options.menuButton.Contains(new InputButton(key)) || key.ToString().Equals(MapModMain.config.menuKey)) && this.readyToClose() && this.canClose)
+            {
+                Game1.exitActiveMenu();
+                Game1.soundBank.PlayCue("bigDeSelect");
+                return;
+            }
+            this.canClose = true;
+            if (this.optionsSlotHeld == -1 || this.optionsSlotHeld + this.currentItemIndex >= this.options.Count)
+            {
+                return;
+            }
+            this.options[this.currentItemIndex + this.optionsSlotHeld].receiveKeyPress(key);
+        }
+
+        public override void receiveScrollWheelAction(int direction)
+        {
+            if (GameMenu.forcePreventClose)
+            {
+                return;
+            }
+            base.receiveScrollWheelAction(direction);
+            if (direction > 0 && this.currentItemIndex > 0)
+            {
+                this.upArrowPressed();
+                Game1.playSound("shiny4");
+                return;
+            }
+            if (direction < 0 && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
+            {
+                this.downArrowPressed();
+                Game1.playSound("shiny4");
+            }
+        }
+
+        public override void releaseLeftClick(int x, int y)
+        {
+            if (GameMenu.forcePreventClose)
+            {
+                return;
+            }
+            base.releaseLeftClick(x, y);
+            if (this.optionsSlotHeld != -1 && this.optionsSlotHeld + this.currentItemIndex < this.options.Count)
+            {
+                this.options[this.currentItemIndex + this.optionsSlotHeld].leftClickReleased(x - this.optionSlots[this.optionsSlotHeld].bounds.X, y - this.optionSlots[this.optionsSlotHeld].bounds.Y);
+            }
+            this.optionsSlotHeld = -1;
+            this.scrolling = false;
+        }       
+
+        private void downArrowPressed()
+        {   
+            this.downArrow.scale = this.downArrow.baseScale;
+            this.currentItemIndex++;
+            this.setScrollBarToCurrentIndex();
+        }
+
+        private void upArrowPressed()
+        {
+            this.upArrow.scale = this.upArrow.baseScale;
+            this.currentItemIndex--;
+            this.setScrollBarToCurrentIndex();
+        }
+
+        public override void receiveLeftClick(int x, int y, bool playSound = true)
+        {
+            if (GameMenu.forcePreventClose)
+            {
+                return;
+            }
+            if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
+            {
+                this.downArrowPressed();
+                Game1.playSound("shwip");
+            }
+            else if (this.upArrow.containsPoint(x, y) && this.currentItemIndex > 0)
+            {
+                this.upArrowPressed();
+                Game1.playSound("shwip");
+            }
+            else if (this.scrollBar.containsPoint(x, y))
+            {
+                this.scrolling = true;
+            }
+            else if (!this.downArrow.containsPoint(x, y) && x > this.xPositionOnScreen + this.width && x < this.xPositionOnScreen + this.width + Game1.tileSize * 2 && y > this.yPositionOnScreen && y < this.yPositionOnScreen + this.height)
+            {
+                this.scrolling = true;
+                this.leftClickHeld(x, y);
+            }
+         
+            if (tooltipButton1.rect.Contains(x, y))
+            {
+                tooltipButton1.receiveLeftClick(x, y);
+                tooltipButton2.greyOut();
+                tooltipButton3.greyOut();
+            } 
+            else if (tooltipButton2.rect.Contains(x, y))
+            {
+                tooltipButton2.receiveLeftClick(x, y);
+                tooltipButton1.greyOut();
+                tooltipButton3.greyOut();
+            }
+            else if (tooltipButton3.rect.Contains(x, y))
+            {
+                tooltipButton3.receiveLeftClick(x, y);
+                tooltipButton1.greyOut();
+                tooltipButton2.greyOut();
+            }
+            else if (immersionButton1.rect.Contains(x, y))
+            {
+                immersionButton1.receiveLeftClick(x, y);
+                immersionButton2.greyOut();
+                immersionButton3.greyOut();
+            }
+            else if (immersionButton2.rect.Contains(x, y))
+            {
+                immersionButton2.receiveLeftClick(x, y);
+                immersionButton1.greyOut();
+                immersionButton3.greyOut();
+            }
+            else if (immersionButton3.rect.Contains(x, y))
+            {
+                immersionButton3.receiveLeftClick(x, y);
+                immersionButton1.greyOut();
+                immersionButton2.greyOut();
+            }
+            if (this.okButton.containsPoint(x, y))
+            {
+                this.okButton.scale -= 0.25f;
+                this.okButton.scale = Math.Max(0.75f, this.okButton.scale);
+                (Game1.activeClickableMenu as MapModMenu).exitThisMenu(true);
+            }
+
+            this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
+            for (int i = 0; i < this.optionSlots.Count<ClickableComponent>(); i++)
+            {
+                if (this.optionSlots[i].bounds.Contains(x, y) && this.currentItemIndex + i < this.options.Count<OptionsElement>() && this.options[this.currentItemIndex + i].bounds.Contains(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y))
+                {
+                    this.options[this.currentItemIndex + i].receiveLeftClick(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y);
+                    this.optionsSlotHeld = i;
+                    break;
+                }
+            }
+        }
+
+        public override void receiveRightClick(int x, int y, bool playSound = true)
+        {
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            if (GameMenu.forcePreventClose)
+            {
+                return;
+            }
+            if (this.okButton.containsPoint(x, y))
+            {
+                this.okButton.scale = Math.Min(this.okButton.scale + 0.02f, this.okButton.baseScale + 0.1f);
+                return;
+            }
+            this.okButton.scale = Math.Max(this.okButton.scale - 0.02f, this.okButton.baseScale);
+            this.upArrow.tryHover(x, y, 0.1f);
+            this.downArrow.tryHover(x, y, 0.1f);
+            this.scrollBar.tryHover(x, y, 0.1f);
+            bool arg_5A_0 = this.scrolling;
+        }
+
+        public override void draw(SpriteBatch b)
+        {
+            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, (this.map.Bounds.Height + 32) * Game1.pixelZoom, false, true, null, false);
+            b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(this.map.Bounds), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            if (!Game1.options.showMenuBackground)
+            {
+                b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
+            }
+            Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
+            this.okButton.draw(b);
+            if (!GameMenu.forcePreventClose)
+            {
+                this.upArrow.draw(b);
+                this.downArrow.draw(b);
+
+                if (this.options.Count<OptionsElement>() > 7)
+                {
+                    IClickableMenu.drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), this.scrollBarRunner.X, this.scrollBarRunner.Y, this.scrollBarRunner.Width, this.scrollBarRunner.Height, Color.White, (float)Game1.pixelZoom, false);
+                    this.scrollBar.draw(b);
+                }
+                for (int i = 0; i < this.optionSlots.Count<ClickableComponent>(); i++)
+                {
+                    int x = this.optionSlots[i].bounds.X;
+                    int y = this.optionSlots[i].bounds.Y + Game1.tileSize / 4;
+                    if (this.currentItemIndex >= 0 && this.currentItemIndex + i < this.options.Count<OptionsElement>())
+                    {
+                        if (options[this.currentItemIndex + i] is MapModButton)
+                        {
+                            Rectangle bounds = new Rectangle(x + 28, y, 500, Game1.tileSize + 8);
+                            if (options[this.currentItemIndex + i].whichOption == 1)
+                            {
+                                tooltipButton1.rect = bounds;
+                            }
+                            else if (options[this.currentItemIndex + i].whichOption == 2)
+                            {
+                                tooltipButton2.rect = bounds;
+                            }
+                            else if (options[this.currentItemIndex + i].whichOption == 3)
+                            {
+                                tooltipButton3.rect = bounds;
+                            }
+                            else if (options[this.currentItemIndex + i].whichOption == 4)
+                            {
+                                immersionButton1.rect = bounds;
+                            }
+                            else if (options[this.currentItemIndex + i].whichOption == 5)
+                            {
+                                immersionButton2.rect = bounds;
+                            }
+                            else if (options[this.currentItemIndex + i].whichOption == 6)
+                            {
+                                immersionButton3.rect = bounds;
+                            }
+
+                            IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y, bounds.Width, bounds.Height, Color.White * (options[this.currentItemIndex + i].greyedOut ? 0.33f : 1f), 1f, false);
+                        }
+                        this.options[this.currentItemIndex + i].draw(b, x, y);
+
+                    }
+                }
+            }
+            b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, Game1.options.gamepadControls ? 44 : 0, 16, 16)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
+        }
+    }
+
+    public class MapModButton : OptionsElement
+    {
+        public const int pixelsWide = 9;
+        public bool isActive;
+        public Rectangle rect;
+
+        public MapModButton(string label, int whichOption, int x, int y, int width, int height) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        {
+            this.rect = new Rectangle(x, y, width, height);
+            if (MapModMain.config.nameTooltipMode == whichOption)
+            {
+                this.greyedOut = false;
+            }
+            else if (MapModMain.config.immersionLevel == whichOption - 3)
+            {
+                this.greyedOut = false;
+            }
+            else
+            {
+                greyedOut = true;
+            }
+        }
+
+        public override void receiveLeftClick(int x, int y)
+        {            
+            if (!isActive)
+            {
+                if (whichOption < 4)
+                {
+                    Game1.playSound("drumkit6");
+                    base.receiveLeftClick(x, y);
+                    this.isActive = true;
+                    this.greyedOut = false;
+                    MapModMain.config.nameTooltipMode = whichOption;
+                }
+                else if (whichOption > 3)
+                {
+                    Game1.playSound("drumkit6");
+                    base.receiveLeftClick(x, y);
+                    this.isActive = true;
+                    this.greyedOut = false;
+                    MapModMain.config.immersionLevel = whichOption - 3;
+                }
+            }
+            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+        }
+
+        public void greyOut()
+        {
+            this.isActive = false;
+            this.greyedOut = true;
+        }
+
+        public override void draw(SpriteBatch b, int slotX, int slotY)
+        {
+            base.draw(b, slotX - 32, slotY);
+        }
+    }
+
+    public class MapModCheckbox : OptionsElement
+    {
+        public const int pixelsWide = 9;
+        public bool isChecked;
+        public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
+        public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
+
+        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+		{
+            switch (whichOption)
+            {
+                case 7:
+                    this.isChecked = MapModMain.config.showAbigail;
+                    return;
+                case 8:
+                    this.isChecked = MapModMain.config.showAlex;
+                    return;
+                case 9:
+                    this.isChecked = MapModMain.config.showCaroline;
+                    return;
+                case 10:
+                    this.isChecked = MapModMain.config.showClint;
+                    return;
+                case 11:
+                    this.isChecked = MapModMain.config.showDemetrius;
+                    return;
+                case 12:
+                    this.isChecked = MapModMain.config.showElliott;
+                    return;
+                case 13:
+                    this.isChecked = MapModMain.config.showEmily;
+                    return;
+                case 14:
+                    this.isChecked = MapModMain.config.showEvelyn;
+                    return;
+                case 15:
+                    this.isChecked = MapModMain.config.showGeorge;
+                    return;
+                case 16:
+                    this.isChecked = MapModMain.config.showGus;
+                    return;
+                case 17:
+                    this.isChecked = MapModMain.config.showHaley;
+                    return;
+                case 18:
+                    this.isChecked = MapModMain.config.showHarvey;
+                    return;
+                case 19:
+                    this.isChecked = MapModMain.config.showJas;
+                    return;
+                case 20:
+                    this.isChecked = MapModMain.config.showJodi;
+                    return;
+                case 21:
+                    this.isChecked = MapModMain.config.showKent;
+                    return;
+                case 22:
+                    this.isChecked = MapModMain.config.showLeah;
+                    return;
+                case 23:
+                    this.isChecked = MapModMain.config.showLewis;
+                    return;
+                case 24:
+                    this.isChecked = MapModMain.config.showLinus;
+                    return;
+                case 25:
+                    this.isChecked = MapModMain.config.showMarnie;
+                    return;
+                case 26:
+                    this.isChecked = MapModMain.config.showMaru;
+                    return;
+                case 27:
+                    this.isChecked = MapModMain.config.showPam;
+                    return;
+                case 28:
+                    this.isChecked = MapModMain.config.showPenny;
+                    return;
+                case 29:
+                    this.isChecked = MapModMain.config.showPierre;
+                    return;
+                case 30:
+                    this.isChecked = MapModMain.config.showRobin;
+                    return;
+                case 31:
+                    this.isChecked = MapModMain.config.showSam;
+                    return;
+                case 32:
+                    this.isChecked = MapModMain.config.showSebastian;
+                    return;
+                case 33:
+                    this.isChecked = MapModMain.config.showShane;
+                    return;
+                case 34:
+                    this.isChecked = MapModMain.config.showVincent;
+                    return;
+                case 35:
+                    this.isChecked = MapModMain.config.showWilly;
+                    return;
+                case 36:
+                    this.isChecked = MapModMain.config.onlySameLocation;
+                    return;
+                default:
+                    return;
+            } 
+        }
+
+        public override void receiveLeftClick(int x, int y)
+        {
+            if (this.greyedOut)
+            {
+                return;
+            }
+            Game1.soundBank.PlayCue("drumkit6");
+            base.receiveLeftClick(x, y);
+            this.isChecked = !this.isChecked;
+            int whichOption = this.whichOption;
+            switch (whichOption)
+            {
+                case 7:
+                    MapModMain.config.showAbigail = this.isChecked;
+                    break;
+                case 8:
+                    MapModMain.config.showAlex = this.isChecked;
+                    break;
+                case 9:
+                    MapModMain.config.showCaroline = this.isChecked;
+                    break;
+                case 10:
+                    MapModMain.config.showClint = this.isChecked;
+                    break;
+                case 11:
+                    MapModMain.config.showDemetrius = this.isChecked;
+                    break;
+                case 12:
+                    MapModMain.config.showElliott = this.isChecked;
+                    break;
+                case 13:
+                    MapModMain.config.showEmily = this.isChecked;
+                    break;
+                case 14:
+                    MapModMain.config.showEvelyn = this.isChecked;
+                    break;
+                case 15:
+                    MapModMain.config.showGeorge = this.isChecked;
+                    break;
+                case 16:
+                    MapModMain.config.showGus = this.isChecked;
+                    break;
+                case 17:
+                    MapModMain.config.showHaley = this.isChecked;
+                    break;
+                case 18:
+                    MapModMain.config.showHarvey = this.isChecked;
+                    break;
+                case 19:
+                    MapModMain.config.showJas = this.isChecked;
+                    break;
+                case 20:
+                    MapModMain.config.showJodi = this.isChecked;
+                    break;
+                case 21:
+                    MapModMain.config.showKent = this.isChecked;
+                    break;
+                case 22:
+                    MapModMain.config.showLeah = this.isChecked;
+                    break;
+                case 23:
+                    MapModMain.config.showLewis = this.isChecked;
+                    break;
+                case 24:
+                    MapModMain.config.showLinus = this.isChecked;
+                    break;
+                case 25:
+                    MapModMain.config.showMarnie = this.isChecked;
+                    break;
+                case 26:
+                    MapModMain.config.showMaru = this.isChecked;
+                    break;
+                case 27:
+                    MapModMain.config.showPam = this.isChecked;
+                    break;
+                case 28:
+                    MapModMain.config.showPenny = this.isChecked;
+                    break;
+                case 29:
+                    MapModMain.config.showPierre = this.isChecked;
+                    break;
+                case 30:
+                    MapModMain.config.showRobin = this.isChecked;
+                    break;
+                case 31:
+                    MapModMain.config.showSam = this.isChecked;
+                    break;
+                case 32:
+                    MapModMain.config.showSebastian = this.isChecked;
+                    break;
+                case 33:
+                    MapModMain.config.showShane = this.isChecked;
+                    break;
+                case 34:
+                    MapModMain.config.showVincent = this.isChecked;
+                    break;
+                case 35:
+                    MapModMain.config.showWilly = this.isChecked;
+                    break;
+                case 36:
+                    MapModMain.config.onlySameLocation = this.isChecked;
+                    break;
+                default:
+                    break;
+            }
+            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+        }
+
+        public override void draw(SpriteBatch b, int slotX, int slotY)
+        {
+            b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X), (float)(slotY + this.bounds.Y)), new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked), Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+            base.draw(b, slotX, slotY);
+        }
+    }
+
+    /*
+    public class MapModInputListener : OptionsElement
+    {
+        public List<string> buttonNames = new List<string>();
+        private string listenerMessage;
+        private bool listening;
+        private Rectangle setbuttonBounds;
+        public static Rectangle setButtonSource = new Rectangle(294, 428, 21, 11);
+
+        public MapModInputListener(string label, int whichOption, int slotWidth, int x = -1, int y = -1) : base(label, x, y, slotWidth - x, 11 * Game1.pixelZoom, whichOption)
+		{
+            this.setbuttonBounds = new Rectangle(slotWidth - 28 * Game1.pixelZoom, y + Game1.pixelZoom * 3, 21 * Game1.pixelZoom, 11 * Game1.pixelZoom);
+            this.buttonNames.Add(MapModMain.config.menuKey);      
+        }
+
+        public override void leftClickHeld(int x, int y)
+        {
+            bool arg_06_0 = this.greyedOut;
+        }
+
+        public override void receiveLeftClick(int x, int y)
+        {
+            if (this.greyedOut || this.listening || !this.setbuttonBounds.Contains(x, y))
+            {
+                return;
+            }
+            if (this.buttonNames.Count<string>() != 0)
+            {
+                this.listening = true;
+                Game1.soundBank.PlayCue("breathin");
+                GameMenu.forcePreventClose = true;
+                this.listenerMessage = "Press new key...";
+                return;
+            }
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            if (this.greyedOut || !this.listening)
+            {
+                return;
+            }
+            if (key == Keys.Escape)
+            {
+                Game1.soundBank.PlayCue("bigDeSelect");
+                this.listening = false;
+                GameMenu.forcePreventClose = false;
+                return;
+            }
+            int whichOption = this.whichOption;
+
+            MapModMain.config.menuKey = key.ToString();
+            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+            
+            this.buttonNames[0] = key.ToString();
+            Game1.soundBank.PlayCue("coin");
+            this.listening = false;
+            GameMenu.forcePreventClose = false;
+        }
+
+        public override void draw(SpriteBatch b, int slotX, int slotY)
+        {
+            if (this.buttonNames.Count<string>() > 0)
+            {
+                Utility.drawTextWithShadow(b, this.label + ": " + this.buttonNames.Last<string>() + ((this.buttonNames.Count<string>() > 1) ? (", " + this.buttonNames.First<string>()) : ""), Game1.dialogueFont, new Vector2((float)(this.bounds.X + slotX), (float)(this.bounds.Y + slotY)), Game1.textColor, 1f, 0.15f, -1, -1, 1f, 3);
+            }
+            Utility.drawWithShadow(b, Game1.mouseCursors, new Vector2((float)(this.setbuttonBounds.X + slotX), (float)(this.setbuttonBounds.Y + slotY)), MapModInputListener.setButtonSource, Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, false, 0.15f, -1, -1, 0.35f);
+            if (this.listening)
+            {
+                b.Draw(Game1.staminaRect, new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), new Rectangle?(new Rectangle(0, 0, 1, 1)), Color.Black * 0.75f, 0f, Vector2.Zero, SpriteEffects.None, 0.999f);
+                b.DrawString(Game1.dialogueFont, this.listenerMessage, Utility.getTopLeftPositionForCenteringOnScreen(Game1.tileSize * 3, Game1.tileSize, 0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9999f);
+            }
+        }
+    }
+    */
+}
+

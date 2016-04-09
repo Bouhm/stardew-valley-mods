@@ -143,5 +143,61 @@ public static class MapModConstants
             };
         }
     }
+
+    public static Dictionary<string, string> indoorLocations
+    {
+        get
+        {
+            return new Dictionary<string, string>
+            {
+                { "Town", "Town"},
+                { "SeedShop", "Town"},
+                { "Saloon", "Town"},
+                { "Hospital", "Town" },
+                { "HarveyRoom", "Town"},
+                { "Mountain", "Mountain"},
+                { "ArchaeologyHouse", "Mountain"},
+                { "ScienceHouse", "Mountain"},
+                { "SebastianRoom", "Mountain"},
+                { "JoshHouse", "Town" },
+                { "HaleyHouse", "Town"},
+                { "CommunityCenter", "Town"},
+                { "Blacksmith", "Town"},
+                { "JojaMart", "Town"},
+                { "Beach", "Beach"},
+                { "ElliottHouse", "Beach"},
+                { "AnimalShop", "Forest"},
+                { "Forest", "Forest" },
+                { "SamHouse", "Town"},
+                { "ManorHouse", "Town"},
+                { "LeahHouse", "Forest"},
+                { "FishShop", "Beach"},
+                { "Tent", "Mountain"},
+                { "Railroad", "Railroad" },
+                { "BathHouse_Entry", "Railroad"},
+                { "BathHouse_MensLocker", "Railroad"},
+                { "BathHouse_WomensLocker", "Railroad"},
+                { "BathHouse_Pool", "Railroad"},
+                { "Trailer", "Town"},
+                { "Mine", "Mountain" },
+                { "Desert", "Desert" },
+                { "SandyHouse", "Desert"},
+                { "FarmHouse", "Farm"},
+                { "Farm", "Farm" },
+                { "Sewer", "Town"},
+                { "WizardHouse", "Forest"},
+                { "Barn", "Farm"},
+                { "Barn2", "Farm" },
+                { "Big Barn", "Farm" },
+                { "Barn3", "Farm"},
+                { "Coop", "Farm"},
+                { "Coop2", "Farm" },
+                { "Coop3", "Farm"},
+                { "Greenhouse", "Farm"},
+                { "FarmCave", "Farm"},
+                { "SlimeHutch", "Farm" }
+            };
+        }
+    }
 }
 
