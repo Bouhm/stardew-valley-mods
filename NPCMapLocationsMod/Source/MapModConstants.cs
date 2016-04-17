@@ -42,7 +42,10 @@ public static class MapModConstants
                 {"Sebastian", 1},
                 {"Shane", 1},
                 {"Vincent", 8},
-                {"Willy", -1}
+                {"Willy", -1},
+                {"Sandy", 3 },
+                {"Marlon", 3 },
+                {"Wizard", 1 }
             };
         }
     }
@@ -81,7 +84,10 @@ public static class MapModConstants
                 {"Sebastian", "SebastianRoom"},
                 {"Shane", "AnimalShop"},
                 {"Vincent", "SamHouse"},
-                {"Willy", "FishShop"}
+                {"Willy", "FishShop"},
+                {"Sandy", "SandyHouse" },
+                {"Marlon", "AdventureGuild" },
+                {"Wizard", "WizardHouse" }
             };
         }
     }
@@ -195,7 +201,8 @@ public static class MapModConstants
                 { "Coop3", "Farm"},
                 { "Greenhouse", "Farm"},
                 { "FarmCave", "Farm"},
-                { "SlimeHutch", "Farm" }
+                { "SlimeHutch", "Farm" },
+                { "AdventureGuild", "Mountain" }
             };
         }
     }

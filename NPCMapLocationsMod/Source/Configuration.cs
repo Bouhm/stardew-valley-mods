@@ -8,6 +8,9 @@ namespace NPCMapLocations
         public int nameTooltipMode { get; set; }
         public string menuKey { get; set; }
         public int immersionLevel { get; set; }
+        public bool byHeartLevel { get; set; }
+        public int heartLevelMin { get; set; }
+        public int heartLevelMax { get; set; }
         public bool onlySameLocation { get; set; }
         public bool showAbigail { get; set; }
         public bool showAlex { get; set; }
@@ -38,13 +41,19 @@ namespace NPCMapLocations
         public bool showShane { get; set; }
         public bool showVincent { get; set; }
         public bool showWilly { get; set; }
-
+        public bool showSandy { get; set; }
+        public bool showWizard { get; set; }
+        public bool showMarlon { get; set; }
+        public bool showTravelingMerchant { get; set; }
 
         public override T GenerateDefaultConfig<T>()
         {
             this.nameTooltipMode = 1;
             this.menuKey = "Tab";
             this.immersionLevel = 1;
+            this.byHeartLevel = false;
+            this.heartLevelMin = 0;
+            this.heartLevelMax = 12;
             this.onlySameLocation = false;
             this.showAbigail = true;
             this.showAlex = true;
@@ -75,6 +84,10 @@ namespace NPCMapLocations
             this.showShane = true;
             this.showVincent = true;
             this.showWilly = true;
+            this.showSandy = false;
+            this.showWizard = false;
+            this.showMarlon = false;
+            this.showTravelingMerchant = false;
             return this as T;
         }
     }

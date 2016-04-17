@@ -36,7 +36,7 @@ namespace NPCMapLocations
         private int optionsSlotHeld = -1;
         private ClickableTextureComponent okButton;
 
-        public MapModMenu(int x, int y, int width, int height) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, bool showExtras) : base(x, y, width, height, false)
         {
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, this.map.Bounds.Height * Game1.pixelZoom, 0, 0);
@@ -55,8 +55,8 @@ namespace NPCMapLocations
             tooltipButton2 = new MapModButton("Below location tooltip", 2, -1, -1, -1, -1);
             tooltipButton3 = new MapModButton("Bottom-left corner", 3, -1, -1, -1, -1);
             immersionButton1 = new MapModButton("Always show villagers", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("Reset map in the beginning", 5, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("Reset map everyday", 6, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("Show villagers player has talked to", 5, -1, -1, -1, -1);
+            immersionButton3 = new MapModButton("Hide villagers player has talked to", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
             this.options.Add(new OptionsElement("Villagers Tooltip Placement:"));
@@ -68,6 +68,9 @@ namespace NPCMapLocations
             this.options.Add(immersionButton2);
             this.options.Add(immersionButton3);
             this.options.Add(new MapModCheckbox("Only show villagers in player's location", 36, -1, -1));
+            this.options.Add(new MapModCheckbox("Only show villagers within specified heart level", 41, -1, -1));
+            this.options.Add(new MapModSlider("Minimum heart level", 0, -1, -1));
+            this.options.Add(new MapModSlider("Maximum heart level", 1, -1, -1));
             this.options.Add(new OptionsElement("Include/Exclude Villagers:"));
             this.options.Add(new MapModCheckbox("Abigail", 7, -1, -1));
             this.options.Add(new MapModCheckbox("Alex", 8, -1, -1));
@@ -98,7 +101,15 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox("Shane", 33, -1, -1));
             this.options.Add(new MapModCheckbox("Vincent", 34, -1, -1));
             this.options.Add(new MapModCheckbox("Willy", 35, -1, -1));
-
+            // Mainly for compatibility with mods that give custom schedules to these NPCs 
+            this.options.Add(new OptionsElement("Extra NPCs:"));
+            if (showExtras)
+            {
+                this.options.Add(new MapModCheckbox("Sandy", 37, -1, -1));
+                this.options.Add(new MapModCheckbox("Wizard", 38, -1, -1));
+                this.options.Add(new MapModCheckbox("Marlon", 39, -1, -1));
+            }
+            this.options.Add(new MapModCheckbox("Traveling Merchant", 40, -1, -1));
         }
 
         private void setScrollBarToCurrentIndex()
@@ -119,6 +130,7 @@ namespace NPCMapLocations
             {
                 return;
             }
+            y -= 5;
             base.leftClickHeld(x, y);
             if (this.scrolling)
             {
@@ -133,9 +145,14 @@ namespace NPCMapLocations
                     return;
                 }
             }
-            else if (this.optionsSlotHeld != -1 && this.optionsSlotHeld + this.currentItemIndex < this.options.Count)
+            else
             {
+                if (this.optionsSlotHeld == -1 || this.optionsSlotHeld + this.currentItemIndex >= this.options.Count)
+                {
+                    return;
+                }
                 this.options[this.currentItemIndex + this.optionsSlotHeld].leftClickHeld(x - this.optionSlots[this.optionsSlotHeld].bounds.X, y - this.optionSlots[this.optionsSlotHeld].bounds.Y);
+                return;
             }
         }
 
@@ -210,6 +227,7 @@ namespace NPCMapLocations
             {
                 return;
             }
+            y -= 5;
             if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
             {
                 this.downArrowPressed();
@@ -229,7 +247,6 @@ namespace NPCMapLocations
                 this.scrolling = true;
                 this.leftClickHeld(x, y);
             }
-         
             if (tooltipButton1.rect.Contains(x, y))
             {
                 tooltipButton1.receiveLeftClick(x, y);
@@ -304,7 +321,7 @@ namespace NPCMapLocations
             this.upArrow.tryHover(x, y, 0.1f);
             this.downArrow.tryHover(x, y, 0.1f);
             this.scrollBar.tryHover(x, y, 0.1f);
-            bool arg_5A_0 = this.scrolling;
+            bool arg_4F_0 = this.scrolling;
         }
 
         public override void draw(SpriteBatch b)
@@ -336,7 +353,7 @@ namespace NPCMapLocations
                     {
                         if (options[this.currentItemIndex + i] is MapModButton)
                         {
-                            Rectangle bounds = new Rectangle(x + 28, y, 500, Game1.tileSize + 8);
+                            Rectangle bounds = new Rectangle(x + 28, y, 700, Game1.tileSize + 8);
                             if (options[this.currentItemIndex + i].whichOption == 1)
                             {
                                 tooltipButton1.rect = bounds;
@@ -533,6 +550,21 @@ namespace NPCMapLocations
                 case 36:
                     this.isChecked = MapModMain.config.onlySameLocation;
                     return;
+                case 37:
+                    this.isChecked = MapModMain.config.showSandy;
+                    return;
+                case 38:
+                    this.isChecked = MapModMain.config.showWizard;
+                    return;
+                case 39:
+                    this.isChecked = MapModMain.config.showMarlon;
+                    return; 
+                case 40:
+                    this.isChecked = MapModMain.config.showTravelingMerchant;
+                    return;
+                case 41:
+                    this.isChecked = MapModMain.config.byHeartLevel;
+                    return;
                 default:
                     return;
             } 
@@ -640,8 +672,23 @@ namespace NPCMapLocations
                 case 36:
                     MapModMain.config.onlySameLocation = this.isChecked;
                     break;
-                default:
+                case 37:
+                    MapModMain.config.showSandy = this.isChecked;
                     break;
+                case 38:
+                    MapModMain.config.showWizard = this.isChecked;
+                    break;
+                case 39:
+                    MapModMain.config.showMarlon = this.isChecked;  
+                    break;
+                case 40:
+                    MapModMain.config.showTravelingMerchant = this.isChecked;
+                    break;
+                case 41:
+                    MapModMain.config.byHeartLevel = this.isChecked;
+                    break;
+                default:
+                    break;  
             }
             ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
         }
@@ -650,6 +697,73 @@ namespace NPCMapLocations
         {
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X), (float)(slotY + this.bounds.Y)), new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked), Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
             base.draw(b, slotX, slotY);
+        }
+    }
+
+    internal class MapModSlider : OptionsElement
+    {
+        public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);
+        public static Rectangle sliderButtonRect = new Rectangle(420, 441, 10, 6);
+        public const int pixelsWide = 48;
+        public const int pixelsHigh = 6;
+        public const int sliderButtonWidth = 10;
+        public int sliderMaxValue = 12;
+        public int value;
+        public string valueLabel;
+
+        public MapModSlider(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
+		{
+            valueLabel = label;
+            if (whichOption == 0)
+            {
+                this.value = MapModMain.config.heartLevelMin;
+            }
+            else if (whichOption == 1)
+            {
+                this.value = MapModMain.config.heartLevelMax;
+            }
+        }
+
+        public override void leftClickHeld(int x, int y)
+        {
+            if (this.greyedOut)
+            {
+                return;
+            }
+            base.leftClickHeld(x, y);
+            this.value = ((x >= this.bounds.X) ? ((x <= this.bounds.Right - 10 * Game1.pixelZoom) ? ((int)((double)((float)(x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom)) * (double)this.sliderMaxValue)) : this.sliderMaxValue) : 0);
+            if (this.whichOption == 0)
+            {
+                MapModMain.config.heartLevelMin = this.value;
+            }
+            else if (this.whichOption == 1)
+            {
+                MapModMain.config.heartLevelMax = this.value;
+            }
+            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+        }
+
+        public override void receiveLeftClick(int x, int y)
+        {
+            if (this.greyedOut)
+            {
+                return;
+            }
+            base.receiveLeftClick(x, y);
+            this.leftClickHeld(x, y);
+        }
+
+        public override void draw(SpriteBatch b, int slotX, int slotY)
+        {
+            this.label = valueLabel + ": " + this.value;
+            this.greyedOut = false;
+            if (this.whichOption == 0 || this.whichOption == 1)
+            {
+                this.greyedOut = !MapModMain.config.byHeartLevel;
+            }
+            base.draw(b, slotX, slotY);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X, slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, (float)Game1.pixelZoom, false);
+            b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X) + (float)(this.bounds.Width - 10 * Game1.pixelZoom) * ((float)this.value / (float)this.sliderMaxValue), (float)(slotY + this.bounds.Y)), new Rectangle?(OptionsSlider.sliderButtonRect), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.9f);
         }
     }
 

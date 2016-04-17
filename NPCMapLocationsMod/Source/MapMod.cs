@@ -26,6 +26,7 @@ namespace NPCMapLocations
         private List<ClickableComponent> points = new List<ClickableComponent>();
         private static MapPageTooltips toolTips;
         private static string npcNames;
+        private bool showExtras;
 
         public override void Entry(params object[] objects)
         {
@@ -35,7 +36,7 @@ namespace NPCMapLocations
             KeyboardInput.KeyDown += KeyboardInput_KeyDown;
         }
 
-        // For changing name tooltip mode
+        // Open menu key
         private void KeyboardInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
@@ -49,7 +50,7 @@ namespace NPCMapLocations
             if (menu.currentTab != 3) { return; }
             if (key.Equals(config.menuKey))
             {
-                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2);
+                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras);
             }
         }
 
@@ -68,6 +69,7 @@ namespace NPCMapLocations
                 if (npc.Schedule != null || npc.isMarried())
                 {
                     bool sameLocation = false;
+                    showExtras = (npc.name.Equals("Sandy") || npc.name.Equals("Wizard") || npc.name.Equals("Marlon"));
                     if (config.onlySameLocation)
                     {
                         string indoorLocationNPC;
@@ -83,9 +85,11 @@ namespace NPCMapLocations
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
                         }
                     }
-                    if ((sameLocation || !config.onlySameLocation) && ((config.immersionLevel == 2) ? Game1.player.friendships.ContainsKey(npc.name) : true) &&
-                       ((config.immersionLevel == 3) ? Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
-                       (showNPC(npc.name)))
+                    if ((sameLocation || !config.onlySameLocation) && 
+                       ((config.immersionLevel == 2) ? Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
+                       ((config.immersionLevel == 3) ? !Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
+                       (showNPC(npc.name)) && 
+                       (config.byHeartLevel ? (Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax) : true))
                     {
                         int offsetX = 0;
                         int offsetY = 0;
@@ -503,6 +507,10 @@ namespace NPCMapLocations
                 {
                     Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[entry.Key], 16, 15)), Color.White);
                 }
+                if (config.showTravelingMerchant &&
+                    (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28)) { 
+                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 140, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                }
                 toolTips.draw(Game1.spriteBatch);   
                 Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
             }
@@ -539,6 +547,9 @@ namespace NPCMapLocations
             if (npc.Equals("Shane")) { return config.showShane; }
             if (npc.Equals("Vincent")) { return config.showVincent; }
             if (npc.Equals("Willy")) { return config.showWilly; }
+            if (npc.Equals("Sandy")) { return config.showSandy; }
+            if (npc.Equals("Marlon")) { return config.showMarlon; }
+            if (npc.Equals("Wizard")) { return config.showWizard; }
             return true;
         }
     }
