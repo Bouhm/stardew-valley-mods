@@ -32,7 +32,7 @@ namespace NPCMapLocations
         {
             config = ConfigExtensions.InitializeConfig<Configuration>(new Configuration(), base.BaseConfigPath);
             GameEvents.UpdateTick += GameEvents_UpdateTick;
-            GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderEvent;
+            GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             KeyboardInput.KeyDown += KeyboardInput_KeyDown;
         }
 
@@ -583,7 +583,7 @@ namespace NPCMapLocations
             this.nameTooltipMode = nameTooltipMode;
             this.names = names;
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
-            Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, this.map.Bounds.Height * Game1.pixelZoom, 0, 0);
+            Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
             this.points.Add(new ClickableComponent(new Rectangle(this.mapX, this.mapY, 292, 152), Game1.player.mailReceived.Contains("ccVault") ? "Calico Desert" : "???"));
@@ -641,8 +641,8 @@ namespace NPCMapLocations
         {
             foreach (ClickableComponent current in this.points)
             {
-                string name;
-                if (current.containsPoint(x, y) && (name = current.name) != null && name == "Lonely Stone")
+                string name = current.name;
+                if (name == "Lonely Stone")
                 {
                     Game1.playSound("stoneCrack");
                 }
@@ -670,13 +670,36 @@ namespace NPCMapLocations
             }
         }
 
+        /*
+        public void drawMap(SpriteBatch b)
+        {
+            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
+            b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            switch (Game1.whichFarm)
+            {
+                case 1:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 2:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 3:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 4:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+            }
+        }
+        */
+
         // Draw location tooltips
         public override void draw(SpriteBatch b)
         {
-            int x = Game1.getOldMouseX() + Game1.tileSize / 2;
-            int y = Game1.getOldMouseY() + Game1.tileSize / 2;
+            int x = Game1.getMouseX() + Game1.tileSize / 2;
+            int y = Game1.getMouseY() + Game1.tileSize / 2;
             int offsetY = 0;
-            performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
+            this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
             if (!this.hoverText.Equals(""))
             {
@@ -714,13 +737,13 @@ namespace NPCMapLocations
                         y = Game1.viewport.Height - height;
                     }
                 }
-
                 drawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
+                //IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1, -1, -1, 1f, null);
             }
             else
             {
