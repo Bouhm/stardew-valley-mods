@@ -12,6 +12,7 @@ namespace NPCMapLocations
         public int heartLevelMin { get; set; }
         public int heartLevelMax { get; set; }
         public bool onlySameLocation { get; set; }
+        public bool markQuests { get; set; }
         public bool showAbigail { get; set; }
         public bool showAlex { get; set; }
         public bool showCaroline { get; set; }
@@ -44,7 +45,13 @@ namespace NPCMapLocations
         public bool showSandy { get; set; }
         public bool showWizard { get; set; }
         public bool showMarlon { get; set; }
+        public bool showCustomNPC1 { get; set; }
+        public bool showCustomNPC2 { get; set; }
+        public bool showCustomNPC3 { get; set; }
+        public bool showCustomNPC4 { get; set; }
+        public bool showCustomNPC5 { get; set; }
         public bool showTravelingMerchant { get; set; }
+        public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; }
 
         public override T GenerateDefaultConfig<T>()
         {
@@ -55,6 +62,7 @@ namespace NPCMapLocations
             this.heartLevelMin = 0;
             this.heartLevelMax = 12;
             this.onlySameLocation = false;
+            this.markQuests = true;
             this.showAbigail = true;
             this.showAlex = true;
             this.showCaroline = true;
@@ -85,9 +93,15 @@ namespace NPCMapLocations
             this.showVincent = true;
             this.showWilly = true;
             this.showSandy = false;
-            this.showWizard = false;
+            this.showWizard = true;
             this.showMarlon = false;
-            this.showTravelingMerchant = false;
+            this.showCustomNPC1 = true;
+            this.showCustomNPC2 = true;
+            this.showCustomNPC3 = true;
+            this.showCustomNPC4 = true;
+            this.showCustomNPC5 = true;
+            this.showTravelingMerchant = true;
+            this.customNPCs = null;
             return this as T;
         }
     }

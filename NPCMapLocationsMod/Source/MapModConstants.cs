@@ -43,9 +43,9 @@ public static class MapModConstants
                 {"Shane", 1},
                 {"Vincent", 8},
                 {"Willy", -1},
-                {"Sandy", 3 },
-                {"Marlon", 3 },
-                {"Wizard", 1 }
+                {"Sandy", 2 },
+                {"Marlon", 2 },
+                {"Wizard", 0 }
             };
         }
     }
@@ -120,6 +120,7 @@ public static class MapModConstants
                 { "AnimalShop", new Double[]{420, 388, 0, 0} },
                 { "SamHouse", new Double[]{609, 400, 0, 0} },
                 { "Mountain", new Double[]{692, 102, 2.7, 2.97} },
+                { "AdventureGuild", new Double[] {898, 110, 0, 0} },
                 { "ManorHouse", new Double[]{763, 390, 0, 0} },
                 { "LeahHouse", new Double[]{447, 419, 0, 0} },
                 { "FishShop", new Double[]{843, 605, 0, 0} },
@@ -135,7 +136,7 @@ public static class MapModConstants
                 { "FarmHouse", new Double[]{457, 259, 0, 0} },
                 { "Desert", new Double[]{111, 23, 0, 0} },
                 { "Sewer", new Double[]{680, 329, 0, 0} },
-                { "WizardHouse", new Double[]{173, 328, 0, 0}},
+                { "WizardHouse", new Double[]{193, 373, 0, 0}},
                 { "Barn", new Double[]{400, 280, 0, 0} },
                 { "Barn2", new Double[]{400, 280, 0, 0} },
                 { "Big Barn", new Double[]{400, 280, 0, 0} },

@@ -3,13 +3,10 @@ My mods for Stardew Valley
 
 
 ### NPC Map Locations Mod
-Shows NPC locations in real-time on the map. Requires SMAPI. Google "Stardew Valley NPC Map Locations" for more information.
-
-Hosted on nexus mods, stardewmods, Chucklefish community forum mods page.
+A SMAPI mod that shows NPC locations in real-time on the map. Includes immersion settings to customize when to show the NPCs.
 
 ###  Inu Pet Mod
 Replaces vanilla dog with a Shiba Inu.
 
-Hosted on stardewmods.
 
 

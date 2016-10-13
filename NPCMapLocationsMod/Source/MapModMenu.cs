@@ -36,7 +36,7 @@ namespace NPCMapLocations
         private int optionsSlotHeld = -1;
         private ClickableTextureComponent okButton;
 
-        public MapModMenu(int x, int y, int width, int height, bool showExtras) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, bool[] showExtras, Dictionary<string, Dictionary<string, int>> customNPCs) : base(x, y, width, height, false)
         {
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -59,7 +59,7 @@ namespace NPCMapLocations
             immersionButton3 = new MapModButton("Hide villagers player has talked to", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
-            this.options.Add(new OptionsElement("Villagers Tooltip Placement:"));
+            this.options.Add(new OptionsElement("Names Tooltip Placement:"));
             this.options.Add(tooltipButton1);
             this.options.Add(tooltipButton2);
             this.options.Add(tooltipButton3);
@@ -71,15 +71,20 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox("Only show villagers within specified heart level", 41, -1, -1));
             this.options.Add(new MapModSlider("Minimum heart level", 0, -1, -1));
             this.options.Add(new MapModSlider("Maximum heart level", 1, -1, -1));
-            // Mainly for compatibility with mods that give custom schedules to these NPCs 
-            this.options.Add(new OptionsElement("Show Extra NPCs:"));
-            if (showExtras)
+            this.options.Add(new OptionsElement("Extra Settings:"));
+            this.options.Add(new MapModCheckbox("Mark villagers with daily quest or birthday", 42, -1, -1));
+            // Custom NPCs
+            if (customNPCs != null)
             {
-                this.options.Add(new MapModCheckbox("Sandy", 37, -1, -1));
-                this.options.Add(new MapModCheckbox("Wizard", 38, -1, -1));
-                this.options.Add(new MapModCheckbox("Marlon", 39, -1, -1));
+                foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
+                {
+                    if (entry.Value.ContainsKey(MapModMain.saveFile) && entry.Value[MapModMain.saveFile] == 1)
+                    { 
+                        this.options.Add(new MapModCheckbox("Show " + entry.Key, 42 + entry.Value["id"], -1, -1));
+                    }
+                }
             }
-            this.options.Add(new MapModCheckbox("Traveling Merchant", 40, -1, -1));
+            this.options.Add(new MapModCheckbox("Show Traveling Merchant", 40, -1, -1));
             this.options.Add(new OptionsElement("Include/Exclude Villagers:"));
             this.options.Add(new MapModCheckbox("Abigail", 7, -1, -1));
             this.options.Add(new MapModCheckbox("Alex", 8, -1, -1));
@@ -99,6 +104,10 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox("Leah", 22, -1, -1));
             this.options.Add(new MapModCheckbox("Lewis", 23, -1, -1));
             this.options.Add(new MapModCheckbox("Linus", 24, -1, -1));
+            if (showExtras[1])
+            {
+                this.options.Add(new MapModCheckbox("Marlon", 39, -1, -1));
+            }
             this.options.Add(new MapModCheckbox("Marnie", 25, -1, -1));
             this.options.Add(new MapModCheckbox("Maru", 26, -1, -1));
             this.options.Add(new MapModCheckbox("Pam", 27, -1, -1));
@@ -106,10 +115,18 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox("Pierre", 29, -1, -1));
             this.options.Add(new MapModCheckbox("Robin", 30, -1, -1));
             this.options.Add(new MapModCheckbox("Sam", 31, -1, -1));
+            if (showExtras[0])
+            {
+                this.options.Add(new MapModCheckbox("Sandy", 37, -1, -1));
+            }
             this.options.Add(new MapModCheckbox("Sebastian", 32, -1, -1));
             this.options.Add(new MapModCheckbox("Shane", 33, -1, -1));
             this.options.Add(new MapModCheckbox("Vincent", 34, -1, -1));
             this.options.Add(new MapModCheckbox("Willy", 35, -1, -1));
+            if (showExtras[2])
+            {
+                this.options.Add(new MapModCheckbox("Wizard", 38, -1, -1));
+            }
         }
 
         private void setScrollBarToCurrentIndex()
@@ -130,7 +147,6 @@ namespace NPCMapLocations
             {
                 return;
             }
-            y -= 5;
             base.leftClickHeld(x, y);
             if (this.scrolling)
             {
@@ -227,7 +243,6 @@ namespace NPCMapLocations
             {
                 return;
             }
-            y -= 5;
             if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
             {
                 this.downArrowPressed();
@@ -282,14 +297,14 @@ namespace NPCMapLocations
                 immersionButton3.receiveLeftClick(x, y);
                 immersionButton1.greyOut();
                 immersionButton2.greyOut();
-            }
+            }   
             if (this.okButton.containsPoint(x, y))
             {
                 this.okButton.scale -= 0.25f;
                 this.okButton.scale = Math.Max(0.75f, this.okButton.scale);
                 (Game1.activeClickableMenu as MapModMenu).exitThisMenu(true);
             }
-
+            y -= 15;
             this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
             for (int i = 0; i < this.optionSlots.Count<ClickableComponent>(); i++)
             {
@@ -580,6 +595,24 @@ namespace NPCMapLocations
                 case 41:
                     this.isChecked = MapModMain.config.byHeartLevel;
                     return;
+                case 42:
+                    this.isChecked = MapModMain.config.markQuests;
+                    return;
+                case 43:
+                    this.isChecked = MapModMain.config.showCustomNPC1;
+                    return;
+                case 44:
+                    this.isChecked = MapModMain.config.showCustomNPC2;
+                    return;
+                case 45:
+                    this.isChecked = MapModMain.config.showCustomNPC3;
+                    return;
+                case 46:
+                    this.isChecked = MapModMain.config.showCustomNPC4;
+                    return;
+                case 47:
+                    this.isChecked = MapModMain.config.showCustomNPC5;
+                    return;
                 default:
                     return;
             } 
@@ -701,6 +734,24 @@ namespace NPCMapLocations
                     break;
                 case 41:
                     MapModMain.config.byHeartLevel = this.isChecked;
+                    break;
+                case 42:
+                    MapModMain.config.markQuests = this.isChecked;
+                    break;
+                case 43:
+                    MapModMain.config.showCustomNPC1 = this.isChecked;
+                    break;
+                case 44:
+                    MapModMain.config.showCustomNPC2 = this.isChecked;
+                    break;
+                case 45:
+                    MapModMain.config.showCustomNPC3 = this.isChecked;
+                    break;
+                case 46:
+                    MapModMain.config.showCustomNPC4 = this.isChecked;
+                    break;
+                case 47:
+                    MapModMain.config.showCustomNPC5 = this.isChecked;
                     break;
                 default:
                     break;  

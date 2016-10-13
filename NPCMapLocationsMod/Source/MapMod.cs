@@ -4,6 +4,7 @@ Shows NPC locations real-time on the map.
 */
 
 using StardewValley;
+using StardewValley.Quests;
 using StardewModdingAPI;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
@@ -17,6 +18,8 @@ namespace NPCMapLocations
     public class MapModMain : Mod
     {
         public static Configuration config;
+        public static string saveFile;
+        private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
         // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, int> spriteCrop;
@@ -26,14 +29,95 @@ namespace NPCMapLocations
         private List<ClickableComponent> points = new List<ClickableComponent>();
         private static MapPageTooltips toolTips;
         private static string npcNames;
-        private bool showExtras;
+        private static HashSet<string> birthdayNPCs;
+        private static HashSet<string> questNPCs;
+        private bool[] showExtras = new Boolean[3];
+        private bool loadComplete = false;
+        private bool initialized = false;
 
         public override void Entry(params object[] objects)
         {
             config = ConfigExtensions.InitializeConfig<Configuration>(new Configuration(), base.BaseConfigPath);
+            PlayerEvents.LoadedGame += PlayerEvents_LoadedGame;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderEvent;
             KeyboardInput.KeyDown += KeyboardInput_KeyDown;
+        }
+
+        private void PlayerEvents_LoadedGame(object sender, EventArgsLoadedGameChanged e)
+        {
+            saveFile = Game1.player.name.RemoveNumerics() + "_" + Game1.uniqueIDForThisGame;
+            spriteCrop = MapModConstants.spriteCrop;
+            startingLocations = MapModConstants.startingLocations;
+            locationVectors = MapModConstants.locationVectors;
+            indoorLocations = MapModConstants.indoorLocations;
+            customNPCs = config.customNPCs;
+            loadComplete = true;
+        }
+
+        private void InitializeCustomNPCs()
+        {
+            if (customNPCs != null && customNPCs.Count != 0)
+            {
+                foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
+                {
+                    if (!entry.Value.ContainsKey(saveFile))
+                    {
+                        if (Game1.getCharacterFromName(entry.Key) != null)
+                        {
+                            entry.Value.Add(saveFile, 1);
+                        }
+                        else
+                        {
+                            entry.Value.Add(saveFile, 0);
+                        }
+                    }
+                    else
+                    {
+                        if (Game1.getCharacterFromName(entry.Key) != null)
+                        {
+                            entry.Value[saveFile] = 1;
+                        }
+                        else
+                        {
+                            entry.Value[saveFile] = 0;
+                        }
+                    }
+                    spriteCrop.Add(entry.Key, entry.Value["crop"]);
+                }
+            }
+            else
+            {
+                customNPCs = new Dictionary<string, Dictionary<string, int>>();
+                var count = 1;
+          
+                foreach (NPC npc in Utility.getAllCharacters())
+                {
+                    if (npc.Schedule != null && isCustomNPC(npc.name))
+                    {
+                        if (!(customNPCs.ContainsKey(npc.name)))
+                        {
+                            var defval = new Dictionary<string, int>();
+                            defval.Add("id", count);
+                            defval.Add("crop", 0);
+                            if (Game1.getCharacterFromName(npc.name) != null)
+                            {
+                                defval.Add(saveFile, 1);
+                            }
+                            else
+                            {
+                                defval.Add(saveFile, 0);
+                            }
+                            customNPCs.Add(npc.name, defval);
+                            spriteCrop.Add(npc.name, 0);
+                            count++;
+                        }
+                    }
+                }
+            }
+            config.customNPCs = customNPCs;
+            ConfigExtensions.WriteConfig<Configuration>(config);
+            initialized = true;
         }
 
         // Open menu key
@@ -50,26 +134,33 @@ namespace NPCMapLocations
             if (menu.currentTab != 3) { return; }
             if (key.Equals(config.menuKey))
             {
-                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras);
+                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras, customNPCs);
             }
         }
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
-            if (!(Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)) { return; }
-            spriteCrop = MapModConstants.spriteCrop;
-            startingLocations = MapModConstants.startingLocations;
-            locationVectors = MapModConstants.locationVectors;
-            indoorLocations = MapModConstants.indoorLocations;
+            if (!(Game1.hasLoadedGame)) { return; }
+            if (loadComplete && !initialized)
+            {
+                InitializeCustomNPCs();
+            }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+
             List<string> npcNamesHovered = new List<String>();
+            birthdayNPCs = new HashSet<string>();
+            questNPCs = new HashSet<string>();
             npcNames = "";
 
             foreach (NPC npc in Utility.getAllCharacters())
             {
-                if (npc.Schedule != null || npc.isMarried())
+                if (npc.Schedule != null || npc.isMarried() || npc.name.Equals("Sandy") || npc.name.Equals("Marlon") || npc.name.Equals("Wizard"))
                 {
                     bool sameLocation = false;
-                    showExtras = (npc.name.Equals("Sandy") || npc.name.Equals("Wizard") || npc.name.Equals("Marlon"));
+                    showExtras[0] = Game1.player.mailReceived.Contains("ccVault");
+                    showExtras[1] = (Game1.stats.DaysPlayed >= 5u);
+                    showExtras[2] = (Game1.stats.DaysPlayed >= 5u); 
+
                     if (config.onlySameLocation)
                     {
                         string indoorLocationNPC;
@@ -85,10 +176,10 @@ namespace NPCMapLocations
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
                         }
                     }
-                    if ((sameLocation || !config.onlySameLocation) && 
+                    if ((sameLocation || !config.onlySameLocation) &&
                        ((config.immersionLevel == 2) ? Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
                        ((config.immersionLevel == 3) ? !Game1.player.hasTalkedToFriendToday(npc.name) : true) &&
-                       (showNPC(npc.name)) && 
+                       (showNPC(npc.name, showExtras)) &&
                        (config.byHeartLevel ? (Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax) : true))
                     {
                         int offsetX = 0;
@@ -116,6 +207,7 @@ namespace NPCMapLocations
                             double[] unknown = { -5000, -5000, 0, 0 };
                             npcLocation = unknown;
                         }
+
                         double mapScaleX = npcLocation[2];
                         double mapScaleY = npcLocation[3];
 
@@ -290,6 +382,52 @@ namespace NPCMapLocations
                         {
                             npcNamesHovered.Add(npc.name);
                         }
+
+                        if (config.markQuests)
+                        {
+                            if (Game1.getCharacterFromName(npc.name).isBirthday(Game1.currentSeason, Game1.dayOfMonth) && Game1.player.friendships[npc.name][3] != 1)
+                            {
+                                birthdayNPCs.Add(npc.name);
+                            }
+                            foreach (Quest quest in Game1.player.questLog)
+                            {
+                                if (quest.accepted && quest.dailyQuest && !quest.completed)
+                                {
+                                    if (quest.questType == 3)
+                                    {
+                                        var current = (ItemDeliveryQuest)quest;
+                                        if (current.target == npc.name)
+                                        {
+                                            questNPCs.Add(npc.name);
+                                        }
+                                    }
+                                    else if (quest.questType == 4)
+                                    {
+                                        var current = (SlayMonsterQuest)quest;
+                                        if (current.target == npc.name)
+                                        {
+                                            questNPCs.Add(npc.name);
+                                        }
+                                    }
+                                    else if (quest.questType == 7)
+                                    {
+                                        var current = (FishingQuest)quest;
+                                        if (current.target == npc.name)
+                                        {
+                                            questNPCs.Add(npc.name);
+                                        }
+                                    }
+                                    else if (quest.questType == 10)
+                                    {
+                                        var current = (ResourceCollectionQuest)quest;
+                                        if (current.target == npc.name)
+                                        {
+                                            questNPCs.Add(npc.name);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -303,11 +441,19 @@ namespace NPCMapLocations
                 npcNames = npcNamesHovered[0];
                 for (int i = 1; i < npcNamesHovered.Count; i++)
                 {
-                    npcNames += ", " + npcNamesHovered[i];
+                    var lines = npcNames.Split('\n');
+                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + ", " + npcNamesHovered[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X)
+                    {
+                        npcNames += ", " + Environment.NewLine;
+                        npcNames += npcNamesHovered[i];
+                    }
+                    else
+                    {
+                        npcNames += ", " + npcNamesHovered[i];
+                    }
                 };
             }
             toolTips = new MapPageTooltips(npcNames, config.nameTooltipMode);
-            
         }
 
         // Draw event (when Map Page is opened)
@@ -316,7 +462,6 @@ namespace NPCMapLocations
             if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
             {
                 drawMarkers((GameMenu)Game1.activeClickableMenu);
-
             }
         }
 
@@ -337,12 +482,13 @@ namespace NPCMapLocations
                 string currentLocation = Game1.player.currentLocation.name;
 
                 locationVectors.TryGetValue(currentLocation, out npcLocation);
+                if (npcLocation == null)
+                {
+                    double[] unknown = { -5000, -5000, 0, 0 };
+                    npcLocation = unknown;
+                }
                 double mapScaleX = npcLocation[2];
                 double mapScaleY = npcLocation[3];
-
-                // Partitioning large areas because map page sucks
-                // In addition to all the locations on the map, all of these values were meticulously calculated to make
-                // real-time tracking accurate with a badly scaling map page (only on NPC paths). DO NOT MESS WITH THESE UNLESS YOU CAN DO IT BETTER.
 
                 // Partitions for Town
                 if (currentLocation.Equals("Town"))
@@ -492,31 +638,51 @@ namespace NPCMapLocations
                         mapScaleY = 2.3;
                     }
                 }
-
+                Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
                 x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + Game1.player.getTileX() * mapScaleX + offsetX)));
                 y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + Game1.player.getTileY() * mapScaleY + offsetY)));
                 width = 32;
                 height = 30;
-                Game1.spriteBatch.Draw(Game1.getCharacterFromName("Kent").sprite.Texture, 
+                Game1.spriteBatch.Draw(Game1.getCharacterFromName("Abigail").sprite.Texture, 
                                        new Rectangle(x, y, width, height), 
-                                       new Rectangle?(new Rectangle(0, -1, 16, 15)), 
+                                       new Rectangle?(new Rectangle(0, 3, 16, 15)), 
                                        Color.White);
                 */
-
+                
+                if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
+                {
+                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                }
                 foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
                 {
-                    Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[entry.Key], 16, 15)), Color.White);
+                    if (!(birthdayNPCs.Contains(entry.Key) && questNPCs.Contains(entry.Key)))
+                    {
+                        Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[entry.Key], 16, 15)), Color.White);
+                    }
                 }
-                if (config.showTravelingMerchant &&
-                    (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28)) { 
-                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 140, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
+                {
+                    if (birthdayNPCs.Contains(entry.Key) || questNPCs.Contains(entry.Key))
+                    {
+                        Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[entry.Key], 16, 15)), Color.White);
+                  
+                        if (birthdayNPCs.Contains(entry.Key))
+                        {
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(entry.Value.position.X + 20, entry.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
+                        }
+                        if (questNPCs.Contains(entry.Key))
+                        {
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(entry.Value.position.X + 22, entry.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
+                        }
+             
+                    }
                 }
                 toolTips.draw(Game1.spriteBatch);   
                 Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
             }
         }
 
-        private static bool showNPC(string npc) 
+        private static bool showNPC(string npc, bool[] showExtras)
         {
             if (npc.Equals("Abigail")) { return config.showAbigail; }
             if (npc.Equals("Alex")) { return config.showAlex; }
@@ -547,10 +713,71 @@ namespace NPCMapLocations
             if (npc.Equals("Shane")) { return config.showShane; }
             if (npc.Equals("Vincent")) { return config.showVincent; }
             if (npc.Equals("Willy")) { return config.showWilly; }
-            if (npc.Equals("Sandy")) { return config.showSandy; }
-            if (npc.Equals("Marlon")) { return config.showMarlon; }
-            if (npc.Equals("Wizard")) { return config.showWizard; }
+            if (npc.Equals("Sandy")) { return (config.showSandy && showExtras[0]); }
+            if (npc.Equals("Marlon")) { return config.showMarlon && showExtras[1]; }
+            if (npc.Equals("Wizard")) { return config.showWizard && showExtras[2]; }
+            foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
+            {
+                if (entry.Value["id"] == 1 && npc.Equals(entry.Key))
+                {
+                    return config.showCustomNPC1;
+                }
+                else if (entry.Value["id"] == 2 && npc.Equals(entry.Key))
+                { 
+                    return config.showCustomNPC2;
+                }
+                else if (entry.Value["id"] == 3 && npc.Equals(entry.Key))
+                {
+                    return config.showCustomNPC3;
+                }
+                else if (entry.Value["id"] == 4 && npc.Equals(entry.Key))
+                {
+                    return config.showCustomNPC4;
+                }
+                else if (entry.Value["id"] == 5 && npc.Equals(entry.Key))
+                {
+                    return config.showCustomNPC5;
+                }
+            }
             return true;
+        }
+
+        private static bool isCustomNPC(string npc)
+        {
+            return (!(
+                npc.Equals("Abigail") ||
+                npc.Equals("Alex") ||
+                npc.Equals("Caroline") ||
+                npc.Equals("Clint") ||
+                npc.Equals("Demetrius") ||
+                npc.Equals("Elliott") ||
+                npc.Equals("Emily") ||
+                npc.Equals("Evelyn") ||
+                npc.Equals("George") ||
+                npc.Equals("Gus") ||
+                npc.Equals("Haley") ||
+                npc.Equals("Harvey") ||
+                npc.Equals("Jas") ||
+                npc.Equals("Jodi") ||
+                npc.Equals("Kent") ||
+                npc.Equals("Leah") ||
+                npc.Equals("Lewis") ||
+                npc.Equals("Linus") ||
+                npc.Equals("Marnie") ||
+                npc.Equals("Maru") ||
+                npc.Equals("Pam") ||
+                npc.Equals("Penny") ||
+                npc.Equals("Pierre") ||
+                npc.Equals("Robin") ||
+                npc.Equals("Sam") ||
+                npc.Equals("Sebastian") ||
+                npc.Equals("Shane") ||
+                npc.Equals("Vincent") ||
+                npc.Equals("Willy") ||
+                npc.Equals("Sandy") ||
+                npc.Equals("Marlon") ||
+                npc.Equals("Wizard"))
+            );
         }
     }
 
@@ -670,29 +897,6 @@ namespace NPCMapLocations
             }
         }
 
-        /*
-        public void drawMap(SpriteBatch b)
-        {
-            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
-            b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
-            switch (Game1.whichFarm)
-            {
-                case 1:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 2:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 3:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 4:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-            }
-        }
-        */
-
         // Draw location tooltips
         public override void draw(SpriteBatch b)
         {
@@ -756,19 +960,34 @@ namespace NPCMapLocations
         {
             if (!(names.Equals("")))
             {
+                var lines = names.Split('\n');
                 int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
                 int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
 
                 if (nameTooltipMode == 1)
                 {
                     x = Game1.getOldMouseX() + Game1.tileSize / 2;
-                    y += offsetY;
+                    if (lines.Length > 1)
+                    {
+                        y += offsetY - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                    }
+                    else
+                    {
+                        y += offsetY;
+                    }
                     // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
                     // without the cursor covering the tooltip
                     if (x + width > Game1.viewport.Width)
                     {
                         x = Game1.viewport.Width - width;
-                        y += relocate - 8 + Game1.tileSize;
+                        if (lines.Length > 1)
+                        {
+                            y += relocate - 8 + ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                        }
+                        else
+                        {
+                            y += relocate - 8 + Game1.tileSize;
+                        }
                     }
                 }
                 else if (nameTooltipMode == 2)
@@ -782,13 +1001,20 @@ namespace NPCMapLocations
                     if (y + height > Game1.viewport.Height)
                     {
                         x = Game1.getOldMouseX() + Game1.tileSize / 2;
-                        y += -relocate + 8 - Game1.tileSize;
+                        if (lines.Length > 1)
+                        {
+                            y += -relocate + 8 - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                        }
+                        else
+                        {
+                            y += -relocate + 8 - Game1.tileSize;
+                        }
                     }
                 }
                 else
                 {
                     x = Game1.activeClickableMenu.xPositionOnScreen - 145;
-                    y = Game1.activeClickableMenu.yPositionOnScreen + 625;
+                    y = Game1.activeClickableMenu.yPositionOnScreen + 625 - height/2;
                 }
 
                 drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
