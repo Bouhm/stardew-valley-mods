@@ -2,8 +2,11 @@
 My mods for Stardew Valley
 
 More information on the mods, discussions, and bug reports:
+
 http://community.playstarbound.com/threads/npc-map-locations-mod.112369/
+
 http://www.nexusmods.com/stardewvalley/mods/239/
+
 http://www.nexusmods.com/stardewvalley/mods/570/
 
 ### NPC Map Locations Mod
