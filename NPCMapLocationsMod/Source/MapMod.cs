@@ -100,7 +100,7 @@ namespace NPCMapLocations
                             var defval = new Dictionary<string, int>();
                             defval.Add("id", count);
                             defval.Add("crop", 0);
-                            if (Game1.getCharacterFromName(npc.name) != null)
+                            if (npc != null)
                             {
                                 defval.Add(saveFile, 1);
                             }
@@ -385,7 +385,7 @@ namespace NPCMapLocations
 
                         if (config.markQuests)
                         {
-                            if (Game1.getCharacterFromName(npc.name).isBirthday(Game1.currentSeason, Game1.dayOfMonth) && Game1.player.friendships[npc.name][3] != 1)
+                            if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth) && Game1.player.friendships[npc.name][3] != 1)
                             {
                                 birthdayNPCs.Add(npc.name);
                             }
@@ -713,7 +713,7 @@ namespace NPCMapLocations
             if (npc.Equals("Shane")) { return config.showShane; }
             if (npc.Equals("Vincent")) { return config.showVincent; }
             if (npc.Equals("Willy")) { return config.showWilly; }
-            if (npc.Equals("Sandy")) { return (config.showSandy && showExtras[0]); }
+            if (npc.Equals("Sandy")) { return config.showSandy && showExtras[0]; }
             if (npc.Equals("Marlon")) { return config.showMarlon && showExtras[1]; }
             if (npc.Equals("Wizard")) { return config.showWizard && showExtras[2]; }
             foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
