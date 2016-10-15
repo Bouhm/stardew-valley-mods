@@ -59,29 +59,24 @@ namespace NPCMapLocations
         {
             if (customNPCs != null && customNPCs.Count != 0)
             {
+                // Have to do it this way because getCharacterFromName causes problems...
                 foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
                 {
+                    int isInGame = 0;
+                    foreach (NPC npc in Utility.getAllCharacters())
+                    {
+                        if (npc.name.Equals(entry.Key))
+                        {
+                            isInGame = 1;
+                        }
+                    }
                     if (!entry.Value.ContainsKey(saveFile))
                     {
-                        if (Game1.getCharacterFromName(entry.Key) != null)
-                        {
-                            entry.Value.Add(saveFile, 1);
-                        }
-                        else
-                        {
-                            entry.Value.Add(saveFile, 0);
-                        }
+                        entry.Value.Add(saveFile, isInGame);
                     }
                     else
                     {
-                        if (Game1.getCharacterFromName(entry.Key) != null)
-                        {
-                            entry.Value[saveFile] = 1;
-                        }
-                        else
-                        {
-                            entry.Value[saveFile] = 0;
-                        }
+                        entry.Value[saveFile] = isInGame;
                     }
                     spriteCrop.Add(entry.Key, entry.Value["crop"]);
                 }
