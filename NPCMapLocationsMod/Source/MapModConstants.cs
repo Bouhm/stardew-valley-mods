@@ -1,6 +1,5 @@
 ﻿/*
 Static class that stores constants for map mod.
-Meticulously calculated locations, npc head crop, starting locations.
 */
 
 using System;

@@ -1,13 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿/*
+Menu settings for the mod. 
+Settings loaded from config file and changes saved onto config file.
+*/
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 
 namespace NPCMapLocations
 {
@@ -51,12 +54,12 @@ namespace NPCMapLocations
             {
                 this.optionSlots.Add(new ClickableComponent(new Rectangle(this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7), width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
             }
-            tooltipButton1 = new MapModButton("Above location tooltip", 1, -1, -1, -1, -1);
-            tooltipButton2 = new MapModButton("Below location tooltip", 2, -1, -1, -1, -1);
-            tooltipButton3 = new MapModButton("Bottom-left corner", 3, -1, -1, -1, -1);
-            immersionButton1 = new MapModButton("Always show villagers", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("Show villagers player has talked to", 5, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("Hide villagers player has talked to", 6, -1, -1, -1, -1);
+            tooltipButton1 = new MapModButton("Above Location Tooltip", 1, -1, -1, -1, -1);
+            tooltipButton2 = new MapModButton("Below Location Tooltip", 2, -1, -1, -1, -1);
+            tooltipButton3 = new MapModButton("Bottom-left Corner", 3, -1, -1, -1, -1);
+            immersionButton1 = new MapModButton("Always Show Villagers", 4, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("Show Villagers Player Has Talked To", 5, -1, -1, -1, -1);
+            immersionButton3 = new MapModButton("Hide Villagers Player Has Talked To", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
             this.options.Add(new OptionsElement("Names Tooltip Placement:"));
@@ -67,12 +70,12 @@ namespace NPCMapLocations
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
             this.options.Add(immersionButton3);
-            this.options.Add(new MapModCheckbox("Only show villagers in player's location", 36, -1, -1));
-            this.options.Add(new MapModCheckbox("Only show villagers within specified heart level", 41, -1, -1));
-            this.options.Add(new MapModSlider("Minimum heart level", 0, -1, -1));
-            this.options.Add(new MapModSlider("Maximum heart level", 1, -1, -1));
+            this.options.Add(new MapModCheckbox("Only Show Villagers in Player's Location", 36, -1, -1));
+            this.options.Add(new MapModCheckbox("Only Show Villagers Within Specified Heart Level", 41, -1, -1));
+            this.options.Add(new MapModSlider("Minimum Heart Level", 0, -1, -1));
+            this.options.Add(new MapModSlider("Maximum Heart Level", 1, -1, -1));
             this.options.Add(new OptionsElement("Extra Settings:"));
-            this.options.Add(new MapModCheckbox("Mark villagers with daily quest or birthday", 42, -1, -1));
+            this.options.Add(new MapModCheckbox("Mark Villagers With Daily Quest or Birthday", 42, -1, -1));
             // Custom NPCs
             if (customNPCs != null)
             {
@@ -177,7 +180,7 @@ namespace NPCMapLocations
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || key.ToString().Equals(MapModMain.config.menuKey)) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
-                Game1.soundBank.PlayCue("bigDeSelect");
+                //Game1.soundBank.PlayCue("bigDeSelect");
                 return;
             }
             this.canClose = true;
@@ -411,8 +414,14 @@ namespace NPCMapLocations
 
                             IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y, bounds.Width, bounds.Height, Color.White * (options[this.currentItemIndex + i].greyedOut ? 0.33f : 1f), 1f, false);
                         }
-                        this.options[this.currentItemIndex + i].draw(b, x, y);
-
+                        if (this.currentItemIndex + i == 0) {
+                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModVersionChecker.VERSION, Game1.borderFont, new Vector2(x + Game1.tileSize/2, y + Game1.tileSize/4), Color.Black);
+                            Utility.drawBoldText(b, MapModVersionChecker.notification, Game1.smoothFont, new Vector2(x + Game1.tileSize / 2 + Game1.borderFont.MeasureString("NPC Map Locations v" + MapModVersionChecker.VERSION).X, y + Game1.tileSize / 2), Color.Gray);
+                        }
+                        else
+                        {
+                            this.options[this.currentItemIndex + i].draw(b, x, y);
+                        }
                     }
                 }
             }
@@ -464,7 +473,7 @@ namespace NPCMapLocations
                     MapModMain.config.immersionLevel = whichOption - 3;
                 }
             }
-            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+            MapModMain.modHelper.WriteConfig(MapModMain.config);
         }
 
         public void greyOut()
@@ -624,7 +633,7 @@ namespace NPCMapLocations
             {
                 return;
             }
-            Game1.soundBank.PlayCue("drumkit6");
+            //Game1.soundBank.PlayCue("drumkit6");
             base.receiveLeftClick(x, y);
             this.isChecked = !this.isChecked;
             int whichOption = this.whichOption;
@@ -756,7 +765,7 @@ namespace NPCMapLocations
                 default:
                     break;  
             }
-            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+            MapModMain.modHelper.WriteConfig(MapModMain.config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -806,7 +815,7 @@ namespace NPCMapLocations
             {
                 MapModMain.config.heartLevelMax = this.value;
             }
-            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
+            MapModMain.modHelper.WriteConfig(MapModMain.config);
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -832,7 +841,7 @@ namespace NPCMapLocations
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X) + (float)(this.bounds.Width - 10 * Game1.pixelZoom) * ((float)this.value / (float)this.sliderMaxValue), (float)(slotY + this.bounds.Y)), new Rectangle?(OptionsSlider.sliderButtonRect), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.9f);
         }
     }
-
+    
     /*
     public class MapModInputListener : OptionsElement
     {

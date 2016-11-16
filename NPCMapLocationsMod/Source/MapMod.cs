@@ -6,18 +6,20 @@ Shows NPC locations real-time on the map.
 using StardewValley;
 using StardewValley.Quests;
 using StardewModdingAPI;
+using StardewValley.Menus;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
-using System;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley.Menus;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static Configuration config;
+        public static ModHelper modHelper;
+        public static MapModConfig config;
         public static string saveFile;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
@@ -35,18 +37,21 @@ namespace NPCMapLocations
         private bool loadComplete = false;
         private bool initialized = false;
 
-        public override void Entry(params object[] objects)
+        public override void Entry(ModHelper helper)
         {
-            config = ConfigExtensions.InitializeConfig<Configuration>(new Configuration(), base.BaseConfigPath);
+            modHelper = helper;
+            config = helper.ReadConfig<MapModConfig>();
             PlayerEvents.LoadedGame += PlayerEvents_LoadedGame;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderEvent;
             KeyboardInput.KeyDown += KeyboardInput_KeyDown;
         }
 
+        // Load constants, initialize custom NPC configurations, asynchronously check for mod update
         private void PlayerEvents_LoadedGame(object sender, EventArgsLoadedGameChanged e)
         {
-            saveFile = Game1.player.name.RemoveNumerics() + "_" + Game1.uniqueIDForThisGame;
+            Task.Run(() => MapModVersionChecker.getNotification()).GetAwaiter().GetResult();
+            saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
             locationVectors = MapModConstants.locationVectors;
@@ -59,51 +64,54 @@ namespace NPCMapLocations
         {
             if (customNPCs != null && customNPCs.Count != 0)
             {
-                // Have to do it this way because getCharacterFromName causes problems...
-                foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
+                var npcInstalled = new Dictionary<string, int>();
+                // Update save files for custom NPC installed or uninstalled
+                foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
                     int isInGame = 0;
                     foreach (NPC npc in Utility.getAllCharacters())
                     {
-                        if (npc.name.Equals(entry.Key))
+                        if (npc.name.Equals(customNPC.Key))
                         {
                             isInGame = 1;
                         }
                     }
-                    if (!entry.Value.ContainsKey(saveFile))
+                    if (!customNPC.Value.ContainsKey(saveFile))
                     {
-                        entry.Value.Add(saveFile, isInGame);
+                        customNPC.Value.Add(saveFile, isInGame);
                     }
                     else
                     {
-                        entry.Value[saveFile] = isInGame;
+                        customNPC.Value[saveFile] = isInGame;
                     }
-                    spriteCrop.Add(entry.Key, entry.Value["crop"]);
+                    if (!customNPC.Value.ContainsKey("crop"))
+                    {
+                        customNPC.Value.Add("crop", 0);
+                    }
+                    spriteCrop.Add(customNPC.Key, customNPC.Value["crop"]);
                 }
             }
             else
             {
-                customNPCs = new Dictionary<string, Dictionary<string, int>>();
                 var count = 1;
-          
                 foreach (NPC npc in Utility.getAllCharacters())
                 {
                     if (npc.Schedule != null && isCustomNPC(npc.name))
                     {
-                        if (!(customNPCs.ContainsKey(npc.name)))
+                        if (!customNPCs.ContainsKey(npc.name))
                         {
-                            var defval = new Dictionary<string, int>();
-                            defval.Add("id", count);
-                            defval.Add("crop", 0);
+                            var npcEntry = new Dictionary<string, int>();
+                            npcEntry.Add("id", count);
+                            npcEntry.Add("crop", 0);
                             if (npc != null)
                             {
-                                defval.Add(saveFile, 1);
+                                npcEntry.Add(saveFile, 1);
                             }
                             else
                             {
-                                defval.Add(saveFile, 0);
+                                npcEntry.Add(saveFile, 0);
                             }
-                            customNPCs.Add(npc.name, defval);
+                            customNPCs.Add(npc.name, npcEntry);
                             spriteCrop.Add(npc.name, 0);
                             count++;
                         }
@@ -111,7 +119,7 @@ namespace NPCMapLocations
                 }
             }
             config.customNPCs = customNPCs;
-            ConfigExtensions.WriteConfig<Configuration>(config);
+            modHelper.WriteConfig(config);
             initialized = true;
         }
 
@@ -135,7 +143,7 @@ namespace NPCMapLocations
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
-            if (!(Game1.hasLoadedGame)) { return; }
+            if (!Game1.hasLoadedGame) { return; }
             if (loadComplete && !initialized)
             {
                 InitializeCustomNPCs();
@@ -196,7 +204,7 @@ namespace NPCMapLocations
                         }
 
                         locationVectors.TryGetValue(currentLocation, out npcLocation);
-                        // So game doesn't crash if I missed a location
+                        // Catch location error
                         if (npcLocation == null)
                         {
                             double[] unknown = { -5000, -5000, 0, 0 };
@@ -206,9 +214,9 @@ namespace NPCMapLocations
                         double mapScaleX = npcLocation[2];
                         double mapScaleY = npcLocation[3];
 
-                        // Partitioning large areas because map page sucks
+                        // Partitioning large areas
                         // In addition to all the locations on the map, all of these values were meticulously calculated to make
-                        // real-time tracking accurate with a badly scaling map page (only on NPC paths). DO NOT MESS WITH THESE UNLESS YOU CAN DO IT BETTER.
+                        // real-time tracking accurate. DO NOT MESS WITH THESE (UNLESS IMPROVEMENTS CAN BE MADE)
 
                         // Partitions for Town
                         if (currentLocation.Equals("Town"))
@@ -648,26 +656,39 @@ namespace NPCMapLocations
                 {
                     Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
                 }
-                foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
+                foreach (KeyValuePair<string, int> crop in spriteCrop)
                 {
-                    if (!(birthdayNPCs.Contains(entry.Key) && questNPCs.Contains(entry.Key)))
+                    if (config.villagerCrop != null && config.villagerCrop.Count > 0)
                     {
-                        Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[entry.Key], 16, 15)), Color.White);
+                        foreach (KeyValuePair<string, int> npc in config.villagerCrop)
+                        {
+                            if (crop.Key.Equals(npc.Key))
+                            {
+                                spriteCrop[npc.Key] = npc.Value;
+                            }
+                        }
                     }
                 }
-                foreach (KeyValuePair<string, NPCMarker> entry in npcMarkers)
+                foreach (KeyValuePair<string, NPCMarker> npc in npcMarkers)
                 {
-                    if (birthdayNPCs.Contains(entry.Key) || questNPCs.Contains(entry.Key))
+                    if (!(birthdayNPCs.Contains(npc.Key) && questNPCs.Contains(npc.Key)))
                     {
-                        Game1.spriteBatch.Draw(entry.Value.marker, entry.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[entry.Key], 16, 15)), Color.White);
+                        Game1.spriteBatch.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[npc.Key], 16, 15)), Color.White);
+                    }
+                }
+                foreach (KeyValuePair<string, NPCMarker> npc in npcMarkers)
+                {
+                    if (birthdayNPCs.Contains(npc.Key) || questNPCs.Contains(npc.Key))
+                    {
+                        Game1.spriteBatch.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[npc.Key], 16, 15)), Color.White);
                   
-                        if (birthdayNPCs.Contains(entry.Key))
+                        if (birthdayNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(entry.Value.position.X + 20, entry.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
                         }
-                        if (questNPCs.Contains(entry.Key))
+                        if (questNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(entry.Value.position.X + 22, entry.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 1f);
                         }
              
                     }
@@ -711,29 +732,30 @@ namespace NPCMapLocations
             if (npc.Equals("Sandy")) { return config.showSandy && showExtras[0]; }
             if (npc.Equals("Marlon")) { return config.showMarlon && showExtras[1]; }
             if (npc.Equals("Wizard")) { return config.showWizard && showExtras[2]; }
-            foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
+            foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
             {
-                if (entry.Value["id"] == 1 && npc.Equals(entry.Key))
+                if (customNPC.Value["id"] == 1 && customNPC.Equals(customNPC.Key))
                 {
                     return config.showCustomNPC1;
                 }
-                else if (entry.Value["id"] == 2 && npc.Equals(entry.Key))
+                else if (customNPC.Value["id"] == 2 && customNPC.Equals(customNPC.Key))
                 { 
                     return config.showCustomNPC2;
                 }
-                else if (entry.Value["id"] == 3 && npc.Equals(entry.Key))
+                else if (customNPC.Value["id"] == 3 && customNPC.Equals(customNPC.Key))
                 {
                     return config.showCustomNPC3;
                 }
-                else if (entry.Value["id"] == 4 && npc.Equals(entry.Key))
+                else if (customNPC.Value["id"] == 4 && customNPC.Equals(customNPC.Key))
                 {
                     return config.showCustomNPC4;
                 }
-                else if (entry.Value["id"] == 5 && npc.Equals(entry.Key))
+                else if (customNPC.Value["id"] == 5 && customNPC.Equals(customNPC.Key))
                 {
                     return config.showCustomNPC5;
                 }
             }
+
             return true;
         }
 
