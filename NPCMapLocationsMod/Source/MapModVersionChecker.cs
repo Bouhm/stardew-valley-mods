@@ -6,12 +6,11 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
-using StardewModdingAPI;
 
 namespace NPCMapLocations
 {
     class MapModVersionChecker
-    { 
+    {
         private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases";
         public const string VERSION = "1.42";
         public static string notification = "";

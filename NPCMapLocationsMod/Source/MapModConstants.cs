@@ -48,7 +48,7 @@ public static class MapModConstants
             };
         }
     }
-    
+
     public static Dictionary<string, string> startingLocations
     {
         get

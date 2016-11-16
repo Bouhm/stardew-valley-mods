@@ -57,4 +57,3 @@ namespace NPCMapLocations
         public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = null;
     }
 }
-    

@@ -82,7 +82,7 @@ namespace NPCMapLocations
                 foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
                 {
                     if (entry.Value.ContainsKey(MapModMain.saveFile) && entry.Value[MapModMain.saveFile] == 1)
-                    { 
+                    {
                         this.options.Add(new MapModCheckbox("Show " + entry.Key, 42 + entry.Value["id"], -1, -1));
                     }
                 }
@@ -224,10 +224,10 @@ namespace NPCMapLocations
             }
             this.optionsSlotHeld = -1;
             this.scrolling = false;
-        }       
+        }
 
         private void downArrowPressed()
-        {   
+        {
             this.downArrow.scale = this.downArrow.baseScale;
             this.currentItemIndex++;
             this.setScrollBarToCurrentIndex();
@@ -270,7 +270,7 @@ namespace NPCMapLocations
                 tooltipButton1.receiveLeftClick(x, y);
                 tooltipButton2.greyOut();
                 tooltipButton3.greyOut();
-            } 
+            }
             else if (tooltipButton2.rect.Contains(x, y))
             {
                 tooltipButton2.receiveLeftClick(x, y);
@@ -300,7 +300,7 @@ namespace NPCMapLocations
                 immersionButton3.receiveLeftClick(x, y);
                 immersionButton1.greyOut();
                 immersionButton2.greyOut();
-            }   
+            }
             if (this.okButton.containsPoint(x, y))
             {
                 this.okButton.scale -= 0.25f;
@@ -414,8 +414,9 @@ namespace NPCMapLocations
 
                             IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y, bounds.Width, bounds.Height, Color.White * (options[this.currentItemIndex + i].greyedOut ? 0.33f : 1f), 1f, false);
                         }
-                        if (this.currentItemIndex + i == 0) {
-                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModVersionChecker.VERSION, Game1.borderFont, new Vector2(x + Game1.tileSize/2, y + Game1.tileSize/4), Color.Black);
+                        if (this.currentItemIndex + i == 0)
+                        {
+                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModVersionChecker.VERSION, Game1.borderFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
                             Utility.drawBoldText(b, MapModVersionChecker.notification, Game1.smoothFont, new Vector2(x + Game1.tileSize / 2 + Game1.borderFont.MeasureString("NPC Map Locations v" + MapModVersionChecker.VERSION).X, y + Game1.tileSize / 2), Color.Gray);
                         }
                         else
@@ -453,7 +454,7 @@ namespace NPCMapLocations
         }
 
         public override void receiveLeftClick(int x, int y)
-        {            
+        {
             if (!isActive)
             {
                 if (whichOption < 4)
@@ -496,7 +497,7 @@ namespace NPCMapLocations
         public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
 
         public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
-		{
+        {
             switch (whichOption)
             {
                 case 7:
@@ -597,7 +598,7 @@ namespace NPCMapLocations
                     return;
                 case 39:
                     this.isChecked = MapModMain.config.showMarlon;
-                    return; 
+                    return;
                 case 40:
                     this.isChecked = MapModMain.config.showTravelingMerchant;
                     return;
@@ -624,7 +625,7 @@ namespace NPCMapLocations
                     return;
                 default:
                     return;
-            } 
+            }
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -736,7 +737,7 @@ namespace NPCMapLocations
                     MapModMain.config.showWizard = this.isChecked;
                     break;
                 case 39:
-                    MapModMain.config.showMarlon = this.isChecked;  
+                    MapModMain.config.showMarlon = this.isChecked;
                     break;
                 case 40:
                     MapModMain.config.showTravelingMerchant = this.isChecked;
@@ -763,7 +764,7 @@ namespace NPCMapLocations
                     MapModMain.config.showCustomNPC5 = this.isChecked;
                     break;
                 default:
-                    break;  
+                    break;
             }
             MapModMain.modHelper.WriteConfig(MapModMain.config);
         }
@@ -787,7 +788,7 @@ namespace NPCMapLocations
         public string valueLabel;
 
         public MapModSlider(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
-		{
+        {
             valueLabel = label;
             if (whichOption == 0)
             {
@@ -841,7 +842,7 @@ namespace NPCMapLocations
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X) + (float)(this.bounds.Width - 10 * Game1.pixelZoom) * ((float)this.value / (float)this.sliderMaxValue), (float)(slotY + this.bounds.Y)), new Rectangle?(OptionsSlider.sliderButtonRect), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.9f);
         }
     }
-    
+
     /*
     public class MapModInputListener : OptionsElement
     {

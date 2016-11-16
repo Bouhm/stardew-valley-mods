@@ -18,7 +18,7 @@ namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static ModHelper modHelper;
+        public static StardewModdingAPI.ModHelper modHelper;
         public static MapModConfig config;
         public static string saveFile;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
