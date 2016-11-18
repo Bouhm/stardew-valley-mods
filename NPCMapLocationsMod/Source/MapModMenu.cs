@@ -58,10 +58,11 @@ namespace NPCMapLocations
             tooltipButton2 = new MapModButton("Below Location Tooltip", 2, -1, -1, -1, -1);
             tooltipButton3 = new MapModButton("Bottom-left Corner", 3, -1, -1, -1, -1);
             immersionButton1 = new MapModButton("Always Show Villagers", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("Show Villagers Player Has Talked To", 5, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("Show Villagers Play Has Talked To", 5, -1, -1, -1, -1);
             immersionButton3 = new MapModButton("Hide Villagers Player Has Talked To", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
+            this.options.Add(new OptionsElement("NPC Map Locations Mod Version"));
             this.options.Add(new OptionsElement("Names Tooltip Placement:"));
             this.options.Add(tooltipButton1);
             this.options.Add(tooltipButton2);
@@ -75,6 +76,7 @@ namespace NPCMapLocations
             this.options.Add(new MapModSlider("Minimum Heart Level", 0, -1, -1));
             this.options.Add(new MapModSlider("Maximum Heart Level", 1, -1, -1));
             this.options.Add(new OptionsElement("Extra Settings:"));
+            this.options.Add(new MapModCheckbox("Show Hidden Villagers", 48, -1, -1));
             this.options.Add(new MapModCheckbox("Mark Villagers With Daily Quest or Birthday", 42, -1, -1));
             // Custom NPCs
             if (customNPCs != null)
@@ -103,7 +105,10 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox("Harvey", 18, -1, -1));
             this.options.Add(new MapModCheckbox("Jas", 19, -1, -1));
             this.options.Add(new MapModCheckbox("Jodi", 20, -1, -1));
-            this.options.Add(new MapModCheckbox("Kent", 21, -1, -1));
+            if (showExtras[3])
+            {
+                this.options.Add(new MapModCheckbox("Kent", 21, -1, -1));
+            }
             this.options.Add(new MapModCheckbox("Leah", 22, -1, -1));
             this.options.Add(new MapModCheckbox("Lewis", 23, -1, -1));
             this.options.Add(new MapModCheckbox("Linus", 24, -1, -1));
@@ -339,7 +344,6 @@ namespace NPCMapLocations
             this.upArrow.tryHover(x, y, 0.1f);
             this.downArrow.tryHover(x, y, 0.1f);
             this.scrollBar.tryHover(x, y, 0.1f);
-            bool arg_4F_0 = this.scrolling;
         }
 
         public override void draw(SpriteBatch b)
@@ -623,6 +627,9 @@ namespace NPCMapLocations
                 case 47:
                     this.isChecked = MapModMain.config.showCustomNPC5;
                     return;
+                case 48:
+                    this.isChecked = MapModMain.config.showHiddenVillagers;
+                    return;
                 default:
                     return;
             }
@@ -763,6 +770,9 @@ namespace NPCMapLocations
                 case 47:
                     MapModMain.config.showCustomNPC5 = this.isChecked;
                     break;
+                case 48:
+                    MapModMain.config.showHiddenVillagers = this.isChecked;
+                    break;
                 default:
                     break;
             }
@@ -772,7 +782,22 @@ namespace NPCMapLocations
         public override void draw(SpriteBatch b, int slotX, int slotY)
         {
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X), (float)(slotY + this.bounds.Y)), new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked), Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
-            base.draw(b, slotX, slotY);
+            if (!MapModMain.isCustomNPC(this.label) && Game1.getCharacterFromName(label) != null)
+            {
+                if (this.isChecked)
+                {
+                    Game1.spriteBatch.Draw(Game1.getCharacterFromName(label).sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[label], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                }                   
+                else
+                {
+                    Game1.spriteBatch.Draw(Game1.getCharacterFromName(label).sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.spriteCrop[label], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                }
+                base.draw(b, slotX + 75, slotY);
+            }
+            else
+            {
+                base.draw(b, slotX, slotY);
+            }
         }
     }
 

@@ -14,6 +14,7 @@ namespace NPCMapLocations
         public int heartLevelMin { get; set; } = 0;
         public int heartLevelMax { get; set; } = 12;
         public bool onlySameLocation { get; set; } = false;
+        public bool showHiddenVillagers { get; set; } = false;
         public bool markQuests { get; set; } = true;
         public bool showAbigail { get; set; } = true;
         public bool showAlex { get; set; } = true;
@@ -48,12 +49,12 @@ namespace NPCMapLocations
         public bool showWizard { get; set; } = true;
         public bool showMarlon { get; set; } = false;
         public bool showTravelingMerchant { get; set; } = true;
-        public Dictionary<string, int> villagerCrop { get; set; } = null;
+        public Dictionary<string, int> villagerCrop { get; set; } = new Dictionary<string, int>();
         public bool showCustomNPC1 { get; set; } = true;
         public bool showCustomNPC2 { get; set; } = true;
         public bool showCustomNPC3 { get; set; } = true;
         public bool showCustomNPC4 { get; set; } = true;
         public bool showCustomNPC5 { get; set; } = true;
-        public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = null;
+        public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
     }
 }

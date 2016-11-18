@@ -63,7 +63,7 @@ namespace NPCMapLocations
                 return -1.0;
             }
             string tag = (string)json[0]["tag_name"];
-            return Convert.ToDouble(tag.Split('v')[1]);
+            return Convert.ToDouble(tag);
         }
     }
 }
