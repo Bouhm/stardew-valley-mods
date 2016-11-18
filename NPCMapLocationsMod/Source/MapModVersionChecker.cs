@@ -11,7 +11,7 @@ namespace NPCMapLocations
 {
     class MapModVersionChecker
     {
-        private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases";
+        private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases/latest";
         public const string VERSION = "1.42";
         public static string notification = "";
 
@@ -38,7 +38,7 @@ namespace NPCMapLocations
             }
         }
 
-        public static async Task<JArray> GetJsonAsync(string uri)
+        public static async Task<JObject> GetJsonAsync(string uri)
         {
             using (var client = new HttpClient())
             {
@@ -46,7 +46,7 @@ namespace NPCMapLocations
                 try
                 {
                     var jsonString = await client.GetStringAsync(uri).ConfigureAwait(false);
-                    return JArray.Parse(jsonString);
+                    return JObject.Parse(jsonString);
                 }
                 catch
                 {
@@ -57,12 +57,12 @@ namespace NPCMapLocations
 
         private static async Task<double> getLatestVersion()
         {
-            JArray json = await GetJsonAsync(uri);
+            JObject json = await GetJsonAsync(uri);
             if (json == null)
             {
                 return -1.0;
             }
-            string tag = (string)json[0]["tag_name"];
+            string tag = (string)json["tag_name"];
             return Convert.ToDouble(tag);
         }
     }
