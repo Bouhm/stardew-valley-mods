@@ -58,7 +58,7 @@ namespace NPCMapLocations
             tooltipButton2 = new MapModButton("Below Location Tooltip", 2, -1, -1, -1, -1);
             tooltipButton3 = new MapModButton("Bottom-left Corner", 3, -1, -1, -1, -1);
             immersionButton1 = new MapModButton("Always Show Villagers", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("Show Villagers Play Has Talked To", 5, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("Show Villagers Player Has Talked To", 5, -1, -1, -1, -1);
             immersionButton3 = new MapModButton("Hide Villagers Player Has Talked To", 6, -1, -1, -1, -1);
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));

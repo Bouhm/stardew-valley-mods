@@ -38,7 +38,7 @@ namespace NPCMapLocations
             }
         }
 
-        public static async Task<JObject> GetJsonAsync(string uri)
+        private static async Task<JObject> GetJsonAsync(string uri)
         {
             using (var client = new HttpClient())
             {
