@@ -45,7 +45,8 @@ namespace NPCMapLocations
             PlayerEvents.LoadedGame += PlayerEvents_LoadedGame;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
-            KeyboardInput.KeyDown += KeyboardInput_KeyDown;
+            ControlEvents.KeyPressed += KeyboardInput_KeyDown;
+
         }
 
         // Load constants, initialize custom NPC configurations, asynchronously check for mod update
@@ -124,11 +125,11 @@ namespace NPCMapLocations
         }
 
         // Open menu key
-        private void KeyboardInput_KeyDown(object sender, KeyEventArgs e)
+        private void KeyboardInput_KeyDown(object sender, EventArgsKeyPressed e)
         {
             if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
             {
-                changeKey(e.KeyCode.ToString(), (GameMenu)Game1.activeClickableMenu);
+                changeKey(e.KeyPressed.ToString(), (GameMenu)Game1.activeClickableMenu);
             }
         }
 
