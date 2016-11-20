@@ -6,29 +6,32 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
+using StardewModdingAPI;
 
 namespace NPCMapLocations
 {
     class MapModVersionChecker
     {
         private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases/latest";
-        public const string VERSION = "1.42";
+        public const string VERSION = "1.43";
         public static string notification = "";
 
         // Notification message
         public static async void getNotification()
         {
-            double latestVer = await getLatestVersion();
-            double currentVer = Convert.ToDouble(VERSION);
-            if (latestVer == -1)
-            {
+            string latestVer = await getLatestVersion();
+            string currentVer = VERSION;
+            int compareVer = compareVersions(currentVer, latestVer);
+
+            if (compareVer == -999)
+            { 
                 notification = "";
             }
-            else if (latestVer > currentVer)
+            else if (compareVer > 0)
             {
                 notification = " - Update is Available.";
             }
-            else if (latestVer == currentVer)
+            else if (compareVer == 0)
             {
                 notification = " - Latest Version.";
             }
@@ -55,15 +58,44 @@ namespace NPCMapLocations
             }
         }
 
-        private static async Task<double> getLatestVersion()
+        private static async Task<string> getLatestVersion()
         {
             JObject json = await GetJsonAsync(uri);
             if (json == null)
             {
-                return -1.0;
+                return "";
             }
-            string tag = (string)json["tag_name"];
-            return Convert.ToDouble(tag);
+            return (string)json["tag_name"];
+        }
+
+        // Comparable for version since converting to double has problems with how different regions interpret double
+        private static int compareVersions(string current, string latest)
+        {
+            if (string.IsNullOrEmpty(latest)) 
+            {
+                return -999;
+            }
+            string[] currentVer = current.Split('.');
+            string[] latestVer = latest.Split('.');
+
+            // Compare major version
+            if (!currentVer[0].Equals(latestVer[0]))
+            {
+                return Int32.Parse(latestVer[0]) - Int32.Parse(currentVer[0]);
+            } 
+            // Compare minor version (if major versions are equal) 
+            if (!currentVer[1].Equals(latestVer[1])) {
+                return Int32.Parse(latestVer[1]) - Int32.Parse(currentVer[1]);
+            }
+            // If I switch to semantic versioning in the future
+            if (currentVer.Length != latestVer.Length) {
+                return latestVer.Length - currentVer.Length;
+            }
+            if ((currentVer.Length > 2 && latestVer.Length > 2) && !currentVer[3].Equals(latestVer[3]))
+            {
+                return Int32.Parse(latestVer[3]) - Int32.Parse(currentVer[3]);
+            }
+            return 0;
         }
     }
 }
