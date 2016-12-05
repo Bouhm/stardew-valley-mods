@@ -3,9 +3,11 @@ Version checker for the mod.
 Gives notifications for updates.
 */
 using System;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using System.Net.Http;
+using System.Net;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
@@ -38,13 +40,20 @@ namespace NPCMapLocations
 
         private static async Task<JObject> GetJsonAsync(string uri)
         {
-            using (var client = new HttpClient())
+            HttpWebRequest request = WebRequest.CreateHttp(uri);
+            request.UserAgent = "Map Mod Version Checker";
+            request.Accept = "application/vnd.github.v3+json";
+            request.Proxy = null;
+
+            // fetch data 
+            using (WebResponse response = await request.GetResponseAsync())
+            using (Stream responseStream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(responseStream))
             {
-                client.DefaultRequestHeaders.Add("User-Agent", "Map Mod Version Checker");
                 try
                 {
-                    var jsonString = await client.GetStringAsync(uri).ConfigureAwait(false);
-                    return JObject.Parse(jsonString);
+                    string responseText = reader.ReadToEnd();
+                    return JsonConvert.DeserializeObject<JObject>(responseText);
                 }
                 catch
                 {
