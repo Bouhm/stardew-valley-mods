@@ -6,14 +6,13 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
-using StardewModdingAPI;
 
 namespace NPCMapLocations
 {
     class MapModVersionChecker
     {
         private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases/latest";
-        public const string VERSION = "1.43";
+        public const string VERSION = "1.4.4";
         public static string notification = "";
 
         // Notification message
@@ -23,11 +22,7 @@ namespace NPCMapLocations
             string currentVer = VERSION;
             int compareVer = compareVersions(currentVer, latestVer);
 
-            if (compareVer == -999)
-            { 
-                notification = "";
-            }
-            else if (compareVer > 0)
+            if (compareVer > 0)
             {
                 notification = " - Update is Available.";
             }
@@ -73,11 +68,16 @@ namespace NPCMapLocations
         {
             if (string.IsNullOrEmpty(latest)) 
             {
-                return -999;
+                return -1;
             }
             string[] currentVer = current.Split('.');
             string[] latestVer = latest.Split('.');
 
+            // When switching from non-semantic version to semantic
+            if (currentVer.Length != latestVer.Length)
+            {
+                return latestVer.Length - currentVer.Length;
+            }
             // Compare major version
             if (!currentVer[0].Equals(latestVer[0]))
             {
@@ -86,10 +86,6 @@ namespace NPCMapLocations
             // Compare minor version (if major versions are equal) 
             if (!currentVer[1].Equals(latestVer[1])) {
                 return Int32.Parse(latestVer[1]) - Int32.Parse(currentVer[1]);
-            }
-            // If I switch to semantic versioning in the future
-            if (currentVer.Length != latestVer.Length) {
-                return latestVer.Length - currentVer.Length;
             }
             if ((currentVer.Length > 2 && latestVer.Length > 2) && !currentVer[3].Equals(latestVer[3]))
             {
