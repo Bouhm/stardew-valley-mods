@@ -433,7 +433,7 @@ namespace NPCMapLocations
                         if (this.currentItemIndex + i == 0)
                         {
                             Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModVersionChecker.VERSION, Game1.borderFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
-                            Utility.drawBoldText(b, MapModVersionChecker.notification, Game1.smoothFont, new Vector2(x + Game1.tileSize / 2 + Game1.borderFont.MeasureString("NPC Map Locations v" + MapModVersionChecker.VERSION).X, y + Game1.tileSize / 2), Color.Gray);
+                            // Utility.drawBoldText(b, MapModVersionChecker.notification, Game1.smoothFont, new Vector2(x + Game1.tileSize / 2 + Game1.borderFont.MeasureString("NPC Map Locations v" + MapModVersionChecker.VERSION).X, y + Game1.tileSize / 2), Color.Gray);
                         }
                         else
                         {
@@ -442,7 +442,10 @@ namespace NPCMapLocations
                     }
                 }
             }
-            b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, Game1.options.gamepadControls ? 44 : 0, 16, 16)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
+            if (!Game1.options.hardwareCursor)
+            {
+                b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, Game1.options.gamepadControls ? 44 : 0, 16, 16)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
+            }
         }
     }
 

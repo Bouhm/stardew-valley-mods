@@ -53,7 +53,7 @@ namespace NPCMapLocations
         // Load constants, initialize custom NPC configurations, asynchronously check for mod update
         private void PlayerEvents_LoadedGame(object sender, EventArgsLoadedGameChanged e)
         {
-            Task.Run(() => MapModVersionChecker.getNotification()).GetAwaiter().GetResult();
+            // Task.Run(() => MapModVersionChecker.getNotification()).GetAwaiter().GetResult();
             saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
@@ -764,7 +764,9 @@ namespace NPCMapLocations
                     }
                 }
                 toolTips.draw(Game1.spriteBatch);
-                Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                if (!Game1.options.hardwareCursor) {
+                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                }
             }
         }
 
