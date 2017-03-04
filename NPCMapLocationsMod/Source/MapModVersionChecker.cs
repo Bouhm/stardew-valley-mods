@@ -15,7 +15,7 @@ namespace NPCMapLocations
     class MapModVersionChecker
     {
         private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases/latest";
-        public const string VERSION = "1.4.5";
+        public const string VERSION = "1.4.6";
         public static string notification = "";
 
         // Notification message

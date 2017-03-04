@@ -9,7 +9,7 @@ namespace NPCMapLocations
     {
         public int nameTooltipMode { get; set; } = 1;
         public string menuKey { get; set; } = "Tab";
-        public int immersionLevel { get; set; } = 1;
+        public int immersionOption { get; set; } = 1;
         public bool byHeartLevel { get; set; } = false;
         public int heartLevelMin { get; set; } = 0;
         public int heartLevelMax { get; set; } = 12;
@@ -45,9 +45,9 @@ namespace NPCMapLocations
         public bool showShane { get; set; } = true;
         public bool showVincent { get; set; } = true;
         public bool showWilly { get; set; } = true;
-        public bool showSandy { get; set; } = false;
+        public bool showSandy { get; set; } = true;
         public bool showWizard { get; set; } = true;
-        public bool showMarlon { get; set; } = false;
+        public bool showMarlon { get; set; } = true;
         public bool showTravelingMerchant { get; set; } = true;
         public Dictionary<string, int> villagerCrop { get; set; } = new Dictionary<string, int>();
         public bool showCustomNPC1 { get; set; } = true;

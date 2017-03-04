@@ -19,9 +19,12 @@ namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
+        public static ISemanticVersion current = new SemanticVersion("1.4.6");
+        public static ISemanticVersion latest = new SemanticVersion("1.4.6");
         public static IModHelper modHelper;
         public static MapModConfig config;
-        public static string saveFile;
+        // public static string saveFile;
+        public static int customNpcId = 0;
         public static int menuOpen = 0;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
@@ -44,17 +47,16 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             config = helper.ReadConfig<MapModConfig>();
-            PlayerEvents.LoadedGame += PlayerEvents_LoadedGame;
+            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             ControlEvents.KeyPressed += KeyboardInput_KeyDown;
         }
 
-        // Load constants, initialize custom NPC configurations, asynchronously check for mod update
-        private void PlayerEvents_LoadedGame(object sender, EventArgsLoadedGameChanged e)
+        private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
             // Task.Run(() => MapModVersionChecker.getNotification()).GetAwaiter().GetResult();
-            saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
+            // saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
             locationVectors = MapModConstants.locationVectors;
@@ -86,15 +88,20 @@ namespace NPCMapLocations
         {
             if (initialize == 0)
             {
-                // Update save files for custom NPC installed or uninstalled
+                int idx = 1;
+                // Update save files for custom NPC installed or uninstalled (pseudo-persave config)
                 foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
-                    int isInGame = 0;
+                    // isInGame = 0;
                     if (npc.name.Equals(customNPC.Key))
                     {
-                        isInGame = 1;
+                        // isInGame = 1;
+                        customNpcId = idx;
                     }
 
+                    /*
+                    // Pseudo-persave config for custom NPC (since custom NPCs have to be installed to each save file)
+                    // Works too unreliably; remove for now;
                     if (!customNPC.Value.ContainsKey(saveFile))
                     {
                         customNPC.Value.Add(saveFile, isInGame);
@@ -103,11 +110,16 @@ namespace NPCMapLocations
                     {
                         customNPC.Value[saveFile] = isInGame;
                     }
+                    */
                     if (!customNPC.Value.ContainsKey("crop"))
                     {
                         customNPC.Value.Add("crop", 0);
                     }
-                    spriteCrop.Add(customNPC.Key, customNPC.Value["crop"]);
+                    if (!spriteCrop.ContainsKey(customNPC.Key))
+                    {
+                        spriteCrop.Add(customNPC.Key, customNPC.Value["crop"]);
+                    }
+                    idx++;
                 }
             } 
             else
@@ -119,6 +131,7 @@ namespace NPCMapLocations
                         var npcEntry = new Dictionary<string, int>();
                         npcEntry.Add("id", id);
                         npcEntry.Add("crop", 0);
+                        /*
                         if (npc != null)
                         {
                             npcEntry.Add(saveFile, 1);
@@ -127,6 +140,7 @@ namespace NPCMapLocations
                         {
                             npcEntry.Add(saveFile, 0);
                         }
+                        */
                         customNPCs.Add(npc.name, npcEntry);
                         spriteCrop.Add(npc.name, 0);
                         id++;
@@ -223,8 +237,8 @@ namespace NPCMapLocations
                         }
                     }
 
-                    if ((config.immersionLevel == 2 && !Game1.player.hasTalkedToFriendToday(npc.name)) ||
-                        (config.immersionLevel == 3 && Game1.player.hasTalkedToFriendToday(npc.name)) ||
+                    if ((config.immersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.name)) ||
+                        (config.immersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.name)) ||
                         (config.onlySameLocation && !sameLocation) ||
                         (config.byHeartLevel && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax)))
                     {
@@ -432,7 +446,10 @@ namespace NPCMapLocations
 
                         if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
                         {
-                            hoveredList.Add(npcNames[npc.name]);
+                            if (npcNames.ContainsKey(npc.name))
+                            {
+                                hoveredList.Add(npcNames[npc.name]);
+                            }
                         }
 
                         if (config.markQuests)
@@ -807,25 +824,21 @@ namespace NPCMapLocations
             if (npc.Equals("Wizard")) { return config.showWizard && showExtras[2]; }
             foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
             {
-                if (customNPC.Value["id"] == 1 && customNPC.Equals(customNPC.Key))
+                if (customNPC.Key.Equals(npc))
                 {
-                    return config.showCustomNPC1;
-                }
-                else if (customNPC.Value["id"] == 2 && customNPC.Equals(customNPC.Key))
-                {
-                    return config.showCustomNPC2;
-                }
-                else if (customNPC.Value["id"] == 3 && customNPC.Equals(customNPC.Key))
-                {
-                    return config.showCustomNPC3;
-                }
-                else if (customNPC.Value["id"] == 4 && customNPC.Equals(customNPC.Key))
-                {
-                    return config.showCustomNPC4;
-                }
-                else if (customNPC.Value["id"] == 5 && customNPC.Equals(customNPC.Key))
-                {
-                    return config.showCustomNPC5;
+                    switch (customNPC.Value["id"])
+                    {
+                        case 1:
+                            return config.showCustomNPC1;
+                        case 2:
+                            return config.showCustomNPC2;
+                        case 3:
+                            return config.showCustomNPC3;
+                        case 4:
+                            return config.showCustomNPC4;
+                        case 5:
+                            return config.showCustomNPC5;
+                    }
                 }
             }
 

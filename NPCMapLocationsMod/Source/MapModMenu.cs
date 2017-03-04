@@ -16,13 +16,13 @@ namespace NPCMapLocations
 {
     public class MapModMenu : IClickableMenu
     {
+        public const int itemsPerPage = 7;
+        public const int indexOfGraphicsPage = 6;
+        public int currentItemIndex;
         private Texture2D map;
         private int mapX;
         private int mapY;
-        public const int itemsPerPage = 7;
-        public const int indexOfGraphicsPage = 6;
         private List<ClickableComponent> optionSlots = new List<ClickableComponent>();
-        public int currentItemIndex;
         private ClickableTextureComponent upArrow;
         private ClickableTextureComponent downArrow;
         private ClickableTextureComponent scrollBar;
@@ -83,9 +83,9 @@ namespace NPCMapLocations
             {
                 foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
                 {
-                    if (entry.Value.ContainsKey(MapModMain.saveFile) && entry.Value[MapModMain.saveFile] == 1)
+                    if (MapModMain.customNpcId > 0)
                     {
-                        this.options.Add(new MapModCheckbox("Show " + entry.Key, 42 + entry.Value["id"], -1, -1));
+                        this.options.Add(new MapModCheckbox("Show " + entry.Key, 42 + MapModMain.customNpcId, -1, -1));
                     }
                 }
             }
@@ -432,7 +432,7 @@ namespace NPCMapLocations
                         }
                         if (this.currentItemIndex + i == 0)
                         {
-                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModVersionChecker.VERSION, Game1.borderFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
+                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModMain.current, Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
                             // Utility.drawBoldText(b, MapModVersionChecker.notification, Game1.smoothFont, new Vector2(x + Game1.tileSize / 2 + Game1.borderFont.MeasureString("NPC Map Locations v" + MapModVersionChecker.VERSION).X, y + Game1.tileSize / 2), Color.Gray);
                         }
                         else
@@ -462,7 +462,7 @@ namespace NPCMapLocations
             {
                 this.greyedOut = false;
             }
-            else if (MapModMain.config.immersionLevel == whichOption - 3)
+            else if (MapModMain.config.immersionOption == whichOption - 3)
             {
                 this.greyedOut = false;
             }
@@ -490,7 +490,7 @@ namespace NPCMapLocations
                     base.receiveLeftClick(x, y);
                     this.isActive = true;
                     this.greyedOut = false;
-                    MapModMain.config.immersionLevel = whichOption - 3;
+                    MapModMain.config.immersionOption = whichOption - 3;
                 }
             }
             MapModMain.modHelper.WriteConfig(MapModMain.config);
@@ -607,16 +607,16 @@ namespace NPCMapLocations
                     this.isChecked = MapModMain.config.showWilly;
                     return;
                 case 36:
-                    this.isChecked = MapModMain.config.onlySameLocation;
-                    return;
-                case 37:
                     this.isChecked = MapModMain.config.showSandy;
                     return;
-                case 38:
+                case 37:
                     this.isChecked = MapModMain.config.showWizard;
                     return;
-                case 39:
+                case 38:
                     this.isChecked = MapModMain.config.showMarlon;
+                    return;
+                case 39:
+                    this.isChecked = MapModMain.config.onlySameLocation;
                     return;
                 case 40:
                     this.isChecked = MapModMain.config.showTravelingMerchant;
@@ -750,16 +750,16 @@ namespace NPCMapLocations
                     MapModMain.config.showWilly = this.isChecked;
                     break;
                 case 36:
-                    MapModMain.config.onlySameLocation = this.isChecked;
-                    break;
-                case 37:
                     MapModMain.config.showSandy = this.isChecked;
                     break;
-                case 38:
+                case 37:
                     MapModMain.config.showWizard = this.isChecked;
                     break;
-                case 39:
+                case 38:
                     MapModMain.config.showMarlon = this.isChecked;
+                    break;
+                case 39:
+                    MapModMain.config.onlySameLocation = this.isChecked;
                     break;
                 case 40:
                     MapModMain.config.showTravelingMerchant = this.isChecked;
