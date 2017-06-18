@@ -12,15 +12,15 @@ using StardewModdingAPI.Events;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using StardewValley.Buildings;
 
 namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static ISemanticVersion current = new SemanticVersion("1.4.6");
-        public static ISemanticVersion latest = new SemanticVersion("1.4.6");
+        public static ISemanticVersion current = new SemanticVersion("1.4.7");
+        public static ISemanticVersion latest = new SemanticVersion("1.4.7");
         public static IModHelper modHelper;
         public static MapModConfig config;
         // public static string saveFile;
@@ -31,7 +31,7 @@ namespace NPCMapLocations
         // NPC head crops, top left corner (0, y), width = 16, height = 15 
         public static Dictionary<string, int> spriteCrop;
         private static Dictionary<string, string> startingLocations;
-        private static Dictionary<string, Double[]> locationVectors;
+        private static Dictionary<string, MapVectors[]> mapVectors;
         private static Dictionary<string, string> indoorLocations;
         private static MapPageTooltips toolTips;
         private static string hoveredNPCNames;
@@ -59,7 +59,7 @@ namespace NPCMapLocations
             // saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
-            locationVectors = MapModConstants.locationVectors;
+            mapVectors = MapModConstants.mapVectors;
             indoorLocations = MapModConstants.indoorLocations;
             customNPCs = config.customNPCs;
             loadComplete = true;
@@ -196,6 +196,88 @@ namespace NPCMapLocations
             }
         }
 
+        public static Vector2 locationToMap(string location, int tileX, int tileY)
+        {
+            if (location == null)
+            {
+                return new Vector2(-5000, -5000);
+            }
+
+            Vector2 mapVector = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+            int mapX = (int)mapVector.X;
+            int mapY = (int)mapVector.Y;
+            int x = 0;
+            int y = 0;
+
+            // Get tile location of farm buildings in farm
+            string[] farmBuildings = { "Coop", "Big Coop", "Deluxe Coop", "Barn", "Big Barn", "Deluxe Barn", "Slime Hutch", "Shed" };
+            if (farmBuildings.Contains(location))
+            {
+                foreach (Building building in Game1.getFarm().buildings)
+                {
+                    if (building.indoors != null && building.indoors.name.Equals(location))
+                    {
+                        tileX = building.tileX;
+                        tileY = building.tileY;
+                        location = "Farm";
+                    }
+                }
+            }
+            // Sort map vectors by distance to point
+            var vectors = mapVectors[location].OrderBy(vector => Math.Sqrt(Math.Pow(vector.tileX - tileX, 2) + Math.Pow(vector.tileY - tileY, 2)));
+
+            if (vectors.Count() == 1)
+            {
+                x = vectors.FirstOrDefault().x;
+                y = vectors.FirstOrDefault().y;
+            }
+            else
+            {
+                MapVectors lower = null;
+                MapVectors upper = null;
+
+                // Create bounding rectangle from two pre-defined points (lower & upper bound) and calculate map scale for that area
+                foreach (MapVectors vector in vectors)
+                {
+                    if (tileX == vector.tileX && tileY == vector.tileY)
+                    {
+                        return new Vector2(mapX + vector.x - 16, mapY + vector.y - 15);
+                    }
+                    else
+                    {
+                        if (lower != null && upper != null)
+                        {
+                            break;
+                        }
+                        if ((lower == null || (upper != null && (vector.tileX != upper.tileX && vector.tileY != upper.tileY))) && 
+                            (tileX >= vector.tileX && tileY >= vector.tileY))
+                        {
+                            lower = vector;
+                            continue;
+                        }
+                        if ((upper == null || (lower != null && (vector.tileX != lower.tileX && vector.tileY != lower.tileY))) &&
+                           (tileX <= vector.tileX && tileY <= vector.tileY))
+                        {
+                            upper = vector;
+                        }
+                    }
+                }
+
+                int tileXMin = Math.Min(lower.tileX, upper.tileX);
+                int tileXMax = Math.Max(lower.tileX, upper.tileX);
+                int tileYMin = Math.Min(lower.tileY, upper.tileY);
+                int tileYMax = Math.Max(lower.tileY, upper.tileY);
+                int xMin = Math.Min(lower.x, upper.x);
+                int xMax = Math.Max(lower.x, upper.x);
+                int yMin = Math.Min(lower.y, upper.y);
+                int yMax = Math.Max(lower.y, upper.y);
+                //Log.Verbose(lower.tileX + ", " + lower.tileY + ", " + upper.tileX + ", " + upper.tileY);
+                x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
+                y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
+            }
+            return new Vector2(mapX + x - 16, mapY + y - 15);
+        }
+
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
@@ -248,192 +330,10 @@ namespace NPCMapLocations
 
                     if (config.showHiddenVillagers ? showNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && showNPC(npc.name, showExtras)))
                     {
-                        int offsetX = 0;
-                        int offsetY = 0;
-                        int x = 0;
-                        int y = 0;
-                        int width = 0;
-                        int height = 0;
-                        double[] npcLocation;
-                        string currentLocation;
-                        // At the start of a new game, for some reason NPCs locations are null until 6:30 AM
-                        if (npc.currentLocation == null)
-                        {
-                            currentLocation = startingLocations[npc.name];
-                        }
-                        else
-                        {
-                            currentLocation = npc.currentLocation.name;
-                        }
-
-                        locationVectors.TryGetValue(currentLocation, out npcLocation);
-                        // Catch location error
-                        if (npcLocation == null)
-                        {
-                            double[] unknown = { -5000, -5000, 0, 0 };
-                            npcLocation = unknown;
-                        }
-
-                        double mapScaleX = npcLocation[2];
-                        double mapScaleY = npcLocation[3];
-
-                        // Partitioning large areas
-                        // In addition to all the locations on the map, all of these values were meticulously calculated to make
-                        // real-time tracking accurate. DO NOT MESS WITH THESE (UNLESS IMPROVEMENTS CAN BE MADE)
-
-                        // Partitions for Town
-                        if (currentLocation.Equals("Town"))
-                        {
-                            if (npc.getTileX() < 28 && npc.getTileY() < 58 && npc.getTileY() > 53)
-                            {
-                                offsetX = 5;
-                                offsetY = -30;
-                            }
-                            else if (npc.getTileX() < 31 && npc.getTileX() > 26 && npc.getTileY() > 74 && npc.getTileY() < 90)
-                            {
-                                offsetX = 10;
-                            }
-                            else if (npc.getTileX() < 30 && npc.getTileY() > 89 && npc.getTileY() < 98)
-                            {
-                                offsetY = -5;
-                                offsetX = 5;
-                            }
-                            else if (npc.getTileX() < 57 && npc.getTileY() > 98 && npc.getTileY() < 109)
-                            {
-                                offsetX = 30;
-                            }
-                            else if (npc.getTileX() < 78 && npc.getTileY() < 103 && npc.getTileY() > 40)
-                            {
-                                mapScaleX = 3.01;
-                                mapScaleY = 2.94;
-                                offsetY = -10;
-                            }
-                            else if (npc.getTileX() < 85 && npc.getTileY() < 43)
-                            {
-                                mapScaleX = 2.48;
-                                mapScaleY = 2.52;
-                                offsetX = -15;
-                            }
-
-                            else if (npc.getTileX() > 90 && npc.getTileY() < 41)
-                            {
-                                offsetX = -20;
-                                offsetY = 25;
-                            }
-                            else if (npc.getTileX() > 77 && npc.getTileY() < 61)
-                            {
-                                mapScaleX = 3.21;
-                                mapScaleY = 2.64;
-                                offsetX = -3;
-                                offsetY = -3;
-                            }
-                            else if (npc.getTileX() > 78 && npc.getTileY() > 60)
-                            {
-                                mapScaleX = 3.21;
-                                mapScaleY = 3.34;
-                                offsetX = -22;
-                                offsetY = -35;
-                            }
-                        }
-
-                        // Partitions for Forest ------------------------------------------------------------------------------------
-                        else if (currentLocation.Equals("Forest"))
-                        {
-                            if (Game1.player.getTileX() < 20)
-                            {
-                                mapScaleX = 3.152;
-                                mapScaleY = 1.82;
-                                offsetX = 47;
-                                offsetY = -35;
-                            }
-                            else if (npc.getTileX() < 66 && npc.getTileY() < 51)
-                            {
-                                mapScaleX = 3.152;
-                                mapScaleY = 1.82;
-                                offsetX = 50;
-                                offsetY = -10;
-                            }
-                            else if (npc.getTileX() > 60 && npc.getTileX() < 90 && npc.getTileY() < 23)
-                            {
-                                mapScaleX = 2.152;
-                                mapScaleY = 1.82;
-                                offsetX = 110;
-                            }
-                            else if (npc.getTileX() < 74 && npc.getTileY() < 49)
-                            {
-                                mapScaleX = 3.152;
-                                mapScaleY = 1.82;
-                                offsetX = 30;
-                            }
-                            else if (npc.getTileX() < 120 && npc.getTileY() < 52)
-                            {
-                                mapScaleX = 3.2;
-                                mapScaleY = 1.8;
-                                offsetX = 15;
-                                offsetY = -10;
-                            }
-                            else if (npc.getTileX() < 120 && npc.getTileY() < 101)
-                            {
-                                mapScaleX = 2.101;
-                                mapScaleY = 2.208;
-                            }
-                        }
-
-                        // Partitions for Beach ------------------------------------------------------------------------------------
-                        else if (currentLocation.Equals("Beach"))
-                        {
-                            if (npc.getTileY() < 7)
-                            {
-                                offsetX = -50;
-                                offsetY = 10;
-                            }
-                            else if (npc.getTileX() < 39 && npc.getTileY() < 22)
-                            {
-                                mapScaleX = 1.21;
-                                mapScaleY = 2.33;
-                                offsetX = -20;
-                            }
-                            else if (npc.getTileX() < 58 && npc.getTileX() > 28 && npc.getTileY() < 27)
-                            {
-                                mapScaleX = 1.11;
-                                mapScaleY = 2.33;
-                                offsetX = 15;
-                            }
-
-                            else if (npc.getTileX() < 58 && npc.getTileY() < 37)
-                            {
-                                mapScaleX = 2.745;
-                                mapScaleY = 2.833;
-                                offsetX = -20;
-                            }
-                        }
-
-                        // Partitions for Mountain ------------------------------------------------------------------------------------
-                        else if (currentLocation.Equals("Mountain"))
-                        {
-                            if (npc.getTileX() < 41 && npc.getTileY() < 16)
-                            {
-                                mapScaleX = 2.9;
-                                mapScaleY = 2.46;
-                                offsetX = -10;
-
-                            }
-                            else if (npc.getTileX() < 41 && npc.getTileY() < 41)
-                            {
-                                mapScaleX = 2.9;
-                                mapScaleY = 1.825;
-                            }
-                            else if (npc.getTileX() < 61 && npc.getTileY() < 41)
-                            {
-                                mapScaleX = 2.5;
-                                mapScaleY = 2.3;
-                            }
-                        }
-
-                        x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + npc.getTileX() * mapScaleX + offsetX)));
-                        y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + npc.getTileY() * mapScaleY + offsetY)));
-                        width = 32;
-                        height = 30;
+                        int x = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X;
+                        int y = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y;
+                        int width = 32;
+                        int height = 30;
 
                         if (npcMarkers.ContainsKey(npc.name))
                         {
@@ -558,200 +458,19 @@ namespace NPCMapLocations
             }
         }
 
-        private void GraphicsEvents_OnPreRenderGuiEvent(object sender, EventArgs e)
-        {
-        }
-
         // Actual draw event
         static void drawMarkers(GameMenu menu)
         {
             if (menu.currentTab == 3)
             {
-                /*
-                // Player testing
-                int offsetX = 0;
-                int offsetY = 0;
-                int x = 0;
-                int y = 0;
-                int width = 0;
-                int height = 0;
-                double[] npcLocation;
-                string currentLocation = Game1.player.currentLocation.name;
-
-                locationVectors.TryGetValue(currentLocation, out npcLocation);
-                if (npcLocation == null)
-                {
-                    double[] unknown = { -5000, -5000, 0, 0 };
-                    npcLocation = unknown;
-                }
-                double mapScaleX = npcLocation[2];
-                double mapScaleY = npcLocation[3];
-
-                // Partitions for Town
-                if (currentLocation.Equals("Town"))
-                {
-                    if (Game1.player.getTileX() < 28 && Game1.player.getTileY() < 58 && Game1.player.getTileY() > 53)
-                    {
-                        offsetX = 5;
-                        offsetY = -30;
-                    }
-                    else if (Game1.player.getTileX() < 31 && Game1.player.getTileX() > 26 && Game1.player.getTileY() > 74 && Game1.player.getTileY() < 90)
-                    {
-                        offsetX = 10;
-                    }
-                    else if (Game1.player.getTileX() < 30 && Game1.player.getTileY() > 89 && Game1.player.getTileY() < 98)
-                    {
-                        offsetY = -5;
-                        offsetX = 5;
-                    }
-                    else if (Game1.player.getTileX() < 57 && Game1.player.getTileY() > 98 && Game1.player.getTileY() < 109)
-                    {
-                        offsetX = 30;
-                    }
-                    else if (Game1.player.getTileX() < 78 && Game1.player.getTileY() < 103 && Game1.player.getTileY() > 40)
-                    {
-                        mapScaleX = 3.01;
-                        mapScaleY = 2.94;
-                        offsetY = -10;
-                    }
-                    else if (Game1.player.getTileX() < 85 && Game1.player.getTileY() < 43)
-                    {
-                        mapScaleX = 2.48;
-                        mapScaleY = 2.52;
-                        offsetX = -15;
-                    }
-
-                    else if (Game1.player.getTileX() > 90 && Game1.player.getTileY() < 41)
-                    {
-                        offsetX = -20;
-                        offsetY = 25;
-                    }
-                    else if (Game1.player.getTileX() > 77 && Game1.player.getTileY() < 61)
-                    {
-                        mapScaleX = 3.21;
-                        mapScaleY = 2.64;
-                        offsetX = -3;
-                        offsetY = -3;
-                    }
-                    else if (Game1.player.getTileX() > 78 && Game1.player.getTileY() > 60)
-                    {
-                        mapScaleX = 3.21;
-                        mapScaleY = 3.34;
-                        offsetX = -22;
-                        offsetY = -35;
-                    }
-                }
-
-                // Partitions for Forest ------------------------------------------------------------------------------------
-                else if (currentLocation.Equals("Forest"))
-                {
-                    if (Game1.player.getTileX() < 20)
-                    {
-                        mapScaleX = 3.152;
-                        mapScaleY = 1.82;
-                        offsetX = 47;
-                        offsetY = -35;
-                    }
-                    else if (Game1.player.getTileX() < 66 && Game1.player.getTileY() < 51)
-                    {
-                        mapScaleX = 3.152;
-                        mapScaleY = 1.82;
-                        offsetX = 50;
-                        offsetY = -10;
-                    }
-                    else if (Game1.player.getTileX() > 60 && Game1.player.getTileX() < 90 && Game1.player.getTileY() < 23)
-                    {
-                        mapScaleX = 2.152;
-                        mapScaleY = 1.82;
-                        offsetX = 110;
-                    }
-                    else if (Game1.player.getTileX() < 74 && Game1.player.getTileY() < 49)
-                    {
-                        mapScaleX = 3.152;
-                        mapScaleY = 1.82;
-                        offsetX = 30;
-                    }
-                    else if (Game1.player.getTileX() < 120 && Game1.player.getTileY() < 52)
-                    {
-                        mapScaleX = 3.2;
-                        mapScaleY = 1.8;
-                        offsetX = 15;
-                        offsetY = -10;
-                    }
-                    else if (Game1.player.getTileX() < 120 && Game1.player.getTileY() < 101)
-                    {
-                        mapScaleX = 2.101;
-                        mapScaleY = 2.208;
-                    }
-                }
-
-                // Partitions for Beach ------------------------------------------------------------------------------------
-                else if (currentLocation.Equals("Beach"))
-                {
-                    if (Game1.player.getTileY() < 7)
-                    {
-                        offsetX = -50;
-                        offsetY = 10;
-                    }
-                    else if (Game1.player.getTileX() < 39 && Game1.player.getTileY() < 22)
-                    {
-                        mapScaleX = 1.21;
-                        mapScaleY = 2.33;
-                        offsetX = -20;
-                    }
-                    else if (Game1.player.getTileX() < 58 && Game1.player.getTileX() > 28 && Game1.player.getTileY() < 27)
-                    {
-                        mapScaleX = 1.11;
-                        mapScaleY = 2.33;
-                        offsetX = 15;
-                    }
-
-                    else if (Game1.player.getTileX() < 58 && Game1.player.getTileY() < 37)
-                    {
-                        mapScaleX = 2.745;
-                        mapScaleY = 2.833;
-                        offsetX = -20;
-                    }
-                }
-
-                // Partitions for Mountain ------------------------------------------------------------------------------------
-                else if (currentLocation.Equals("Mountain"))
-                {
-                    if (Game1.player.getTileX() < 41 && Game1.player.getTileY() < 16)
-                    {
-                        mapScaleX = 2.9;
-                        mapScaleY = 2.46;
-                        offsetX = -10;
-
-                    }
-                    else if (Game1.player.getTileX() < 41 && Game1.player.getTileY() < 41)
-                    {
-                        mapScaleX = 2.9;
-                        mapScaleY = 1.825;
-                    }
-                    else if (Game1.player.getTileX() < 61 && Game1.player.getTileY() < 41)
-                    {
-                        mapScaleX = 2.5;
-                        mapScaleY = 2.3;
-                    }
-                }
-                Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
-                x = (int)(((Game1.activeClickableMenu.xPositionOnScreen - 160) + (4 + npcLocation[0] + Game1.player.getTileX() * mapScaleX + offsetX)));
-                y = (int)(((Game1.activeClickableMenu.yPositionOnScreen - 20) + (5 + npcLocation[1] + Game1.player.getTileY() * mapScaleY + offsetY)));
-                width = 32;
-                height = 30;
-                Game1.spriteBatch.Draw(Game1.getCharacterFromName("Abigail").sprite.Texture, 
-                                       new Rectangle(x, y, width, height), 
-                                       new Rectangle?(new Rectangle(0, 3, 16, 15)), 
-                                       Color.White);
-                */
-
+                // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
                 {
                     Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
                 }
                 var sortedMarkers = npcMarkers.ToList();
                 sortedMarkers.Sort((y, x) => x.Value.layer.CompareTo(y.Value.layer));
+              
                 foreach (KeyValuePair<string, NPCMarker> npc in sortedMarkers)
                 {
                     if (hiddenNPCs.Contains(npc.Key)) {
@@ -780,8 +499,12 @@ namespace NPCMapLocations
 
                     }
                 }
+                // Location and name tooltips
                 toolTips.draw(Game1.spriteBatch);
-                if (!Game1.options.hardwareCursor) {
+
+                // Cursor
+                if (!Game1.options.hardwareCursor)
+                {
                     Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
                 }
             }
@@ -841,7 +564,6 @@ namespace NPCMapLocations
                     }
                 }
             }
-
             return true;
         }
 
@@ -1068,8 +790,28 @@ namespace NPCMapLocations
         }
 
         // Draw NPC names in bottom left corner of map page
-        public static void drawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
+        public void drawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
+            // Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
+            // b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            switch (Game1.whichFarm)
+            {
+                case 1:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 2:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 3:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+                case 4:
+                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    break;
+            }
+            //Vector2 playerLoc = MapModMain.locationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
+            //Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 3, playerLoc.Y - 10), 0.00011f, 2f, 1, Game1.player);
+
             if (!(names.Equals("")))
             {
                 var lines = names.Split('\n');

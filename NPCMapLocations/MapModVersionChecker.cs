@@ -2,7 +2,7 @@
 Version checker for the mod.
 Gives notifications for updates.
 --- DEPRECATED - USE SMAPI VERSION CHECKER INSTEAD ---
-*/
+
 using System;
 using System.Threading.Tasks;
 using System.Net;
@@ -15,7 +15,7 @@ namespace NPCMapLocations
     class MapModVersionChecker
     {
         private static string uri = "https://api.github.com/repos/Bouhm/stardew-valley-mods/releases/latest";
-        public const string VERSION = "1.4.6";
+        public const string VERSION = "1.4.7";
         public static string notification = "";
 
         // Notification message
@@ -105,3 +105,4 @@ namespace NPCMapLocations
         }
     }
 }
+*/
