@@ -235,6 +235,7 @@ namespace NPCMapLocations
             {
                 MapVectors lower = null;
                 MapVectors upper = null;
+                var hasEqualTile = false; 
 
                 // Create bounding rectangle from two pre-defined points (lower & upper bound) and calculate map scale for that area
                 foreach (MapVectors vector in vectors)
@@ -247,16 +248,22 @@ namespace NPCMapLocations
                     {
                         if (lower != null && upper != null)
                         {
-                            break;
+                            // Don't want to exclude points where tile = vector x/y (hence the <= and >=) but avoid cases where both upper/lower are equal
+                            if (lower.tileX == upper.tileX || lower.tileY == upper.tileY)
+                            {
+                                hasEqualTile = true;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                        if ((lower == null || (upper != null && (vector.tileX != upper.tileX && vector.tileY != upper.tileY))) && 
-                            (tileX >= vector.tileX && tileY >= vector.tileY))
+                        if ((lower == null || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
                         {
                             lower = vector;
                             continue;
                         }
-                        if ((upper == null || (lower != null && (vector.tileX != lower.tileX && vector.tileY != lower.tileY))) &&
-                           (tileX <= vector.tileX && tileY <= vector.tileY))
+                        if ((upper == null || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
                         {
                             upper = vector;
                         }
@@ -271,7 +278,7 @@ namespace NPCMapLocations
                 int xMax = Math.Max(lower.x, upper.x);
                 int yMin = Math.Min(lower.y, upper.y);
                 int yMax = Math.Max(lower.y, upper.y);
-                //Log.Verbose(lower.tileX + ", " + lower.tileY + ", " + upper.tileX + ", " + upper.tileY);
+                Log.Verbose(lower.tileX + ", " + lower.tileY + ", " + upper.tileX + ", " + upper.tileY);
                 x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
                 y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
             }
@@ -330,8 +337,8 @@ namespace NPCMapLocations
 
                     if (config.showHiddenVillagers ? showNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && showNPC(npc.name, showExtras)))
                     {
-                        int x = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X;
-                        int y = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y;
+                        int x = 0; //int x = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X;
+                        int y = 0; //int y = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y;
                         int width = 32;
                         int height = 30;
 
@@ -435,7 +442,7 @@ namespace NPCMapLocations
                 for (int i = 1; i < hoveredList.Count; i++)
                 {
                     var lines = hoveredNPCNames.Split('\n');
-                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + ", " + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X)
+                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + ", " + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
                     {
                         hoveredNPCNames += ", " + Environment.NewLine;
                         hoveredNPCNames += hoveredList[i];
@@ -463,6 +470,9 @@ namespace NPCMapLocations
         {
             if (menu.currentTab == 3)
             {
+                // Location and name tooltips
+                toolTips.draw(Game1.spriteBatch);
+
                 // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
                 {
@@ -483,7 +493,6 @@ namespace NPCMapLocations
                         {
                             Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
-
                     }
                     else
                     {
@@ -496,11 +505,8 @@ namespace NPCMapLocations
                         {
                             Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
-
                     }
                 }
-                // Location and name tooltips
-                toolTips.draw(Game1.spriteBatch);
 
                 // Cursor
                 if (!Game1.options.hardwareCursor)
@@ -792,8 +798,8 @@ namespace NPCMapLocations
         // Draw NPC names in bottom left corner of map page
         public void drawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
-            // Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
-            // b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
+            b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
                 case 1:
@@ -809,8 +815,8 @@ namespace NPCMapLocations
                     b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
-            //Vector2 playerLoc = MapModMain.locationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
-            //Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 3, playerLoc.Y - 10), 0.00011f, 2f, 1, Game1.player);
+            Vector2 playerLoc = MapModMain.locationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
+            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
 
             if (!(names.Equals("")))
             {

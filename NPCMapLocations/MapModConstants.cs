@@ -155,17 +155,17 @@ public static class MapModConstants
                         new MapVectors(430, 228)
                     }},
                 { "Forest", new MapVectors[] {
-                    new MapVectors(0, 0, 215, 350),
                     new MapVectors(0, 7, 215, 360),
                     new MapVectors(5, 27, 209, 413),
                     new MapVectors(5, 75, 205, 525),
                     new MapVectors(10, 24, 250, 398),
+      
                     new MapVectors(14, 40, 234, 429),
                     new MapVectors(15, 57, 241, 469),
                     new MapVectors(17, 10, 265, 379),
                     new MapVectors(22, 25, 273, 422),
-                    new MapVectors(31, 99, 259, 599),
-                    new MapVectors(33, 99, 266, 598),
+                    new MapVectors(31, 99, 259, 596),
+                    new MapVectors(33, 99, 266, 596),
                     new MapVectors(34, 17, 304, 410),
                     new MapVectors(34, 96, 270, 593),
                     new MapVectors(35, 25, 305, 433),
@@ -173,30 +173,31 @@ public static class MapModConstants
                     new MapVectors(40, 11, 315, 396),
                     new MapVectors(40, 78, 289, 559),
                     new MapVectors(40, 81, 289, 567),
-                    new MapVectors(42, 41, 332, 461),
-                    new MapVectors(43, 59, 300, 531),
+                    new MapVectors(42, 41, 325, 461),
+                    new MapVectors(43, 59, 325, 531),
                     new MapVectors(45, 6, 326, 387),
                     new MapVectors(45, 20, 330, 421),
                     new MapVectors(45, 70, 292, 459),
                     new MapVectors(47, 91, 301, 585),
                     new MapVectors(48, 27, 341, 430),
-                    new MapVectors(48, 30, 334, 440),
                     new MapVectors(49, 99, 301, 597),
                     new MapVectors(52, 74, 301, 554),
                     new MapVectors(57, 10, 372, 401),
                     new MapVectors(61, 81, 310, 562),
                     new MapVectors(64, 70, 321, 549),
-                    new MapVectors(66, 50, 329, 459),
+                    new MapVectors(66, 50, 329, 462),
                     new MapVectors(66, 70, 365, 485),
                     new MapVectors(67, 0, 416, 389),
                     new MapVectors(68, 0, 417, 389),
                     new MapVectors(68, 17, 417, 418),
                     new MapVectors(69, 61, 349, 521),
-                    new MapVectors(70, 99, 498, 370),
                     new MapVectors(74, 31, 402, 431),
-                    new MapVectors(76, 49, 377, 481),
+                    new MapVectors(75, 50, 377, 479),
                     new MapVectors(79, 8, 426, 401),
-                    new MapVectors(85, 50, 398, 477),
+                    new MapVectors(79, 49, 383, 477),
+                    new MapVectors(87, 57, 401, 488),
+                    new MapVectors(87, 69, 401, 549),
+                    new MapVectors(89, 49, 383, 477),
                     new MapVectors(88, 54, 402, 488),
                     new MapVectors(89, 18, 451, 421),
                     new MapVectors(89, 49, 383, 477),
@@ -205,13 +206,12 @@ public static class MapModConstants
                     new MapVectors(94, 100, 391, 613),
                     new MapVectors(96, 23, 459, 425),
                     new MapVectors(96, 39, 440, 457),
-                    new MapVectors(99, 53, 420, 489),
-                    new MapVectors(104, 34, 469, 453),
-                    new MapVectors(104, 34, 466, 454),
+                    new MapVectors(99, 53, 422, 486),
+                    new MapVectors(104, 36, 467, 452),
                     new MapVectors(111, 99, 435, 596),
                     new MapVectors(118, 92, 441, 584),
-                    new MapVectors(119, 27, 497, 439),
-                    new MapVectors(120, 100, 525, 590),
+                    new MapVectors(118, 36, 496, 456),
+                    new MapVectors(119, 27, 497, 439)
                 }},
                     { "Woods", new MapVectors[] {
                         new MapVectors(0, 0, 97, 318),
@@ -258,6 +258,7 @@ public static class MapModConstants
                     new MapVectors(74, 54, 837, 324),
                     new MapVectors(75, 94, 829, 454),
                     new MapVectors(72, 95, 838, 464),
+                    new MapVectors(82, 23, 809, 261),
                     new MapVectors(94, 82, 865, 241),
                     new MapVectors(95, 51, 896, 325),
                     new MapVectors(98, 4, 861, 241),
@@ -314,6 +315,7 @@ public static class MapModConstants
                     new MapVectors(24, 22, 833, 642),
                     new MapVectors(27, 36, 813, 642),
                     new MapVectors(38, 36, 877, 642),
+                    new MapVectors(43, 24, 855, 592),
                     new MapVectors(44, 35, 889, 641),
                     new MapVectors(59, 13, 869, 581),
                     new MapVectors(62, 4, 871, 553),
@@ -383,16 +385,19 @@ public static class MapModConstants
                         new MapVectors(887, 109)
                     }},
                 { "Desert", new MapVectors[] {
-                    new MapVectors()
+                    new MapVectors(2, 9, 4, 10),
+                    new MapVectors(48, 24, 254, 72),
+                    new MapVectors(2, 30, 4, 94),
+                    new MapVectors(48, 54, 254, 125)
                 }},
                     { "SandyHouse", new MapVectors[] {
-                        new MapVectors()
+                        new MapVectors(12, 120)
                     }},
                     { "SkullCave", new MapVectors[] {
-                        new MapVectors()
+                        new MapVectors(19, 7)
                     }},
                     { "Club", new MapVectors[] {
-                        new MapVectors()
+                        new MapVectors(10, 117)
                     }}
             };
         }
