@@ -938,7 +938,7 @@ namespace NPCMapLocations
                 Environment.NewLine,
                 "Home of Pierre, Caroline & Abigail ",
                 Environment.NewLine,
-                "Open 9:00AM to 6:00PM (Closed Wednesday)"
+                "Open 9:00AM to 5:00PM (Closed Wednesday)"
             })));
             this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 852, this.mapY + 388, 80, 36), "Blacksmith" + Environment.NewLine + "Open 9:00AM to 4:00PM"));
             this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 716, this.mapY + 352, 28, 40), "Saloon" + Environment.NewLine + "Open 12:00PM To 12:00AM"));
