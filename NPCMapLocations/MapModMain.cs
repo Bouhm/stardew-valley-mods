@@ -609,6 +609,7 @@ namespace NPCMapLocations
         private static void ShowDebugInfo()
         {
             if (Game1.player.currentLocation == null) { return; }
+
             // Show map location and tile positions
             Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(1, 1), Color.Black);
             Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(-1, 1), Color.Black);

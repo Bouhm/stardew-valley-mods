@@ -1,0 +1,19 @@
+{
+	"names-tooltip.label": "Names Tooltip Placement:",
+	"names-tooltip.option1": "Above Location Tooltip",
+	"names-tooltip.option2": "Below Location Tooltip",
+	"names-tooltip.option3": "Bottom-Left Corner",
+	"immersion.label": "Immersion Settings:",
+	"immersion.option1": "Always Show Villagers",
+	"immersion.option2": "Show Villagers Player Has Talked To",
+	"immersion.option3": "Hide Villagers Player Has Talked To",
+	"immersion.option4": "Only Show Villagers in Player's Location",
+	"immersion.option5": "Only Show Villagers Within Heart Level",
+	"immersion.slider1": "Minimum Heart Level",
+	"immersion.slider2": "Maximum Heart Level",
+	"extra.label": "Extra Settings:",
+	"extra.option1": "Mark Villagers With Daily Quest or Birthday",
+	"extra.option2": "Show Hidden Villagers",
+	"extra.option3": "Show Traveling Merchant",
+	"villagers.label": "Include/Exclude Villagers:"
+}

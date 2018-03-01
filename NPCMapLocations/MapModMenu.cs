@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
+using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace NPCMapLocations
         private MapModButton immersionButton3;
         private bool scrolling;
         private bool canClose;
-        private List<OptionsElement> options = new List<OptionsElement>();
+        private List<MapModOptionsElement> options = new List<MapModOptionsElement>();
         private Rectangle scrollBarRunner;
         private int optionsSlotHeld = -1;
         private ClickableTextureComponent okButton;
@@ -54,30 +55,33 @@ namespace NPCMapLocations
             {
                 this.optionSlots.Add(new ClickableComponent(new Rectangle(this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7), width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
             }
-            tooltipButton1 = new MapModButton("Above Location Tooltip", 1, -1, -1, -1, -1);
-            tooltipButton2 = new MapModButton("Below Location Tooltip", 2, -1, -1, -1, -1);
-            tooltipButton3 = new MapModButton("Bottom-left Corner", 3, -1, -1, -1, -1);
-            immersionButton1 = new MapModButton("Always Show Villagers", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("Show Villagers Player Has Talked To", 5, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("Hide Villagers Player Has Talked To", 6, -1, -1, -1, -1);
-            //this.options.Add(new OptionsElement("Menu Key:"));
+
+            tooltipButton1 = new MapModButton("names-tooltip.option1", 1, -1, -1, -1, -1);
+            tooltipButton2 = new MapModButton("names-tooltip.option2", 2, -1, -1, -1, -1);
+            tooltipButton3 = new MapModButton("names-tooltip.option3", 3, -1, -1, -1, -1);
+            immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1);
+            immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1);
+            immersionButton3 = new MapModButton("immersion.option3", 6, -1, -1, -1, -1);
+            //this.options.Add(new MapModOptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
-            this.options.Add(new OptionsElement("NPC Map Locations Mod Version"));
-            this.options.Add(new OptionsElement("Names Tooltip Placement:"));
+            this.options.Add(new MapModOptionsElement("NPC Map Locations Mod Version"));
+            this.options.Add(new MapModOptionsElement("names-tooltip.label"));
             this.options.Add(tooltipButton1);
             this.options.Add(tooltipButton2);
             this.options.Add(tooltipButton3);
-            this.options.Add(new OptionsElement("Immersion Settings:"));
+            this.options.Add(new MapModOptionsElement("immersion.label"));
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
             this.options.Add(immersionButton3);
-            this.options.Add(new MapModCheckbox("Only Show Villagers in Player's Location", 39, -1, -1));
-            this.options.Add(new MapModCheckbox("Only Show Villagers Within Specified Heart Level", 41, -1, -1));
-            this.options.Add(new MapModSlider("Minimum Heart Level", 0, -1, -1));
-            this.options.Add(new MapModSlider("Maximum Heart Level", 1, -1, -1));
-            this.options.Add(new OptionsElement("Extra Settings:"));
-            this.options.Add(new MapModCheckbox("Show Hidden Villagers", 48, -1, -1));
-            this.options.Add(new MapModCheckbox("Mark Villagers With Daily Quest or Birthday", 42, -1, -1));
+            this.options.Add(new MapModCheckbox("immersion.option4", 39, -1, -1));
+            this.options.Add(new MapModCheckbox("immersion.option5", 41, -1, -1));
+            this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1));
+            this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1));
+            this.options.Add(new MapModOptionsElement("extra.label"));
+            this.options.Add(new MapModCheckbox("extra.option1", 48, -1, -1));
+            this.options.Add(new MapModCheckbox("extra.option2", 42, -1, -1));
+            this.options.Add(new MapModCheckbox("extra.option3", 40, -1, -1));
+            this.options.Add(new MapModOptionsElement("villagers.label"));
             // Custom NPCs
             if (customNPCs != null)
             {
@@ -85,12 +89,10 @@ namespace NPCMapLocations
                 {
                     if (MapModMain.customNpcId > 0)
                     {
-                        this.options.Add(new MapModCheckbox("Show " + entry.Key, 42 + MapModMain.customNpcId, -1, -1));
+                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 42 + MapModMain.customNpcId, -1, -1));
                     }
                 }
             }
-            this.options.Add(new MapModCheckbox("Show Traveling Merchant", 40, -1, -1));
-            this.options.Add(new OptionsElement("Include/Exclude Villagers:"));
             this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1));
@@ -139,10 +141,10 @@ namespace NPCMapLocations
 
         private void setScrollBarToCurrentIndex()
         {
-            if (this.options.Count<OptionsElement>() > 0)
+            if (this.options.Count<MapModOptionsElement>() > 0)
             {
                 this.scrollBar.bounds.Y = this.scrollBarRunner.Height / Math.Max(1, this.options.Count - 7 + 1) * this.currentItemIndex + this.upArrow.bounds.Bottom + Game1.pixelZoom;
-                if (this.currentItemIndex == this.options.Count<OptionsElement>() - 7)
+                if (this.currentItemIndex == this.options.Count<MapModOptionsElement>() - 7)
                 {
                     this.scrollBar.bounds.Y = this.downArrow.bounds.Y - this.scrollBar.bounds.Height - Game1.pixelZoom;
                 }
@@ -218,7 +220,7 @@ namespace NPCMapLocations
                 Game1.playSound("shiny4");
                 return;
             }
-            if (direction < 0 && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
+            if (direction < 0 && this.currentItemIndex < Math.Max(0, this.options.Count<MapModOptionsElement>() - 7))
             {
                 this.downArrowPressed();
                 Game1.playSound("shiny4");
@@ -260,7 +262,7 @@ namespace NPCMapLocations
             {
                 return;
             }
-            if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
+            if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<MapModOptionsElement>() - 7))
             {
                 this.downArrowPressed();
                 Game1.playSound("shwip");
@@ -325,10 +327,10 @@ namespace NPCMapLocations
                 MapModMain.menuOpen = 0;
             }
             y -= 15;
-            this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
+            this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<MapModOptionsElement>() - 7, this.currentItemIndex));
             for (int i = 0; i < this.optionSlots.Count<ClickableComponent>(); i++)
             {
-                if (this.optionSlots[i].bounds.Contains(x, y) && this.currentItemIndex + i < this.options.Count<OptionsElement>() && this.options[this.currentItemIndex + i].bounds.Contains(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y))
+                if (this.optionSlots[i].bounds.Contains(x, y) && this.currentItemIndex + i < this.options.Count<MapModOptionsElement>() && this.options[this.currentItemIndex + i].bounds.Contains(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y))
                 {
                     this.options[this.currentItemIndex + i].receiveLeftClick(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y);
                     this.optionsSlotHeld = i;
@@ -389,7 +391,7 @@ namespace NPCMapLocations
                 this.upArrow.draw(b);
                 this.downArrow.draw(b);
 
-                if (this.options.Count<OptionsElement>() > 7)
+                if (this.options.Count<MapModOptionsElement>() > 7)
                 {
                     IClickableMenu.drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), this.scrollBarRunner.X, this.scrollBarRunner.Y, this.scrollBarRunner.Width, this.scrollBarRunner.Height, Color.White, (float)Game1.pixelZoom, false);
                     this.scrollBar.draw(b);
@@ -398,7 +400,7 @@ namespace NPCMapLocations
                 {
                     int x = this.optionSlots[i].bounds.X;
                     int y = this.optionSlots[i].bounds.Y + Game1.tileSize / 4;
-                    if (this.currentItemIndex >= 0 && this.currentItemIndex + i < this.options.Count<OptionsElement>())
+                    if (this.currentItemIndex >= 0 && this.currentItemIndex + i < this.options.Count<MapModOptionsElement>())
                     {
                         if (options[this.currentItemIndex + i] is MapModButton)
                         {
@@ -448,7 +450,73 @@ namespace NPCMapLocations
         }
     }
 
-    public class MapModButton : OptionsElement
+    public class MapModOptionsElement
+    {
+        public const int defaultX = 8;
+        public const int defaultY = 4;
+        public const int defaultPixelWidth = 9;
+        public Rectangle bounds;
+        public string label;
+        public int whichOption;
+        public bool greyedOut;
+
+        public MapModOptionsElement(string label)
+        {
+            this.label = MapModMain.modHelper.Translation.Get(label);
+            this.bounds = new Rectangle(8 * Game1.pixelZoom, 4 * Game1.pixelZoom, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom);
+            this.whichOption = -1;
+        }
+
+        public MapModOptionsElement(string label, int x, int y, int width, int height, int whichOption = -1)
+        {
+            if (x == -1)
+            {
+                x = 8 * Game1.pixelZoom;
+            }
+            if (y == -1)
+            {
+                y = 4 * Game1.pixelZoom;
+            }
+            this.bounds = new Rectangle(x, y, width, height);
+            this.label = MapModMain.modHelper.Translation.Get(label);
+            this.whichOption = whichOption;
+        }
+
+        public MapModOptionsElement(string label, Rectangle bounds, int whichOption)
+        {
+            this.whichOption = whichOption;
+            this.label = MapModMain.modHelper.Translation.Get(label);
+            this.bounds = bounds;
+        }
+
+        public virtual void receiveLeftClick(int x, int y)
+        {
+        }
+
+        public virtual void leftClickHeld(int x, int y)
+        {
+        }
+
+        public virtual void leftClickReleased(int x, int y)
+        {
+        }
+
+        public virtual void receiveKeyPress(Keys key)
+        {
+        }
+
+        public virtual void draw(SpriteBatch b, int slotX, int slotY)
+        {
+            if (this.whichOption == -1)
+            {
+                StardewValley.BellsAndWhistles.SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + Game1.pixelZoom * 3, 999, -1, 999, 1f, 0.1f, false, -1, "", -1);
+                return;
+            }
+            Utility.drawTextWithShadow(b, this.label, Game1.dialogueFont, new Vector2((float)(slotX + this.bounds.X + this.bounds.Width + Game1.pixelZoom * 2), (float)(slotY + this.bounds.Y)), this.greyedOut ? (Game1.textColor * 0.33f) : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
+        }
+    }
+
+    public class MapModButton : MapModOptionsElement
     {
         public const int pixelsWide = 9;
         public bool isActive;
@@ -507,7 +575,7 @@ namespace NPCMapLocations
         }
     }
 
-    public class MapModCheckbox : OptionsElement
+    public class MapModCheckbox : MapModOptionsElement
     {
         public const int pixelsWide = 9;
         public bool isChecked;
@@ -827,7 +895,7 @@ namespace NPCMapLocations
         }
     }
 
-    internal class MapModSlider : OptionsElement
+    internal class MapModSlider : MapModOptionsElement
     {
         public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);
         public static Rectangle sliderButtonRect = new Rectangle(420, 441, 10, 6);
@@ -893,81 +961,5 @@ namespace NPCMapLocations
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X) + (float)(this.bounds.Width - 10 * Game1.pixelZoom) * ((float)this.value / (float)this.sliderMaxValue), (float)(slotY + this.bounds.Y)), new Rectangle?(OptionsSlider.sliderButtonRect), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.9f);
         }
     }
-
-    /*
-    public class MapModInputListener : OptionsElement
-    {
-        public List<string> buttonNames = new List<string>();
-        private string listenerMessage;
-        private bool listening;
-        private Rectangle setbuttonBounds;
-        public static Rectangle setButtonSource = new Rectangle(294, 428, 21, 11);
-
-        public MapModInputListener(string label, int whichOption, int slotWidth, int x = -1, int y = -1) : base(label, x, y, slotWidth - x, 11 * Game1.pixelZoom, whichOption)
-		{
-            this.setbuttonBounds = new Rectangle(slotWidth - 28 * Game1.pixelZoom, y + Game1.pixelZoom * 3, 21 * Game1.pixelZoom, 11 * Game1.pixelZoom);
-            this.buttonNames.Add(MapModMain.config.menuKey);      
-        }
-
-        public override void leftClickHeld(int x, int y)
-        {
-            bool arg_06_0 = this.greyedOut;
-        }
-
-        public override void receiveLeftClick(int x, int y)
-        {
-            if (this.greyedOut || this.listening || !this.setbuttonBounds.Contains(x, y))
-            {
-                return;
-            }
-            if (this.buttonNames.Count<string>() != 0)
-            {
-                this.listening = true;
-                Game1.soundBank.PlayCue("breathin");
-                GameMenu.forcePreventClose = true;
-                this.listenerMessage = "Press new key...";
-                return;
-            }
-        }
-
-        public override void receiveKeyPress(Keys key)
-        {
-            if (this.greyedOut || !this.listening)
-            {
-                return;
-            }
-            if (key == Keys.Escape)
-            {
-                Game1.soundBank.PlayCue("bigDeSelect");
-                this.listening = false;
-                GameMenu.forcePreventClose = false;
-                return;
-            }
-            int whichOption = this.whichOption;
-
-            MapModMain.config.menuKey = key.ToString();
-            ConfigExtensions.WriteConfig<Configuration>(MapModMain.config);
-            
-            this.buttonNames[0] = key.ToString();
-            Game1.soundBank.PlayCue("coin");
-            this.listening = false;
-            GameMenu.forcePreventClose = false;
-        }
-
-        public override void draw(SpriteBatch b, int slotX, int slotY)
-        {
-            if (this.buttonNames.Count<string>() > 0)
-            {
-                Utility.drawTextWithShadow(b, this.label + ": " + this.buttonNames.Last<string>() + ((this.buttonNames.Count<string>() > 1) ? (", " + this.buttonNames.First<string>()) : ""), Game1.dialogueFont, new Vector2((float)(this.bounds.X + slotX), (float)(this.bounds.Y + slotY)), Game1.textColor, 1f, 0.15f, -1, -1, 1f, 3);
-            }
-            Utility.drawWithShadow(b, Game1.mouseCursors, new Vector2((float)(this.setbuttonBounds.X + slotX), (float)(this.setbuttonBounds.Y + slotY)), MapModInputListener.setButtonSource, Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, false, 0.15f, -1, -1, 0.35f);
-            if (this.listening)
-            {
-                b.Draw(Game1.staminaRect, new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), new Rectangle?(new Rectangle(0, 0, 1, 1)), Color.Black * 0.75f, 0f, Vector2.Zero, SpriteEffects.None, 0.999f);
-                b.DrawString(Game1.dialogueFont, this.listenerMessage, Utility.getTopLeftPositionForCenteringOnScreen(Game1.tileSize * 3, Game1.tileSize, 0, 0), Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9999f);
-            }
-        }
-    }
-    */
 }
 

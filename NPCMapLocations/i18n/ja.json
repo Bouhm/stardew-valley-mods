@@ -1,0 +1,19 @@
+{
+	"names-tooltip.label": "名前の表示位置:",
+	"names-tooltip.option1": "場所の上",
+	"names-tooltip.option2": "場所の下",
+	"names-tooltip.option3": "マップの左下",
+	"immersion.label": "注目設定:",
+	"immersion.option1": "住人を常に表示する",
+	"immersion.option2": "プレイヤーと話した住人を表示する",
+	"immersion.option3": "プレイヤーと話した住人を非表示にする",
+	"immersion.option4": "プレイヤーがいる地区の住人だけを表示する",
+	"immersion.option5": "特定の好感度の住人だけを表示する",
+	"immersion.slider1": "最小好感度",
+	"immersion.slider2": "最大好感度",
+	"extra.label": "その他の設定:",
+	"extra.option1": "デイリークエストや誕生日の住人にマークを付ける",
+	"extra.option2": "隠された住人を表示する",
+	"extra.option3": "行商人を表示する",
+	"villagers.label": "住人の表示/非表示:"
+}
