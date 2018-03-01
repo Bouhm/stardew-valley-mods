@@ -3,33 +3,32 @@ NPC Map Locations Mod by Bouhm.
 Shows NPC locations real-time on the map.
 */
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Menus;
 using StardewValley.Quests;
 using StardewModdingAPI;
-using StardewValley.Menus;
-using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
-using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using StardewValley.Buildings;
 
 namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static ISemanticVersion current = new SemanticVersion("1.4.7");
-        public static ISemanticVersion latest = new SemanticVersion("1.4.7");
+        public static bool DEBUG_MODE = true;
+        public static string current;
         public static IModHelper modHelper;
         public static MapModConfig config;
-        // public static string saveFile;
         public static int customNpcId = 0;
         public static int menuOpen = 0;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
-        // NPC head crops, top left corner (0, y), width = 16, height = 15 
-        public static Dictionary<string, int> spriteCrop;
+        public static Dictionary<string, int> spriteCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, string> startingLocations;
         private static Dictionary<string, MapVectors[]> mapVectors;
         private static Dictionary<string, string> indoorLocations;
@@ -49,14 +48,14 @@ namespace NPCMapLocations
             config = helper.ReadConfig<MapModConfig>();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
+            GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             ControlEvents.KeyPressed += KeyboardInput_KeyDown;
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
-            // Task.Run(() => MapModVersionChecker.getNotification()).GetAwaiter().GetResult();
-            // saveFile = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
+            current = ModManifest.Version.ToString();
             spriteCrop = MapModConstants.spriteCrop;
             startingLocations = MapModConstants.startingLocations;
             mapVectors = MapModConstants.mapVectors;
@@ -65,7 +64,7 @@ namespace NPCMapLocations
             loadComplete = true;
         }
 
-        private void loadCustomMods()
+        private void LoadCustomMods()
         {
             var initializeCustomNPCs = 1;
             if (customNPCs != null && customNPCs.Count != 0)
@@ -75,21 +74,20 @@ namespace NPCMapLocations
             int id = 1;
             foreach (NPC npc in Utility.getAllCharacters())
             {
-                id = loadCustomNPCs(npc, initializeCustomNPCs, id);
-                loadNPCCrop(npc);
-                loadCustomNames(npc);
+                id = LoadCustomNPCs(npc, initializeCustomNPCs, id);
+                LoadNPCCrop(npc);
+                LoadCustomNames(npc);
             }
             config.customNPCs = customNPCs;
             modHelper.WriteConfig(config);
             initialized = true;
         }
 
-        private int loadCustomNPCs(NPC npc, int initialize, int id)
+        private int LoadCustomNPCs(NPC npc, int initialize, int id)
         {
             if (initialize == 0)
             {
                 int idx = 1;
-                // Update save files for custom NPC installed or uninstalled (pseudo-persave config)
                 foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
                     // isInGame = 0;
@@ -99,18 +97,6 @@ namespace NPCMapLocations
                         customNpcId = idx;
                     }
 
-                    /*
-                    // Pseudo-persave config for custom NPC (since custom NPCs have to be installed to each save file)
-                    // Works too unreliably; remove for now;
-                    if (!customNPC.Value.ContainsKey(saveFile))
-                    {
-                        customNPC.Value.Add(saveFile, isInGame);
-                    }
-                    else
-                    {
-                        customNPC.Value[saveFile] = isInGame;
-                    }
-                    */
                     if (!customNPC.Value.ContainsKey("crop"))
                     {
                         customNPC.Value.Add("crop", 0);
@@ -124,23 +110,15 @@ namespace NPCMapLocations
             } 
             else
             {
-                if (npc.Schedule != null && isCustomNPC(npc.name))
+                if (npc.Schedule != null && IsCustomNPC(npc.name))
                 {
                     if (!customNPCs.ContainsKey(npc.name))
                     {
-                        var npcEntry = new Dictionary<string, int>();
-                        npcEntry.Add("id", id);
-                        npcEntry.Add("crop", 0);
-                        /*
-                        if (npc != null)
+                        var npcEntry = new Dictionary<string, int>
                         {
-                            npcEntry.Add(saveFile, 1);
-                        }
-                        else
-                        {
-                            npcEntry.Add(saveFile, 0);
-                        }
-                        */
+                            { "id", id },
+                            { "crop", 0 }
+                        };
                         customNPCs.Add(npc.name, npcEntry);
                         spriteCrop.Add(npc.name, 0);
                         id++;
@@ -150,7 +128,7 @@ namespace NPCMapLocations
             return id;
         }
 
-        private void loadCustomNames(NPC npc)
+        private void LoadCustomNames(NPC npc)
         {
             if (!npcNames.ContainsKey(npc.name))
             {
@@ -163,7 +141,7 @@ namespace NPCMapLocations
             }
         }
 
-        private void loadNPCCrop(NPC npc)
+        private void LoadNPCCrop(NPC npc)
         {
             if (config.villagerCrop != null && config.villagerCrop.Count > 0)
             {
@@ -182,11 +160,11 @@ namespace NPCMapLocations
         {
             if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
             {
-                changeKey(e.KeyPressed.ToString(), (GameMenu)Game1.activeClickableMenu);
+                ChangeKey(e.KeyPressed.ToString(), (GameMenu)Game1.activeClickableMenu);
             }
         }
 
-        private void changeKey(string key, GameMenu menu)
+        private void ChangeKey(string key, GameMenu menu)
         {
             if (menu.currentTab != 3) { return; }
             if (key.Equals(config.menuKey))
@@ -196,7 +174,8 @@ namespace NPCMapLocations
             }
         }
 
-        public static Vector2 locationToMap(string location, int tileX, int tileY)
+        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
+        public static Vector2 LocationToMap(string location, int tileX, int tileY)
         {
             if (location == null)
             {
@@ -278,7 +257,6 @@ namespace NPCMapLocations
                 int xMax = Math.Max(lower.x, upper.x);
                 int yMin = Math.Min(lower.y, upper.y);
                 int yMax = Math.Max(lower.y, upper.y);
-                Log.Verbose(lower.tileX + ", " + lower.tileY + ", " + upper.tileX + ", " + upper.tileY);
                 x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
                 y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
             }
@@ -290,8 +268,9 @@ namespace NPCMapLocations
             if (!Game1.hasLoadedGame) { return; }
             if (loadComplete && !initialized)
             {
-                loadCustomMods();
+                LoadCustomMods();
             }
+
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }
 
             List<string> hoveredList = new List<String>();
@@ -312,10 +291,8 @@ namespace NPCMapLocations
 
                     if (config.onlySameLocation)
                     {
-                        string indoorLocationNPC;
-                        string indoorLocationPlayer;
-                        indoorLocations.TryGetValue(npc.currentLocation.name, out indoorLocationNPC);
-                        indoorLocations.TryGetValue(Game1.player.currentLocation.name, out indoorLocationPlayer);
+                        indoorLocations.TryGetValue(npc.currentLocation.name, out string indoorLocationNPC);
+                        indoorLocations.TryGetValue(Game1.player.currentLocation.name, out string indoorLocationPlayer);
                         if (indoorLocationPlayer == null || indoorLocationNPC == null)
                         {
                             sameLocation = false;
@@ -335,10 +312,10 @@ namespace NPCMapLocations
                     }
 
 
-                    if (config.showHiddenVillagers ? showNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && showNPC(npc.name, showExtras)))
+                    if (config.showHiddenVillagers ? ShowNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && ShowNPC(npc.name, showExtras)))
                     {
-                        int x = 0; //int x = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X;
-                        int y = 0; //int y = (int)locationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y;
+                        int x = (int)LocationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X;
+                        int y = (int)LocationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y;
                         int width = 32;
                         int height = 30;
 
@@ -456,27 +433,37 @@ namespace NPCMapLocations
             toolTips = new MapPageTooltips(hoveredNPCNames, npcNames, config.nameTooltipMode);
         }
 
+        // Draw misc
+        private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
+        {
+            if (!Game1.hasLoadedGame || Game1.player == null) { return; }
+            if (DEBUG_MODE)
+                ShowDebugInfo();
+        }
+
         // Draw event (when Map Page is opened)
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
-            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
+            if (!Game1.hasLoadedGame) { return; }
+            if (Game1.activeClickableMenu is GameMenu)
             {
-                drawMarkers((GameMenu)Game1.activeClickableMenu);
+                DrawMarkers((GameMenu)Game1.activeClickableMenu);
             }
         }
 
         // Actual draw event
-        static void drawMarkers(GameMenu menu)
+        static void DrawMarkers(GameMenu menu)
         {
             if (menu.currentTab == 3)
             {
-                // Location and name tooltips
-                toolTips.draw(Game1.spriteBatch);
+                SpriteBatch b = Game1.spriteBatch;
+                // Draw map overlay
+                toolTips.DrawMap(b);
 
                 // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
                 {
-                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                    b.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
                 }
                 var sortedMarkers = npcMarkers.ToList();
                 sortedMarkers.Sort((y, x) => x.Value.layer.CompareTo(y.Value.layer));
@@ -484,40 +471,47 @@ namespace NPCMapLocations
                 foreach (KeyValuePair<string, NPCMarker> npc in sortedMarkers)
                 {
                     if (hiddenNPCs.Contains(npc.Key)) {
-                        Game1.spriteBatch.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.DimGray * 0.9f);
+                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.DimGray * 0.9f);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                         if (questNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                     }
                     else
                     {
-                        Game1.spriteBatch.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.White * 0.9f);
+                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.White * 0.9f);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                         if (questNPCs.Contains(npc.Key))
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                     }
                 }
 
+                // Player
+                Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
+
+                // Location and name tooltips
+                toolTips.draw(b);
+
                 // Cursor
                 if (!Game1.options.hardwareCursor)
                 {
-                    Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                    b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
                 }
             }
         }
 
         // Config show/hide 
-        private static bool showNPC(string npc, bool[] showExtras)
+        private static bool ShowNPC(string npc, bool[] showExtras)
         {
             if (npc.Equals("Abigail")) { return config.showAbigail; }
             if (npc.Equals("Alex")) { return config.showAlex; }
@@ -574,7 +568,7 @@ namespace NPCMapLocations
         }
 
         // Only checks against existing villager names
-        public static bool isCustomNPC(string npc)
+        public static bool IsCustomNPC(string npc)
         {
             return (!(
                 npc.Equals("Abigail") ||
@@ -611,6 +605,17 @@ namespace NPCMapLocations
                 npc.Equals("Wizard"))
             );
         }
+
+        private static void ShowDebugInfo()
+        {
+            if (Game1.player.currentLocation == null) { return; }
+            // Show map location and tile positions
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(1, 1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(-1, 1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(1, -1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(-1, -1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize/2, Game1.tileSize / 2), Color.White);
+        }
     }
 
     // Class for NPC markers
@@ -631,11 +636,49 @@ namespace NPCMapLocations
     // For drawing tooltips
     public class MapPageTooltips : IClickableMenu
     {
+        public const int region_desert = 1001;
+        public const int region_farm = 1002;
+        public const int region_backwoods = 1003;
+        public const int region_busstop = 1004;  
+        public const int region_wizardtower = 1005;
+        public const int region_marnieranch = 1006;
+        public const int region_leahcottage = 1007;
+        public const int region_samhouse = 1008;
+        public const int region_haleyhouse = 1009;
+        public const int region_townsquare = 1010;
+        public const int region_harveyclinic = 1011;
+        public const int region_generalstore = 1012;
+        public const int region_blacksmith = 1013;
+        public const int region_saloon = 1014;
+        public const int region_manor = 1015;
+        public const int region_museum = 1016;
+        public const int region_elliottcabin = 1017;
+        public const int region_sewer = 1018;
+        public const int region_graveyard = 1019;
+        public const int region_trailer = 1020;
+        public const int region_alexhouse = 1021;
+        public const int region_sciencehouse = 1022;
+        public const int region_tent = 1023;
+        public const int region_mines = 1024;
+        public const int region_adventureguild = 1025;
+        public const int region_quarry = 1026;
+        public const int region_jojamart = 1027;
+        public const int region_fishshop = 1028;
+        public const int region_spa = 1029;
+        public const int region_secretwoods = 1030;
+        public const int region_ruinedhouse = 1031;
+        public const int region_communitycenter = 1032;
+        public const int region_sewerpipe = 1033;
+        public const int region_railroad = 1034;
+        private string descriptionText = "";
         private string hoverText = "";
+        private string playerLocationName;
         private Texture2D map;
         private int mapX;
         private int mapY;
-        private List<ClickableComponent> points = new List<ClickableComponent>();
+        private Vector2 playerMapPosition;
+        public List<ClickableComponent> points = new List<ClickableComponent>();
+        public ClickableTextureComponent okButton;
         private string names;
         private Dictionary<string, string> npcNames;
         private int nameTooltipMode;
@@ -645,59 +688,280 @@ namespace NPCMapLocations
             this.nameTooltipMode = nameTooltipMode;
             this.names = names;
             this.npcNames = npcNames;
+            this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX, this.mapY, 292, 152), Game1.player.mailReceived.Contains("ccVault") ? "Calico Desert" : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 324, this.mapY + 252, 188, 132), Game1.player.farmName + " Farm"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 360, this.mapY + 96, 188, 132), "Backwoods"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 516, this.mapY + 224, 76, 100), "Bus Stop"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 196, this.mapY + 352, 36, 76), "Wizard's Tower"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 420, this.mapY + 392, 76, 40), "Marnie's Ranch" + Environment.NewLine + "Open 9:00AM to 4:00PM most days"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 452, this.mapY + 436, 32, 24), "Leah's Cottage"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 612, this.mapY + 396, 36, 52), "1 Willow Lane" + Environment.NewLine + "Home of Jodi, Kent & Sam"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 652, this.mapY + 408, 40, 36), "2 Willow Lane" + Environment.NewLine + "Home of Emily & Haley"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 672, this.mapY + 340, 44, 60), "Town Square"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 680, this.mapY + 304, 16, 32), "Harvey's Clinic" + Environment.NewLine + "Open 9:00AM to 3:00PM"));
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX, this.mapY, 292, 152), Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???")
+            {
+                myID = 1001,
+                rightNeighborID = 1003,
+                downNeighborID = 1030
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 324, this.mapY + 252, 188, 132), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[]
+            {
+                Game1.player.farmName
+            }))
+            {
+                myID = 1002,
+                leftNeighborID = 1005,
+                upNeighborID = 1003,
+                rightNeighborID = 1004,
+                downNeighborID = 1006
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 360, this.mapY + 96, 188, 132), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0]))
+            {
+                myID = 1003,
+                downNeighborID = 1002,
+                leftNeighborID = 1001,
+                rightNeighborID = 1022,
+                upNeighborID = 1029
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 516, this.mapY + 224, 76, 100), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0]))
+            {
+                myID = 1004,
+                leftNeighborID = 1002,
+                upNeighborID = 1003,
+                downNeighborID = 1006,
+                rightNeighborID = 1011
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 196, this.mapY + 352, 36, 76), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0]))
+            {
+                myID = 1005,
+                upNeighborID = 1001,
+                downNeighborID = 1031,
+                rightNeighborID = 1006,
+                leftNeighborID = 1030
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 420, this.mapY + 392, 76, 40), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0]))
+            {
+                myID = 1006,
+                leftNeighborID = 1005,
+                downNeighborID = 1007,
+                upNeighborID = 1002,
+                rightNeighborID = 1008
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 452, this.mapY + 436, 32, 24), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0]))
+            {
+                myID = 1007,
+                upNeighborID = 1006,
+                downNeighborID = 1033,
+                leftNeighborID = 1005,
+                rightNeighborID = 1008
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 612, this.mapY + 396, 36, 52), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0]))
+            {
+                myID = 1008,
+                leftNeighborID = 1006,
+                upNeighborID = 1010,
+                rightNeighborID = 1009
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 652, this.mapY + 408, 40, 36), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0]))
+            {
+                myID = 1009,
+                leftNeighborID = 1008,
+                upNeighborID = 1010,
+                rightNeighborID = 1018
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 672, this.mapY + 340, 44, 60), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0]))
+            {
+                myID = 1010,
+                leftNeighborID = 1008,
+                downNeighborID = 1009,
+                rightNeighborID = 1014,
+                upNeighborID = 1011
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 680, this.mapY + 304, 16, 32), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0]))
+            {
+                myID = 1011,
+                leftNeighborID = 1004,
+                rightNeighborID = 1012,
+                downNeighborID = 1010,
+                upNeighborID = 1032
+            });
             this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 696, this.mapY + 296, 28, 40), string.Concat(new string[]
             {
-                "Pierre's General Store",
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
                 Environment.NewLine,
-                "Home of Pierre, Caroline & Abigail ",
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079", new object[0]),
                 Environment.NewLine,
-                "Open 9:00AM to 6:00PM (Closed Wednesday)"
-            })));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 852, this.mapY + 388, 80, 36), "Blacksmith" + Environment.NewLine + "Open 9:00AM to 4:00PM"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 716, this.mapY + 352, 28, 40), "Saloon" + Environment.NewLine + "Open 12:00PM To 12:00AM"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 768, this.mapY + 388, 44, 56), "Mayor's Manor"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 892, this.mapY + 416, 32, 28), "Stardew Valley Museum & Library" + Environment.NewLine + "Open 8:00AM to 6:00PM"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 824, this.mapY + 564, 28, 20), "Elliott's Cabin"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 696, this.mapY + 448, 24, 20), "Sewer"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 724, this.mapY + 424, 40, 32), "Graveyard"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 780, this.mapY + 360, 24, 20), "Trailer"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 748, this.mapY + 316, 36, 36), "1 River Road" + Environment.NewLine + "Home of George, Evelyn & Alex"));
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080", new object[0])
+            }))
+            {
+                myID = 1012,
+                leftNeighborID = 1011,
+                downNeighborID = 1014,
+                rightNeighborID = 1021,
+                upNeighborID = 1032
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 852, this.mapY + 388, 80, 36), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0]))
+            {
+                myID = 1013,
+                upNeighborID = 1027,
+                rightNeighborID = 1016,
+                downNeighborID = 1017,
+                leftNeighborID = 1015
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 716, this.mapY + 352, 28, 40), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0]))
+            {
+                myID = 1014,
+                leftNeighborID = 1010,
+                rightNeighborID = 1020,
+                downNeighborID = 1019,
+                upNeighborID = 1012
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 768, this.mapY + 388, 44, 56), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0]))
+            {
+                myID = 1015,
+                leftNeighborID = 1019,
+                upNeighborID = 1020,
+                rightNeighborID = 1013,
+                downNeighborID = 1017
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 892, this.mapY + 416, 32, 28), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0]))
+            {
+                myID = 1016,
+                downNeighborID = 1017,
+                leftNeighborID = 1013,
+                upNeighborID = 1027,
+                rightNeighborID = 99989
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 824, this.mapY + 564, 28, 20), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0]))
+            {
+                myID = 1017,
+                downNeighborID = 1028,
+                upNeighborID = 1015,
+                rightNeighborID = 99989
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 696, this.mapY + 448, 24, 20), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0]))
+            {
+                myID = 1018,
+                downNeighborID = 1017,
+                rightNeighborID = 1019,
+                upNeighborID = 1014,
+                leftNeighborID = 1009
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 724, this.mapY + 424, 40, 32), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0]))
+            {
+                myID = 1019,
+                leftNeighborID = 1018,
+                upNeighborID = 1014,
+                rightNeighborID = 1015,
+                downNeighborID = 1017
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 780, this.mapY + 360, 24, 20), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0]))
+            {
+                myID = 1020,
+                upNeighborID = 1021,
+                leftNeighborID = 1014,
+                downNeighborID = 1015,
+                rightNeighborID = 1027
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 748, this.mapY + 316, 36, 36), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0]))
+            {
+                myID = 1021,
+                rightNeighborID = 1027,
+                downNeighborID = 1020,
+                leftNeighborID = 1012,
+                upNeighborID = 1032
+            });
             this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 732, this.mapY + 148, 48, 32), string.Concat(new string[]
             {
-                "Carpenter's Shop",
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
                 Environment.NewLine,
-                "Home of Robin, Demetrius, Sebastian & Maru",
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095", new object[0]),
                 Environment.NewLine,
-                "Shop open 9:00AM to 5:00PM most days"
-            })));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 784, this.mapY + 128, 12, 16), "Tent"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 880, this.mapY + 96, 16, 24), "Mines"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 900, this.mapY + 108, 32, 36), (Game1.stats.DaysPlayed >= 5u) ? ("Adventurer's Guild" + Environment.NewLine + "Open 2:00PM to 10:00PM") : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 968, this.mapY + 116, 88, 76), Game1.player.mailReceived.Contains("ccCraftsRoom") ? "Quarry" : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 872, this.mapY + 280, 52, 52), "JojaMart" + Environment.NewLine + "Open 9:00AM to 11:00PM"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 844, this.mapY + 608, 36, 40), "Fish Shop" + Environment.NewLine + "Open 9:00AM to 5:00PM"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 576, this.mapY + 60, 48, 36), Game1.isLocationAccessible("Railroad") ? ("Spa" + Environment.NewLine + "Open all day") : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX, this.mapY + 272, 196, 176), Game1.player.mailReceived.Contains("beenToWoods") ? "Secret Woods" : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 260, this.mapY + 572, 20, 20), "Ruined House"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 692, this.mapY + 204, 44, 36), "Community Center"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 380, this.mapY + 596, 24, 32), "Sewer Pipe"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 644, this.mapY + 64, 16, 8), Game1.isLocationAccessible("Railroad") ? "Railroad" : "???"));
-            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 728, this.mapY + 652, 28, 28), "Lonely Stone"));
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11096", new object[0])
+            }))
+            {
+                myID = 1022,
+                downNeighborID = 1032,
+                leftNeighborID = 1003,
+                upNeighborID = 1034,
+                rightNeighborID = 1023
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 784, this.mapY + 128, 12, 16), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0]))
+            {
+                myID = 1023,
+                leftNeighborID = 1034,
+                downNeighborID = 1022,
+                rightNeighborID = 1024
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 880, this.mapY + 96, 16, 24), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0]))
+            {
+                myID = 1024,
+                leftNeighborID = 1023,
+                rightNeighborID = 1025,
+                downNeighborID = 1027
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 900, this.mapY + 108, 32, 36), (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???")
+            {
+                myID = 1025,
+                leftNeighborID = 1024,
+                rightNeighborID = 1026,
+                downNeighborID = 1027
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 968, this.mapY + 116, 88, 76), Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???")
+            {
+                myID = 1026,
+                leftNeighborID = 1025,
+                downNeighborID = 1027
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 872, this.mapY + 280, 52, 52), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0]))
+            {
+                myID = 1027,
+                upNeighborID = 1025,
+                leftNeighborID = 1021,
+                downNeighborID = 1013
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 844, this.mapY + 608, 36, 40), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0]))
+            {
+                myID = 1028,
+                upNeighborID = 1017,
+                rightNeighborID = 99989
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 576, this.mapY + 60, 48, 36), Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???")
+            {
+                myID = 1029,
+                rightNeighborID = 1034,
+                downNeighborID = 1003,
+                leftNeighborID = 1001
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX, this.mapY + 272, 196, 176), Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???")
+            {
+                myID = 1030,
+                upNeighborID = 1001,
+                rightNeighborID = 1005
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 260, this.mapY + 572, 20, 20), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0]))
+            {
+                myID = 1031,
+                rightNeighborID = 1033,
+                upNeighborID = 1005
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 692, this.mapY + 204, 44, 36), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0]))
+            {
+                myID = 1032,
+                downNeighborID = 1012,
+                upNeighborID = 1022,
+                leftNeighborID = 1004
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 380, this.mapY + 596, 24, 32), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0]))
+            {
+                myID = 1033,
+                leftNeighborID = 1031,
+                rightNeighborID = 1017,
+                upNeighborID = 1007
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 644, this.mapY + 64, 16, 8), Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???")
+            {
+                myID = 1034,
+                leftNeighborID = 1029,
+                rightNeighborID = 1023,
+                downNeighborID = 1022
+            });
+            this.points.Add(new ClickableComponent(new Rectangle(this.mapX + 728, this.mapY + 652, 28, 28), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])));
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -741,8 +1005,14 @@ namespace NPCMapLocations
             int offsetY = 0;
             this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
+            if (this.playerLocationName != null)
+            {
+                StardewValley.BellsAndWhistles.SpriteText.drawStringWithScrollCenteredAt(b, this.playerLocationName, this.xPositionOnScreen + this.width / 2, this.yPositionOnScreen + this.height + Game1.tileSize / 2 + Game1.pixelZoom * 4, "", 1f, -1, 0, 0.88f, false);
+            }
+
             if (!this.hoverText.Equals(""))
             {
+                IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1, -1, -1, 1f, null);
                 int textLength = (int)Game1.smallFont.MeasureString(hoverText).X + Game1.tileSize / 2;
                 foreach (KeyValuePair<string, string> customName in npcNames)
                 {
@@ -782,7 +1052,7 @@ namespace NPCMapLocations
                     }
                 }
 
-                drawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
+                DrawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
@@ -791,14 +1061,14 @@ namespace NPCMapLocations
             }
             else
             {
-                drawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
+                DrawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
             }
         }
 
-        // Draw NPC names in bottom left corner of map page
-        public void drawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
+        // Draw map to cover base rendering 
+        public void DrawMap(SpriteBatch b)
         {
-            Log.Verbose(Game1.player.currentLocation.name + ", " + Game1.player.getTileX() + ", " + Game1.player.getTileY());
+            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
             b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
@@ -815,9 +1085,11 @@ namespace NPCMapLocations
                     b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
-            Vector2 playerLoc = MapModMain.locationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
-            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
+        }
 
+        // Draw NPC names in bottom left corner of map page
+        public void DrawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
+        {
             if (!(names.Equals("")))
             {
                 var lines = names.Split('\n');
@@ -874,7 +1146,7 @@ namespace NPCMapLocations
                 else
                 {
                     x = Game1.activeClickableMenu.xPositionOnScreen - 145;
-                    y = Game1.activeClickableMenu.yPositionOnScreen + 625 - height / 2;
+                    y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
                 }
 
                 drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);

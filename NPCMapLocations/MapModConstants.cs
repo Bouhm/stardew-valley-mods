@@ -93,6 +93,7 @@ public static class MapModConstants
 
     // tileX and tileY (the first two values) are tile positions in the game for that location
     // x and y (the latter values) are pixel positions in the map sprite that correspond to the game location
+    // the mapping is done manually due to inaccurate scaling of the game world and map. More vectors = More accuracy.
     public static Dictionary<string, MapVectors[]> mapVectors
     {
         get
@@ -127,6 +128,7 @@ public static class MapModConstants
                     new MapVectors(40, 63, 418, 376),
                     new MapVectors(44, 50, 429, 333),
                     new MapVectors(45, 57, 427, 367),
+                    new MapVectors(51, 20, 437, 301),
                     new MapVectors(60, 17, 470, 293),
                     new MapVectors(64, 15, 477, 291),
                     new MapVectors(64, 17, 477, 294),
