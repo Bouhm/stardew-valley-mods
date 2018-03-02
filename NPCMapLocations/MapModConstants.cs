@@ -160,8 +160,7 @@ public static class MapModConstants
                     new MapVectors(0, 7, 215, 360),
                     new MapVectors(5, 27, 209, 413),
                     new MapVectors(5, 75, 205, 525),
-                    new MapVectors(10, 24, 250, 398),
-      
+                    new MapVectors(10, 24, 250, 398),   
                     new MapVectors(14, 40, 234, 429),
                     new MapVectors(15, 57, 241, 469),
                     new MapVectors(17, 10, 265, 379),
@@ -190,7 +189,6 @@ public static class MapModConstants
                     new MapVectors(66, 50, 329, 462),
                     new MapVectors(66, 70, 365, 485),
                     new MapVectors(67, 0, 416, 389),
-                    new MapVectors(68, 0, 417, 389),
                     new MapVectors(68, 17, 417, 418),
                     new MapVectors(69, 61, 349, 521),
                     new MapVectors(74, 31, 402, 431),
