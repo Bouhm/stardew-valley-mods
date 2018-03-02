@@ -20,7 +20,6 @@ namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static bool DEBUG_MODE = true;
         public static string current;
         public static IModHelper modHelper;
         public static MapModConfig config;
@@ -41,6 +40,9 @@ namespace NPCMapLocations
         private bool[] showExtras = new Boolean[4];
         private bool loadComplete = false;
         private bool initialized = false;
+        private static bool DEBUG_MODE = true;
+        private static Vector2 _tileLower; // For debug info
+        private static Vector2 _tileUpper; // For debug info
 
         public override void Entry(IModHelper helper)
         {
@@ -212,8 +214,9 @@ namespace NPCMapLocations
             }
             else
             {
-                MapVectors lower = null;
-                MapVectors upper = null;
+                MapVectors first = vectors.First();
+                MapVectors lower = first;
+                MapVectors upper = first;
                 var hasEqualTile = false; 
 
                 // Create bounding rectangle from two pre-defined points (lower & upper bound) and calculate map scale for that area
@@ -225,7 +228,7 @@ namespace NPCMapLocations
                     }
                     else
                     {
-                        if (lower != null && upper != null)
+                        if (lower != first && upper != first)
                         {
                             // Don't want to exclude points where tile = vector x/y (hence the <= and >=) but avoid cases where both upper/lower are equal
                             if (lower.tileX == upper.tileX || lower.tileY == upper.tileY)
@@ -237,18 +240,19 @@ namespace NPCMapLocations
                                 break;
                             }
                         }
-                        if ((lower == null || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
+                        if ((lower == first || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
                         {
                             lower = vector;
                             continue;
                         }
-                        if ((upper == null || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
+                        if ((upper == first || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
                         {
                             upper = vector;
                         }
                     }
                 }
 
+                // Quick maffs
                 int tileXMin = Math.Min(lower.tileX, upper.tileX);
                 int tileXMax = Math.Max(lower.tileX, upper.tileX);
                 int tileYMin = Math.Min(lower.tileY, upper.tileY);
@@ -259,6 +263,10 @@ namespace NPCMapLocations
                 int yMax = Math.Max(lower.y, upper.y);
                 x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
                 y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
+
+                // For debug info
+                MapModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
+                MapModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
             }
             return new Vector2(mapX + x - 16, mapY + y - 15);
         }
@@ -454,7 +462,7 @@ namespace NPCMapLocations
         // Actual draw event
         static void DrawMarkers(GameMenu menu)
         {
-            if (menu.currentTab == 3)
+            if (menu.currentTab == GameMenu.mapTab)
             {
                 SpriteBatch b = Game1.spriteBatch;
                 // Draw map overlay
@@ -606,16 +614,40 @@ namespace NPCMapLocations
             );
         }
 
+        // Show debug info if debug mode
         private static void ShowDebugInfo()
         {
             if (Game1.player.currentLocation == null) { return; }
 
+            // Black backgronud for legible text
+            Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 410, 160), new Rectangle(6, 3, 1, 1), Color.Black);
+
             // Show map location and tile positions
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(-1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 2, Game1.tileSize / 2) + new Vector2(-1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize/2, Game1.tileSize / 2), Color.White);
+            DrawText(Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize/4, Game1.tileSize/4));
+
+            var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
+
+            // Show lower & upper bound tiles used for calculations 
+            if (currMenu != null && currMenu.currentTab == GameMenu.mapTab)
+            {
+                DrawText("Lower bound: (" + MapModMain._tileLower.X + ", " + MapModMain._tileLower.Y + ")", new Vector2(Game1.tileSize/4, Game1.tileSize*3/4 + 8));
+                DrawText("Upper bound: (" + MapModMain._tileUpper.X + ", " + MapModMain._tileUpper.Y + ")", new Vector2(Game1.tileSize/4, Game1.tileSize*5/4 + 8*2));
+            }
+            else
+            {
+                DrawText("Lower bound: (" + MapModMain._tileLower.X + ", " + MapModMain._tileLower.Y + ")", new Vector2(Game1.tileSize/4, Game1.tileSize*3/4 + 8), Color.DimGray);
+                DrawText("Upper bound: (" + MapModMain._tileUpper.X + ", " + MapModMain._tileUpper.Y + ")", new Vector2(Game1.tileSize/4, Game1.tileSize*5/4 + 8*2), Color.DimGray);
+            }
+        }
+
+        // Draw outlined text
+        private static void DrawText(string text, Vector2 pos, Color? color = null)
+        {
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
         }
     }
 
