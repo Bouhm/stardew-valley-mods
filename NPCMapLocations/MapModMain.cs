@@ -44,7 +44,7 @@ namespace NPCMapLocations
         private static Vector2 _tileUpper; // For debug info
         private static string alertFlag;
 
-        private const bool DEBUG_MODE = true;
+        private const bool DEBUG_MODE = true; // For showing debug info. Set false for release.
 
         public override void Entry(IModHelper helper)
         {
@@ -187,9 +187,11 @@ namespace NPCMapLocations
                 return new Vector2(-5000, -5000);
             }
 
-            Vector2 mapVector = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-            int mapX = (int)mapVector.X;
-            int mapY = (int)mapVector.Y;
+            var locVectors = mapVectors[location];
+            var playerLoc = new Vector2(Game1.player.getTileX(), Game1.player.getTileY());
+            Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+            int mapX = (int)mapPagePos.X;
+            int mapY = (int)mapPagePos.Y;
             int x = 0;
             int y = 0;
 
@@ -209,15 +211,15 @@ namespace NPCMapLocations
             }
 
             // Handle indoor locations
-            if (mapVectors[location].Count() == 1)
+            if (locVectors.Count() == 1)
             {
-                x = mapVectors[location].FirstOrDefault().x;
-                y = mapVectors[location].FirstOrDefault().y;
+                x = locVectors.FirstOrDefault().x;
+                y = locVectors.FirstOrDefault().y;
             }
             else
             { 
                 // Sort map vectors by distance to point
-                var vectors = mapVectors[location].OrderBy(vector => Math.Sqrt(Math.Pow(vector.tileX - tileX, 2) + Math.Pow(vector.tileY - tileY, 2)));
+                var vectors = locVectors.OrderBy(vector => Math.Sqrt(Math.Pow(vector.tileX - tileX, 2) + Math.Pow(vector.tileY - tileY, 2)));
 
                 MapVectors lower = null;
                 MapVectors upper = null;
@@ -261,20 +263,20 @@ namespace NPCMapLocations
                 // Uses fallback strategy - get closest points such that lower != upper
                 if (lower == null)
                 {
-                    if (alertFlag != "NullBound:" + mapVectors[location])
+                    if (alertFlag != "NullBound:" + playerLoc)
                     { 
-                        MapModMain.monitor.Log("Null lower bound - No vector less than tile pos to calculate location using lower/upper bound strategy.", LogLevel.Alert);
-                        alertFlag = "NullBound:" + mapVectors[location];
+                        MapModMain.monitor.Log("Null lower bound - No vector less than (" + playerLoc.X + ", " + playerLoc.Y + ") to calculate location.", LogLevel.Alert);
+                        alertFlag = "NullBound:" + playerLoc;
                     }
 
                     lower = upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
                 }
-                else if (upper == null)
+                if (upper == null)
                 {
-                    if (alertFlag != "NullBound:" + mapVectors[location])
+                    if (alertFlag != "NullBound:" + playerLoc)
                     {
-                        MapModMain.monitor.Log("Null upper bound - No vector greater than tile pos to calculate location using lower/upper bound strategy.", LogLevel.Alert);
-                        alertFlag = "NullBound:" + mapVectors[location];
+                        MapModMain.monitor.Log("Null upper bound - No vector greater than (" + playerLoc.X + ", " + playerLoc.Y + ") to calculate location.", LogLevel.Alert);
+                        alertFlag = "NullBound:" + playerLoc;
                     }
 
                     upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
