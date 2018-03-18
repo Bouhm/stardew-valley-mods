@@ -263,7 +263,7 @@ namespace NPCMapLocations
                 // Uses fallback strategy - get closest points such that lower != upper
                 if (lower == null)
                 {
-                    if (alertFlag != "NullBound:" + playerLoc)
+                    if (DEBUG_MODE && alertFlag != "NullBound:" + playerLoc)
                     { 
                         MapModMain.monitor.Log("Null lower bound - No vector less than (" + playerLoc.X + ", " + playerLoc.Y + ") to calculate location.", LogLevel.Alert);
                         alertFlag = "NullBound:" + playerLoc;
@@ -273,7 +273,7 @@ namespace NPCMapLocations
                 }
                 if (upper == null)
                 {
-                    if (alertFlag != "NullBound:" + playerLoc)
+                    if (DEBUG_MODE && alertFlag != "NullBound:" + playerLoc)
                     {
                         MapModMain.monitor.Log("Null upper bound - No vector greater than (" + playerLoc.X + ", " + playerLoc.Y + ") to calculate location.", LogLevel.Alert);
                         alertFlag = "NullBound:" + playerLoc;
@@ -498,6 +498,10 @@ namespace NPCMapLocations
                 // Draw map overlay
                 toolTips.DrawMap(b);
 
+                // Player
+                Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
+
                 // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
                 {
@@ -509,19 +513,19 @@ namespace NPCMapLocations
                 foreach (KeyValuePair<string, NPCMarker> npc in sortedMarkers)
                 {
                     if (hiddenNPCs.Contains(npc.Key)) {
-                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.DimGray * 0.9f);
+                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.Gray * 0.8f);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.Gray * 0.8f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                         if (questNPCs.Contains(npc.Key))
                         {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.9f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 22, npc.Value.position.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.Gray * 0.8f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                     }
                     else
                     {
-                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.White * 0.9f);
+                        b.Draw(npc.Value.marker, npc.Value.position, new Rectangle?(new Rectangle(0, spriteCrop[npc.Key], 16, 15)), Color.Gray *0.8f);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
                             b.Draw(Game1.mouseCursors, new Vector2(npc.Value.position.X + 20, npc.Value.position.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
@@ -532,10 +536,6 @@ namespace NPCMapLocations
                         }
                     }
                 }
-
-                // Player
-                Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY());
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
 
                 // Location and name tooltips
                 toolTips.draw(b);
@@ -548,7 +548,7 @@ namespace NPCMapLocations
             }
         }
 
-        // Show debug info if debug mode
+        // Show debug info in top left corner
         private static void ShowDebugInfo()
         {
             if (Game1.player.currentLocation == null) { return; }
@@ -752,7 +752,7 @@ namespace NPCMapLocations
             this.names = names;
             this.npcNames = npcNames;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
-            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+            this.map = MapModMain.modHelper.Content.Load<Texture2D>(@"map", ContentSource.ModFolder);
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
