@@ -21,13 +21,14 @@ namespace NPCMapLocations
     {
         public static string current;
         public static IModHelper modHelper;
-        private static IMonitor monitor;
+        public static IMonitor monitor;
         public static MapModConfig config;
         public static int customNpcId = 0;
         public static int menuOpen = 0;
+        public static Dictionary<string, int> spriteCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
+        public static Texture2D map;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
-        public static Dictionary<string, int> spriteCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, string> startingLocations;
         private static Dictionary<string, MapVectors[]> mapVectors;
         private static Dictionary<string, string> indoorLocations;
@@ -66,6 +67,7 @@ namespace NPCMapLocations
             mapVectors = MapModConstants.mapVectors;
             indoorLocations = MapModConstants.indoorLocations;
             customNPCs = config.customNPCs;
+            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"map", ContentSource.ModFolder); // Load modified map page
             loadComplete = true;
         }
 
@@ -171,11 +173,18 @@ namespace NPCMapLocations
 
         private void ChangeKey(string key, GameMenu menu)
         {
-            if (menu.currentTab != 3) { return; }
+            if (menu.currentTab != GameMenu.mapTab) { return; }
             if (key.Equals(config.menuKey))
             {
                 Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras, customNPCs, npcNames);
                 menuOpen = 1;
+            }
+            else if (key.Equals(config.tooltipKey))
+            {
+                if (++config.nameTooltipMode > 3) {
+                    config.nameTooltipMode = 1;
+                } 
+                modHelper.WriteConfig(config);
             }
         }
 
@@ -752,7 +761,7 @@ namespace NPCMapLocations
             this.names = names;
             this.npcNames = npcNames;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
-            this.map = MapModMain.modHelper.Content.Load<Texture2D>(@"map", ContentSource.ModFolder);
+            this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;

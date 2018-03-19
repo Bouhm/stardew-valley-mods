@@ -27,9 +27,6 @@ namespace NPCMapLocations
         private ClickableTextureComponent upArrow;
         private ClickableTextureComponent downArrow;
         private ClickableTextureComponent scrollBar;
-        private MapModButton tooltipButton1;
-        private MapModButton tooltipButton2;
-        private MapModButton tooltipButton3;
         private MapModButton immersionButton1;
         private MapModButton immersionButton2;
         private MapModButton immersionButton3;
@@ -42,7 +39,7 @@ namespace NPCMapLocations
 
         public MapModMenu(int x, int y, int width, int height, bool[] showExtras, Dictionary<string, Dictionary<string, int>> customNPCs, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
-            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+            this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -57,13 +54,9 @@ namespace NPCMapLocations
             }
 
             // Translate labels and initialize buttons to handle button press
-            string namesLabel = MapModMain.modHelper.Translation.Get("names-tooltip.label");
             string immersionLabel = MapModMain.modHelper.Translation.Get("immersion.label");
             string extraLabel = MapModMain.modHelper.Translation.Get("extra.label");
             string villagersLabel = MapModMain.modHelper.Translation.Get("villagers.label");
-            tooltipButton1 = new MapModButton("names-tooltip.option1", 1, -1, -1, -1, -1);
-            tooltipButton2 = new MapModButton("names-tooltip.option2", 2, -1, -1, -1, -1);
-            tooltipButton3 = new MapModButton("names-tooltip.option3", 3, -1, -1, -1, -1);
             immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1);
             immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1);
             immersionButton3 = new MapModButton("immersion.option3", 6, -1, -1, -1, -1);
@@ -71,10 +64,6 @@ namespace NPCMapLocations
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
             this.options.Add(new OptionsElement("NPC Map Locations Mod Version"));
-            this.options.Add(new OptionsElement(namesLabel));
-            this.options.Add(tooltipButton1);
-            this.options.Add(tooltipButton2);
-            this.options.Add(tooltipButton3);
             this.options.Add(new OptionsElement(immersionLabel));
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
@@ -287,24 +276,6 @@ namespace NPCMapLocations
                 this.scrolling = true;
                 this.leftClickHeld(x, y);
             }
-            if (tooltipButton1.rect.Contains(x, y))
-            {
-                tooltipButton1.receiveLeftClick(x, y);
-                tooltipButton2.greyOut();
-                tooltipButton3.greyOut();
-            }
-            else if (tooltipButton2.rect.Contains(x, y))
-            {
-                tooltipButton2.receiveLeftClick(x, y);
-                tooltipButton1.greyOut();
-                tooltipButton3.greyOut();
-            }
-            else if (tooltipButton3.rect.Contains(x, y))
-            {
-                tooltipButton3.receiveLeftClick(x, y);
-                tooltipButton1.greyOut();
-                tooltipButton2.greyOut();
-            }
             else if (immersionButton1.rect.Contains(x, y))
             {
                 immersionButton1.receiveLeftClick(x, y);
@@ -411,19 +382,7 @@ namespace NPCMapLocations
                         if (options[this.currentItemIndex + i] is MapModButton)
                         {
                             Rectangle bounds = new Rectangle(x + 28, y, 700, Game1.tileSize + 8);
-                            if (options[this.currentItemIndex + i].whichOption == 1)
-                            {
-                                tooltipButton1.rect = bounds;
-                            }
-                            else if (options[this.currentItemIndex + i].whichOption == 2)
-                            {
-                                tooltipButton2.rect = bounds;
-                            }
-                            else if (options[this.currentItemIndex + i].whichOption == 3)
-                            {
-                                tooltipButton3.rect = bounds;
-                            }
-                            else if (options[this.currentItemIndex + i].whichOption == 4)
+                            if (options[this.currentItemIndex + i].whichOption == 4)
                             {
                                 immersionButton1.rect = bounds;
                             }
@@ -466,11 +425,7 @@ namespace NPCMapLocations
         {
             this.label = MapModMain.modHelper.Translation.Get(label);
             this.rect = new Rectangle(x, y, width, height);
-            if (MapModMain.config.nameTooltipMode == whichOption)
-            {
-                this.greyedOut = false;
-            }
-            else if (MapModMain.config.immersionOption == whichOption - 3)
+            if (MapModMain.config.immersionOption == whichOption - 3)
             {
                 this.greyedOut = false;
             }
@@ -484,15 +439,7 @@ namespace NPCMapLocations
         {
             if (!isActive)
             {
-                if (whichOption < 4)
-                {
-                    Game1.playSound("drumkit6");
-                    base.receiveLeftClick(x, y);
-                    this.isActive = true;
-                    this.greyedOut = false;
-                    MapModMain.config.nameTooltipMode = whichOption;
-                }
-                else if (whichOption > 3)
+                if (whichOption > 3)
                 {
                     Game1.playSound("drumkit6");
                     base.receiveLeftClick(x, y);
