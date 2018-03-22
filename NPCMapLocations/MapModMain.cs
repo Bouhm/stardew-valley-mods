@@ -14,6 +14,7 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NPCMapLocations
 {
@@ -31,7 +32,7 @@ namespace NPCMapLocations
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
         private static Dictionary<string, MapVectors[]> mapVectors;
         private static Dictionary<string, string> indoorLocations;
-        private static MapPageTooltips toolTips;
+        private static ModMap modMap;
         private static string hoveredNPCNames;
         private static HashSet<string> birthdayNPCs;
         private static HashSet<string> questNPCs;
@@ -312,12 +313,17 @@ namespace NPCMapLocations
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+
+            updateMarkers((GameMenu) Game1.activeClickableMenu);
+        }
+
+        private void updateMarkers(GameMenu menu)
+        {
             if (loadComplete && !initialized)
             {
                 LoadCustomMods();
             }
-
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
 
             List<string> hoveredList = new List<String>();
             birthdayNPCs = new HashSet<string>();
@@ -476,7 +482,7 @@ namespace NPCMapLocations
                     }
                 };
             }
-            toolTips = new MapPageTooltips(hoveredNPCNames, npcNames, config.nameTooltipMode);
+            modMap = new ModMap(hoveredNPCNames, npcNames, config.nameTooltipMode, menu);
         }
 
         // Draw misc
@@ -491,20 +497,19 @@ namespace NPCMapLocations
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (Game1.activeClickableMenu is GameMenu)
-            {
-                DrawMarkers((GameMenu)Game1.activeClickableMenu);
-            }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+
+            DrawMapPage((GameMenu)Game1.activeClickableMenu);
         }
 
-        // Actual draw event
-        static void DrawMarkers(GameMenu menu)
+        // Draw event
+        static void DrawMapPage(GameMenu menu)
         {
             if (menu.currentTab == GameMenu.mapTab)
             {
                 SpriteBatch b = Game1.spriteBatch;
                 // Draw map overlay
-                toolTips.DrawMap(b);
+                modMap.DrawMap(b);
 
                 // Player
                 Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
@@ -513,7 +518,7 @@ namespace NPCMapLocations
                 // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
                 {
-                    b.Draw(Game1.mouseCursors, new Vector2(Game1.activeClickableMenu.xPositionOnScreen + 130, Game1.activeClickableMenu.yPositionOnScreen + 355), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                    b.Draw(Game1.mouseCursors, LocationToMap("Forest", 27, 11), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
                 }
                 var sortedMarkers = npcMarkers.ToList();
                 sortedMarkers.Sort((y, x) => x.Value.layer.CompareTo(y.Value.layer));
@@ -547,7 +552,7 @@ namespace NPCMapLocations
                 }
 
                 // Location and name tooltips
-                toolTips.draw(b);
+                modMap.draw(b);
 
                 // Cursor
                 if (!Game1.options.hardwareCursor)
@@ -563,7 +568,7 @@ namespace NPCMapLocations
             if (Game1.player.currentLocation == null) { return; }
 
             // Black backgronud for legible text
-            Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 410, 160), new Rectangle(6, 3, 1, 1), Color.Black);
+            Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 160), new Rectangle(6, 3, 1, 1), Color.Black);
 
             // Show map location and tile positions
             DrawText(Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
@@ -706,7 +711,7 @@ namespace NPCMapLocations
     }
 
     // For drawing tooltips
-    public class MapPageTooltips : IClickableMenu
+    public class ModMap : IClickableMenu
     {
         public const int region_desert = 1001;
         public const int region_farm = 1002;
@@ -756,7 +761,7 @@ namespace NPCMapLocations
         private Dictionary<string, string> npcNames;
         private int nameTooltipMode;
 
-        public MapPageTooltips(string names, Dictionary<string, string> npcNames, int nameTooltipMode)
+        public ModMap(string names, Dictionary<string, string> npcNames, int nameTooltipMode, GameMenu menu)
         {
             this.nameTooltipMode = nameTooltipMode;
             this.names = names;
@@ -768,8 +773,8 @@ namespace NPCMapLocations
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("Desert").X - 8,
-                    (int)MapModMain.LocationToMap("Desert").Y - 8,
+                    (int)MapModMain.LocationToMap("Desert").X,
+                    (int)MapModMain.LocationToMap("Desert").Y,
                     regionRects["Desert"].width,
                     regionRects["Desert"].height
                 ),
@@ -781,8 +786,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("Farm").X - 8,
-                    (int)MapModMain.LocationToMap("Farm").Y - 8,
+                    (int)MapModMain.LocationToMap("Farm").X,
+                    (int)MapModMain.LocationToMap("Farm").Y,
                     regionRects["Farm"].width,
                     regionRects["Farm"].height
                 ),
@@ -799,8 +804,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("Backwoods").X - 8,
-                    (int)MapModMain.LocationToMap("Backwoods").Y - 8,
+                    (int)MapModMain.LocationToMap("Backwoods").X,
+                    (int)MapModMain.LocationToMap("Backwoods").Y,
                     regionRects["Backwoods"].width,
                     regionRects["Backwoods"].height
                 ),
@@ -814,8 +819,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("BusStop").X - 8,
-                    (int)MapModMain.LocationToMap("BusStop").Y - 8,
+                    (int)MapModMain.LocationToMap("BusStop").X,
+                    (int)MapModMain.LocationToMap("BusStop").Y,
                     regionRects["BusStop"].width,
                     regionRects["BusStop"].height
                 ),
@@ -901,8 +906,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("TownSquare").X - 8,
-                    (int)MapModMain.LocationToMap("TownSquare").Y - 8,
+                    (int)MapModMain.LocationToMap("TownSquare").X,
+                    (int)MapModMain.LocationToMap("TownSquare").Y,
                     regionRects["TownSquare"].width,
                     regionRects["TownSquare"].height
                 ),
@@ -1151,8 +1156,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("Quarry").X - 8, 
-                    (int)MapModMain.LocationToMap("Quarry").Y - 8,
+                    (int)MapModMain.LocationToMap("Quarry").X, 
+                    (int)MapModMain.LocationToMap("Quarry").Y,
                     regionRects["Quarry"].width, 
                     regionRects["Quarry"].height
                 ), 
@@ -1219,7 +1224,7 @@ namespace NPCMapLocations
             this.points.Add(new ClickableComponent(
                 new Rectangle(
                     (int)MapModMain.LocationToMap("RuinedHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("RuinedHouse").Y - 82,
+                    (int)MapModMain.LocationToMap("RuinedHouse").Y - 8,
                     regionRects["RuinedHouse"].width,
                     regionRects["RuinedHouse"].height
                 ), 
@@ -1259,8 +1264,8 @@ namespace NPCMapLocations
             });
             this.points.Add(new ClickableComponent(
                 new Rectangle(
-                    (int)MapModMain.LocationToMap("Railroad").X - 8, 
-                    (int)MapModMain.LocationToMap("Railroad").Y - 84,
+                    (int)MapModMain.LocationToMap("Railroad").X, 
+                    (int)MapModMain.LocationToMap("Railroad").Y,
                     regionRects["Railroad"].width,
                     regionRects["Railroad"].height
                 ), 
@@ -1274,11 +1279,16 @@ namespace NPCMapLocations
             this.points.Add(new ClickableComponent(
                 new Rectangle(
                     (int)MapModMain.LocationToMap("LonelyStone").X - 8, 
-                    (int)MapModMain.LocationToMap("LonelyStone").Y - 84,
+                    (int)MapModMain.LocationToMap("LonelyStone").Y - 8,
                     regionRects["LonelyStone"].width,
                     regionRects["LonelyStone"].height
                 ), 
                 Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])));
+
+            // Remove vanilla map tooltips
+            List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
+            MapPage mapPage = (MapPage)menuPages[menu.currentTab];
+            MapModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").SetValue(new List<ClickableComponent>());
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)

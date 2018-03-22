@@ -59,7 +59,7 @@ public static class MapModConstants
             return new Dictionary<string, MapVectors[]>
             {
                 { "Backwoods", new MapVectors[] {
-                    new MapVectors(0, 0, 400, 150),
+                    new MapVectors(0, 0, 421, 148),
                     new MapVectors(49, 32, 500, 238),
                 }},
                 // FARMS
@@ -70,6 +70,9 @@ public static class MapModConstants
                     { "FarmHouse", new MapVectors[] {
                         new MapVectors(477, 270)
                     }},
+                    { "Cellar", new MapVectors[] {
+                        new MapVectors(477, 270)
+                    }},
                     { "FarmCave", new MapVectors[] {
                         new MapVectors(386, 246)
                     }},
@@ -77,7 +80,7 @@ public static class MapModConstants
                         new MapVectors(380, 264)
                     }},
                 { "BusStop", new MapVectors[] {
-                    new MapVectors(0, 0, 521, 310),
+                    new MapVectors(0, 0, 501, 195),
                     new MapVectors(34, 25, 609, 312)
                 }},
                     { "Tunnel", new MapVectors[] {
@@ -92,147 +95,148 @@ public static class MapModConstants
                         new MapVectors(62, 32, 189, 356)
                     }},
                     { "WizardHouse", new MapVectors[] {
-                        new MapVectors(211, 398)
+                        new MapVectors(255, 444)
                     }},
                     { "WizardHouseBasement", new MapVectors[] {
-                        new MapVectors(211, 398)
+                        new MapVectors(255, 444)
                     }},
                     { "AnimalShop", new MapVectors[] {
-                        new MapVectors(453, 408)
+                        new MapVectors(470, 423)
                     }},
                     { "LeahHouse", new MapVectors[] {
-                        new MapVectors(469, 441)
+                        new MapVectors(507, 467)
                     }},
                     { "RuinedHouse", new MapVectors[] {
-                        new MapVectors(323, 622)
+                        new MapVectors(324, 622)
                     }},
                     { "SewerPipe", new MapVectors[] {
-                        new MapVectors(481, 644)
+                        new MapVectors(480, 643)
                     }},
                 // Town is divided by upper/lower section because the whole
                 // town wouldn't fit in the map page
                 { "Town", new MapVectors[] {
-                    new MapVectors(0, 53, 601, 314),
-                    new MapVectors(110, 97, 928, 464),
-                    new MapVectors(0, 53, 601, 314),
+                    new MapVectors(0, 0, 594, 182),
+                    new MapVectors(0, 0, 926, 273),
+
+                    new MapVectors(0, 36, 601, 314),
                     new MapVectors(110, 97, 928, 464)
                 }},
                     { "TownSquare", new MapVectors[] {
-                        new MapVectors(698, 366)
+                        new MapVectors(662, 349)
                     }},
                     { "SeedShop", new MapVectors[] {
-                        new MapVectors(711, 322)
+                        new MapVectors(721, 318)
                     }},
                     { "Saloon", new MapVectors[] {
-                        new MapVectors(733, 369)
+                        new MapVectors(725, 371)
                     }},
                     { "Hospital", new MapVectors[] {
-                        new MapVectors(689, 320)
+                        new MapVectors(704, 319)
                     }},
                     { "HarveyRoom", new MapVectors[] {
-                        new MapVectors(689, 314)
+                        new MapVectors(704, 315)
                     }},
                     { "ArchaeologyHouse", new MapVectors[] {
-                        new MapVectors(901, 433)
+                        new MapVectors(905, 436)
                     }},
                     { "AlexHouse", new MapVectors[] {
-                        new MapVectors(765, 336)
+                        new MapVectors(771, 347)
                     }},
                     { "JoshHouse", new MapVectors[] {
-                        new MapVectors(765, 336)
+                        new MapVectors(771, 347)
                     }},
                     { "HaleyHouse", new MapVectors[] {
                         new MapVectors(665, 429)
                     }},
                     { "CommunityCenter", new MapVectors[] {
-                        new MapVectors(713, 224)
+                        new MapVectors(737, 220)
                     }},
                     { "Blacksmith", new MapVectors[] {
-                        new MapVectors(865, 406)
+                        new MapVectors(877, 409)
                     }},
                     { "JojaMart", new MapVectors[] {
-                        new MapVectors(897, 310)
+                        new MapVectors(885, 302)
                     }},
                     { "SamHouse", new MapVectors[] {
                         new MapVectors(629, 423)
                     }},
                     { "Trailer", new MapVectors[] {
-                        new MapVectors(795, 361)
+                        new MapVectors(813, 365)
                     }},
                     { "ManorHouse", new MapVectors[] {
-                        new MapVectors(781, 416)
+                        new MapVectors(780, 421)
                     }},
                     { "Graveyard", new MapVectors[] {
-                        new MapVectors(700, 466)
+                        new MapVectors(740, 438)
                     }},
                     { "Sewer", new MapVectors[] {
-                        new MapVectors(707, 454)
+                        new MapVectors(703, 467)
                     }},
                     { "BugLand", new MapVectors[] {
-                        new MapVectors(707, 454)
+                        new MapVectors(703, 467)
                     }},
                 { "Beach", new MapVectors[] {
                     new MapVectors(0, 0, 798, 595),
                     new MapVectors(14, 39, 813, 601)
                 }},
                     { "ElliottHouse", new MapVectors[] {
-                        new MapVectors(845, 572)
+                        new MapVectors(847, 565)
                     }},
                     { "FishShop", new MapVectors[] {
-                        new MapVectors(861, 629)
+                        new MapVectors(813, 626)
                     }},
                     { "LonelyStone", new MapVectors[] {
-                        new MapVectors(861, 629)
+                        new MapVectors(713, 634)
                     }},
                 { "Railroad", new MapVectors[] {
-                    new MapVectors(0, 0, 670, 38),
+                    new MapVectors(0, 0, 595, 10),
                     new MapVectors(51, 43, 697, 49)
                 }},
                     { "BathHouse_Entry", new MapVectors[] {
-                        new MapVectors(593, 85)
+                        new MapVectors(630, 59)
                     }},
                     { "BathHouse_MensLocker", new MapVectors[] {
-                        new MapVectors(593, 85)
+                        new MapVectors(630, 59)
                     }},
                     { "BathHouse_WomensLocker", new MapVectors[] {
-                        new MapVectors(593, 85)
+                        new MapVectors(630, 59)
                     }},
                     { "BathHouse_Pool", new MapVectors[] {
-                        new MapVectors(593, 85)
+                        new MapVectors(630, 59)
                     }},
                     { "Spa", new MapVectors[] {
-                        new MapVectors(593, 85)
+                        new MapVectors(630, 59)
                     }},
                     { "WitchWarpCave", new MapVectors[] {
-                        new MapVectors(697, 28)
+                        new MapVectors(749, 9)
                     }},
                     { "WitchSwamp", new MapVectors[] {
-                        new MapVectors(697, 28)
+                        new MapVectors(749, 9)
                     }},
                     { "WitchHut", new MapVectors[] {
-                        new MapVectors(697, 28)
+                        new MapVectors(749, 9)
                     }},
                 { "Mountain", new MapVectors[] {
-                    new MapVectors(0, 0, 702, 147),
+                    new MapVectors(0, 0, 717, 85),
                     new MapVectors(12, 26, 741, 177),
                 }},
                     { "ScienceHouse", new MapVectors[] {
-                        new MapVectors(742, 162)
+                        new MapVectors(751, 136)
                     }},
                     { "SebastianRoom", new MapVectors[] {
-                        new MapVectors(741, 162)
+                        new MapVectors(751, 136)
                     }},
                     { "AdventureGuild", new MapVectors[] {
-                        new MapVectors(917, 130)
+                        new MapVectors(918, 99)
                     }},
                     { "Tent", new MapVectors[] {
-                        new MapVectors(789, 130)
+                        new MapVectors(793, 97)
                     }},
                     { "Mine", new MapVectors[] {
-                        new MapVectors(887, 109)
+                        new MapVectors(865, 87)
                     }},
                     { "Quarry", new MapVectors[] {
-                        new MapVectors(887, 109)
+                        new MapVectors(995, 109)
                     }},
                 { "Desert", new MapVectors[] {
                     new MapVectors(0, 0, 4, 10),
@@ -267,7 +271,7 @@ public static class MapModConstants
                 { "LeahHouse", new Rect(32, 24) },
                 { "SamHouse", new Rect(36, 52) },
                 { "HaleyHouse", new Rect(40, 36) },
-                { "TownSquare", new Rect(44, 40) },
+                { "TownSquare", new Rect(48, 45) },
                 { "Hospital", new Rect(16, 32) },
                 { "SeedShop", new Rect(28, 40) },
                 { "Blacksmith", new Rect(80, 36) },
@@ -340,6 +344,7 @@ public static class MapModConstants
                 { "Farm", "Farm" },
                 { "Sewer", "Town"},
                 { "WizardHouse", "Forest"},
+                { "Cellar", "Farm"},
                 { "Barn", "Farm"},
                 { "Big Barn", "Farm" },
                 { "Deluxe Barn", "Farm"},
