@@ -771,519 +771,447 @@ namespace NPCMapLocations
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Desert").X,
-                    (int)MapModMain.LocationToMap("Desert").Y,
-                    regionRects["Desert"].width,
-                    regionRects["Desert"].height
-                ),
-                Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???")
-            {
-                myID = 1001,
-                rightNeighborID = 1003,
-                downNeighborID = 1030
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Farm").X,
-                    (int)MapModMain.LocationToMap("Farm").Y,
-                    regionRects["Farm"].width,
-                    regionRects["Farm"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[]
-            {
-                Game1.player.farmName
-            }))
-            {
-                myID = 1002,
-                leftNeighborID = 1005,
-                upNeighborID = 1003,
-                rightNeighborID = 1004,
-                downNeighborID = 1006
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Backwoods").X,
-                    (int)MapModMain.LocationToMap("Backwoods").Y,
-                    regionRects["Backwoods"].width,
-                    regionRects["Backwoods"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0]))
-            {
-                myID = 1003,
-                downNeighborID = 1002,
-                leftNeighborID = 1001,
-                rightNeighborID = 1022,
-                upNeighborID = 1029
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("BusStop").X,
-                    (int)MapModMain.LocationToMap("BusStop").Y,
-                    regionRects["BusStop"].width,
-                    regionRects["BusStop"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0]))
-            {
-                myID = 1004,
-                leftNeighborID = 1002,
-                upNeighborID = 1003,
-                downNeighborID = 1006,
-                rightNeighborID = 1011
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("WizardHouse").X - 8,
-                    (int)MapModMain.LocationToMap("WizardHouse").Y - 8,
-                    regionRects["WizardHouse"].width,
-                    regionRects["WizardHouse"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0]))
-            {
-                myID = 1005,
-                upNeighborID = 1001,
-                downNeighborID = 1031,
-                rightNeighborID = 1006,
-                leftNeighborID = 1030
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("AnimalShop").X - 8,
-                    (int)MapModMain.LocationToMap("AnimalShop").Y - 8,
-                    regionRects["AnimalShop"].width,
-                    regionRects["AnimalShop"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0]))
-            {
-                myID = 1006,
-                leftNeighborID = 1005,
-                downNeighborID = 1007,
-                upNeighborID = 1002,
-                rightNeighborID = 1008
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("LeahHouse").X - 8,
-                    (int)MapModMain.LocationToMap("LeahHouse").Y - 8,
-                    regionRects["LeahHouse"].width,
-                    regionRects["LeahHouse"].height
-                ), Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0]))
-            {
-                myID = 1007,
-                upNeighborID = 1006,
-                downNeighborID = 1033,
-                leftNeighborID = 1005,
-                rightNeighborID = 1008
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("SamHouse").X - 8,
-                    (int)MapModMain.LocationToMap("SamHouse").Y - 8,
-                    regionRects["SamHouse"].width,
-                    regionRects["SamHouse"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0]))
-            {
-                myID = 1008,
-                leftNeighborID = 1006,
-                upNeighborID = 1010,
-                rightNeighborID = 1009
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("HaleyHouse").X - 8,
-                    (int)MapModMain.LocationToMap("HaleyHouse").Y - 8,
-                    regionRects["HaleyHouse"].width,
-                    regionRects["HaleyHouse"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0]))
-            {
-                myID = 1009,
-                leftNeighborID = 1008,
-                upNeighborID = 1010,
-                rightNeighborID = 1018
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("TownSquare").X,
-                    (int)MapModMain.LocationToMap("TownSquare").Y,
-                    regionRects["TownSquare"].width,
-                    regionRects["TownSquare"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0]))
-            {
-                myID = 1010,
-                leftNeighborID = 1008,
-                downNeighborID = 1009,
-                rightNeighborID = 1014,
-                upNeighborID = 1011
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Hospital").X - 8,
-                    (int)MapModMain.LocationToMap("Hospital").Y - 8,
-                    regionRects["Hospital"].width,
-                    regionRects["Hospital"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0]))
-            {
-                myID = 1011,
-                leftNeighborID = 1004,
-                rightNeighborID = 1012,
-                downNeighborID = 1010,
-                upNeighborID = 1032
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("SeedShop").X - 8,
-                    (int)MapModMain.LocationToMap("SeedShop").Y - 8,
-                    regionRects["SeedShop"].width,
-                    regionRects["SeedShop"].height
-                ),
-                string.Concat(new string[]
-            {
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
-                Environment.NewLine,
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079", new object[0]),
-                Environment.NewLine,
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080", new object[0])
-            }))
-            {
-                myID = 1012,
-                leftNeighborID = 1011,
-                downNeighborID = 1014,
-                rightNeighborID = 1021,
-                upNeighborID = 1032
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Blacksmith").X - 8,
-                    (int)MapModMain.LocationToMap("Blacksmith").Y - 8,
-                    regionRects["Blacksmith"].width,
-                    regionRects["Blacksmith"].height
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0]))
-            {
-                myID = 1013,
-                upNeighborID = 1027,
-                rightNeighborID = 1016,
-                downNeighborID = 1017,
-                leftNeighborID = 1015
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Saloon").X - 8, 
-                    (int)MapModMain.LocationToMap("Saloon").Y - 8,
-                    regionRects["Saloon"].width,
-                    regionRects["Saloon"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0]))
-            {
-                myID = 1014,
-                leftNeighborID = 1010,
-                rightNeighborID = 1020,
-                downNeighborID = 1019,
-                upNeighborID = 1012
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("ManorHouse").X - 8,
-                    (int)MapModMain.LocationToMap("ManorHouse").Y - 8,
-                    regionRects["ManorHouse"].width,
-                    regionRects["ManorHouse"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0]))
-            {
-                myID = 1015,
-                leftNeighborID = 1019,
-                upNeighborID = 1020,
-                rightNeighborID = 1013,
-                downNeighborID = 1017
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("ArchaeologyHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("ArchaeologyHouse").Y - 8,
-                    regionRects["ArchaeologyHouse"].width, 
-                    regionRects["ArchaeologyHouse"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0]))
-            {
-                myID = 1016,
-                downNeighborID = 1017,
-                leftNeighborID = 1013,
-                upNeighborID = 1027,
-                rightNeighborID = 99989
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("ElliottHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("ElliottHouse").Y - 8,
-                    regionRects["ElliottHouse"].width,
-                    regionRects["ElliottHouse"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0]))
-            {
-                myID = 1017,
-                downNeighborID = 1028,
-                upNeighborID = 1015,
-                rightNeighborID = 99989
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Sewer").X - 8, 
-                    (int)MapModMain.LocationToMap("Sewer").Y - 8,
-                    regionRects["Sewer"].width,
-                    regionRects["Sewer"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0]))
-            {
-                myID = 1018,
-                downNeighborID = 1017,
-                rightNeighborID = 1019,
-                upNeighborID = 1014,
-                leftNeighborID = 1009
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Graveyard").X - 8, 
-                    (int)MapModMain.LocationToMap("Graveyard").Y - 8,
-                    regionRects["Graveyard"].width,
-                    regionRects["Graveyard"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0]))
-            {
-                myID = 1019,
-                leftNeighborID = 1018,
-                upNeighborID = 1014,
-                rightNeighborID = 1015,
-                downNeighborID = 1017
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Trailer").X - 8, 
-                    (int)MapModMain.LocationToMap("Trailer").Y - 8,
-                    regionRects["Trailer"].width, 
-                    regionRects["Trailer"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0]))
-            {
-                myID = 1020,
-                upNeighborID = 1021,
-                leftNeighborID = 1014,
-                downNeighborID = 1015,
-                rightNeighborID = 1027
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("JoshHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("JoshHouse").Y - 8,
-                    regionRects["JoshHouse"].width,
-                    regionRects["JoshHouse"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0]))
-            {
-                myID = 1021,
-                rightNeighborID = 1027,
-                downNeighborID = 1020,
-                leftNeighborID = 1012,
-                upNeighborID = 1032
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("ScienceHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("ScienceHouse").Y - 8,
-                    regionRects["ScienceHouse"].width, 
-                    regionRects["ScienceHouse"].height
-                ), 
-                string.Concat(new string[]
-            {
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
-                Environment.NewLine,
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095", new object[0]),
-                Environment.NewLine,
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11096", new object[0])
-            }))
-            {
-                myID = 1022,
-                downNeighborID = 1032,
-                leftNeighborID = 1003,
-                upNeighborID = 1034,
-                rightNeighborID = 1023
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Tent").X - 8,
-                    (int)MapModMain.LocationToMap("Tent").Y - 8,
-                    regionRects["Tent"].width,
-                    regionRects["Tent"].width
-                ),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0]))
-            {
-                myID = 1023,
-                leftNeighborID = 1034,
-                downNeighborID = 1022,
-                rightNeighborID = 1024
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Mine").X - 8, 
-                    (int)MapModMain.LocationToMap("Mine").Y - 8,
-                    regionRects["Mine"].width,
-                    regionRects["Mine"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0]))
-            {
-                myID = 1024,
-                leftNeighborID = 1023,
-                rightNeighborID = 1025,
-                downNeighborID = 1027
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("AdventureGuild").X - 8, 
-                    (int)MapModMain.LocationToMap("AdventureGuild").Y - 8,
-                    regionRects["AdventureGuild"].width, 
-                    regionRects["AdventureGuild"].height
-                ), 
-                (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???")
-            {
-                myID = 1025,
-                leftNeighborID = 1024,
-                rightNeighborID = 1026,
-                downNeighborID = 1027
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Quarry").X, 
-                    (int)MapModMain.LocationToMap("Quarry").Y,
-                    regionRects["Quarry"].width, 
-                    regionRects["Quarry"].height
-                ), 
-                Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???")
-            {
-                myID = 1026,
-                leftNeighborID = 1025,
-                downNeighborID = 1027
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("JojaMart").X - 8, 
-                    (int)MapModMain.LocationToMap("JojaMart").Y - 8,
-                    regionRects["JojaMart"].width,
-                    regionRects["JojaMart"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0]))
-            {
-                myID = 1027,
-                upNeighborID = 1025,
-                leftNeighborID = 1021,
-                downNeighborID = 1013
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("FishShop").X - 8, 
-                    (int)MapModMain.LocationToMap("FishShop").Y - 8,
-                    regionRects["FishShop"].width,
-                    regionRects["FishShop"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0]))
-            {
-                myID = 1028,
-                upNeighborID = 1017,
-                rightNeighborID = 99989
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Spa").X - 8, 
-                    (int)MapModMain.LocationToMap("Spa").Y - 8,
-                    regionRects["Spa"].width,
-                    regionRects["Spa"].height
-                ), 
-                Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???")
-            {
-                myID = 1029,
-                rightNeighborID = 1034,
-                downNeighborID = 1003,
-                leftNeighborID = 1001
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Woods").X - 8, 
-                    (int)MapModMain.LocationToMap("Woods").Y - 8,
-                    regionRects["Woods"].width,
-                    regionRects["Woods"].height
-                ), 
-                Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???")
-            {
-                myID = 1030,
-                upNeighborID = 1001,
-                rightNeighborID = 1005
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("RuinedHouse").X - 8, 
-                    (int)MapModMain.LocationToMap("RuinedHouse").Y - 8,
-                    regionRects["RuinedHouse"].width,
-                    regionRects["RuinedHouse"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0]))
-            {
-                myID = 1031,
-                rightNeighborID = 1033,
-                upNeighborID = 1005
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("CommunityCenter").X - 8, 
-                    (int)MapModMain.LocationToMap("CommunityCenter").Y - 8,
-                    regionRects["CommunityCenter"].width,
-                    regionRects["CommunityCenter"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0]))
-            {
-                myID = 1032,
-                downNeighborID = 1012,
-                upNeighborID = 1022,
-                leftNeighborID = 1004
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("SewerPipe").X - 8, 
-                    (int)MapModMain.LocationToMap("SewerPipe").Y - 8,
-                    regionRects["SewerPipe"].width,
-                    regionRects["SewerPipe"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0]))
-            {
-                myID = 1033,
-                leftNeighborID = 1031,
-                rightNeighborID = 1017,
-                upNeighborID = 1007
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("Railroad").X, 
-                    (int)MapModMain.LocationToMap("Railroad").Y,
-                    regionRects["Railroad"].width,
-                    regionRects["Railroad"].height
-                ), 
-                Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???")
-            {
-                myID = 1034,
-                leftNeighborID = 1029,
-                rightNeighborID = 1023,
-                downNeighborID = 1022
-            });
-            this.points.Add(new ClickableComponent(
-                new Rectangle(
-                    (int)MapModMain.LocationToMap("LonelyStone").X - 8, 
-                    (int)MapModMain.LocationToMap("LonelyStone").Y - 8,
-                    regionRects["LonelyStone"].width,
-                    regionRects["LonelyStone"].height
-                ), 
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])));
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Desert"),
+                    Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???"
+                )
+                {
+                    myID = 1001,
+                    rightNeighborID = 1003,
+                    downNeighborID = 1030
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Farm"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[]{Game1.player.farmName})
+                )
+                {
+                    myID = 1002,
+                    leftNeighborID = 1005,
+                    upNeighborID = 1003,
+                    rightNeighborID = 1004,
+                    downNeighborID = 1006
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Backwoods"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0])
+                )
+                {
+                    myID = 1003,
+                    downNeighborID = 1002,
+                    leftNeighborID = 1001,
+                    rightNeighborID = 1022,
+                    upNeighborID = 1029
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("BusStop"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0])
+                )
+                {
+                    myID = 1004,
+                    leftNeighborID = 1002,
+                    upNeighborID = 1003,
+                    downNeighborID = 1006,
+                    rightNeighborID = 1011
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("WizardHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0])
+                )
+                {
+                    myID = 1005,
+                    upNeighborID = 1001,
+                    downNeighborID = 1031,
+                    rightNeighborID = 1006,
+                    leftNeighborID = 1030
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("AnimalShop"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0])
+                )
+                {
+                    myID = 1006,
+                    leftNeighborID = 1005,
+                    downNeighborID = 1007,
+                    upNeighborID = 1002,
+                    rightNeighborID = 1008
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("LeahHouse"), 
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0])
+                )
+                {
+                    myID = 1007,
+                    upNeighborID = 1006,
+                    downNeighborID = 1033,
+                    leftNeighborID = 1005,
+                    rightNeighborID = 1008
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("SamHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0])
+                )
+                {
+                    myID = 1008,
+                    leftNeighborID = 1006,
+                    upNeighborID = 1010,
+                    rightNeighborID = 1009
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("HaleyHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0])    
+                )
+                {
+                    myID = 1009,
+                    leftNeighborID = 1008,
+                    upNeighborID = 1010,
+                    rightNeighborID = 1018
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("TownSquare"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0])
+                )
+                {
+                    myID = 1010,
+                    leftNeighborID = 1008,
+                    downNeighborID = 1009,
+                    rightNeighborID = 1014,
+                    upNeighborID = 1011
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Hospital"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0])
+                )
+                {
+                    myID = 1011,
+                    leftNeighborID = 1004,
+                    rightNeighborID = 1012,
+                    downNeighborID = 1010,
+                    upNeighborID = 1032
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("SeedShop"),
+                    string.Concat(new string[]
+                    {
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
+                        Environment.NewLine,
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079", new object[0]),
+                        Environment.NewLine,
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080", new object[0])
+                    })
+                )
+                {
+                    myID = 1012,
+                    leftNeighborID = 1011,
+                    downNeighborID = 1014,
+                    rightNeighborID = 1021,
+                    upNeighborID = 1032
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Blacksmith"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0])
+                )
+                {
+                    myID = 1013,
+                    upNeighborID = 1027,
+                    rightNeighborID = 1016,
+                    downNeighborID = 1017,
+                    leftNeighborID = 1015
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Saloon"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0])
+                )
+                {
+                    myID = 1014,
+                    leftNeighborID = 1010,
+                    rightNeighborID = 1020,
+                    downNeighborID = 1019,
+                    upNeighborID = 1012
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("ManorHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0])
+                )
+                {
+                    myID = 1015,
+                    leftNeighborID = 1019,
+                    upNeighborID = 1020,
+                    rightNeighborID = 1013,
+                    downNeighborID = 1017
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("ArchaeologyHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0])
+                )
+                {
+                    myID = 1016,
+                    downNeighborID = 1017,
+                    leftNeighborID = 1013,
+                    upNeighborID = 1027,
+                    rightNeighborID = 99989
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("ElliottHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0])
+                )
+                {
+                    myID = 1017,
+                    downNeighborID = 1028,
+                    upNeighborID = 1015,
+                    rightNeighborID = 99989
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Sewer"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0])
+                    )
+                {
+                    myID = 1018,
+                    downNeighborID = 1017,
+                    rightNeighborID = 1019,
+                    upNeighborID = 1014,
+                    leftNeighborID = 1009
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Graveyard"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0])
+                )
+                {
+                    myID = 1019,
+                    leftNeighborID = 1018,
+                    upNeighborID = 1014,
+                    rightNeighborID = 1015,
+                    downNeighborID = 1017
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Trailer"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0])
+                )
+                {
+                    myID = 1020,
+                    upNeighborID = 1021,
+                    leftNeighborID = 1014,
+                    downNeighborID = 1015,
+                    rightNeighborID = 1027
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("JoshHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0])
+                )
+                {
+                    myID = 1021,
+                    rightNeighborID = 1027,
+                    downNeighborID = 1020,
+                    leftNeighborID = 1012,
+                    upNeighborID = 1032
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("ScienceHouse"),
+                    string.Concat(new string[]
+                    {
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
+                        Environment.NewLine,
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095", new object[0]),
+                        Environment.NewLine,
+                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11096", new object[0])
+                    })
+                )
+                {
+                    myID = 1022,
+                    downNeighborID = 1032,
+                    leftNeighborID = 1003,
+                    upNeighborID = 1034,
+                    rightNeighborID = 1023
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Tent"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0])
+                )
+                {
+                    myID = 1023,
+                    leftNeighborID = 1034,
+                    downNeighborID = 1022,
+                    rightNeighborID = 1024
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Mine"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0])
+                )
+                {
+                    myID = 1024,
+                    leftNeighborID = 1023,
+                    rightNeighborID = 1025,
+                    downNeighborID = 1027
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("AdventureGuild"),
+                    (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???"
+                )
+                {
+                    myID = 1025,
+                    leftNeighborID = 1024,
+                    rightNeighborID = 1026,
+                    downNeighborID = 1027
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Quarry"),
+                    Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???"
+                )
+                {
+                    myID = 1026,
+                    leftNeighborID = 1025,
+                    downNeighborID = 1027
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("JojaMart"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0])
+                )
+                {
+                    myID = 1027,
+                    upNeighborID = 1025,
+                    leftNeighborID = 1021,
+                    downNeighborID = 1013
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("FishShop"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0])
+                )
+                {
+                    myID = 1028,
+                    upNeighborID = 1017,
+                    rightNeighborID = 99989
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Spa"),
+                    Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???"
+                )
+                {
+                    myID = 1029,
+                    rightNeighborID = 1034,
+                    downNeighborID = 1003,
+                    leftNeighborID = 1001
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Woods"),
+                    Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???"
+                )
+                {
+                    myID = 1030,
+                    upNeighborID = 1001,
+                    rightNeighborID = 1005
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("RuinedHouse"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0])
+                )
+                {
+                    myID = 1031,
+                    rightNeighborID = 1033,
+                    upNeighborID = 1005
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("CommunityCenter"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0])
+                )
+                {
+                    myID = 1032,
+                    downNeighborID = 1012,
+                    upNeighborID = 1022,
+                    leftNeighborID = 1004
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("SewerPipe"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0])
+                )
+                {
+                    myID = 1033,
+                    leftNeighborID = 1031,
+                    rightNeighborID = 1017,
+                    upNeighborID = 1007
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("Railroad"),
+                    Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???"
+                )
+                {
+                    myID = 1034,
+                    leftNeighborID = 1029,
+                    rightNeighborID = 1023,
+                    downNeighborID = 1022
+                }
+            );
+            this.points.Add(
+                new ClickableComponent(
+                    getRegionRect("LonelyStone"),
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])
+                )
+            );
 
             // Remove vanilla map tooltips
             List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
@@ -1483,6 +1411,16 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
+        }
+
+        private Rectangle getRegionRect(string region)
+        {
+            return new Rectangle(
+                (int)MapModMain.LocationToMap(region).X - regionRects[region].width/2,
+                (int)MapModMain.LocationToMap(region).Y - regionRects[region].height/2,
+                regionRects[region].width,
+                regionRects[region].height
+            );
         }
     }
 }
