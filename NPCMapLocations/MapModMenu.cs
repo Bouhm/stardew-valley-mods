@@ -448,7 +448,6 @@ namespace NPCMapLocations
                     MapModMain.config.immersionOption = whichOption - 3;
                 }
             }
-            MapModMain.modHelper.WriteConfig(MapModMain.config);
         }
 
         public void greyOut()
@@ -751,7 +750,7 @@ namespace NPCMapLocations
                 default:
                     break;
             }
-            MapModMain.modHelper.WriteConfig(MapModMain.config);
+            MapModMain.modHelper.WriteJsonFile($"data/{MapModMain.saveName}.json", MapModMain.config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -828,7 +827,7 @@ namespace NPCMapLocations
             {
                 MapModMain.config.heartLevelMax = this.value;
             }
-            MapModMain.modHelper.WriteConfig(MapModMain.config);
+            MapModMain.modHelper.WriteJsonFile($"data/{MapModMain.saveName}.json", MapModMain.config);
         }
 
         public override void receiveLeftClick(int x, int y)

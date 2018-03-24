@@ -61,15 +61,17 @@ public static class MapModConstants
                     new MapVectors(0, 0, 385, 122),
                     new MapVectors(50, 40, 529, 238),
                 }},
-                // FARMS
+                    { "Backwoods_Region", new MapVectors[] {
+                        new MapVectors(460, 190)
+                    }},
                 { "Farm", new MapVectors[] {
                     new MapVectors(0, 0, 330, 242),
                     new MapVectors(80, 65, 514, 386)
                 }},
-                    { "FarmHouse", new MapVectors[] {
-                        new MapVectors(477, 270)
+                    {"Farm_Region", new MapVectors[] {
+                        new MapVectors(423, 321)
                     }},
-                    { "Cellar", new MapVectors[] {
+                    { "FarmHouse", new MapVectors[] {
                         new MapVectors(477, 270)
                     }},
                     { "FarmCave", new MapVectors[] {
@@ -82,6 +84,9 @@ public static class MapModConstants
                     new MapVectors(0, 0, 517, 182),
                     new MapVectors(35, 30, 594, 305)
                 }},
+                    { "BusStop_Region", new MapVectors[] {
+                        new MapVectors(555, 229)
+                    }},
                     { "Tunnel", new MapVectors[] {
                         new MapVectors(447, 216)
                     }},
@@ -118,7 +123,7 @@ public static class MapModConstants
                     new MapVectors(110, 97, 928, 464)
                 }},
                     { "TownSquare", new MapVectors[] {
-                        new MapVectors(705, 361)
+                        new MapVectors(686, 366)
                     }},
                     { "SeedShop", new MapVectors[] {
                         new MapVectors(721, 318)
@@ -163,13 +168,13 @@ public static class MapModConstants
                         new MapVectors(780, 421)
                     }},
                     { "Graveyard", new MapVectors[] {
-                        new MapVectors(740, 438)
+                        new MapVectors(738, 438)
                     }},
                     { "Sewer", new MapVectors[] {
-                        new MapVectors(703, 467)
+                        new MapVectors(701, 467)
                     }},
                     { "BugLand", new MapVectors[] {
-                        new MapVectors(703, 467)
+                        new MapVectors(701, 467)
                     }},
                 { "Beach", new MapVectors[] {
                     new MapVectors(0, 0, 726, 549),
@@ -188,6 +193,10 @@ public static class MapModConstants
                     new MapVectors(0, 33, 589, 5),
                     new MapVectors(70, 62, 794, 86)
                 }},
+                    { "Railroad_Region", new MapVectors[] {
+                        new MapVectors(0, 33, 589, 5),
+                        new MapVectors(70, 62, 794, 86)
+                    }},
                     { "BathHouse_Entry", new MapVectors[] {
                         new MapVectors(627, 56)
                     }},
@@ -211,6 +220,9 @@ public static class MapModConstants
                     }},
                     { "WitchHut", new MapVectors[] {
                         new MapVectors(749, 6)
+                    }},
+                    { "Summit", new MapVectors[] {
+                        new MapVectors(819, 36)
                     }},
                 { "Mountain", new MapVectors[] {
                     new MapVectors(0, 0, 718, 86),
@@ -238,6 +250,9 @@ public static class MapModConstants
                     new MapVectors(0, 0, 53, 6),
                     new MapVectors(50, 60, 201, 178),
                 }},
+                    { "Desert_Region", new MapVectors[] {
+                        new MapVectors(130, 96),
+                    }},
                     { "SandyHouse", new MapVectors[] {
                         new MapVectors(76, 140)
                     }},
@@ -258,10 +273,10 @@ public static class MapModConstants
         {
             return new Dictionary<string, Rect>
             {
-                { "Desert", new Rect(261, 175) },
-                { "Farm", new Rect(188, 148) },
-                { "Backwoods", new Rect(148, 120) },
-                { "BusStop", new Rect(76, 100) },
+                { "Desert_Region", new Rect(261, 175) },
+                { "Farm_Region", new Rect(188, 148) },
+                { "Backwoods_Region", new Rect(148, 120) },
+                { "BusStop_Region", new Rect(76, 100) },
                 { "WizardHouse", new Rect(36, 76) },
                 { "AnimalShop", new Rect(76, 40) },
                 { "LeahHouse", new Rect(32, 24) },
@@ -292,7 +307,7 @@ public static class MapModConstants
                 { "RuinedHouse", new Rect(20, 20) },
                 { "CommunityCenter", new Rect(44, 36) },
                 { "SewerPipe", new Rect(24, 32) },
-                { "Railroad", new Rect(16, 8) },
+                { "Railroad_Region", new Rect(16, 8) },
                 { "LonelyStone", new Rect(28, 28) },
             };
         }
@@ -304,54 +319,61 @@ public static class MapModConstants
         {
             return new Dictionary<string, string>
             {
-                { "Town", "Town"},
-                { "SeedShop", "Town"},
-                { "Saloon", "Town"},
-                { "Hospital", "Town" },
-                { "HarveyRoom", "Town"},
-                { "Mountain", "Mountain"},
-                { "ArchaeologyHouse", "Mountain"},
-                { "ScienceHouse", "Mountain"},
-                { "SebastianRoom", "Mountain"},
-                { "JoshHouse", "Town" },
-                { "HaleyHouse", "Town"},
-                { "CommunityCenter", "Town"},
-                { "Blacksmith", "Town"},
-                { "JojaMart", "Town"},
-                { "Beach", "Beach"},
-                { "ElliottHouse", "Beach"},
-                { "AnimalShop", "Forest"},
-                { "Forest", "Forest" },
-                { "SamHouse", "Town"},
-                { "ManorHouse", "Town"},
-                { "LeahHouse", "Forest"},
-                { "FishShop", "Beach"},
-                { "Tent", "Mountain"},
-                { "Railroad", "Railroad" },
-                { "BathHouse_Entry", "Railroad"},
-                { "BathHouse_MensLocker", "Railroad"},
-                { "BathHouse_WomensLocker", "Railroad"},
-                { "BathHouse_Pool", "Railroad"},
-                { "Trailer", "Town"},
-                { "Mine", "Mountain" },
-                { "Desert", "Desert" },
-                { "SandyHouse", "Desert"},
-                { "FarmHouse", "Farm"},
                 { "Farm", "Farm" },
-                { "Sewer", "Town"},
-                { "WizardHouse", "Forest"},
-                { "Cellar", "Farm"},
-                { "Barn", "Farm"},
-                { "Big Barn", "Farm" },
-                { "Deluxe Barn", "Farm"},
-                { "Shed", "Farm" },
-                { "Coop", "Farm"},
-                { "Big Coop", "Farm"},
-                { "Deluxe Coop", "Farm"},
-                { "Greenhouse", "Farm"},
-                { "FarmCave", "Farm"},
-                { "Slime Hutch", "Farm" },
-                { "AdventureGuild", "Mountain" }
+                    { "FarmHouse", "Farm"},
+                    { "Cellar", "Farm"},
+                    { "Barn", "Farm"},
+                    { "Big Barn", "Farm" },
+                    { "Deluxe Barn", "Farm"},
+                    { "Shed", "Farm" },
+                    { "Coop", "Farm"},
+                    { "Big Coop", "Farm"},
+                    { "Deluxe Coop", "Farm"},
+                    { "Greenhouse", "Farm"},
+                    { "FarmCave", "Farm"},
+                    { "Slime Hutch", "Farm" },
+                { "Town", "Town"},
+                    { "SeedShop", "Town"},
+                    { "Saloon", "Town"},
+                    { "Hospital", "Town" },
+                    { "HarveyRoom", "Town"},
+                    { "JoshHouse", "Town" },
+                    { "HaleyHouse", "Town"},
+                    { "CommunityCenter", "Town"},
+                    { "Blacksmith", "Town"},
+                    { "JojaMart", "Town"},
+                    { "SamHouse", "Town"},
+                    { "ManorHouse", "Town"},
+                    { "Trailer", "Town"},
+                    { "Sewer", "Town"},
+                { "Forest", "Forest" },
+                    { "AnimalShop", "Forest"},
+                    { "LeahHouse", "Forest"},
+                    { "WizardHouse", "Forest"},
+                    { "WizardHouseBasement", "Forest"},
+                { "Mountain", "Mountain"},
+                    { "ArchaeologyHouse", "Mountain"},
+                    { "ScienceHouse", "Mountain"},
+                    { "SebastianRoom", "Mountain"},
+                    { "AdventureGuild", "Mountain"},
+                    { "Tent", "Mountain"},
+                    { "Mine", "Mountain" },
+                { "Railroad", "Railroad" },
+                    { "BathHouse_Entry", "Railroad"},
+                    { "BathHouse_MensLocker", "Railroad"},
+                    { "BathHouse_WomensLocker", "Railroad"},
+                    { "BathHouse_Pool", "Railroad"},
+                    { "WitchWarpCave", "Railroad"},
+                    { "WitchSwamp", "Railroad"},
+                    { "WitchHut", "Railroad"},
+                    { "Summit", "Railroad"},
+                { "Beach", "Beach"},
+                    { "ElliottHouse", "Beach"},
+                    { "FishShop", "Beach"},
+                { "Desert", "Desert" },
+                    { "SandyHouse", "Desert"},
+                    { "Club", "Desert"},
+                    { "SkullCave", "Desert"}
             };
         }
     }

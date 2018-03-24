@@ -46,6 +46,7 @@
     <Compile Include="MapModConfig.cs" />
     <Compile Include="MapModConstants.cs" />
     <Compile Include="MapModMain.cs" />
+    <Compile Include="MapModMapPage.cs" />
     <Compile Include="MapModMenu.cs" />
   </ItemGroup>
   <ItemGroup>
