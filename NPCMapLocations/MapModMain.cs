@@ -52,7 +52,6 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
-            config = modHelper.ReadJsonFile<MapModConfig>($"data/{saveName}.json") ?? new MapModConfig();
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
@@ -63,7 +62,8 @@ namespace NPCMapLocations
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
             current = ModManifest.Version.ToString();
-            saveName = Game1.player.name.Replace(" ", String.Empty) + "_" + Game1.uniqueIDForThisGame;
+            saveName = Constants.SaveFolderName;
+            config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.markerCrop;
             mapVectors = MapModConstants.mapVectors;
             indoorLocations = MapModConstants.indoorLocations;
@@ -87,7 +87,7 @@ namespace NPCMapLocations
                 LoadCustomNames(npc);
             }
             config.customNPCs = customNPCs;
-            modHelper.WriteJsonFile($"data/{saveName}.json", config);
+            modHelper.WriteJsonFile($"config/{saveName}.json", config);
             initialized = true;
         }
 
@@ -186,7 +186,7 @@ namespace NPCMapLocations
                 {
                     config.nameTooltipMode = 1;
                 }
-                modHelper.WriteJsonFile($"data/{saveName}.json", config);
+                modHelper.WriteJsonFile($"config/{saveName}.json", config);
             }
         }
 
@@ -284,7 +284,7 @@ namespace NPCMapLocations
                 }
                 if (upper == null)
                 {
-                    if (isFarmer && DEBUG_MODE && alertFlag != "NullBound:" + tilePos)
+                    if (DEBUG_MODE && isFarmer && alertFlag != "NullBound:" + tilePos)
                     {
                         MapModMain.monitor.Log("Null upper bound - No vector greater than " + tilePos + " to calculate location.", LogLevel.Alert);
                         alertFlag = "NullBound:" + tilePos;
@@ -305,9 +305,11 @@ namespace NPCMapLocations
                 x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
                 y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
 
-                // For debug info
-                MapModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
-                MapModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
+                if (DEBUG_MODE && isFarmer)
+                {
+                    MapModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
+                    MapModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
+                }
             }
             return new Vector2(mapX + x, mapY + y);
         }
@@ -516,7 +518,7 @@ namespace NPCMapLocations
 
                 // Player
                 Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X, playerLoc.Y), 0.00011f, 2f, 1, Game1.player);
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
 
                 // NPC markers and icons
                 if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
@@ -531,19 +533,19 @@ namespace NPCMapLocations
                 {
                     if (hiddenNPCs.Contains(npc.Key))
                     {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.Gray * 0.85f);
+                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.Gray * 0.8f);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.Gray * 0.85f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.Gray * 0.8f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                         if (questNPCs.Contains(npc.Key))
                         {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.Gray * 0.85f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.Gray * 0.8f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                         }
                     }
                     else
                     {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.Gray * 0.8f);
+                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.White);
                         if (birthdayNPCs.Contains(npc.Key))
                         {
                             b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);

@@ -117,10 +117,13 @@ public static class MapModConstants
                         new MapVectors(489, 643)
                     }},
                 { "Town", new MapVectors[] {
+                    // Top half of town
                     new MapVectors(0, 0, 594, 182),
-                    new MapVectors(0, 0, 926, 273),
-                    new MapVectors(0, 36, 601, 314),
-                    new MapVectors(110, 97, 928, 464)
+                    new MapVectors(120, 40, 917, 273),
+
+                    // Bottom half of town
+                    new MapVectors(0, 41, 597, 277),
+                    new MapVectors(120, 110, 953, 513)
                 }},
                     { "TownSquare", new MapVectors[] {
                         new MapVectors(686, 366)

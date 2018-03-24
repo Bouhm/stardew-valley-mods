@@ -750,7 +750,7 @@ namespace NPCMapLocations
                 default:
                     break;
             }
-            MapModMain.modHelper.WriteJsonFile($"data/{MapModMain.saveName}.json", MapModMain.config);
+            MapModMain.modHelper.WriteJsonFile($"config/{MapModMain.saveName}.json", MapModMain.config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -827,7 +827,7 @@ namespace NPCMapLocations
             {
                 MapModMain.config.heartLevelMax = this.value;
             }
-            MapModMain.modHelper.WriteJsonFile($"data/{MapModMain.saveName}.json", MapModMain.config);
+            MapModMain.modHelper.WriteJsonFile($"config/{MapModMain.saveName}.json", MapModMain.config);
         }
 
         public override void receiveLeftClick(int x, int y)
