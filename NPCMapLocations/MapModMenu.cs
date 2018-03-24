@@ -298,7 +298,7 @@ namespace NPCMapLocations
             {
                 this.okButton.scale -= 0.25f;
                 this.okButton.scale = Math.Max(0.75f, this.okButton.scale);
-                (Game1.activeClickableMenu as MapModMenu).exitThisMenu(true);
+                (Game1.activeClickableMenu as MapModMenu).exitThisMenu(false);
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
                 MapModMain.menuOpen = 0;

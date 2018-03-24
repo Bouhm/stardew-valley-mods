@@ -293,7 +293,9 @@ namespace NPCMapLocations
                     upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
                 }
 
-                // Quick maffs
+                /*
+                // For use with vanilla map. Requires a LOT of points in mapVectors for some accuracy (from past experience, not worth).
+                // With modified accurate map, this is no longer necessary since lower x,y < upper x,y is always true for two closest points.
                 int tileXMin = Math.Min(lower.tileX, upper.tileX);
                 int tileXMax = Math.Max(lower.tileX, upper.tileX);
                 int tileYMin = Math.Min(lower.tileY, upper.tileY);
@@ -302,8 +304,13 @@ namespace NPCMapLocations
                 int xMax = Math.Max(lower.x, upper.x);
                 int yMin = Math.Min(lower.y, upper.y);
                 int yMax = Math.Max(lower.y, upper.y);
+
                 x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
                 y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
+                */
+
+                x = (int)(lower.x + (double)(tileX - lower.tileX) / (double)(upper.tileX - lower.tileX) * (upper.x - lower.x));
+                y = (int)(lower.y + (double)(tileY - lower.tileY) / (double)(upper.tileY - lower.tileY) * (upper.y - lower.y));
 
                 if (DEBUG_MODE && isFarmer)
                 {
@@ -371,8 +378,27 @@ namespace NPCMapLocations
 
                     if (config.showHiddenVillagers ? ShowNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && ShowNPC(npc.name, showExtras)))
                     {
-                        int x = (int)LocationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).X - 16;
-                        int y = (int)LocationToMap(npc.currentLocation.name, npc.getTileX(), npc.getTileY()).Y - 15;
+                        MapVectors[] npcLocation;
+                        string currentLocation;
+
+                        if (npc.currentLocation == null)
+                        {
+                            currentLocation = MapModConstants.startingLocations[npc.name];
+                        }
+                        else
+                        {
+                            currentLocation = npc.currentLocation.name;
+                        }
+
+                        // Catch null location error
+                        mapVectors.TryGetValue(currentLocation, out npcLocation);
+                        if (npcLocation == null)
+                        {
+                            return;
+                        }
+
+                        int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - 16;
+                        int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - 15;
                         int width = 32;
                         int height = 30;
 

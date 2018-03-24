@@ -49,6 +49,48 @@ public static class MapModConstants
         }
     }
 
+    public static Dictionary<string, string> startingLocations
+    {
+        get
+        {
+            return new Dictionary<string, string>
+            {
+                {"Abigail", "SeedShop"},
+                {"Alex", "JoshHouse"},
+                {"Caroline", "SeedShop"},
+                {"Clint", "Blacksmith"},
+                {"Demetrius", "ScienceHouse"},
+                {"Elliott", "ElliottHouse"},
+                {"Emily", "HaleyHouse"},
+                {"Evelyn", "JoshHouse"},
+                {"George", "JoshHouse"},
+                {"Gus", "Saloon"},
+                {"Haley", "HaleyHouse"},
+                {"Harvey", "HarveyRoom" },
+                {"Jas", "AnimalShop"},
+                {"Jodi", "SamHouse"},
+                {"Kent", "SamHouse"},
+                {"Leah", "LeahHouse"},
+                {"Lewis", "ManorHouse"},
+                {"Linus", "Tent"},
+                {"Marnie", "AnimalShop"},
+                {"Maru", "ScienceHouse"},
+                {"Pam", "Trailer"},
+                {"Penny", "Trailer"},
+                {"Pierre", "SeedShop"},
+                {"Robin", "ScienceHouse"},
+                {"Sam", "SamHouse"},
+                {"Sebastian", "SebastianRoom"},
+                {"Shane", "AnimalShop"},
+                {"Vincent", "SamHouse"},
+                {"Willy", "FishShop"},
+                {"Sandy", "SandyHouse" },
+                {"Marlon", "AdventureGuild" },
+                {"Wizard", "WizardHouse" }
+            };
+        }
+    }
+
     // tileX and tileY (the first two values) are tile positions in the game for that location
     // x and y (the latter values) are pixel positions (centered) in the map sprite that correspond to the game location
     public static Dictionary<string, MapVectors[]> mapVectors
