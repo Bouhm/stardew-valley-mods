@@ -1,0 +1,15 @@
+{
+	"immersion.label": "设置:",
+	"immersion.option1": "總是顯示所有村民",
+	"immersion.option2": "只顯示談話過的村民",
+	"immersion.option3": "隱藏談話過的村民",
+	"immersion.option4": "只顯示位於玩家所在區域的村民",
+	"immersion.option5": "只顯示特定好感度的村民",
+	"immersion.slider1": "最小好感度",
+	"immersion.slider2": "最大好感度",
+	"extra.label": "額外設定:",
+	"extra.option1": "顯示任务或生日",
+	"extra.option2": "顯示隐藏的村民",
+	"extra.option3": "顯示旅行商人",
+	"villagers.label": "包含村民清單:"
+}

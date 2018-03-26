@@ -7,8 +7,9 @@ namespace NPCMapLocations
 {
     public class MapModConfig
     {
-        public int nameTooltipMode { get; set; } = 1;
         public string menuKey { get; set; } = "Tab";
+        public string tooltipKey { get; set; } = "Space";
+        public int nameTooltipMode { get; set; } = 1;
         public int immersionOption { get; set; } = 1;
         public bool byHeartLevel { get; set; } = false;
         public int heartLevelMin { get; set; } = 0;
@@ -45,9 +46,9 @@ namespace NPCMapLocations
         public bool showShane { get; set; } = true;
         public bool showVincent { get; set; } = true;
         public bool showWilly { get; set; } = true;
-        public bool showSandy { get; set; } = true;
-        public bool showWizard { get; set; } = true;
-        public bool showMarlon { get; set; } = true;
+        public bool showSandy { get; set; } = false;
+        public bool showWizard { get; set; } = false;
+        public bool showMarlon { get; set; } = false;
         public bool showTravelingMerchant { get; set; } = true;
         public Dictionary<string, int> villagerCrop { get; set; } = new Dictionary<string, int>();
         public bool showCustomNPC1 { get; set; } = true;
@@ -56,5 +57,6 @@ namespace NPCMapLocations
         public bool showCustomNPC4 { get; set; } = true;
         public bool showCustomNPC5 { get; set; } = true;
         public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
+        public bool showFarmBuildings { get; set; } = true;
     }
 }
