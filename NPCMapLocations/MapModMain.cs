@@ -14,6 +14,7 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using StardewValley.Locations;
 
 namespace NPCMapLocations
 {
@@ -28,6 +29,7 @@ namespace NPCMapLocations
         public static int menuOpen = 0;
         public static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         public static Texture2D map;
+        public static Texture2D farmBuildings;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, NPCMarker> npcMarkers = new Dictionary<string, NPCMarker>();
         private static Dictionary<string, MapVectors[]> mapVectors;
@@ -69,6 +71,7 @@ namespace NPCMapLocations
             indoorLocations = MapModConstants.indoorLocations;
             customNPCs = config.customNPCs;
             MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"map", ContentSource.ModFolder); // Load modified map page
+            MapModMain.farmBuildings = MapModMain.modHelper.Content.Load<Texture2D>(@"farm-buildings", ContentSource.ModFolder);
             loadComplete = true;
         }
 
@@ -198,13 +201,6 @@ namespace NPCMapLocations
                 return new Vector2(-5000, -5000);
             }
 
-            var locVectors = mapVectors[location];
-            Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-            int mapX = (int)mapPagePos.X;
-            int mapY = (int)mapPagePos.Y;
-            int x = 0;
-            int y = 0;
-
             // Get tile location of farm buildings in farm
             string[] farmBuildings = { "Coop", "Big Coop", "Deluxe Coop", "Barn", "Big Barn", "Deluxe Barn", "Slime Hutch", "Shed" };
             if (farmBuildings.Contains(location))
@@ -219,6 +215,13 @@ namespace NPCMapLocations
                     }
                 }
             }
+
+            var locVectors = mapVectors[location];
+            Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+            int mapX = (int)mapPagePos.X;
+            int mapY = (int)mapPagePos.Y;
+            int x = 0;
+            int y = 0;
 
             // Handle regions and indoor locations
             if (locVectors.Count() == 1 || (tileX == -1 || tileY == -1))
@@ -389,7 +392,7 @@ namespace NPCMapLocations
                         {
                             currentLocation = npc.currentLocation.name;
                         }
-
+                        
                         // Catch null location error
                         mapVectors.TryGetValue(currentLocation, out npcLocation);
                         if (npcLocation == null)
@@ -541,6 +544,39 @@ namespace NPCMapLocations
                 SpriteBatch b = Game1.spriteBatch;
                 // Draw map overlay
                 modMapPage.DrawMap(b);
+
+                // Draw farm buildings
+                foreach (Building building in Game1.getFarm().buildings)
+                {
+                    if (building.baseNameOfIndoors == null)
+                    {
+                        continue;
+                    }
+
+                    Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
+                    if (building.baseNameOfIndoors.Equals("Coop"))
+                    {
+                        b.Draw(farmBuildings, locVector, new Rectangle?(new Rectangle(5, 0, 5, 6)), Color.White, 0f, Vector2.Zero, 3.5f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("Barn"))
+                    {
+                        b.Draw(farmBuildings, new Vector2(locVector.X, locVector.Y - 1), new Rectangle?(new Rectangle(10, 0, 6, 6)), Color.White, 0f, Vector2.Zero, 3.5f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("Shed"))
+                    {
+                        b.Draw(farmBuildings, locVector, new Rectangle?(new Rectangle(0, 0, 5, 6)), Color.White, 0f, Vector2.Zero, 3.5f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
+                    {
+                        b.Draw(farmBuildings, locVector, new Rectangle?(new Rectangle(16, 0, 7, 6)), Color.White, 0f, Vector2.Zero, 3.5f, SpriteEffects.None, 1f);
+                    }
+                }
+                
+                // Greenhouse unlocked after pantry bundles completed
+                if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+                {
+                    b.Draw(farmBuildings, MapModMain.LocationToMap("Greenhouse"), new Rectangle?(new Rectangle(23, 0, 5, 6)), Color.White, 0f, Vector2.Zero, 3.5f, SpriteEffects.None, 1f);
+                }
 
                 // Player
                 Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
