@@ -1,9 +1,5 @@
 {
-	"names-tooltip.label": "Localização Das Dicas dos Nomes:",
-	"names-tooltip.option1": "Dicas Em Cima da Localização",
-	"names-tooltip.option2": "Dicas Debaixo da Localização",
-	"names-tooltip.option3": "Canto Esquerdo de Baixo",
-	"immersion.label": "Configurações de Imersão:",
+	"immersion.label": "Configurações:",
 	"immersion.option1": "Sempre Mostrar Moradores",
 	"immersion.option2": "Mostrar Moradores que o Jogador Já Falou",
 	"immersion.option3": "Esconder Moradores que o Jogador Já falou",
@@ -12,8 +8,8 @@
 	"immersion.slider1": "Level Minimo de Coração",
 	"immersion.slider2": "Level Máximo de Coração",
 	"extra.label": "Configurações Extras:",
-	"extra.option1": "Marcar Moradores com Quest Diaria ou Aniverário",
-	"extra.option2": " Mostrar Em Cinza Quando Escondido",
+	"extra.option1": "Mostrar Quests ou Aniverários",
+	"extra.option2": "Mostrar Moradores Escondidos",
 	"extra.option3": "Mostrar Comerciante Viajante",
 	"villagers.label": "Incluir/Excluir Moradores:"
 }

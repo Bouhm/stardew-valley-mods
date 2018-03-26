@@ -107,7 +107,7 @@ public static class MapModConstants
                         new MapVectors(460, 190)
                     }},
                 { "Farm", new MapVectors[] {
-                    new MapVectors(0, 0, 330, 242),
+                    new MapVectors(0, 0, 330, 237),
                     new MapVectors(80, 65, 514, 386)
                 }},
                     {"Farm_Region", new MapVectors[] {
@@ -117,10 +117,10 @@ public static class MapModConstants
                         new MapVectors(477, 270)
                     }},
                     { "FarmCave", new MapVectors[] {
-                        new MapVectors(386, 246)
+                        new MapVectors(410, 247)
                     }},
                     { "Greenhouse", new MapVectors[] {
-                        new MapVectors(380, 264)
+                        new MapVectors(393, 268)
                     }},
                 { "BusStop", new MapVectors[] {
                     new MapVectors(0, 0, 517, 182),

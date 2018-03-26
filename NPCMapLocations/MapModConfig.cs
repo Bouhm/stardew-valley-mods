@@ -57,5 +57,6 @@ namespace NPCMapLocations
         public bool showCustomNPC4 { get; set; } = true;
         public bool showCustomNPC5 { get; set; } = true;
         public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
+        public bool showFarmBuildings { get; set; } = true;
     }
 }

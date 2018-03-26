@@ -713,6 +713,7 @@ namespace NPCMapLocations
 
         private Rectangle getRegionRect(string region)
         {
+            // Set origin to center
             return new Rectangle(
                 (int)MapModMain.LocationToMap(region).X - regionRects[region].width / 2,
                 (int)MapModMain.LocationToMap(region).Y - regionRects[region].height / 2,
