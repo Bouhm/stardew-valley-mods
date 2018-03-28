@@ -124,7 +124,7 @@ public static class MapModConstants
                     }},
                 { "BusStop", new MapVectors[] {
                     new MapVectors(0, 0, 517, 182),
-                    new MapVectors(35, 30, 594, 305)
+                    new MapVectors(35, 30, 594, 300)
                 }},
                     { "BusStop_Region", new MapVectors[] {
                         new MapVectors(555, 229)
@@ -133,18 +133,18 @@ public static class MapModConstants
                         new MapVectors(447, 216)
                     }},
                 { "Forest", new MapVectors[] {
-                    new MapVectors(0, 0, 250, 389),
-                    new MapVectors(120, 120, 554, 693)
+                    new MapVectors(0, 0, 250, 383),
+                    new MapVectors(120, 120, 554, 687)
                 }},
                     { "Woods", new MapVectors[] {
                         new MapVectors(0, 0, 136, 346),
                         new MapVectors(60, 32, 230, 395)
                     }},
                     { "WizardHouse", new MapVectors[] {
-                        new MapVectors(257, 441)
+                        new MapVectors(264, 441)
                     }},
                     { "WizardHouseBasement", new MapVectors[] {
-                        new MapVectors(257, 441)
+                        new MapVectors(264, 441)
                     }},
                     { "AnimalShop", new MapVectors[] {
                         new MapVectors(479, 422)
@@ -160,12 +160,12 @@ public static class MapModConstants
                     }},
                 { "Town", new MapVectors[] {
                     // Top half of town
-                    new MapVectors(0, 0, 594, 182),
-                    new MapVectors(120, 40, 917, 273),
+                    new MapVectors(0, 0, 598, 181),
+                    new MapVectors(120, 40, 921, 272),
 
                     // Bottom half of town
-                    new MapVectors(0, 41, 597, 277),
-                    new MapVectors(120, 110, 953, 513)
+                    new MapVectors(0, 41, 602, 268),
+                    new MapVectors(120, 110, 958, 513)
                 }},
                     { "TownSquare", new MapVectors[] {
                         new MapVectors(686, 366)
@@ -229,14 +229,14 @@ public static class MapModConstants
                         new MapVectors(852, 566)
                     }},
                     { "FishShop", new MapVectors[] {
-                        new MapVectors(807, 632)
+                        new MapVectors(809, 632)
                     }},
                     { "LonelyStone", new MapVectors[] {
                         new MapVectors(714, 636)
                     }},
                 { "Railroad", new MapVectors[] {
-                    new MapVectors(0, 28, 589, 5),
-                    new MapVectors(70, 62, 794, 86)
+                    new MapVectors(0, 34, 589, 0),
+                    new MapVectors(70, 62, 794, 81)
                 }},
                     { "Railroad_Region", new MapVectors[] {
                         new MapVectors(0, 33, 589, 5),
@@ -258,13 +258,13 @@ public static class MapModConstants
                         new MapVectors(627, 56)
                     }},
                     { "WitchWarpCave", new MapVectors[] {
-                        new MapVectors(749, 6)
+                        new MapVectors(749, 3)
                     }},
                     { "WitchSwamp", new MapVectors[] {
-                        new MapVectors(749, 6)
+                        new MapVectors(749, 3)
                     }},
                     { "WitchHut", new MapVectors[] {
-                        new MapVectors(749, 6)
+                        new MapVectors(749, 3)
                     }},
                     { "Summit", new MapVectors[] {
                         new MapVectors(819, 36)
