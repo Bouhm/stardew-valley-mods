@@ -60,7 +60,15 @@ namespace NPCMapLocations
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
-            ControlEvents.KeyPressed += KeyboardInput_KeyDown;
+            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+        }
+
+        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        {
+            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
+            {
+                HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
+            }
         }
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -75,6 +83,34 @@ namespace NPCMapLocations
             MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map", ContentSource.ModFolder); // Load modified map page
             MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings", ContentSource.ModFolder);
             loadComplete = true;
+        }
+
+        private void HandleInput(GameMenu menu, SButton input)
+        {
+            if (menu.currentTab != GameMenu.mapTab) { return; }
+            if (input.ToString().Equals(config.menuKey) || input is SButton.ControllerB)
+            {
+                openModMenu();
+            }
+            else if (input.ToString().Equals(config.tooltipKey) || input is SButton.ControllerY)
+            {
+                changeTooltipConfig();
+            }
+        }
+
+        private void openModMenu()
+        {
+            Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras, customNPCs, npcNames);
+            menuOpen = 1;
+        }
+
+        private void changeTooltipConfig()
+        {
+            if (++config.nameTooltipMode > 3)
+            {
+                config.nameTooltipMode = 1;
+            }
+            modHelper.WriteJsonFile($"config/{saveName}.json", config);
         }
 
         private void LoadCustomMods()
@@ -165,33 +201,6 @@ namespace NPCMapLocations
                         markerCrop[npc.name] = villager.Value;
                     }
                 }
-            }
-        }
-
-        // Open menu key
-        private void KeyboardInput_KeyDown(object sender, EventArgsKeyPressed e)
-        {
-            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
-            {
-                ChangeKey(e.KeyPressed.ToString(), (GameMenu)Game1.activeClickableMenu);
-            }
-        }
-
-        private void ChangeKey(string key, GameMenu menu)
-        {
-            if (menu.currentTab != GameMenu.mapTab) { return; }
-            if (key.Equals(config.menuKey))
-            {
-                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (950 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (750 + IClickableMenu.borderWidth * 2) / 2, 900 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras, customNPCs, npcNames);
-                menuOpen = 1;
-            }
-            else if (key.Equals(config.tooltipKey))
-            {
-                if (++config.nameTooltipMode > 3)
-                {
-                    config.nameTooltipMode = 1;
-                }
-                modHelper.WriteJsonFile($"config/{saveName}.json", config);
             }
         }
 
