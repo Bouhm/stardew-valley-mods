@@ -386,7 +386,6 @@ namespace NPCMapLocations
                 }
 
                 bool isOutdoors = Game1.getLocationFromName(currentLocation).isOutdoors;
-                //monitor.Log(npc.name + " " + currentLocation + " " + isOutdoors);
 
                 if (npc.Schedule != null || npc.isMarried() || npc.name.Equals("Sandy") || npc.name.Equals("Marlon") || npc.name.Equals("Wizard"))
                 {
@@ -508,6 +507,8 @@ namespace NPCMapLocations
                             if (npcNames.ContainsKey(npc.name) && (!config.showHiddenVillagers))
                             {
                                 // Hacky way to add the icons
+                                // ^ indoor, # gift, ! quest, _ whitespace
+                                // Cannot use any whitespace for Chinese localization
                                 string markStr = "";
                                 if (!npc.currentLocation.IsOutdoors && !showIndoor)
                                 {
@@ -515,17 +516,17 @@ namespace NPCMapLocations
                                 }
                                 if (questNPCs.Contains(npc.name) && birthdayNPCs.Contains(npc.name))
                                 {
-                                    markStr += "!+";
+                                    markStr += "!#";
                                 }
                                 else
                                 {
                                     if (questNPCs.Contains(npc.name))
                                     {
-                                        markStr += " !";
+                                        markStr += "_!";
                                     }
                                     if (birthdayNPCs.Contains(npc.name))
                                     {
-                                        markStr += " +";
+                                        markStr += "_#";
                                     }
                                 }
                                 hoveredList.Add(npcNames[npc.name] + markStr);
@@ -591,15 +592,17 @@ namespace NPCMapLocations
                 hoveredNPCNames = hoveredList[0];
                 for (int i = 1; i < hoveredList.Count; i++)
                 {
+                    // Have to use special character to separate strings for Chinese
+                    var separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
                     var lines = hoveredNPCNames.Split('\n');
-                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + ", " + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
                     {
-                        hoveredNPCNames += ", " + Environment.NewLine;
+                        hoveredNPCNames += separator + Environment.NewLine;
                         hoveredNPCNames += hoveredList[i];
                     }
                     else
                     {
-                        hoveredNPCNames += ", " + hoveredList[i];
+                        hoveredNPCNames += separator + hoveredList[i];
                     }
                 }
             }
