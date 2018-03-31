@@ -93,9 +93,13 @@ namespace NPCMapLocations
             {
                 openModMenu();
             }
-            else if (input.ToString().Equals(config.tooltipKey) || input is SButton.ControllerY)
+            else if (input.ToString().Equals(config.tooltipKey) || input is SButton.DPadUp || input is SButton.DPadRight)
             {
                 changeTooltipConfig();
+            }
+            else if (input.ToString().Equals(config.tooltipKey) || input is SButton.DPadDown || input is SButton.DPadLeft)
+            {
+                changeTooltipConfig(false);
             }
         }
 
@@ -105,13 +109,24 @@ namespace NPCMapLocations
             menuOpen = 1;
         }
 
-        private void changeTooltipConfig()
+        private void changeTooltipConfig(bool incre = true)
         {
-            if (++config.nameTooltipMode > 3)
+            if (incre)
             {
-                config.nameTooltipMode = 1;
+                if (++config.nameTooltipMode > 3)
+                {
+                    config.nameTooltipMode = 1;
+                }
+                modHelper.WriteJsonFile($"config/{saveName}.json", config);
             }
-            modHelper.WriteJsonFile($"config/{saveName}.json", config);
+            else
+            {
+                if (--config.nameTooltipMode < 1)
+                {
+                    config.nameTooltipMode = 3;
+                }
+                modHelper.WriteJsonFile($"config/{saveName}.json", config);
+            }
         }
 
         private void LoadCustomMods()
