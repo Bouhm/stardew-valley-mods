@@ -381,9 +381,12 @@ namespace NPCMapLocations
 
                 mapVectors.TryGetValue(currentLocation, out npcLocation);
                 if (npcLocation == null)
-                {
                     continue;
-                }
+                
+                // Handle case where Kent randomly shows up on the map when he shouldn't be in town
+                // Go home Kent you're drunk
+                if (npc.name.Equals("Kent") && Game1.year < 2)
+                    continue;
 
                 bool isOutdoors = Game1.getLocationFromName(currentLocation).isOutdoors;
 
@@ -504,32 +507,21 @@ namespace NPCMapLocations
 
                         if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
                         {
-                            if (npcNames.ContainsKey(npc.name) && (!config.showHiddenVillagers))
+                            if (npcNames.ContainsKey(npc.name) && (!config.showHiddenVillagers || !hiddenNPCs.Contains(npc.name)))
                             {
-                                // Hacky way to add the icons
-                                // ^ indoor, # gift, ! quest, _ whitespace
-                                // Cannot use any whitespace for Chinese localization
+                                /*
+                                // Magic string for quest/birthday icons
                                 string markStr = "";
-                                if (!npc.currentLocation.IsOutdoors && !showIndoor)
+                                if (questNPCs.Contains(npc.name))
                                 {
-                                    showIndoor = true;
+                                    markStr += "!";
                                 }
-                                if (questNPCs.Contains(npc.name) && birthdayNPCs.Contains(npc.name))
+                                if (birthdayNPCs.Contains(npc.name))
                                 {
-                                    markStr += "!#";
+                                    markStr += "#";
                                 }
-                                else
-                                {
-                                    if (questNPCs.Contains(npc.name))
-                                    {
-                                        markStr += "_!";
-                                    }
-                                    if (birthdayNPCs.Contains(npc.name))
-                                    {
-                                        markStr += "_#";
-                                    }
-                                }
-                                hoveredList.Add(npcNames[npc.name] + markStr);
+                                */
+                                hoveredList.Add(npcNames[npc.name]);
                             }
                         }
 

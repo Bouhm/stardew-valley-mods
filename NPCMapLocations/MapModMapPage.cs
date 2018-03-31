@@ -652,19 +652,11 @@ namespace NPCMapLocations
                 }
 
                 string[] nameStrs = names.Split(',');
-                int iconWidths = 0;
 
-                if (names.Contains("#")) 
-                    iconWidths += GIFT_WIDTH;
-                if (names.Contains("!"))
-                    iconWidths += QUEST_WIDTH;
-                if (names.Contains("_"))
-                    iconWidths += SPACE_WIDTH;
-
-                names = names.Replace("#", "").Replace("!", "").Replace("_", "").Replace(",", " ").Replace("，", "");
+                // names.Replace("!", "").Replace("#", ""); // Remove magic strings
                 var lines = names.Split('\n');
                 int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
-                int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2 + 4 + iconWidths;
+                int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
 
                 if (nameTooltipMode == 1)
                 {
@@ -727,56 +719,30 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-
-                drawIcons(b, nameStrs, vector);
             }
         }
 
-        // Convert magic string into icons
+        /*
+        // Draw icons
         private void drawIcons(SpriteBatch b, string[] nameStrs, Vector2 vector)
         {
-            // Draw icons next to names
-            string namesLen = "";
-
+            int namesLen = 0;
             foreach (string nameStr in nameStrs)
             {
-                // Replace magic string forcefully
-                string name = nameStr.Replace("#", "").Replace("!", "").Replace("_", "").Replace(",", "").Replace("，","").Trim();
-                namesLen += name; // Cumulatively add name lengths, commas, icons, spaces, etc.
-
-                if (nameStr.Contains("!") && nameStr.Contains("#"))
+                namesLen += (int)Game1.smallFont.MeasureString(nameStr).X;
+                if (nameStr.Contains("!"))
                 {
-                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 5, vector.Y + 2), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 5, vector.Y), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                    namesLen += GIFT_WIDTH;
+                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
                 }
-                else
+                if (nameStr.Contains("#"))
                 {
-                    if (nameStr.Contains("!"))
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 5, vector.Y), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                        namesLen += QUEST_WIDTH;
-                    }
-                    if (nameStr.Contains("#"))
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 5, vector.Y + 2), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
-                        namesLen += GIFT_WIDTH;
-                    }
+                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen + 2, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
                 }
-
-                // Draw commas separately after name and icons... This is insanity
-                // Whitespace would ideally replace magic strings to displace commas
-                // but not all languages use whitespace so have to do this hacky way
-                if (nameStrs.Length > 1)
-                {
-                    b.DrawString(Game1.smallFont, ",", new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 2f, vector.Y + 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    b.DrawString(Game1.smallFont, ",", new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X, vector.Y + 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    b.DrawString(Game1.smallFont, ",", new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X + 2f, vector.Y), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    b.DrawString(Game1.smallFont, ",", new Vector2(vector.X + (int)Game1.smallFont.MeasureString(namesLen).X, vector.Y), Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                    namesLen += SPACE_WIDTH * 2; // Width of ", "
-                }
+                string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+                namesLen += (int)Game1.smallFont.MeasureString(separator).X;
             }
         }
+        */
 
         private Rectangle getRegionRect(string region)
         {

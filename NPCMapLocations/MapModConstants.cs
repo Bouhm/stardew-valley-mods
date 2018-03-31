@@ -92,7 +92,8 @@ public static class MapModConstants
     }
 
     // tileX and tileY (the first two values) are tile positions in the game for that location
-    // x and y (the latter values) are pixel positions (centered) in the map sprite that correspond to the game location
+    // x and y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
+    // MapModMain handles all the calculations to make sure the positions are center-based.
     public static Dictionary<string, MapVectors[]> mapVectors
     {
         get
@@ -147,10 +148,10 @@ public static class MapModConstants
                         new MapVectors(264, 441)
                     }},
                     { "AnimalShop", new MapVectors[] {
-                        new MapVectors(479, 422)
+                        new MapVectors(479, 418)
                     }},
                     { "LeahHouse", new MapVectors[] {
-                        new MapVectors(515, 464)
+                        new MapVectors(515, 460)
                     }},
                     { "RuinedHouse", new MapVectors[] {
                         new MapVectors(333, 622)
@@ -160,8 +161,8 @@ public static class MapModConstants
                     }},
                 { "Town", new MapVectors[] {
                     // Top half of town
-                    new MapVectors(0, 0, 598, 181),
-                    new MapVectors(120, 40, 921, 272),
+                    new MapVectors(0, 0, 593, 173),
+                    new MapVectors(120, 40, 921, 275),
 
                     // Bottom half of town
                     new MapVectors(0, 41, 602, 268),
@@ -177,19 +178,20 @@ public static class MapModConstants
                         new MapVectors(727, 371)
                     }},
                     { "Hospital", new MapVectors[] {
-                        new MapVectors(704, 319)
+                        new MapVectors(706, 319)
                     }},
                     { "HarveyRoom", new MapVectors[] {
-                        new MapVectors(704, 315)
+                        new MapVectors(706, 315)
                     }},
                     { "ArchaeologyHouse", new MapVectors[] {
                         new MapVectors(905, 436)
                     }},
+                    // Just incase CA fixes the old name to the live one. I don't know.
                     { "AlexHouse", new MapVectors[] {
-                        new MapVectors(771, 347)
+                        new MapVectors(771, 340)
                     }},
                     { "JoshHouse", new MapVectors[] {
-                        new MapVectors(771, 342)
+                        new MapVectors(771, 340)
                     }},
                     { "HaleyHouse", new MapVectors[] {
                         new MapVectors(669, 427)
@@ -222,11 +224,11 @@ public static class MapModConstants
                         new MapVectors(701, 467)
                     }},
                 { "Beach", new MapVectors[] {
-                    new MapVectors(0, 0, 726, 549),
-                    new MapVectors(104, 50, 994, 686)
+                    new MapVectors(0, 0, 726, 541),
+                    new MapVectors(104, 50, 997, 688)
                 }},
                     { "ElliottHouse", new MapVectors[] {
-                        new MapVectors(852, 566)
+                        new MapVectors(852, 564)
                     }},
                     { "FishShop", new MapVectors[] {
                         new MapVectors(809, 632)
@@ -239,8 +241,7 @@ public static class MapModConstants
                     new MapVectors(70, 62, 794, 81)
                 }},
                     { "Railroad_Region", new MapVectors[] {
-                        new MapVectors(0, 33, 589, 5),
-                        new MapVectors(70, 62, 794, 86)
+                        new MapVectors(696, 47),
                     }},
                     { "BathHouse_Entry", new MapVectors[] {
                         new MapVectors(627, 56)
@@ -270,7 +271,7 @@ public static class MapModConstants
                         new MapVectors(819, 36)
                     }},
                 { "Mountain", new MapVectors[] {
-                    new MapVectors(0, 0, 718, 83),
+                    new MapVectors(0, 0, 718, 81),
                     new MapVectors(135, 41, 1074, 186),
                 }},
                     { "ScienceHouse", new MapVectors[] {
@@ -280,7 +281,7 @@ public static class MapModConstants
                         new MapVectors(751, 133)
                     }},
                     { "AdventureGuild", new MapVectors[] {
-                        new MapVectors(918, 99)
+                        new MapVectors(918, 96)
                     }},
                     { "Tent", new MapVectors[] {
                         new MapVectors(795, 95)
@@ -352,7 +353,7 @@ public static class MapModConstants
                 { "RuinedHouse", new Rect(20, 20) },
                 { "CommunityCenter", new Rect(44, 36) },
                 { "SewerPipe", new Rect(24, 32) },
-                { "Railroad_Region", new Rect(16, 8) },
+                { "Railroad_Region", new Rect(200, 69) },
                 { "LonelyStone", new Rect(28, 28) },
             };
         }
