@@ -667,7 +667,7 @@ namespace NPCMapLocations
                         }
                         else if (building.baseNameOfIndoors.Equals("Barn"))
                         {
-                            b.Draw(buildings, new Vector2(locVector.X, locVector.Y + 2), new Rectangle?(new Rectangle(10, 0, 6, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                            b.Draw(buildings, new Vector2(locVector.X, locVector.Y + 3), new Rectangle?(new Rectangle(10, 0, 6, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
                         }
                         else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
                         {
