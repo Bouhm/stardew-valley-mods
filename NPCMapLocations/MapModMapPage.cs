@@ -5,6 +5,7 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace NPCMapLocations
 {
@@ -46,18 +47,19 @@ namespace NPCMapLocations
         public const int region_sewerpipe = 1033;
         public const int region_railroad = 1034;
         private Dictionary<string, Rect> regionRects = MapModConstants.regionRects;
-        private string descriptionText = "";
         private string hoverText = "";
-        private string playerLocationName;
         private Texture2D map;
         private int mapX;
         private int mapY;
-        private Vector2 playerMapPosition;
         public List<ClickableComponent> points = new List<ClickableComponent>();
         public ClickableTextureComponent okButton;
         private string names;
+        private Vector2 indoorIconVector;
         private Dictionary<string, string> npcNames;
         private int nameTooltipMode;
+        private const int GIFT_WIDTH = 14;
+        private const int QUEST_WIDTH = 8;
+        private const int SPACE_WIDTH = 10;
 
         public MapModMapPage(string names, Dictionary<string, string> npcNames, int nameTooltipMode, GameMenu menu)
         {
@@ -558,11 +560,6 @@ namespace NPCMapLocations
             int offsetY = 0;
             this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
-            if (this.playerLocationName != null)
-            {
-                StardewValley.BellsAndWhistles.SpriteText.drawStringWithScrollCenteredAt(b, this.playerLocationName, this.xPositionOnScreen + this.width / 2, this.yPositionOnScreen + this.height + Game1.tileSize / 2 + Game1.pixelZoom * 4, "", 1f, -1, 0, 0.88f, false);
-            }
-
             if (!this.hoverText.Equals(""))
             {
                 IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1, -1, -1, 1f, null);
@@ -604,8 +601,10 @@ namespace NPCMapLocations
                         y = Game1.viewport.Height - height;
                     }
                 }
+                // Name tooltip
+                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, height, nameTooltipMode);
 
-                DrawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
+                // Location tooltips
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
@@ -614,8 +613,10 @@ namespace NPCMapLocations
             }
             else
             {
-                DrawNPCNames(Game1.spriteBatch, this.names, x, y, offsetY, height, this.nameTooltipMode);
+                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, height, nameTooltipMode);
             }
+            if (names.Length > 0)
+                b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
         }
 
         // Draw map to cover base rendering 
@@ -645,9 +646,17 @@ namespace NPCMapLocations
         {
             if (!(names.Equals("")))
             {
+                if (names.StartsWith("^"))
+                {
+                    names = names.Substring(1);
+                }
+
+                string[] nameStrs = names.Split(',');
+
+                // names.Replace("!", "").Replace("#", ""); // Remove magic strings
                 var lines = names.Split('\n');
-                int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
-                int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
+                int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
+                int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
 
                 if (nameTooltipMode == 1)
                 {
@@ -702,8 +711,10 @@ namespace NPCMapLocations
                     y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
                 }
 
-                drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
+                indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
                 Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
+
+                drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
@@ -711,12 +722,34 @@ namespace NPCMapLocations
             }
         }
 
+        /*
+        // Draw icons
+        private void drawIcons(SpriteBatch b, string[] nameStrs, Vector2 vector)
+        {
+            int namesLen = 0;
+            foreach (string nameStr in nameStrs)
+            {
+                namesLen += (int)Game1.smallFont.MeasureString(nameStr).X;
+                if (nameStr.Contains("!"))
+                {
+                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
+                }
+                if (nameStr.Contains("#"))
+                {
+                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen + 2, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
+                }
+                string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+                namesLen += (int)Game1.smallFont.MeasureString(separator).X;
+            }
+        }
+        */
+
         private Rectangle getRegionRect(string region)
         {
             // Set origin to center
             return new Rectangle(
-                (int)MapModMain.LocationToMap(region).X - regionRects[region].width / 2,
-                (int)MapModMain.LocationToMap(region).Y - regionRects[region].height / 2,
+                (int)MapModMain.LocationToMap(region).X - regionRects[region].width/2,
+                (int)MapModMain.LocationToMap(region).Y - regionRects[region].height/2,
                 regionRects[region].width,
                 regionRects[region].height
             );

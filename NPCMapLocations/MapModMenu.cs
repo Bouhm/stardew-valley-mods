@@ -345,24 +345,10 @@ namespace NPCMapLocations
             }
             Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
             b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
-            switch (Game1.whichFarm)
-            {
-                case 1:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 2:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 3:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 4:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-            }
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
             this.okButton.draw(b);
+            int width = (int)Game1.dialogueFont.MeasureString(MapModMain.modHelper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
                 this.upArrow.draw(b);
@@ -381,7 +367,7 @@ namespace NPCMapLocations
                     {
                         if (options[this.currentItemIndex + i] is MapModButton)
                         {
-                            Rectangle bounds = new Rectangle(x + 28, y, 700, Game1.tileSize + 8);
+                            Rectangle bounds = new Rectangle(x + 28, y, width + Game1.tileSize + 8, Game1.tileSize + 8);
                             if (options[this.currentItemIndex + i].whichOption == 4)
                             {
                                 immersionButton1.rect = bounds;

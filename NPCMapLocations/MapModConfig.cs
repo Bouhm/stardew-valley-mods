@@ -47,7 +47,7 @@ namespace NPCMapLocations
         public bool showVincent { get; set; } = true;
         public bool showWilly { get; set; } = true;
         public bool showSandy { get; set; } = false;
-        public bool showWizard { get; set; } = false;
+        public bool showWizard { get; set; } = true;
         public bool showMarlon { get; set; } = false;
         public bool showTravelingMerchant { get; set; } = true;
         public Dictionary<string, int> villagerCrop { get; set; } = new Dictionary<string, int>();
@@ -56,7 +56,7 @@ namespace NPCMapLocations
         public bool showCustomNPC3 { get; set; } = true;
         public bool showCustomNPC4 { get; set; } = true;
         public bool showCustomNPC5 { get; set; } = true;
-        public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
         public bool showFarmBuildings { get; set; } = true;
+        public Dictionary<string, Dictionary<string, int>> customNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
     }
 }
