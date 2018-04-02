@@ -53,18 +53,15 @@ namespace NPCMapLocations
         private int mapY;
         public List<ClickableComponent> points = new List<ClickableComponent>();
         public ClickableTextureComponent okButton;
-        private string names;
+        private List<String> hoveredNames;
         private Vector2 indoorIconVector;
         private Dictionary<string, string> npcNames;
         private int nameTooltipMode;
-        private const int GIFT_WIDTH = 14;
-        private const int QUEST_WIDTH = 8;
-        private const int SPACE_WIDTH = 10;
 
-        public MapModMapPage(string names, Dictionary<string, string> npcNames, int nameTooltipMode, GameMenu menu)
+        public MapModMapPage(List<String> hoveredNames, Dictionary<string, string> npcNames, int nameTooltipMode)
         {
             this.nameTooltipMode = nameTooltipMode;
-            this.names = names;
+            this.hoveredNames = hoveredNames;
             this.npcNames = npcNames;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             this.map = MapModMain.map;
@@ -514,6 +511,7 @@ namespace NPCMapLocations
             );
 
             // Remove vanilla map tooltips
+            GameMenu menu = (GameMenu)Game1.activeClickableMenu;
             List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
             MapPage mapPage = (MapPage)menuPages[menu.currentTab];
             MapModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").SetValue(new List<ClickableComponent>());
@@ -555,6 +553,7 @@ namespace NPCMapLocations
         // Draw location tooltips
         public override void draw(SpriteBatch b)
         {
+            string names = "";
             int x = Game1.getMouseX() + Game1.tileSize / 2;
             int y = Game1.getMouseY() + Game1.tileSize / 2;
             int offsetY = 0;
@@ -601,6 +600,32 @@ namespace NPCMapLocations
                         y = Game1.viewport.Height - height;
                     }
                 }
+
+                if (this.hoveredNames != null && this.hoveredNames.Count > 0)
+                {
+                    foreach (string name in this.hoveredNames)
+                    {
+                        if (names == "")
+                        {
+                            names += name;
+                            continue;
+                        }
+
+                        // Have to use special character to separate strings for Chinese
+                        var separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+                        var lines = names.Split('\n');
+                        if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + name).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                        {
+                            names += separator + Environment.NewLine;
+                            names += name;
+                        }
+                        else
+                        {
+                            names += separator + name;
+                        }
+                    }
+                }
+
                 // Name tooltip
                 DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, height, nameTooltipMode);
 
@@ -646,14 +671,6 @@ namespace NPCMapLocations
         {
             if (!(names.Equals("")))
             {
-                if (names.StartsWith("^"))
-                {
-                    names = names.Substring(1);
-                }
-
-                string[] nameStrs = names.Split(',');
-
-                // names.Replace("!", "").Replace("#", ""); // Remove magic strings
                 var lines = names.Split('\n');
                 int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
                 int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
@@ -721,28 +738,6 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
         }
-
-        /*
-        // Draw icons
-        private void drawIcons(SpriteBatch b, string[] nameStrs, Vector2 vector)
-        {
-            int namesLen = 0;
-            foreach (string nameStr in nameStrs)
-            {
-                namesLen += (int)Game1.smallFont.MeasureString(nameStr).X;
-                if (nameStr.Contains("!"))
-                {
-                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
-                }
-                if (nameStr.Contains("#"))
-                {
-                    b.Draw(Game1.mouseCursors, new Vector2(vector.X + namesLen + 2, vector.Y - Game1.tileSize / 8 + 2), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.25f, SpriteEffects.None, 0f);
-                }
-                string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
-                namesLen += (int)Game1.smallFont.MeasureString(separator).X;
-            }
-        }
-        */
 
         private Rectangle getRegionRect(string region)
         {

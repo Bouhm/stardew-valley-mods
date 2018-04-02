@@ -1,12 +1,13 @@
 ﻿/*
 NPC Map Locations Mod by Bouhm.
-Shows NPC locations real-time on the map.
+Shows NPC locations on a modified map.
 */
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
 using StardewModdingAPI;
@@ -14,36 +15,26 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using StardewValley.Locations;
 
 namespace NPCMapLocations
 {
     public class MapModMain : Mod
     {
-        public static string current;
         public static IModHelper modHelper;
         public static IMonitor monitor;
         public static MapModConfig config;
-        public static string saveName;
-        public static int customNpcId = 0;
-        public static int menuOpen = 0;
-        public static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         public static Texture2D map;
         public static Texture2D buildings;
-        private static int mapX;
-        private static int mapY;
+        public static string saveName;
+        public static int customNpcId = 0;
+        public static bool isMenuOpen = false;
+        public static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
-        private static Dictionary<string, NPCMarker> indoorNPCs;
-        private static Dictionary<string, NPCMarker> outdoorNPCs;
-        private static Dictionary<string, MapVectors[]> mapVectors;
+        private static Dictionary<string, string> npcNames = new Dictionary<string, string>(); // For custom names
+        private static HashSet<NPCMarker> npcMarkers = new HashSet<NPCMarker>();
         private static Dictionary<string, string> indoorLocations;
+        private static bool[] showSecondaryNPCs = new Boolean[4];
         private static MapModMapPage modMapPage;
-        private static string hoveredNPCNames;
-        private static HashSet<string> birthdayNPCs;
-        private static HashSet<string> questNPCs;
-        private static HashSet<string> hiddenNPCs;
-        private static Dictionary<string, string> npcNames = new Dictionary<string, string>();
-        private bool[] showExtras = new Boolean[4];
         private bool loadComplete = false;
         private bool initialized = false;
 
@@ -57,11 +48,14 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
+            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map", ContentSource.ModFolder); // Load modified map page
+            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings", ContentSource.ModFolder); // Load cfarm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
         }
 
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
@@ -74,16 +68,29 @@ namespace NPCMapLocations
 
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
-            current = ModManifest.Version.ToString();
             saveName = Constants.SaveFolderName;
             config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.markerCrop;
-            mapVectors = MapModConstants.mapVectors;
             indoorLocations = MapModConstants.indoorLocations;
             customNPCs = config.customNPCs;
-            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map", ContentSource.ModFolder); // Load modified map page
-            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings", ContentSource.ModFolder);
-            loadComplete = true;
+            HandleCustomMods();
+        }
+
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        {
+            showSecondaryNPCs[0] = Game1.player.mailReceived.Contains("ccVault");
+            showSecondaryNPCs[1] = Game1.stats.DaysPlayed >= 5u;
+            showSecondaryNPCs[2] = Game1.stats.DaysPlayed >= 5u;
+            showSecondaryNPCs[3] = Game1.year >= 2;
+            foreach (NPC npc in Utility.getAllCharacters())
+            {
+                // Handle case where Kent appears even though he shouldn't
+                if (!npc.isVillager() || (npc.name.Equals("Kent") && Game1.year < 2)) { continue; }
+
+                NPCMarker npcMarker = new NPCMarker(npc.name);
+                npcMarker.IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth); // Check for birthday
+                npcMarkers.Add(npcMarker);
+            }
         }
 
         private void HandleInput(GameMenu menu, SButton input)
@@ -91,25 +98,20 @@ namespace NPCMapLocations
             if (menu.currentTab != GameMenu.mapTab) { return; }
             if (input.ToString().Equals(config.menuKey) || input is SButton.ControllerB)
             {
-                openModMenu();
+                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2, 1100 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showSecondaryNPCs, customNPCs, npcNames);
+                isMenuOpen = true;
             }
             else if (input.ToString().Equals(config.tooltipKey) || input is SButton.DPadUp || input is SButton.DPadRight)
             {
-                changeTooltipConfig();
+                ChangeTooltipConfig();
             }
             else if (input.ToString().Equals(config.tooltipKey) || input is SButton.DPadDown || input is SButton.DPadLeft)
             {
-                changeTooltipConfig(false);
+                ChangeTooltipConfig(false);
             }
         }
 
-        private void openModMenu()
-        {
-            Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2, 1100 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showExtras, customNPCs, npcNames);
-            menuOpen = 1;
-        }
-
-        private void changeTooltipConfig(bool incre = true)
+        private void ChangeTooltipConfig(bool incre = true)
         {
             if (incre)
             {
@@ -129,7 +131,7 @@ namespace NPCMapLocations
             }
         }
 
-        private void LoadCustomMods()
+        private void HandleCustomMods()
         {
             var initializeCustomNPCs = 1;
             if (customNPCs != null && customNPCs.Count != 0)
@@ -155,10 +157,8 @@ namespace NPCMapLocations
                 int idx = 1;
                 foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
-                    // isInGame = 0;
                     if (npc.name.Equals(customNPC.Key))
                     {
-                        // isInGame = 1;
                         customNpcId = idx;
                     }
 
@@ -244,10 +244,8 @@ namespace NPCMapLocations
                 }
             }
 
-            var locVectors = mapVectors[location];
+            var locVectors = MapModConstants.mapVectors[location];
             Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-            mapX = (int)mapPagePos.X;
-            mapY = (int)mapPagePos.Y;
             int x = 0;
             int y = 0;
 
@@ -269,34 +267,25 @@ namespace NPCMapLocations
                 // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
                 foreach (MapVectors vector in vectors)
                 {
-                    // Handle exact points
-                    if (tileX == vector.tileX && tileY == vector.tileY)
+                    if (lower != null && upper != null)
                     {
-                        return new Vector2(mapX + vector.x - 16, mapY + vector.y - 15);
+                        if (lower.tileX == upper.tileX || lower.tileY == upper.tileY)
+                        {
+                            hasEqualTile = true;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
-                    else
+                    if ((lower == null || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
                     {
-                        if (lower != null && upper != null)
-                        {
-                            // Don't want to exclude points where tile = vector x/y (hence the <= and >=) but avoid cases where both upper/lower are equal
-                            if (lower.tileX == upper.tileX || lower.tileY == upper.tileY)
-                            {
-                                hasEqualTile = true;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        if ((lower == null || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
-                        {
-                            lower = vector;
-                            continue;
-                        }
-                        if ((upper == null || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
-                        {
-                            upper = vector;
-                        }
+                        lower = vector;
+                        continue;
+                    }
+                    if ((upper == null || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
+                    {
+                        upper = vector;
                     }
                 }
 
@@ -324,22 +313,6 @@ namespace NPCMapLocations
                     upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
                 }
 
-                /*
-                // For use with vanilla map. Requires a LOT of points in mapVectors for some accuracy (from past experience, not worth).
-                // With modified accurate map, this is no longer necessary since lower x,y < upper x,y is always true for two closest points.
-                int tileXMin = Math.Min(lower.tileX, upper.tileX);
-                int tileXMax = Math.Max(lower.tileX, upper.tileX);
-                int tileYMin = Math.Min(lower.tileY, upper.tileY);
-                int tileYMax = Math.Max(lower.tileY, upper.tileY);
-                int xMin = Math.Min(lower.x, upper.x);
-                int xMax = Math.Max(lower.x, upper.x);
-                int yMin = Math.Min(lower.y, upper.y);
-                int yMax = Math.Max(lower.y, upper.y);
-
-                x = (int)(xMin + (double)(tileX - tileXMin) / (double)(tileXMax - tileXMin) * (xMax - xMin));
-                y = (int)(yMin + (double)(tileY - tileYMin) / (double)(tileYMax - tileYMin) * (yMax - yMin));
-                */
-
                 x = (int)(lower.x + (double)(tileX - lower.tileX) / (double)(upper.tileX - lower.tileX) * (upper.x - lower.x));
                 y = (int)(lower.y + (double)(tileY - lower.tileY) / (double)(upper.tileY - lower.tileY) * (upper.y - lower.y));
 
@@ -349,38 +322,37 @@ namespace NPCMapLocations
                     MapModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
                 }
             }
-            return new Vector2(mapX + x, mapY + y);
+            return new Vector2((int)mapPagePos.X + x, (int)mapPagePos.Y + y);
         }
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (!IsMapOpen()) { return; }
 
-            updateNPCMarkers((GameMenu)Game1.activeClickableMenu);
+            updateNPCMarkers();
         }
 
-        private void updateNPCMarkers(GameMenu menu)
+        private static bool IsMapOpen()
         {
-            if (menu.currentTab != GameMenu.mapTab) { return; }
+            if (Game1.activeClickableMenu == null || isMenuOpen) { return false; }
+            GameMenu menu = (GameMenu)Game1.activeClickableMenu;
+            return menu.currentTab == GameMenu.mapTab;
+        }
+
+        private void updateNPCMarkers()
+        {
             if (loadComplete && !initialized)
             {
-                LoadCustomMods();
+                HandleCustomMods();
             }
 
-            indoorNPCs = new Dictionary<string, NPCMarker>();
-            outdoorNPCs = new Dictionary<string, NPCMarker>();
-            List<string> hoveredList = new List<String>();
-            birthdayNPCs = new HashSet<string>();
-            questNPCs = new HashSet<string>();
-            hiddenNPCs = new HashSet<string>();
-            hoveredNPCNames = "";
-            bool showIndoor = false;
+            bool[] showSecondaryNPCs = new Boolean[4];
+            List<string> hoveredNames = new List<string>();
 
-            foreach (NPC npc in Utility.getAllCharacters())
+            foreach (NPCMarker npcMarker in npcMarkers)
             {
-                if (!npc.isVillager()) { continue; }
-
+                NPC npc = Game1.getCharacterFromName(npcMarker.Name, true);
                 MapVectors[] npcLocation;
                 string currentLocation;
 
@@ -394,227 +366,92 @@ namespace NPCMapLocations
                     currentLocation = npc.currentLocation.name;
                 }
 
-                mapVectors.TryGetValue(currentLocation, out npcLocation);
+                MapModConstants.mapVectors.TryGetValue(currentLocation, out npcLocation);
                 if (npcLocation == null)
-                    continue;
-                
-                // Handle case where Kent randomly shows up on the map when he shouldn't be in town
-                // Go home Kent you're drunk
-                if (npc.name.Equals("Kent") && Game1.year < 2)
-                    continue;
+                    continue;         
 
-                bool isOutdoors = Game1.getLocationFromName(currentLocation).isOutdoors;
+                // For layering indoor/outdoor NPCs and indoor indicator
+                npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).isOutdoors;
 
                 if (npc.Schedule != null || npc.isMarried() || npc.name.Equals("Sandy") || npc.name.Equals("Marlon") || npc.name.Equals("Wizard"))
                 {
+                    // For show NPCs in player's location option
                     bool sameLocation = false;
-                    showExtras[0] = Game1.player.mailReceived.Contains("ccVault");
-                    showExtras[1] = Game1.stats.DaysPlayed >= 5u;
-                    showExtras[2] = Game1.stats.DaysPlayed >= 5u;
-                    showExtras[3] = Game1.year >= 2;
-
                     if (config.onlySameLocation)
                     {
                         indoorLocations.TryGetValue(npc.currentLocation.name, out string indoorLocationNPC);
                         indoorLocations.TryGetValue(Game1.player.currentLocation.name, out string indoorLocationPlayer);
-                        if (indoorLocationPlayer == null || indoorLocationNPC == null)
-                        {
-                            sameLocation = false;
-                        }
-                        else
+                        if (indoorLocationPlayer != null && indoorLocationNPC != null)
                         {
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
                         }
                     }
 
-                    if ((config.immersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.name)) ||
-                        (config.immersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.name)) ||
-                        (config.onlySameLocation && !sameLocation) ||
-                        (config.byHeartLevel && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax)))
-                    {
-                        hiddenNPCs.Add(npc.name);
-                    }
+                    // NPCs that won't be shown on the map unless Show Hidden NPCs is checked
+                    npcMarker.IsHidden =
+                        ((config.immersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.name))
+                        || (config.immersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.name))
+                        || (config.onlySameLocation && !sameLocation)
+                        || (config.byHeartLevel && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax)));
 
-
-                    if (config.showHiddenVillagers ? ShowNPC(npc.name, showExtras) : (!hiddenNPCs.Contains(npc.name) && ShowNPC(npc.name, showExtras)))
+                    // NPCs that will be drawn onto the map
+                    if (config.showHiddenVillagers ? ShowNPC(npc.name, showSecondaryNPCs) : !npcMarker.IsHidden && ShowNPC(npc.name, showSecondaryNPCs))
                     {
                         int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - 16;
                         int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - 15;
                         int width = 32;
                         int height = 30;
 
-                        if (isOutdoors)
+                        // Check for daily quests
+                        foreach (Quest quest in Game1.player.questLog)
                         {
-                            if (outdoorNPCs.ContainsKey(npc.name))
+                            if (quest.accepted && quest.dailyQuest && !quest.completed)
                             {
-                                outdoorNPCs[npc.name].location = new Rectangle(x, y, width, height);
-                            }
-                            else
-                            {
-                                outdoorNPCs.Add(npc.name, new NPCMarker(npc.sprite.Texture, new Rectangle(x, y, width, height)));
-                            }
-                        }
-                        else
-                        {
-                            if (indoorNPCs.ContainsKey(npc.name))
-                            {
-                                indoorNPCs[npc.name].location = new Rectangle(x, y, width, height);
-                            }
-                            else
-                            {
-                                indoorNPCs.Add(npc.name, new NPCMarker(npc.sprite.Texture, new Rectangle(x, y, width, height)));
-                            }
-                        }
-
-
-                        if (config.markQuests)
-                        {
-                            if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
-                            {
-                                if (Game1.player.friendships.ContainsKey(npc.name) && Game1.player.friendships[npc.name][3] != 1)
+                                switch (quest.questType)
                                 {
-                                    birthdayNPCs.Add(npc.name);
-                                }
-                                else
-                                {
-                                    birthdayNPCs.Add(npc.name);
-                                }
-                            }
-                            foreach (Quest quest in Game1.player.questLog)
-                            {
-                                if (quest.accepted && quest.dailyQuest && !quest.completed)
-                                {
-                                    if (quest.questType == 3)
-                                    {
-                                        var current = (ItemDeliveryQuest)quest;
-                                        if (current.target == npc.name)
-                                        {
-                                            questNPCs.Add(npc.name);
-                                        }
-                                    }
-                                    else if (quest.questType == 4)
-                                    {
-                                        var current = (SlayMonsterQuest)quest;
-                                        if (current.target == npc.name)
-                                        {
-                                            questNPCs.Add(npc.name);
-                                        }
-                                    }
-                                    else if (quest.questType == 7)
-                                    {
-                                        var current = (FishingQuest)quest;
-                                        if (current.target == npc.name)
-                                        {
-                                            questNPCs.Add(npc.name);
-                                        }
-                                    }
-                                    else if (quest.questType == 10)
-                                    {
-                                        var current = (ResourceCollectionQuest)quest;
-                                        if (current.target == npc.name)
-                                        {
-                                            questNPCs.Add(npc.name);
-                                        }
-                                    }
+                                    case 3:
+                                        npcMarker.HasQuest = (((ItemDeliveryQuest)quest).target == npc.name);
+                                        break;
+                                    case 4:
+                                        npcMarker.HasQuest = (((SlayMonsterQuest)quest).target == npc.name);
+                                        break;
+                                    case 7:
+                                        npcMarker.HasQuest = (((FishingQuest)quest).target == npc.name);
+                                        break;
+                                    case 10:
+                                        npcMarker.HasQuest = (((ResourceCollectionQuest)quest).target == npc.name);
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
                         }
 
+                        // Hovered NPCs
                         if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
                         {
-                            if (npcNames.ContainsKey(npc.name) && (!config.showHiddenVillagers || !hiddenNPCs.Contains(npc.name)))
+                            if (npcNames.ContainsKey(npc.name) && (!config.showHiddenVillagers || npcMarker.IsHidden))
                             {
-                                /*
-                                // Magic string for quest/birthday icons
-                                string markStr = "";
-                                if (questNPCs.Contains(npc.name))
+                                string name = npcNames[npc.name];
+                                if (!npcMarker.IsOutdoors)
                                 {
-                                    markStr += "!";
+                                    name = "^" + name;
                                 }
-                                if (birthdayNPCs.Contains(npc.name))
-                                {
-                                    markStr += "#";
-                                }
-                                */
-                                hoveredList.Add(npcNames[npc.name]);
+                                hoveredNames.Add(npcNames[npc.name]);
                             }
                         }
 
-                        // Draw order
-                        if (isOutdoors)
-                        {
-                            if (hiddenNPCs.Contains(npc.name))
-                            {
-                                outdoorNPCs[npc.name].layer = 4;
-                                if (questNPCs.Contains(npc.name) || (birthdayNPCs.Contains(npc.name)))
-                                {
-                                    outdoorNPCs[npc.name].layer = 3;
-                                }
-                            }
-                            else
-                            {
-                                outdoorNPCs[npc.name].layer = 2;
-                                if (questNPCs.Contains(npc.name) || (birthdayNPCs.Contains(npc.name)))
-                                {
-                                    outdoorNPCs[npc.name].layer = 1;
-                                }
-                            }
-                        }
-                        else
-                        { 
-                            if (hiddenNPCs.Contains(npc.name))
-                            {
-                                indoorNPCs[npc.name].layer = 4;
-                                if (questNPCs.Contains(npc.name) || (birthdayNPCs.Contains(npc.name)))
-                                {
-                                    indoorNPCs[npc.name].layer = 3;
-                                }
-                            }
-                            else
-                            {
-                                indoorNPCs[npc.name].layer = 2;
-                                if (questNPCs.Contains(npc.name) || (birthdayNPCs.Contains(npc.name)))
-                                {
-                                    indoorNPCs[npc.name].layer = 1;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (isOutdoors)
-                        {
-                            outdoorNPCs.Remove(npc.name);
-                        }
-                        else
-                        {
-                            indoorNPCs.Remove(npc.name);
-                        }
+                        // Establish draw order, higher number infront
+                        // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+                        // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+                        npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
+                        if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
+                        if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
                     }
                 }
             }
 
-            if (hoveredList != null && hoveredList.Count > 0)
-            {
-                hoveredNPCNames = hoveredList[0];
-                for (int i = 1; i < hoveredList.Count; i++)
-                {
-                    // Have to use special character to separate strings for Chinese
-                    var separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
-                    var lines = hoveredNPCNames.Split('\n');
-                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
-                    {
-                        hoveredNPCNames += separator + Environment.NewLine;
-                        hoveredNPCNames += hoveredList[i];
-                    }
-                    else
-                    {
-                        hoveredNPCNames += separator + hoveredList[i];
-                    }
-                }
-            }
-            hoveredNPCNames = showIndoor ? "^" + hoveredNPCNames : hoveredNPCNames;
-            modMapPage = new MapModMapPage(hoveredNPCNames, npcNames, config.nameTooltipMode, menu);
+            modMapPage = new MapModMapPage(hoveredNames, npcNames, config.nameTooltipMode);
         }
 
         // Draw misc
@@ -629,143 +466,112 @@ namespace NPCMapLocations
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (!IsMapOpen()) { return; }
 
-            DrawMapPage((GameMenu)Game1.activeClickableMenu);
+            DrawMapPage();
         }
 
         // Draw event
         // Subtractions within location vectors are to set the origin to the center of the sprite
-        static void DrawMapPage(GameMenu menu)
+        static void DrawMapPage()
         {
-            if (menu.currentTab == GameMenu.mapTab)
+            SpriteBatch b = Game1.spriteBatch;
+            // Draw map overlay
+            modMapPage.DrawMap(b);
+
+            if (config.showFarmBuildings)
             {
-                SpriteBatch b = Game1.spriteBatch;
-                // Draw map overlay
-                modMapPage.DrawMap(b);
+                float scale = 3;
 
-                if (config.showFarmBuildings)
+                // Draw farm buildings
+                foreach (Building building in Game1.getFarm().buildings)
                 {
-                    float scale = 3;
-
-                    // Draw farm buildings
-                    foreach (Building building in Game1.getFarm().buildings)
+                    if (building.baseNameOfIndoors == null)
                     {
-                        if (building.baseNameOfIndoors == null)
-                        {
-                            continue;
-                        }
-
-                        Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
-                        if (building.baseNameOfIndoors.Equals("Shed"))
-                        {
-                            b.Draw(buildings, locVector, new Rectangle?(new Rectangle(0, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                        }
-                        else if (building.baseNameOfIndoors.Equals("Coop"))
-                        {
-                            b.Draw(buildings, locVector, new Rectangle?(new Rectangle(5, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                        }
-                        else if (building.baseNameOfIndoors.Equals("Barn"))
-                        {
-                            b.Draw(buildings, new Vector2(locVector.X, locVector.Y + 3), new Rectangle?(new Rectangle(10, 0, 6, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                        }
-                        else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
-                        {
-                            b.Draw(buildings, locVector, new Rectangle?(new Rectangle(16, 0, 7, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                        }
+                        continue;
                     }
 
-                    // Greenhouse unlocked after pantry bundles completed
-                    if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+                    Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
+                    if (building.baseNameOfIndoors.Equals("Shed"))
                     {
-                        Vector2 locVector = MapModMain.LocationToMap("Greenhouse");
-                        b.Draw(buildings, new Vector2((int)(locVector.X - 5/2 * scale), (int)(locVector.Y - 7/2 * scale)), new Rectangle?(new Rectangle(23, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(0, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("Coop"))
+                    {
+                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(5, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("Barn"))
+                    {
+                        b.Draw(buildings, new Vector2(locVector.X, locVector.Y + scale), new Rectangle?(new Rectangle(10, 0, 6, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                    }
+                    else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
+                    {
+                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(16, 0, 7, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
                     }
                 }
 
-                Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
-                if (!Game1.player.currentLocation.isOutdoors)
+                // Greenhouse unlocked after pantry bundles completed
+                if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
                 {
-                    Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
-                }      
-
-                // NPC markers and icons
-                if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
-                {
-                    Vector2 merchantLoc = LocationToMap("Forest", 27, 11);
-                    b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
-                }
-                var outdoorMarkers = outdoorNPCs.ToList();
-                var indoorMarkers = indoorNPCs.ToList();
-                outdoorMarkers.Sort((y, x) => x.Value.layer.CompareTo(y.Value.layer));
-                indoorMarkers.Sort((y, x) => x.Value.layer.CompareTo(y.Value.layer));
-
-                foreach (KeyValuePair<string, NPCMarker> npc in indoorMarkers)
-                {
-                    if (hiddenNPCs.Contains(npc.Key))
-                    {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.DimGray * 0.7f);
-                        if (birthdayNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                        if (questNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                    }
-                    else
-                    {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.White);
-                        if (birthdayNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                        if (questNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                    }
-                }
-
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player); 
-                foreach (KeyValuePair<string, NPCMarker> npc in outdoorMarkers)
-                {
-                    if (hiddenNPCs.Contains(npc.Key))
-                    {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.DimGray * 0.7f);
-                        if (birthdayNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                        if (questNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                    }
-                    else
-                    {
-                        b.Draw(npc.Value.marker, npc.Value.location, new Rectangle?(new Rectangle(0, markerCrop[npc.Key], 16, 15)), Color.White);
-                        if (birthdayNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 20, npc.Value.location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                        if (questNPCs.Contains(npc.Key))
-                        {
-                            b.Draw(Game1.mouseCursors, new Vector2(npc.Value.location.X + 22, npc.Value.location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                        }
-                    }
-                }
-
-                // Location and name tooltips
-                modMapPage.draw(b);
-
-                // Cursor
-                if (!Game1.options.hardwareCursor)
-                {
-                    b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                    Vector2 locVector = MapModMain.LocationToMap("Greenhouse");
+                    b.Draw(buildings, new Vector2((int)(locVector.X - 5/2 * scale), (int)(locVector.Y - 7/2 * scale)), new Rectangle?(new Rectangle(23, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
                 }
             }
+
+            // NPC markers and icons
+            if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
+            {
+                Vector2 merchantLoc = LocationToMap("Forest", 27, 11);
+                b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+            }
+
+            // Sort by drawing order
+            var sortedMarkers = npcMarkers.ToList();
+            sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
+
+            foreach (NPCMarker npcMarker in sortedMarkers)
+            {
+                if (npcMarker.Location == Rectangle.Empty) { continue; }
+
+                // Tint/dim hidden markers
+                if (npcMarker.IsHidden)
+                {
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, markerCrop[npcMarker.Name], 16, 15)), Color.DimGray * 0.7f);
+                    if (npcMarker.IsBirthday)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                    if (npcMarker.HasQuest)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                }
+                else
+                {
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, markerCrop[npcMarker.Name], 16, 15)), Color.White);
+                    if (npcMarker.IsBirthday)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                    if (npcMarker.HasQuest)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                }
+            }
+
+            Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
+            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player); 
+
+            // Location and name tooltips
+            modMapPage.draw(b);
+
+            // Cursor
+            if (!Game1.options.hardwareCursor)
+            {
+                b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            }
+            
         }
 
         // Show debug info in top left corner
@@ -805,7 +611,7 @@ namespace NPCMapLocations
         }
 
         // Config show/hide 
-        private static bool ShowNPC(string npc, bool[] showExtras)
+        private static bool ShowNPC(string npc, bool[] showSecondaryNPCs)
         {
             if (npc.Equals("Abigail")) { return config.showAbigail; }
             if (npc.Equals("Alex")) { return config.showAlex; }
@@ -836,9 +642,9 @@ namespace NPCMapLocations
             if (npc.Equals("Shane")) { return config.showShane; }
             if (npc.Equals("Vincent")) { return config.showVincent; }
             if (npc.Equals("Willy")) { return config.showWilly; }
-            if (npc.Equals("Sandy")) { return config.showSandy && showExtras[0]; }
-            if (npc.Equals("Marlon")) { return config.showMarlon && showExtras[1]; }
-            if (npc.Equals("Wizard")) { return config.showWizard && showExtras[2]; }
+            if (npc.Equals("Sandy")) { return config.showSandy && showSecondaryNPCs[0]; }
+            if (npc.Equals("Marlon")) { return config.showMarlon && showSecondaryNPCs[1]; }
+            if (npc.Equals("Wizard")) { return config.showWizard && showSecondaryNPCs[2]; }
             foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
             {
                 if (customNPC.Key.Equals(npc))
@@ -901,18 +707,125 @@ namespace NPCMapLocations
         }
     }
 
-    // Class for NPC markers
-    public class NPCMarker
-    {
-        public Texture2D marker;
-        public Rectangle location;
-        public int layer;
 
-        public NPCMarker(Texture2D marker, Rectangle location)
+    // Class for NPC markers
+    internal class NPCMarker
+    {
+        private string name;
+        private Texture2D marker;
+        private Rectangle location;
+        private bool isBirthday;
+        private bool hasQuest;
+        private bool isHidden;
+        private bool isOutdoors;
+        private int layer;
+
+        public NPCMarker(string name)
         {
-            this.marker = marker;
-            this.location = location;
-            this.layer = 4;
+            this.name = name;
+            this.marker = null;
+            this.location = new Rectangle();
+            this.isBirthday = false;
+            this.hasQuest = false;
+            this.isOutdoors = false;
+            this.isHidden = false;
+            this.layer = 0;
+        }
+
+        public string Name
+        {
+            get
+            {
+                return this.name;
+            }
+            set
+            {
+                this.name = value;
+            }
+        }
+
+        public Texture2D Marker
+        {
+            get
+            {
+                return this.marker;
+            }
+            set
+            {
+                this.marker= value;
+            }
+        }
+
+        public Rectangle Location
+        {
+            get
+            {
+                return this.location;
+            }
+            set
+            {
+                 this.location = value;
+            }
+        }
+
+        public bool IsBirthday
+        {
+            get
+            {
+                return this.isBirthday;
+            }
+            set
+            {
+                this.isBirthday = value;
+            }
+        }
+
+        public bool HasQuest
+        {
+            get
+            {
+                return this.hasQuest;
+            }
+            set
+            {
+                this.hasQuest = value;
+            }
+        }
+
+        public int Layer
+        {
+            get
+            {
+                return this.layer;
+            }
+            set
+            {
+                this.layer = value;
+            }
+        }
+
+        public bool IsOutdoors
+        {
+            get
+            {
+                return this.isOutdoors;
+            }
+            set
+            {
+                this.isOutdoors = value;
+            }
+        }
+
+        public bool IsHidden
+        {
+            get
+            {
+                return this.isHidden;
+            }
+            set
+            {
+                this.isHidden = value;
+            }
         }
     }
 }

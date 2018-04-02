@@ -37,7 +37,7 @@ namespace NPCMapLocations
         private int optionsSlotHeld = -1;
         private ClickableTextureComponent okButton;
 
-        public MapModMenu(int x, int y, int width, int height, bool[] showExtras, Dictionary<string, Dictionary<string, int>> customNPCs, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
             this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -102,14 +102,14 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1));
-            if (showExtras[3])
+            if (showSecondaryNPCs[3])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1));
             }
             this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1));
-            if (showExtras[1])
+            if (showSecondaryNPCs[1])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Marlon"], 38, -1, -1));
             }
@@ -120,7 +120,7 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Pierre"], 29, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Robin"], 30, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Sam"], 31, -1, -1));
-            if (showExtras[0])
+            if (showSecondaryNPCs[0])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Sandy"], 36, -1, -1));
             }
@@ -128,7 +128,7 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Shane"], 33, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Vincent"], 34, -1, -1));
             this.options.Add(new MapModCheckbox(npcNames["Willy"], 35, -1, -1));
-            if (showExtras[2])
+            if (showSecondaryNPCs[2])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Wizard"], 37, -1, -1));
             }
@@ -182,16 +182,15 @@ namespace NPCMapLocations
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
-                MapModMain.menuOpen = 0;
-                //Game1.soundBank.PlayCue("bigDeSelect");
+                MapModMain.isMenuOpen = false;
                 return;
             }
-            if (key.ToString().Equals(MapModMain.config.menuKey) && MapModMain.menuOpen == 1 && this.readyToClose() && this.canClose)
+            if (key.ToString().Equals(MapModMain.config.menuKey) && MapModMain.isMenuOpen && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.menuOpen = 0;
+                MapModMain.isMenuOpen = false;
                 return;
             }
             this.canClose = true;
@@ -301,7 +300,7 @@ namespace NPCMapLocations
                 (Game1.activeClickableMenu as MapModMenu).exitThisMenu(false);
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.menuOpen = 0;
+                MapModMain.isMenuOpen = false;
             }
             y -= 15;
             this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
@@ -385,7 +384,7 @@ namespace NPCMapLocations
                         }
                         if (this.currentItemIndex + i == 0)
                         {
-                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModMain.current, Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
+                            Utility.drawTextWithShadow(b, "NPC Map Locations", Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
                         }
                         else
                         {
