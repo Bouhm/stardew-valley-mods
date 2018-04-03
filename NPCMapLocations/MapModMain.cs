@@ -32,7 +32,6 @@ namespace NPCMapLocations
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, string> npcNames = new Dictionary<string, string>(); // For custom names
         private static HashSet<NPCMarker> npcMarkers = new HashSet<NPCMarker>();
-        private static Dictionary<string, string> indoorLocations;
         private static bool[] showSecondaryNPCs = new Boolean[4];
         private static MapModMapPage modMapPage;
         private bool loadComplete = false;
@@ -71,7 +70,6 @@ namespace NPCMapLocations
             saveName = Constants.SaveFolderName;
             config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.markerCrop;
-            indoorLocations = MapModConstants.indoorLocations;
             customNPCs = config.customNPCs;
             HandleCustomMods();
         }
@@ -388,8 +386,8 @@ namespace NPCMapLocations
                     bool sameLocation = false;
                     if (config.onlySameLocation)
                     {
-                        indoorLocations.TryGetValue(npc.currentLocation.name, out string indoorLocationNPC);
-                        indoorLocations.TryGetValue(Game1.player.currentLocation.name, out string indoorLocationPlayer);
+                        MapModConstants.indoorLocations.TryGetValue(npc.currentLocation.name, out string indoorLocationNPC);
+                        MapModConstants.indoorLocations.TryGetValue(Game1.player.currentLocation.name, out string indoorLocationPlayer);
                         if (indoorLocationPlayer != null && indoorLocationNPC != null)
                         {
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
