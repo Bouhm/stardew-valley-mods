@@ -87,8 +87,10 @@ namespace NPCMapLocations
                 // Handle case where Kent appears even though he shouldn't
                 if (!npc.isVillager() || (npc.name.Equals("Kent") && Game1.year < 2)) { continue; }
 
-                NPCMarker npcMarker = new NPCMarker(npc.name);
-                npcMarker.IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth); // Check for birthday
+                NPCMarker npcMarker = new NPCMarker(){
+                    Name = npc.name, 
+                    IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+                };
                 npcMarkers.Add(npcMarker);
             }
         }
@@ -98,7 +100,15 @@ namespace NPCMapLocations
             if (menu.currentTab != GameMenu.mapTab) { return; }
             if (input.ToString().Equals(config.menuKey) || input is SButton.ControllerB)
             {
-                Game1.activeClickableMenu = new MapModMenu(Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2, 1100 + IClickableMenu.borderWidth * 2, 650 + IClickableMenu.borderWidth * 2, showSecondaryNPCs, customNPCs, npcNames);
+                Game1.activeClickableMenu = new MapModMenu(
+                    Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2, 
+                    Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2, 
+                    1100 + IClickableMenu.borderWidth * 2, 
+                    650 + IClickableMenu.borderWidth * 2, 
+                    showSecondaryNPCs, 
+                    customNPCs, 
+                    npcNames
+                );
                 isMenuOpen = true;
             }
             else if (input.ToString().Equals(config.tooltipKey) || input is SButton.DPadUp || input is SButton.DPadRight)
@@ -229,16 +239,16 @@ namespace NPCMapLocations
             }
 
             // Get tile location of farm buildings in farm
-            string[] buildings = { "Coop", "Big Coop", "Deluxe Coop", "Barn", "Big Barn", "Deluxe Barn", "Slime Hutch", "Shed" };
-            if (buildings.Contains(location))
+            string[] farmBuildings = { "Coop", "Big Coop", "Deluxe Coop", "Barn", "Big Barn", "Deluxe Barn", "Slime Hutch", "Shed" };
+            if (farmBuildings.Contains(location))
             {
-                foreach (Building building in Game1.getFarm().buildings)
+                foreach (Building farmBuilding in Game1.getFarm().buildings)
                 {
-                    if (building.indoors != null && building.indoors.name.Equals(location))
+                    if (farmBuilding.indoors != null && farmBuilding.indoors.name.Equals(location))
                     {
                         // Set origin to center
-                        tileX = (int)(building.tileX - building.tilesWide/2);
-                        tileY = (int)(building.tileY - building.tilesHigh/2);
+                        tileX = (int)(farmBuilding.tileX - farmBuilding.tilesWide/2);
+                        tileY = (int)(farmBuilding.tileY - farmBuilding.tilesHigh/2);
                         location = "Farm";
                     }
                 }
@@ -347,7 +357,6 @@ namespace NPCMapLocations
                 HandleCustomMods();
             }
 
-            bool[] showSecondaryNPCs = new Boolean[4];
             List<string> hoveredNames = new List<string>();
 
             foreach (NPCMarker npcMarker in npcMarkers)
@@ -395,12 +404,15 @@ namespace NPCMapLocations
                         || (config.byHeartLevel && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.heartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.heartLevelMax)));
 
                     // NPCs that will be drawn onto the map
-                    if (config.showHiddenVillagers ? ShowNPC(npc.name, showSecondaryNPCs) : !npcMarker.IsHidden && ShowNPC(npc.name, showSecondaryNPCs))
+                    if (config.showHiddenVillagers ? ShowNPC(npc.name) : !npcMarker.IsHidden && ShowNPC(npc.name))
                     {
                         int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - 16;
                         int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - 15;
                         int width = 32;
                         int height = 30;
+
+                        npcMarker.Location = new Rectangle(x, y, width, height);
+                        npcMarker.Marker = npc.sprite.Texture;
 
                         // Check for daily quests
                         foreach (Quest quest in Game1.player.questLog)
@@ -518,13 +530,14 @@ namespace NPCMapLocations
                 }
             }
 
-            // NPC markers and icons
+            // Traveling Merchant
             if (config.showTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
             {
                 Vector2 merchantLoc = LocationToMap("Forest", 27, 11);
                 b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
             }
 
+            // NPCs
             // Sort by drawing order
             var sortedMarkers = npcMarkers.ToList();
             sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
@@ -611,7 +624,7 @@ namespace NPCMapLocations
         }
 
         // Config show/hide 
-        private static bool ShowNPC(string npc, bool[] showSecondaryNPCs)
+        private static bool ShowNPC(string npc)
         {
             if (npc.Equals("Abigail")) { return config.showAbigail; }
             if (npc.Equals("Alex")) { return config.showAlex; }
@@ -711,121 +724,13 @@ namespace NPCMapLocations
     // Class for NPC markers
     internal class NPCMarker
     {
-        private string name;
-        private Texture2D marker;
-        private Rectangle location;
-        private bool isBirthday;
-        private bool hasQuest;
-        private bool isHidden;
-        private bool isOutdoors;
-        private int layer;
-
-        public NPCMarker(string name)
-        {
-            this.name = name;
-            this.marker = null;
-            this.location = new Rectangle();
-            this.isBirthday = false;
-            this.hasQuest = false;
-            this.isOutdoors = false;
-            this.isHidden = false;
-            this.layer = 0;
-        }
-
-        public string Name
-        {
-            get
-            {
-                return this.name;
-            }
-            set
-            {
-                this.name = value;
-            }
-        }
-
-        public Texture2D Marker
-        {
-            get
-            {
-                return this.marker;
-            }
-            set
-            {
-                this.marker= value;
-            }
-        }
-
-        public Rectangle Location
-        {
-            get
-            {
-                return this.location;
-            }
-            set
-            {
-                 this.location = value;
-            }
-        }
-
-        public bool IsBirthday
-        {
-            get
-            {
-                return this.isBirthday;
-            }
-            set
-            {
-                this.isBirthday = value;
-            }
-        }
-
-        public bool HasQuest
-        {
-            get
-            {
-                return this.hasQuest;
-            }
-            set
-            {
-                this.hasQuest = value;
-            }
-        }
-
-        public int Layer
-        {
-            get
-            {
-                return this.layer;
-            }
-            set
-            {
-                this.layer = value;
-            }
-        }
-
-        public bool IsOutdoors
-        {
-            get
-            {
-                return this.isOutdoors;
-            }
-            set
-            {
-                this.isOutdoors = value;
-            }
-        }
-
-        public bool IsHidden
-        {
-            get
-            {
-                return this.isHidden;
-            }
-            set
-            {
-                this.isHidden = value;
-            }
-        }
+        public string Name { get; set; } = "";
+        public Texture2D Marker { get; set; } = null;
+        public Rectangle Location { get; set; } = new Rectangle();
+        public bool IsBirthday { get; set; } = false;
+        public bool HasQuest { get; set; } = false;
+        public bool IsOutdoors { get; set; } = false;
+        public bool IsHidden { get; set; } = false;
+        public int Layer { get; set; } = 0;
     }
 }
