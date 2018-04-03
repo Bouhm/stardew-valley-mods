@@ -46,7 +46,7 @@ namespace NPCMapLocations
         public const int region_communitycenter = 1032;
         public const int region_sewerpipe = 1033;
         public const int region_railroad = 1034;
-        private Dictionary<string, Rect> regionRects = MapModConstants.regionRects;
+        private readonly Dictionary<string, Rect> regionRects = MapModConstants.RegionRects;
         private string hoverText = "";
         private Texture2D map;
         private int mapX;
@@ -70,7 +70,7 @@ namespace NPCMapLocations
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Desert_Region"),
+                    GetRegionRect("Desert_Region"),
                     Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???"
                 )
                 {
@@ -81,7 +81,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Farm_Region"),
+                    GetRegionRect("Farm_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName })
                 )
                 {
@@ -94,7 +94,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Backwoods_Region"),
+                    GetRegionRect("Backwoods_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0])
                 )
                 {
@@ -107,7 +107,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("BusStop_Region"),
+                    GetRegionRect("BusStop_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0])
                 )
                 {
@@ -120,7 +120,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("WizardHouse"),
+                    GetRegionRect("WizardHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0])
                 )
                 {
@@ -133,7 +133,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("AnimalShop"),
+                    GetRegionRect("AnimalShop"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0])
                 )
                 {
@@ -146,7 +146,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("LeahHouse"),
+                    GetRegionRect("LeahHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0])
                 )
                 {
@@ -159,7 +159,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("SamHouse"),
+                    GetRegionRect("SamHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0])
                 )
                 {
@@ -171,7 +171,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("HaleyHouse"),
+                    GetRegionRect("HaleyHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0])
                 )
                 {
@@ -183,7 +183,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("TownSquare"),
+                    GetRegionRect("TownSquare"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0])
                 )
                 {
@@ -196,7 +196,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Hospital"),
+                    GetRegionRect("Hospital"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0])
                 )
                 {
@@ -209,7 +209,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("SeedShop"),
+                    GetRegionRect("SeedShop"),
                     string.Concat(new string[]
                     {
                         Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
@@ -229,7 +229,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Blacksmith"),
+                    GetRegionRect("Blacksmith"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0])
                 )
                 {
@@ -242,7 +242,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Saloon"),
+                    GetRegionRect("Saloon"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0])
                 )
                 {
@@ -255,7 +255,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("ManorHouse"),
+                    GetRegionRect("ManorHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0])
                 )
                 {
@@ -268,7 +268,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("ArchaeologyHouse"),
+                    GetRegionRect("ArchaeologyHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0])
                 )
                 {
@@ -281,7 +281,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("ElliottHouse"),
+                    GetRegionRect("ElliottHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0])
                 )
                 {
@@ -293,7 +293,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Sewer"),
+                    GetRegionRect("Sewer"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0])
                     )
                 {
@@ -306,7 +306,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Graveyard"),
+                    GetRegionRect("Graveyard"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0])
                 )
                 {
@@ -319,7 +319,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Trailer"),
+                    GetRegionRect("Trailer"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0])
                 )
                 {
@@ -332,7 +332,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("JoshHouse"),
+                    GetRegionRect("JoshHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0])
                 )
                 {
@@ -345,7 +345,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("ScienceHouse"),
+                    GetRegionRect("ScienceHouse"),
                     string.Concat(new string[]
                     {
                         Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
@@ -365,7 +365,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Tent"),
+                    GetRegionRect("Tent"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0])
                 )
                 {
@@ -377,7 +377,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Mine"),
+                    GetRegionRect("Mine"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0])
                 )
                 {
@@ -389,7 +389,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("AdventureGuild"),
+                    GetRegionRect("AdventureGuild"),
                     (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???"
                 )
                 {
@@ -401,7 +401,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Quarry"),
+                    GetRegionRect("Quarry"),
                     Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???"
                 )
                 {
@@ -412,7 +412,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("JojaMart"),
+                    GetRegionRect("JojaMart"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0])
                 )
                 {
@@ -424,7 +424,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("FishShop"),
+                    GetRegionRect("FishShop"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0])
                 )
                 {
@@ -435,7 +435,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Spa"),
+                    GetRegionRect("Spa"),
                     Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???"
                 )
                 {
@@ -447,7 +447,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Woods"),
+                    GetRegionRect("Woods"),
                     Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???"
                 )
                 {
@@ -458,7 +458,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("RuinedHouse"),
+                    GetRegionRect("RuinedHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0])
                 )
                 {
@@ -469,7 +469,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("CommunityCenter"),
+                    GetRegionRect("CommunityCenter"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0])
                 )
                 {
@@ -481,7 +481,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("SewerPipe"),
+                    GetRegionRect("SewerPipe"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0])
                 )
                 {
@@ -493,7 +493,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("Railroad_Region"),
+                    GetRegionRect("Railroad_Region"),
                     Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???"
                 )
                 {
@@ -505,7 +505,7 @@ namespace NPCMapLocations
             );
             this.points.Add(
                 new ClickableComponent(
-                    getRegionRect("LonelyStone"),
+                    GetRegionRect("LonelyStone"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])
                 )
             );
@@ -567,37 +567,37 @@ namespace NPCMapLocations
                 {
                     this.hoverText = this.hoverText.Replace(customName.Key, customName.Value);
                 }
-                int width = Math.Max((int)Game1.smallFont.MeasureString(hoverText).X + Game1.tileSize / 2, textLength);
-                int height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoverText).Y + Game1.tileSize / 2);
-                if (x + width > Game1.viewport.Width)
+                int ttWidth = Math.Max((int)Game1.smallFont.MeasureString(hoverText).X + Game1.tileSize / 2, textLength);
+                int ttHeight = (int)Math.Max(60, Game1.smallFont.MeasureString(hoverText).Y + Game1.tileSize / 2);
+                if (x + ttWidth > Game1.viewport.Width)
                 {
-                    x = Game1.viewport.Width - width;
+                    x = Game1.viewport.Width - ttWidth;
                     y += Game1.tileSize / 4;
                 }
                 if (this.nameTooltipMode == 1)
                 {
-                    if (y + height > Game1.viewport.Height)
+                    if (y + ttHeight > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height - height;
+                        y = Game1.viewport.Height - ttHeight;
                     }
                     offsetY = 4 - Game1.tileSize;
                 }
                 else if (this.nameTooltipMode == 2)
                 {
-                    if (y + height > Game1.viewport.Height)
+                    if (y + ttHeight > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height - height;
+                        y = Game1.viewport.Height -ttHeight;
                     }
-                    offsetY = height - 4;
+                    offsetY = ttHeight - 4;
                 }
                 else
                 {
-                    if (y + height > Game1.viewport.Height)
+                    if (y + ttHeight > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height - height;
+                        y = Game1.viewport.Height - ttHeight;
                     }
                 }
 
@@ -627,10 +627,10 @@ namespace NPCMapLocations
                 }
 
                 // Name tooltip
-                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, height, nameTooltipMode);
+                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, ttHeight, nameTooltipMode);
 
                 // Location tooltips
-                IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
+                IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, ttWidth, ttHeight, Color.White, 1f, false);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
                 b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f), Game1.textShadowColor);
@@ -638,7 +638,7 @@ namespace NPCMapLocations
             }
             else
             {
-                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, height, nameTooltipMode);
+                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, this.height, nameTooltipMode);
             }
             if (names.Length > 0)
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
@@ -672,8 +672,8 @@ namespace NPCMapLocations
             if (!(names.Equals("")))
             {
                 var lines = names.Split('\n');
-                int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
-                int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
+                int ttHeight = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
+                int ttWidth = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
 
                 if (nameTooltipMode == 1)
                 {
@@ -688,9 +688,9 @@ namespace NPCMapLocations
                     }
                     // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
                     // without the cursor covering the tooltip
-                    if (x + width > Game1.viewport.Width)
+                    if (x + ttWidth > Game1.viewport.Width)
                     {
-                        x = Game1.viewport.Width - width;
+                        x = Game1.viewport.Width - ttWidth;
                         if (lines.Length > 1)
                         {
                             y += relocate - 8 + ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
@@ -704,12 +704,12 @@ namespace NPCMapLocations
                 else if (nameTooltipMode == 2)
                 {
                     y += offsetY;
-                    if (x + width > Game1.viewport.Width)
+                    if (x + ttWidth > Game1.viewport.Width)
                     {
-                        x = Game1.viewport.Width - width;
+                        x = Game1.viewport.Width - ttWidth;
                     }
                     // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
-                    if (y + height > Game1.viewport.Height)
+                    if (y + ttHeight > Game1.viewport.Height)
                     {
                         x = Game1.getOldMouseX() + Game1.tileSize / 2;
                         if (lines.Length > 1)
@@ -725,13 +725,13 @@ namespace NPCMapLocations
                 else
                 {
                     x = Game1.activeClickableMenu.xPositionOnScreen - 145;
-                    y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
+                    y = Game1.activeClickableMenu.yPositionOnScreen + 650 - ttHeight / 2;
                 }
 
                 indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
                 Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
 
-                drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
+                drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, ttWidth, ttHeight, Color.White, 1f, true);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
@@ -739,7 +739,7 @@ namespace NPCMapLocations
             }
         }
 
-        private Rectangle getRegionRect(string region)
+        private Rectangle GetRegionRect(string region)
         {
             // Set origin to center
             return new Rectangle(

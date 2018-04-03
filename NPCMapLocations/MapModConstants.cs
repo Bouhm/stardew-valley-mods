@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public static class MapModConstants
 {
-    public static Dictionary<string, int> markerCrop
+    public static Dictionary<string, int> MarkerCrop
     {
         get
         {
@@ -49,7 +49,7 @@ public static class MapModConstants
         }
     }
 
-    public static Dictionary<string, string> startingLocations
+    public static Dictionary<string, string> StartingLocations
     {
         get
         {
@@ -94,7 +94,7 @@ public static class MapModConstants
     // tileX and tileY (the first two values) are tile positions in the game for that location
     // x and y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
     // MapModMain handles all the calculations to make sure the positions are center-based.
-    public static Dictionary<string, MapVectors[]> mapVectors
+    public static Dictionary<string, MapVectors[]> MapVectors
     {
         get
         {
@@ -313,7 +313,7 @@ public static class MapModConstants
     }
 
     // Resize region rectangles accord to modified map page
-    public static Dictionary<string, Rect> regionRects
+    public static Dictionary<string, Rect> RegionRects
     {
         get
         {
@@ -359,7 +359,7 @@ public static class MapModConstants
         }
     }
 
-    public static Dictionary<string, string> indoorLocations
+    public static Dictionary<string, string> IndoorLocations
     {
         get
         {
@@ -457,7 +457,7 @@ public class MapVectors
         this.y = y;
     }
 
-    public int[] getValues()
+    public int[] GetValues()
     {
         return new int[] { this.tileX, this.tileY, this.x, this.y };
     }
