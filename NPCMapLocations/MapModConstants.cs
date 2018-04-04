@@ -7,44 +7,44 @@ using System.Collections.Generic;
 
 public static class MapModConstants
 {
-    public static Dictionary<string, int> MarkerCrop
+    public static string[] Villagers
     {
         get
         {
-            return new Dictionary<string, int>
-            {
-                {"Abigail", 3},
-                {"Alex", 0},
-                {"Caroline", 2},
-                {"Clint", -1},
-                {"Demetrius", -2},
-                {"Elliott", -1},
-                {"Emily", 1},
-                {"Evelyn", 4},
-                {"George", 4},
-                {"Gus", 2},
-                {"Haley", 2},
-                {"Harvey", -1},
-                {"Jas", 7},
-                {"Jodi", 3},
-                {"Kent", -1},
-                {"Leah", 2 },
-                {"Lewis", 1},
-                {"Linus", 6},
-                {"Marnie", 4},
-                {"Maru", 2},
-                {"Pam", 5},
-                {"Penny", 3},
-                {"Pierre", 0},
-                {"Robin", 2},
-                {"Sam", 0},
-                {"Sebastian", 1},
-                {"Shane", 1},
-                {"Vincent", 8},
-                {"Willy", -1},
-                {"Sandy", 2 },
-                {"Marlon", 2 },
-                {"Wizard", 0 }
+            return new string[]
+          {
+                "Abigail",
+                "Alex",
+                "Caroline",
+                "Clint",
+                "Demetrius",
+                "Elliott",
+                "Emily",
+                "Evelyn",
+                "George",
+                "Gus",
+                "Haley",
+                "Harvey",
+                "Jas",
+                "Jodi",
+                "Kent",
+                "Leah",
+                "Lewis",
+                "Linus",
+                "Marlon",
+                "Marnie",
+                "Maru",
+                "Pam",
+                "Penny",
+                "Pierre",
+                "Robin",
+                "Sam",
+                "Sandy",
+                "Sebastian",
+                "Shane",
+                "Vincent",
+                "Willy",
+                "Wizard"
             };
         }
     }
@@ -73,6 +73,7 @@ public static class MapModConstants
                 {"Leah", "LeahHouse"},
                 {"Lewis", "ManorHouse"},
                 {"Linus", "Tent"},
+                {"Marlon", "AdventureGuild" },
                 {"Marnie", "AnimalShop"},
                 {"Maru", "ScienceHouse"},
                 {"Pam", "Trailer"},
@@ -80,13 +81,54 @@ public static class MapModConstants
                 {"Pierre", "SeedShop"},
                 {"Robin", "ScienceHouse"},
                 {"Sam", "SamHouse"},
+                {"Sandy", "SandyHouse" },
                 {"Sebastian", "SebastianRoom"},
                 {"Shane", "AnimalShop"},
                 {"Vincent", "SamHouse"},
                 {"Willy", "FishShop"},
-                {"Sandy", "SandyHouse" },
-                {"Marlon", "AdventureGuild" },
                 {"Wizard", "WizardHouse" }
+            };
+        }
+    }
+
+    public static Dictionary<string, int> MarkerCrop
+    {
+        get
+        {
+            return new Dictionary<string, int>
+            {
+                {"Abigail", 3},
+                {"Alex", 0},
+                {"Caroline", 2},
+                {"Clint", -1},
+                {"Demetrius", -2},
+                {"Elliott", -1},
+                {"Emily", 1},
+                {"Evelyn", 4},
+                {"George", 4},
+                {"Gus", 2},
+                {"Haley", 2},
+                {"Harvey", -1},
+                {"Jas", 7},
+                {"Jodi", 3},
+                {"Kent", -1},
+                {"Leah", 2 },
+                {"Lewis", 1},
+                {"Linus", 6},
+                {"Marlon", 2 },
+                {"Marnie", 4},
+                {"Maru", 2},
+                {"Pam", 5},
+                {"Penny", 3},
+                {"Pierre", 0},
+                {"Robin", 2},
+                {"Sam", 0},
+                {"Sandy", 2 },
+                {"Sebastian", 1},
+                {"Shane", 1},
+                {"Vincent", 8},
+                {"Willy", -1},
+                {"Wizard", 0 }
             };
         }
     }

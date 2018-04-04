@@ -27,12 +27,11 @@ namespace NPCMapLocations
         public static Texture2D buildings;
         public static string saveName;
         public static int customNpcId;
-        public static bool isMenuOpen;
         public static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, string> npcNames = new Dictionary<string, string>(); // For custom names
         private static HashSet<NPCMarker> npcMarkers = new HashSet<NPCMarker>();
-        private static bool[] showSecondaryNPCs = new Boolean[4];
+        private static bool[] showSecondaryNPCs = new Boolean[5];
         private static MapModMapPage modMapPage;
         private bool isInitialized;
 
@@ -75,15 +74,25 @@ namespace NPCMapLocations
 
         private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
         {
-            showSecondaryNPCs[0] = Game1.player.mailReceived.Contains("ccVault");
-            showSecondaryNPCs[1] = Game1.stats.DaysPlayed >= 5u;
-            showSecondaryNPCs[2] = Game1.stats.DaysPlayed >= 5u;
-            showSecondaryNPCs[3] = Game1.year >= 2;
+            showSecondaryNPCs[0] = Game1.player.mailReceived.Contains("ccVault"); // Sandy
+            showSecondaryNPCs[1] = Game1.stats.DaysPlayed >= 5u; // Marlon
+            showSecondaryNPCs[2] = Game1.stats.DaysPlayed >= 5u; // Wizard
+            showSecondaryNPCs[3] = Game1.year >= 2; // Kent
+            showSecondaryNPCs[4] = // Traveling Merchant
+                (Game1.dayOfMonth == 5
+                || Game1.dayOfMonth == 7
+                || Game1.dayOfMonth == 12
+                || Game1.dayOfMonth == 14
+                || Game1.dayOfMonth == 19
+                || Game1.dayOfMonth == 21
+                || Game1.dayOfMonth == 26
+                || Game1.dayOfMonth == 28);
+            npcMarkers = new HashSet<NPCMarker>();
             foreach (NPC npc in Utility.getAllCharacters())
             {
                 // Handle case where Kent appears even though he shouldn't
-                if (!npc.isVillager() || (npc.name.Equals("Kent") && Game1.year < 2)) { continue; }
-
+                if (!npc.isVillager() || (npc.name.Equals("Kent") && !showSecondaryNPCs[3])) { continue; }
+               
                 NPCMarker npcMarker = new NPCMarker(){
                     Name = npc.name, 
                     IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
@@ -106,7 +115,6 @@ namespace NPCMapLocations
                     customNPCs, 
                     npcNames
                 );
-                isMenuOpen = true;
             }
             else if (input.ToString().Equals(config.TooltipKey) || input is SButton.DPadUp || input is SButton.DPadRight)
             {
@@ -335,15 +343,14 @@ namespace NPCMapLocations
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (!IsMapOpen()) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             UpdateNPCMarkers();
         }
 
-        private static bool IsMapOpen()
+        private static bool IsMapOpen(GameMenu menu)
         {
-            if (Game1.activeClickableMenu == null || isMenuOpen) { return false; }
-            GameMenu menu = (GameMenu)Game1.activeClickableMenu;
             return menu.currentTab == GameMenu.mapTab;
         }
 
@@ -393,19 +400,26 @@ namespace NPCMapLocations
                     }
 
                     // NPCs that won't be shown on the map unless Show Hidden NPCs is checked
-                    npcMarker.IsHidden =
-                        ((config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.name))
-                        || (config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.name))
+                    npcMarker.IsHidden = ( 
+                        (config.ImmersionOption == 2 && !Game1.player.hasPlayerTalkedToNPC(npc.name))
+                        || (config.ImmersionOption == 3 && Game1.player.hasPlayerTalkedToNPC(npc.name))
                         || (config.OnlySameLocation && !sameLocation)
-                        || (config.ByHeartLevel && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) >= config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) <= config.HeartLevelMax)));
+                        || (config.ByHeartLevel 
+                            && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name) 
+                            >= config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name) 
+                            <= config.HeartLevelMax)
+                           )
+                                          
+                    );
 
                     // NPCs that will be drawn onto the map
-                    if (config.ShowHiddenVillagers ? ShowNPC(npc.name) : !npcMarker.IsHidden && ShowNPC(npc.name))
+                    if (IsNPCShown(npc.name) && (config.ShowHiddenVillagers || !npcMarker.IsHidden))
                     {
-                        int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - 16;
-                        int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - 15;
                         int width = 32;
                         int height = 30;
+                        // Get center of NPC marker 
+                        int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - width/2; 
+                        int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
 
                         npcMarker.Location = new Rectangle(x, y, width, height);
                         npcMarker.Marker = npc.sprite.Texture;
@@ -436,9 +450,10 @@ namespace NPCMapLocations
                         }
 
                         // Hovered NPCs
-                        if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
+                        if (Game1.getMouseX() >= x+2 && Game1.getMouseX() <= x-2 + width && Game1.getMouseY() >= y+2 && Game1.getMouseY() <= y-2 + height)
                         {
-                            if (npcNames.ContainsKey(npc.name) && (!config.ShowHiddenVillagers || npcMarker.IsHidden))
+                            // Don't show names of hidden NPCs even if drawn
+                            if (npcNames.ContainsKey(npc.name) && !npcMarker.IsHidden)
                             {
                                 string name = npcNames[npc.name];
                                 if (!npcMarker.IsOutdoors)
@@ -455,6 +470,11 @@ namespace NPCMapLocations
                         npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
                         if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
                         if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
+                    }
+                    else 
+                    {
+                        // Set no location so they don't get drawn
+                        npcMarker.Location = new Rectangle();
                     }
                 }
             }
@@ -474,7 +494,8 @@ namespace NPCMapLocations
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (!IsMapOpen()) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             DrawMapPage();
         }
@@ -527,7 +548,7 @@ namespace NPCMapLocations
             }
 
             // Traveling Merchant
-            if (config.ShowTravelingMerchant && (Game1.dayOfMonth == 5 || Game1.dayOfMonth == 7 || Game1.dayOfMonth == 12 || Game1.dayOfMonth == 14 || Game1.dayOfMonth == 19 || Game1.dayOfMonth == 21 || Game1.dayOfMonth == 26 || Game1.dayOfMonth == 28))
+            if (config.ShowTravelingMerchant && showSecondaryNPCs[4])
             {
                 Vector2 merchantLoc = LocationToMap("Forest", 27, 11);
                 b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
@@ -620,56 +641,34 @@ namespace NPCMapLocations
         }
 
         // Config show/hide 
-        private static bool ShowNPC(string npc)
+        private static bool IsNPCShown(string npc)
         {
-            if (npc.Equals("Abigail")) { return config.ShowAbigail; }
-            if (npc.Equals("Alex")) { return config.ShowAlex; }
-            if (npc.Equals("Caroline")) { return config.ShowCaroline; }
-            if (npc.Equals("Clint")) { return config.ShowClint; }
-            if (npc.Equals("Demetrius")) { return config.ShowDemetrius; }
-            if (npc.Equals("Elliott")) { return config.ShowElliott; }
-            if (npc.Equals("Emily")) { return config.ShowEmily; }
-            if (npc.Equals("Evelyn")) { return config.ShowEvelyn; }
-            if (npc.Equals("George")) { return config.ShowGeorge; }
-            if (npc.Equals("Gus")) { return config.ShowGus; }
-            if (npc.Equals("Haley")) { return config.ShowHaley; }
-            if (npc.Equals("Harvey")) { return config.ShowHarvey; }
-            if (npc.Equals("Jas")) { return config.ShowJas; }
-            if (npc.Equals("Jodi")) { return config.ShowJodi; }
-            if (npc.Equals("Kent")) { return config.ShowKent; }
-            if (npc.Equals("Leah")) { return config.ShowLeah; }
-            if (npc.Equals("Lewis")) { return config.ShowLewis; }
-            if (npc.Equals("Linus")) { return config.ShowLinus; }
-            if (npc.Equals("Marnie")) { return config.ShowMarnie; }
-            if (npc.Equals("Maru")) { return config.ShowMaru; }
-            if (npc.Equals("Pam")) { return config.ShowPam; }
-            if (npc.Equals("Penny")) { return config.ShowPenny; }
-            if (npc.Equals("Pierre")) { return config.ShowPierre; }
-            if (npc.Equals("Robin")) { return config.ShowRobin; }
-            if (npc.Equals("Sam")) { return config.ShowSam; }
-            if (npc.Equals("Sebastian")) { return config.ShowSebastian; }
-            if (npc.Equals("Shane")) { return config.ShowShane; }
-            if (npc.Equals("Vincent")) { return config.ShowVincent; }
-            if (npc.Equals("Willy")) { return config.ShowWilly; }
-            if (npc.Equals("Sandy")) { return config.ShowSandy && showSecondaryNPCs[0]; }
-            if (npc.Equals("Marlon")) { return config.ShowMarlon && showSecondaryNPCs[1]; }
-            if (npc.Equals("Wizard")) { return config.ShowWizard && showSecondaryNPCs[2]; }
-            foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
+            bool showNPC = !config.NPCBlacklist.Contains(npc);   
+            if (!IsCustomNPC(npc)) {
+                if (npc.Equals("Sandy")) { return showNPC && showSecondaryNPCs[0]; }
+                else if (npc.Equals("Marlon")) { return showNPC && showSecondaryNPCs[1]; }
+                else if (npc.Equals("Wizard")) { return showNPC && showSecondaryNPCs[2]; }
+                else return showNPC;
+            }
+            else 
             {
-                if (customNPC.Key.Equals(npc))
+                foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
-                    switch (customNPC.Value["id"])
+                    if (customNPC.Key.Equals(npc))
                     {
-                        case 1:
-                            return config.ShowCustomNPC1;
-                        case 2:
-                            return config.ShowCustomNPC2;
-                        case 3:
-                            return config.ShowCustomNPC3;
-                        case 4:
-                            return config.ShowCustomNPC4;
-                        case 5:
-                            return config.ShowCustomNPC5;
+                        switch (customNPC.Value["id"])
+                        {
+                            case 1:
+                                return config.ShowCustomNPC1;
+                            case 2:
+                                return config.ShowCustomNPC2;
+                            case 3:
+                                return config.ShowCustomNPC3;
+                            case 4:
+                                return config.ShowCustomNPC4;
+                            case 5:
+                                return config.ShowCustomNPC5;
+                        }
                     }
                 }
             }
@@ -679,40 +678,7 @@ namespace NPCMapLocations
         // Only checks against existing villager names
         public static bool IsCustomNPC(string npc)
         {
-            return (!(
-                npc.Equals("Abigail") ||
-                npc.Equals("Alex") ||
-                npc.Equals("Caroline") ||
-                npc.Equals("Clint") ||
-                npc.Equals("Demetrius") ||
-                npc.Equals("Elliott") ||
-                npc.Equals("Emily") ||
-                npc.Equals("Evelyn") ||
-                npc.Equals("George") ||
-                npc.Equals("Gus") ||
-                npc.Equals("Haley") ||
-                npc.Equals("Harvey") ||
-                npc.Equals("Jas") ||
-                npc.Equals("Jodi") ||
-                npc.Equals("Kent") ||
-                npc.Equals("Leah") ||
-                npc.Equals("Lewis") ||
-                npc.Equals("Linus") ||
-                npc.Equals("Marnie") ||
-                npc.Equals("Maru") ||
-                npc.Equals("Pam") ||
-                npc.Equals("Penny") ||
-                npc.Equals("Pierre") ||
-                npc.Equals("Robin") ||
-                npc.Equals("Sam") ||
-                npc.Equals("Sebastian") ||
-                npc.Equals("Shane") ||
-                npc.Equals("Vincent") ||
-                npc.Equals("Willy") ||
-                npc.Equals("Sandy") ||
-                npc.Equals("Marlon") ||
-                npc.Equals("Wizard"))
-            );
+            return !MapModConstants.Villagers.Contains(npc);
         }
     }
 

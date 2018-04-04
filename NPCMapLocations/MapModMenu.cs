@@ -110,26 +110,26 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1));
             if (showSecondaryNPCs[1])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 38, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 25, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Maru"], 26, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pam"], 27, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Penny"], 28, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 29, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Robin"], 30, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Sam"], 31, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 26, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Maru"], 27, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Pam"], 28, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Penny"], 29, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1));
             if (showSecondaryNPCs[0])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 36, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 32, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Shane"], 33, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 34, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Willy"], 35, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 34, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1));
             if (showSecondaryNPCs[2])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 37, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1));
             }
         }
 
@@ -181,15 +181,13 @@ namespace NPCMapLocations
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
-                MapModMain.isMenuOpen = false;
                 return;
             }
-            if (key.ToString().Equals(MapModMain.config.MenuKey) && MapModMain.isMenuOpen && this.readyToClose() && this.canClose)
+            if (key.ToString().Equals(MapModMain.config.MenuKey) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.isMenuOpen = false;
                 return;
             }
             this.canClose = true;
@@ -299,7 +297,6 @@ namespace NPCMapLocations
                 (Game1.activeClickableMenu as MapModMenu).exitThisMenu(false);
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.isMenuOpen = false;
             }
             y -= 15;
             this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
@@ -455,109 +452,17 @@ namespace NPCMapLocations
 
         public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            if (whichOption > 43)
+            if (whichOption > 6 && whichOption < 39)
+            {
+                this.isChecked = !MapModMain.config.NPCBlacklist.Contains(MapModConstants.Villagers[whichOption-7]);
+                return;
+            }
+            else if (whichOption > 43)
             {
                 this.label = MapModMain.modHelper.Translation.Get(label);
             }
-
             switch (whichOption)
             {
-                case 7:
-                    this.isChecked = MapModMain.config.ShowAbigail;
-                    return;
-                case 8:
-                    this.isChecked = MapModMain.config.ShowAlex;
-                    return;
-                case 9:
-                    this.isChecked = MapModMain.config.ShowCaroline;
-                    return;
-                case 10:
-                    this.isChecked = MapModMain.config.ShowClint;
-                    return;
-                case 11:
-                    this.isChecked = MapModMain.config.ShowDemetrius;
-                    return;
-                case 12:
-                    this.isChecked = MapModMain.config.ShowElliott;
-                    return;
-                case 13:
-                    this.isChecked = MapModMain.config.ShowEmily;
-                    return;
-                case 14:
-                    this.isChecked = MapModMain.config.ShowEvelyn;
-                    return;
-                case 15:
-                    this.isChecked = MapModMain.config.ShowGeorge;
-                    return;
-                case 16:
-                    this.isChecked = MapModMain.config.ShowGus;
-                    return;
-                case 17:
-                    this.isChecked = MapModMain.config.ShowHaley;
-                    return;
-                case 18:
-                    this.isChecked = MapModMain.config.ShowHarvey;
-                    return;
-                case 19:
-                    this.isChecked = MapModMain.config.ShowJas;
-                    return;
-                case 20:
-                    this.isChecked = MapModMain.config.ShowJodi;
-                    return;
-                case 21:
-                    this.isChecked = MapModMain.config.ShowKent;
-                    return;
-                case 22:
-                    this.isChecked = MapModMain.config.ShowLeah;
-                    return;
-                case 23:
-                    this.isChecked = MapModMain.config.ShowLewis;
-                    return;
-                case 24:
-                    this.isChecked = MapModMain.config.ShowLinus;
-                    return;
-                case 25:
-                    this.isChecked = MapModMain.config.ShowMarnie;
-                    return;
-                case 26:
-                    this.isChecked = MapModMain.config.ShowMaru;
-                    return;
-                case 27:
-                    this.isChecked = MapModMain.config.ShowPam;
-                    return;
-                case 28:
-                    this.isChecked = MapModMain.config.ShowPenny;
-                    return;
-                case 29:
-                    this.isChecked = MapModMain.config.ShowPierre;
-                    return;
-                case 30:
-                    this.isChecked = MapModMain.config.ShowRobin;
-                    return;
-                case 31:
-                    this.isChecked = MapModMain.config.ShowSam;
-                    return;
-                case 32:
-                    this.isChecked = MapModMain.config.ShowSebastian;
-                    return;
-                case 33:
-                    this.isChecked = MapModMain.config.ShowShane;
-                    return;
-                case 34:
-                    this.isChecked = MapModMain.config.ShowVincent;
-                    return;
-                case 35:
-                    this.isChecked = MapModMain.config.ShowWilly;
-                    return;
-                case 36:
-                    this.isChecked = MapModMain.config.ShowSandy;
-                    return;
-                case 37:
-                    this.isChecked = MapModMain.config.ShowWizard;
-                    return;
-                case 38:
-                    this.isChecked = MapModMain.config.ShowMarlon;
-                    return;
                 case 39:
                     this.isChecked = MapModMain.config.ShowCustomNPC1;
                     return;
@@ -603,136 +508,51 @@ namespace NPCMapLocations
             base.receiveLeftClick(x, y);
             this.isChecked = !this.isChecked;
             int whichOption = this.whichOption;
-            switch (whichOption)
+
+            if (whichOption > 6 && whichOption < 39) 
             {
-                case 7:
-                    MapModMain.config.ShowAbigail = this.isChecked;
-                    break;
-                case 8:
-                    MapModMain.config.ShowAlex = this.isChecked;
-                    break;
-                case 9:
-                    MapModMain.config.ShowCaroline = this.isChecked;
-                    break;
-                case 10:
-                    MapModMain.config.ShowClint = this.isChecked;
-                    break;
-                case 11:
-                    MapModMain.config.ShowDemetrius = this.isChecked;
-                    break;
-                case 12:
-                    MapModMain.config.ShowElliott = this.isChecked;
-                    break;
-                case 13:
-                    MapModMain.config.ShowEmily = this.isChecked;
-                    break;
-                case 14:
-                    MapModMain.config.ShowEvelyn = this.isChecked;
-                    break;
-                case 15:
-                    MapModMain.config.ShowGeorge = this.isChecked;
-                    break;
-                case 16:
-                    MapModMain.config.ShowGus = this.isChecked;
-                    break;
-                case 17:
-                    MapModMain.config.ShowHaley = this.isChecked;
-                    break;
-                case 18:
-                    MapModMain.config.ShowHarvey = this.isChecked;
-                    break;
-                case 19:
-                    MapModMain.config.ShowJas = this.isChecked;
-                    break;
-                case 20:
-                    MapModMain.config.ShowJodi = this.isChecked;
-                    break;
-                case 21:
-                    MapModMain.config.ShowKent = this.isChecked;
-                    break;
-                case 22:
-                    MapModMain.config.ShowLeah = this.isChecked;
-                    break;
-                case 23:
-                    MapModMain.config.ShowLewis = this.isChecked;
-                    break;
-                case 24:
-                    MapModMain.config.ShowLinus = this.isChecked;
-                    break;
-                case 25:
-                    MapModMain.config.ShowMarnie = this.isChecked;
-                    break;
-                case 26:
-                    MapModMain.config.ShowMaru = this.isChecked;
-                    break;
-                case 27:
-                    MapModMain.config.ShowPam = this.isChecked;
-                    break;
-                case 28:
-                    MapModMain.config.ShowPenny = this.isChecked;
-                    break;
-                case 29:
-                    MapModMain.config.ShowPierre = this.isChecked;
-                    break;
-                case 30:
-                    MapModMain.config.ShowRobin = this.isChecked;
-                    break;
-                case 31:
-                    MapModMain.config.ShowSam = this.isChecked;
-                    break;
-                case 32:
-                    MapModMain.config.ShowSebastian = this.isChecked;
-                    break;
-                case 33:
-                    MapModMain.config.ShowShane = this.isChecked;
-                    break;
-                case 34:
-                    MapModMain.config.ShowVincent = this.isChecked;
-                    break;
-                case 35:
-                    MapModMain.config.ShowWilly = this.isChecked;
-                    break;
-                case 36:
-                    MapModMain.config.ShowSandy = this.isChecked;
-                    break;
-                case 37:
-                    MapModMain.config.ShowWizard = this.isChecked;
-                    break;
-                case 38:
-                    MapModMain.config.ShowMarlon = this.isChecked;
-                    break;
-                case 39:
-                    MapModMain.config.ShowCustomNPC1 = this.isChecked;
-                    break;
-                case 40:
-                    MapModMain.config.ShowCustomNPC2 = this.isChecked;
-                    break;
-                case 41:
-                    MapModMain.config.ShowCustomNPC3 = this.isChecked;
-                    break;
-                case 42:
-                    MapModMain.config.ShowCustomNPC4 = this.isChecked;
-                    break;
-                case 43:
-                    MapModMain.config.ShowCustomNPC5 = this.isChecked;
-                    break;
-                case 44:
-                    MapModMain.config.OnlySameLocation = this.isChecked;
-                    break;
-                case 45:
-                    MapModMain.config.ByHeartLevel = this.isChecked;
-                    break;
-                case 46:
-                    MapModMain.config.MarkQuests = this.isChecked;
-                    break;
-                case 47:
-                    MapModMain.config.ShowHiddenVillagers = this.isChecked;
-                    break;
-                case 48:
-                    MapModMain.config.ShowTravelingMerchant = this.isChecked;
-                    break;
-                default:
-                    break;
+                if (this.isChecked)
+                    MapModMain.config.NPCBlacklist.Remove(MapModConstants.Villagers[whichOption-7]);
+                else 
+                    MapModMain.config.NPCBlacklist.Add(MapModConstants.Villagers[whichOption-7]);
+            }
+            else 
+            {
+                switch (whichOption)
+                {
+                    case 39:
+                        MapModMain.config.ShowCustomNPC1 = this.isChecked;
+                        break;
+                    case 40:
+                        MapModMain.config.ShowCustomNPC2 = this.isChecked;
+                        break;
+                    case 41:
+                        MapModMain.config.ShowCustomNPC3 = this.isChecked;
+                        break;
+                    case 42:
+                        MapModMain.config.ShowCustomNPC4 = this.isChecked;
+                        break;
+                    case 43:
+                        MapModMain.config.ShowCustomNPC5 = this.isChecked;
+                        break;
+                    case 44:
+                        MapModMain.config.OnlySameLocation = this.isChecked;
+                        break;
+                    case 45:
+                        MapModMain.config.ByHeartLevel = this.isChecked;
+                        break;
+                    case 46:
+                        MapModMain.config.MarkQuests = this.isChecked;
+                        break;
+                    case 47:
+                        MapModMain.config.ShowHiddenVillagers = this.isChecked;
+                        break;
+                    case 48:
+                        MapModMain.config.ShowTravelingMerchant = this.isChecked;
+                        break;
+                    default:
+                        break;
+                }
             }
             MapModMain.modHelper.WriteJsonFile($"config/{MapModMain.saveName}.json", MapModMain.config);
         }
