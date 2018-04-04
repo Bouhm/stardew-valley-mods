@@ -16,9 +16,9 @@ namespace NPCMapLocations
 {
     public class MapModMenu : IClickableMenu
     {
-        public const int itemsPerPage = 7;
-        public const int indexOfGraphicsPage = 6;
-        public int currentItemIndex;
+        private const int itemsPerPage = 7;
+        private const int indexOfGraphicsPage = 6;
+        private int currentItemIndex;
         private readonly Texture2D map;
         private readonly int mapX;
         private readonly int mapY;
@@ -36,7 +36,7 @@ namespace NPCMapLocations
         private bool canClose;
         private int optionsSlotHeld = -1;
 
-        public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
             this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -81,55 +81,55 @@ namespace NPCMapLocations
             {
                 foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
                 {
-                    if (MapModMain.customNpcId > 0)
+                    if (customNpcId > 0)
                     {
-                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 39 + MapModMain.customNpcId, -1, -1));
+                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 39 + customNpcId, -1, -1, markerCrop));
                     }
                 }
             }
-            this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Clint"], 10, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Demetrius"], 11, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Elliott"], 12, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Emily"], 13, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Evelyn"], 14, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["George"], 15, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Gus"], 16, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Haley"], 17, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Clint"], 10, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Demetrius"], 11, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Elliott"], 12, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Emily"], 13, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Evelyn"], 14, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["George"], 15, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Gus"], 16, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Haley"], 17, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1, markerCrop));
             if (showSecondaryNPCs[3])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1, markerCrop));
             if (showSecondaryNPCs[1])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 26, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Maru"], 27, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pam"], 28, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Penny"], 29, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 26, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Maru"], 27, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Pam"], 28, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Penny"], 29, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1, markerCrop));
             if (showSecondaryNPCs[0])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 34, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1));
+            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 34, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1, markerCrop));
             if (showSecondaryNPCs[2])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1, markerCrop));
             }
         }
 
@@ -449,9 +449,11 @@ namespace NPCMapLocations
         public bool isChecked;
         public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
         public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
+        private Dictionary<string, int> markerCrop;
 
-        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, int> markerCrop = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
+            this.markerCrop = markerCrop;
             if (whichOption > 6 && whichOption < 39)
             {
                 this.isChecked = !MapModMain.config.NPCBlacklist.Contains(MapModConstants.Villagers[whichOption-7]);
@@ -573,11 +575,11 @@ namespace NPCMapLocations
                     {
                         if (this.isChecked)
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         else
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         base.draw(b, slotX + 75, slotY);
                         break;

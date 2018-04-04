@@ -1,5 +1,6 @@
 ﻿/*
 Static class that stores constants for map mod.
+Do NOT modify anything here other than MapVectors
 */
 
 using System;
@@ -350,6 +351,51 @@ public static class MapModConstants
                     { "Club", new MapVectors[] {
                         new MapVectors(79, 140)
                     }}
+            };
+        }
+    }
+
+    // From Map Page... What is this even used for?
+    public static Dictionary<string, int> RegionIds
+    {
+        get
+        {
+            return new Dictionary<string, int>
+            {
+                {"region_desert",  1001},
+                {"region_farm",  1002},
+                {"region_backwoods",  1003},
+                {"region_busstop",  1004},
+                {"region_wizardtower",  1005},
+                {"region_marnieranch",  1006},
+                {"region_leahcottage",  1007},
+                {"region_samhouse",  1008},
+                {"region_haleyhouse",  1009},
+                {"region_townsquare",  1010},
+                {"region_harveyclinic",  1011},
+                {"region_generalstore",  1012},
+                {"region_blacksmith",  1013},
+                {"region_saloon",  1014},
+                {"region_manor",  1015},
+                {"region_museum",  1016},
+                {"region_elliottcabin",  1017},
+                {"region_sewer",  1018},
+                {"region_graveyard",  1019},
+                {"region_trailer",  1020},
+                {"region_alexhouse",  1021},
+                {"region_sciencehouse",  1022},
+                {"region_tent",  1023},
+                {"region_mines",  1024},
+                {"region_adventureguild",  1025},
+                {"region_quarry",  1026},
+                {"region_jojamart",  1027},
+                {"region_fishshop",  1028},
+                {"region_spa",  1029},
+                {"region_secretwoods",  1030},
+                {"region_ruinedhouse",  1031},
+                {"region_communitycenter",  1032},
+                {"region_sewerpipe",  1033},
+                {"region_railroad",  1034}
             };
         }
     }
