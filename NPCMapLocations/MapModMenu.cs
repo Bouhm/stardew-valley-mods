@@ -1,5 +1,6 @@
 ﻿/*
 Menu settings for the mod. 
+Menu code regurgitated from the game code
 Settings loaded from config file and changes saved onto config file.
 */
 
@@ -332,6 +333,7 @@ namespace NPCMapLocations
             this.scrollBar.tryHover(x, y, 0.1f);
         }
 
+        // Draw menu
         public override void draw(SpriteBatch b)
         {
             if (Game1.options.showMenuBackground)
@@ -396,6 +398,7 @@ namespace NPCMapLocations
         }
     }
 
+    // Mod button for the three main modes
     public class MapModButton : OptionsElement
     {
         public const int pixelsWide = 9;
@@ -443,7 +446,8 @@ namespace NPCMapLocations
         }
     }
 
-    public class MapModCheckbox : OptionsElement
+    // Mod checkbox for immersion settings and npc blacklst
+    internal class MapModCheckbox : OptionsElement
     {
         public const int pixelsWide = 9;
         public bool isChecked;
@@ -593,6 +597,7 @@ namespace NPCMapLocations
         }
     }
 
+    // Mod slider for heart level config
     internal class MapModSlider : OptionsElement
     {
         public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);

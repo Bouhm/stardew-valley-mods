@@ -24,6 +24,7 @@ namespace NPCMapLocations
         private Dictionary<string, string> npcNames;
         private int nameTooltipMode;
 
+        // Map menu that uses modified map page and modified component locations for hover
         public MapModMapPage(List<String> hoveredNames, Dictionary<string, string> npcNames, int nameTooltipMode)
         {
             this.nameTooltipMode = nameTooltipMode;
@@ -305,7 +306,7 @@ namespace NPCMapLocations
             }
         }
 
-        // Draw location tooltips
+        // Draw location and name tooltips
         public override void draw(SpriteBatch b)
         {
             string names = "";
@@ -421,7 +422,7 @@ namespace NPCMapLocations
             }
         }
 
-        // Draw NPC names in bottom left corner of map page
+        // Draw NPC name tooltips map page
         public void DrawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
             if (!(names.Equals("")))
@@ -494,6 +495,7 @@ namespace NPCMapLocations
             }
         }
 
+        // Get location and area of region component
         private Rectangle GetRegionRect(string region)
         {
             // Set origin to center

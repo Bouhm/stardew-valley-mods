@@ -50,6 +50,7 @@ public static class MapModConstants
         }
     }
 
+    // For handling null locations at beginning of new game; basically used only once
     public static Dictionary<string, string> StartingLocations
     {
         get
@@ -92,6 +93,8 @@ public static class MapModConstants
         }
     }
 
+    // Cropping heads for NPC markers
+    // Values shift the head up or down
     public static Dictionary<string, int> MarkerCrop
     {
         get
@@ -402,6 +405,7 @@ public static class MapModConstants
         }
     }
 
+    // To determine which region an indoor location belongs to
     public static Dictionary<string, string> IndoorLocations
     {
         get
