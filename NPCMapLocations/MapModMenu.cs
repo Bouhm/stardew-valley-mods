@@ -1,5 +1,6 @@
 ﻿/*
 Menu settings for the mod. 
+Menu code regurgitated from the game code
 Settings loaded from config file and changes saved onto config file.
 */
 
@@ -8,7 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
-using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,27 +17,27 @@ namespace NPCMapLocations
 {
     public class MapModMenu : IClickableMenu
     {
-        public const int itemsPerPage = 7;
-        public const int indexOfGraphicsPage = 6;
-        public int currentItemIndex;
-        private Texture2D map;
-        private int mapX;
-        private int mapY;
-        private List<ClickableComponent> optionSlots = new List<ClickableComponent>();
-        private ClickableTextureComponent upArrow;
-        private ClickableTextureComponent downArrow;
-        private ClickableTextureComponent scrollBar;
-        private MapModButton immersionButton1;
-        private MapModButton immersionButton2;
-        private MapModButton immersionButton3;
+        private const int itemsPerPage = 7;
+        private const int indexOfGraphicsPage = 6;
+        private int currentItemIndex;
+        private readonly Texture2D map;
+        private readonly int mapX;
+        private readonly int mapY;
+        private readonly List<ClickableComponent> optionSlots = new List<ClickableComponent>();
+        private readonly ClickableTextureComponent upArrow;
+        private readonly ClickableTextureComponent downArrow;
+        private readonly ClickableTextureComponent scrollBar;
+        private readonly MapModButton immersionButton1;
+        private readonly MapModButton immersionButton2;
+        private readonly MapModButton immersionButton3;
+        private readonly List<OptionsElement> options = new List<OptionsElement>();
+        private readonly Rectangle scrollBarRunner;
+        private readonly ClickableTextureComponent okButton;
         private bool scrolling;
         private bool canClose;
-        private List<OptionsElement> options = new List<OptionsElement>();
-        private Rectangle scrollBarRunner;
         private int optionsSlotHeld = -1;
-        private ClickableTextureComponent okButton;
 
-        public MapModMenu(int x, int y, int width, int height, bool[] showExtras, Dictionary<string, Dictionary<string, int>> customNPCs, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
             this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -82,61 +82,61 @@ namespace NPCMapLocations
             {
                 foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
                 {
-                    if (MapModMain.customNpcId > 0)
+                    if (customNpcId > 0)
                     {
-                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 39 + MapModMain.customNpcId, -1, -1));
+                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 39 + customNpcId, -1, -1, markerCrop));
                     }
                 }
             }
-            this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Clint"], 10, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Demetrius"], 11, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Elliott"], 12, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Emily"], 13, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Evelyn"], 14, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["George"], 15, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Gus"], 16, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Haley"], 17, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1));
-            if (showExtras[3])
+            this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Clint"], 10, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Demetrius"], 11, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Elliott"], 12, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Emily"], 13, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Evelyn"], 14, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["George"], 15, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Gus"], 16, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Haley"], 17, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1, markerCrop));
+            if (showSecondaryNPCs[3])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1));
-            if (showExtras[1])
+            this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1, markerCrop));
+            if (showSecondaryNPCs[1])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 38, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 25, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Maru"], 26, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pam"], 27, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Penny"], 28, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 29, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Robin"], 30, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Sam"], 31, -1, -1));
-            if (showExtras[0])
+            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 26, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Maru"], 27, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Pam"], 28, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Penny"], 29, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1, markerCrop));
+            if (showSecondaryNPCs[0])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 36, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1, markerCrop));
             }
-            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 32, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Shane"], 33, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 34, -1, -1));
-            this.options.Add(new MapModCheckbox(npcNames["Willy"], 35, -1, -1));
-            if (showExtras[2])
+            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 34, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1, markerCrop));
+            this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1, markerCrop));
+            if (showSecondaryNPCs[2])
             {
-                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 37, -1, -1));
+                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1, markerCrop));
             }
         }
 
-        private void setScrollBarToCurrentIndex()
+        private void SetScrollBarToCurrentIndex()
         {
-            if (this.options.Count<OptionsElement>() > 0)
+            if (options.Any())
             {
                 this.scrollBar.bounds.Y = this.scrollBarRunner.Height / Math.Max(1, this.options.Count - 7 + 1) * this.currentItemIndex + this.upArrow.bounds.Bottom + Game1.pixelZoom;
                 if (this.currentItemIndex == this.options.Count<OptionsElement>() - 7)
@@ -159,7 +159,7 @@ namespace NPCMapLocations
                 this.scrollBar.bounds.Y = Math.Min(this.yPositionOnScreen + this.height - Game1.tileSize - Game1.pixelZoom * 3 - this.scrollBar.bounds.Height, Math.Max(y, this.yPositionOnScreen + this.upArrow.bounds.Height + Game1.pixelZoom * 5));
                 float num = (float)(y - this.scrollBarRunner.Y) / (float)this.scrollBarRunner.Height;
                 this.currentItemIndex = Math.Min(this.options.Count - 7, Math.Max(0, (int)((float)this.options.Count * num)));
-                this.setScrollBarToCurrentIndex();
+                this.SetScrollBarToCurrentIndex();
                 if (y2 != this.scrollBar.bounds.Y)
                 {
                     Game1.playSound("shiny4");
@@ -182,16 +182,13 @@ namespace NPCMapLocations
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
-                MapModMain.menuOpen = 0;
-                //Game1.soundBank.PlayCue("bigDeSelect");
                 return;
             }
-            if (key.ToString().Equals(MapModMain.config.menuKey) && MapModMain.menuOpen == 1 && this.readyToClose() && this.canClose)
+            if (key.ToString().Equals(MapModMain.config.MenuKey) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.menuOpen = 0;
                 return;
             }
             this.canClose = true;
@@ -211,13 +208,13 @@ namespace NPCMapLocations
             base.receiveScrollWheelAction(direction);
             if (direction > 0 && this.currentItemIndex > 0)
             {
-                this.upArrowPressed();
+                this.UpArrowPressed();
                 Game1.playSound("shiny4");
                 return;
             }
             if (direction < 0 && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
             {
-                this.downArrowPressed();
+                this.DownArrowPressed();
                 Game1.playSound("shiny4");
             }
         }
@@ -237,18 +234,18 @@ namespace NPCMapLocations
             this.scrolling = false;
         }
 
-        private void downArrowPressed()
+        private void DownArrowPressed()
         {
             this.downArrow.scale = this.downArrow.baseScale;
             this.currentItemIndex++;
-            this.setScrollBarToCurrentIndex();
+            this.SetScrollBarToCurrentIndex();
         }
 
-        private void upArrowPressed()
+        private void UpArrowPressed()
         {
             this.upArrow.scale = this.upArrow.baseScale;
             this.currentItemIndex--;
-            this.setScrollBarToCurrentIndex();
+            this.SetScrollBarToCurrentIndex();
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -259,12 +256,12 @@ namespace NPCMapLocations
             }
             if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count<OptionsElement>() - 7))
             {
-                this.downArrowPressed();
+                this.DownArrowPressed();
                 Game1.playSound("shwip");
             }
             else if (this.upArrow.containsPoint(x, y) && this.currentItemIndex > 0)
             {
-                this.upArrowPressed();
+                this.UpArrowPressed();
                 Game1.playSound("shwip");
             }
             else if (this.scrollBar.containsPoint(x, y))
@@ -279,20 +276,20 @@ namespace NPCMapLocations
             else if (immersionButton1.rect.Contains(x, y))
             {
                 immersionButton1.receiveLeftClick(x, y);
-                immersionButton2.greyOut();
-                immersionButton3.greyOut();
+                immersionButton2.GreyOut();
+                immersionButton3.GreyOut();
             }
             else if (immersionButton2.rect.Contains(x, y))
             {
                 immersionButton2.receiveLeftClick(x, y);
-                immersionButton1.greyOut();
-                immersionButton3.greyOut();
+                immersionButton1.GreyOut();
+                immersionButton3.GreyOut();
             }
             else if (immersionButton3.rect.Contains(x, y))
             {
                 immersionButton3.receiveLeftClick(x, y);
-                immersionButton1.greyOut();
-                immersionButton2.greyOut();
+                immersionButton1.GreyOut();
+                immersionButton2.GreyOut();
             }
             if (this.okButton.containsPoint(x, y))
             {
@@ -301,7 +298,6 @@ namespace NPCMapLocations
                 (Game1.activeClickableMenu as MapModMenu).exitThisMenu(false);
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
-                MapModMain.menuOpen = 0;
             }
             y -= 15;
             this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count<OptionsElement>() - 7, this.currentItemIndex));
@@ -337,6 +333,7 @@ namespace NPCMapLocations
             this.scrollBar.tryHover(x, y, 0.1f);
         }
 
+        // Draw menu
         public override void draw(SpriteBatch b)
         {
             if (Game1.options.showMenuBackground)
@@ -348,7 +345,7 @@ namespace NPCMapLocations
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
             this.okButton.draw(b);
-            int width = (int)Game1.dialogueFont.MeasureString(MapModMain.modHelper.Translation.Get("immersion.option3")).X;
+            int buttonWidth = (int)Game1.dialogueFont.MeasureString(MapModMain.modHelper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
                 this.upArrow.draw(b);
@@ -367,25 +364,25 @@ namespace NPCMapLocations
                     {
                         if (options[this.currentItemIndex + i] is MapModButton)
                         {
-                            Rectangle bounds = new Rectangle(x + 28, y, width + Game1.tileSize + 8, Game1.tileSize + 8);
-                            if (options[this.currentItemIndex + i].whichOption == 4)
+                            Rectangle bounds = new Rectangle(x + 28, y, buttonWidth + Game1.tileSize + 8, Game1.tileSize + 8);
+                            switch (options[this.currentItemIndex + i].whichOption)
                             {
-                                immersionButton1.rect = bounds;
-                            }
-                            else if (options[this.currentItemIndex + i].whichOption == 5)
-                            {
-                                immersionButton2.rect = bounds;
-                            }
-                            else if (options[this.currentItemIndex + i].whichOption == 6)
-                            {
-                                immersionButton3.rect = bounds;
+                                case 4:
+                                    immersionButton1.rect = bounds;
+                                    break;
+                                case 5:
+                                    immersionButton2.rect = bounds;
+                                    break;
+                                case 6:
+                                    immersionButton3.rect = bounds;
+                                    break;
                             }
 
                             IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y, bounds.Width, bounds.Height, Color.White * (options[this.currentItemIndex + i].greyedOut ? 0.33f : 1f), 1f, false);
                         }
                         if (this.currentItemIndex + i == 0)
                         {
-                            Utility.drawTextWithShadow(b, "NPC Map Locations v" + MapModMain.current, Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
+                            Utility.drawTextWithShadow(b, "NPC Map Locations", Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
                         }
                         else
                         {
@@ -401,6 +398,7 @@ namespace NPCMapLocations
         }
     }
 
+    // Mod button for the three main modes
     public class MapModButton : OptionsElement
     {
         public const int pixelsWide = 9;
@@ -411,7 +409,7 @@ namespace NPCMapLocations
         {
             this.label = MapModMain.modHelper.Translation.Get(label);
             this.rect = new Rectangle(x, y, width, height);
-            if (MapModMain.config.immersionOption == whichOption - 3)
+            if (MapModMain.config.ImmersionOption == whichOption - 3)
             {
                 this.greyedOut = false;
             }
@@ -431,12 +429,12 @@ namespace NPCMapLocations
                     base.receiveLeftClick(x, y);
                     this.isActive = true;
                     this.greyedOut = false;
-                    MapModMain.config.immersionOption = whichOption - 3;
+                    MapModMain.config.ImmersionOption = whichOption - 3;
                 }
             }
         }
 
-        public void greyOut()
+        public void GreyOut()
         {
             this.isActive = false;
             this.greyedOut = true;
@@ -448,147 +446,58 @@ namespace NPCMapLocations
         }
     }
 
-    public class MapModCheckbox : OptionsElement
+    // Mod checkbox for immersion settings and npc blacklst
+    internal class MapModCheckbox : OptionsElement
     {
         public const int pixelsWide = 9;
         public bool isChecked;
         public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
         public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
+        private Dictionary<string, int> markerCrop;
 
-        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, int> markerCrop = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            if (whichOption > 43)
+            this.markerCrop = markerCrop;
+            if (whichOption > 6 && whichOption < 39)
+            {
+                this.isChecked = !MapModMain.config.NPCBlacklist.Contains(MapModConstants.Villagers[whichOption-7]);
+                return;
+            }
+            else if (whichOption > 43)
             {
                 this.label = MapModMain.modHelper.Translation.Get(label);
             }
-
             switch (whichOption)
             {
-                case 7:
-                    this.isChecked = MapModMain.config.showAbigail;
-                    return;
-                case 8:
-                    this.isChecked = MapModMain.config.showAlex;
-                    return;
-                case 9:
-                    this.isChecked = MapModMain.config.showCaroline;
-                    return;
-                case 10:
-                    this.isChecked = MapModMain.config.showClint;
-                    return;
-                case 11:
-                    this.isChecked = MapModMain.config.showDemetrius;
-                    return;
-                case 12:
-                    this.isChecked = MapModMain.config.showElliott;
-                    return;
-                case 13:
-                    this.isChecked = MapModMain.config.showEmily;
-                    return;
-                case 14:
-                    this.isChecked = MapModMain.config.showEvelyn;
-                    return;
-                case 15:
-                    this.isChecked = MapModMain.config.showGeorge;
-                    return;
-                case 16:
-                    this.isChecked = MapModMain.config.showGus;
-                    return;
-                case 17:
-                    this.isChecked = MapModMain.config.showHaley;
-                    return;
-                case 18:
-                    this.isChecked = MapModMain.config.showHarvey;
-                    return;
-                case 19:
-                    this.isChecked = MapModMain.config.showJas;
-                    return;
-                case 20:
-                    this.isChecked = MapModMain.config.showJodi;
-                    return;
-                case 21:
-                    this.isChecked = MapModMain.config.showKent;
-                    return;
-                case 22:
-                    this.isChecked = MapModMain.config.showLeah;
-                    return;
-                case 23:
-                    this.isChecked = MapModMain.config.showLewis;
-                    return;
-                case 24:
-                    this.isChecked = MapModMain.config.showLinus;
-                    return;
-                case 25:
-                    this.isChecked = MapModMain.config.showMarnie;
-                    return;
-                case 26:
-                    this.isChecked = MapModMain.config.showMaru;
-                    return;
-                case 27:
-                    this.isChecked = MapModMain.config.showPam;
-                    return;
-                case 28:
-                    this.isChecked = MapModMain.config.showPenny;
-                    return;
-                case 29:
-                    this.isChecked = MapModMain.config.showPierre;
-                    return;
-                case 30:
-                    this.isChecked = MapModMain.config.showRobin;
-                    return;
-                case 31:
-                    this.isChecked = MapModMain.config.showSam;
-                    return;
-                case 32:
-                    this.isChecked = MapModMain.config.showSebastian;
-                    return;
-                case 33:
-                    this.isChecked = MapModMain.config.showShane;
-                    return;
-                case 34:
-                    this.isChecked = MapModMain.config.showVincent;
-                    return;
-                case 35:
-                    this.isChecked = MapModMain.config.showWilly;
-                    return;
-                case 36:
-                    this.isChecked = MapModMain.config.showSandy;
-                    return;
-                case 37:
-                    this.isChecked = MapModMain.config.showWizard;
-                    return;
-                case 38:
-                    this.isChecked = MapModMain.config.showMarlon;
-                    return;
                 case 39:
-                    this.isChecked = MapModMain.config.showCustomNPC1;
+                    this.isChecked = MapModMain.config.ShowCustomNPC1;
                     return;
                 case 40:
-                    this.isChecked = MapModMain.config.showCustomNPC2;
+                    this.isChecked = MapModMain.config.ShowCustomNPC2;
                     return;
                 case 41:
-                    this.isChecked = MapModMain.config.showCustomNPC3;
+                    this.isChecked = MapModMain.config.ShowCustomNPC3;
                     return;
                 case 42:
-                    this.isChecked = MapModMain.config.showCustomNPC4;
+                    this.isChecked = MapModMain.config.ShowCustomNPC4;
                     return;
                 case 43:
-                    this.isChecked = MapModMain.config.showCustomNPC5;
+                    this.isChecked = MapModMain.config.ShowCustomNPC5;
                     return;
                 case 44:
-                    this.isChecked = MapModMain.config.onlySameLocation;
+                    this.isChecked = MapModMain.config.OnlySameLocation;
                     return;
                 case 45:
-                    this.isChecked = MapModMain.config.byHeartLevel;
+                    this.isChecked = MapModMain.config.ByHeartLevel;
                     return;
                 case 46:
-                    this.isChecked = MapModMain.config.markQuests;
+                    this.isChecked = MapModMain.config.MarkQuests;
                     return;
                 case 47:
-                    this.isChecked = MapModMain.config.showHiddenVillagers;
+                    this.isChecked = MapModMain.config.ShowHiddenVillagers;
                     return;
                 case 48:
-                    this.isChecked = MapModMain.config.showTravelingMerchant;
+                    this.isChecked = MapModMain.config.ShowTravelingMerchant;
                     return;
                 default:
                     return;
@@ -605,136 +514,51 @@ namespace NPCMapLocations
             base.receiveLeftClick(x, y);
             this.isChecked = !this.isChecked;
             int whichOption = this.whichOption;
-            switch (whichOption)
+
+            if (whichOption > 6 && whichOption < 39) 
             {
-                case 7:
-                    MapModMain.config.showAbigail = this.isChecked;
-                    break;
-                case 8:
-                    MapModMain.config.showAlex = this.isChecked;
-                    break;
-                case 9:
-                    MapModMain.config.showCaroline = this.isChecked;
-                    break;
-                case 10:
-                    MapModMain.config.showClint = this.isChecked;
-                    break;
-                case 11:
-                    MapModMain.config.showDemetrius = this.isChecked;
-                    break;
-                case 12:
-                    MapModMain.config.showElliott = this.isChecked;
-                    break;
-                case 13:
-                    MapModMain.config.showEmily = this.isChecked;
-                    break;
-                case 14:
-                    MapModMain.config.showEvelyn = this.isChecked;
-                    break;
-                case 15:
-                    MapModMain.config.showGeorge = this.isChecked;
-                    break;
-                case 16:
-                    MapModMain.config.showGus = this.isChecked;
-                    break;
-                case 17:
-                    MapModMain.config.showHaley = this.isChecked;
-                    break;
-                case 18:
-                    MapModMain.config.showHarvey = this.isChecked;
-                    break;
-                case 19:
-                    MapModMain.config.showJas = this.isChecked;
-                    break;
-                case 20:
-                    MapModMain.config.showJodi = this.isChecked;
-                    break;
-                case 21:
-                    MapModMain.config.showKent = this.isChecked;
-                    break;
-                case 22:
-                    MapModMain.config.showLeah = this.isChecked;
-                    break;
-                case 23:
-                    MapModMain.config.showLewis = this.isChecked;
-                    break;
-                case 24:
-                    MapModMain.config.showLinus = this.isChecked;
-                    break;
-                case 25:
-                    MapModMain.config.showMarnie = this.isChecked;
-                    break;
-                case 26:
-                    MapModMain.config.showMaru = this.isChecked;
-                    break;
-                case 27:
-                    MapModMain.config.showPam = this.isChecked;
-                    break;
-                case 28:
-                    MapModMain.config.showPenny = this.isChecked;
-                    break;
-                case 29:
-                    MapModMain.config.showPierre = this.isChecked;
-                    break;
-                case 30:
-                    MapModMain.config.showRobin = this.isChecked;
-                    break;
-                case 31:
-                    MapModMain.config.showSam = this.isChecked;
-                    break;
-                case 32:
-                    MapModMain.config.showSebastian = this.isChecked;
-                    break;
-                case 33:
-                    MapModMain.config.showShane = this.isChecked;
-                    break;
-                case 34:
-                    MapModMain.config.showVincent = this.isChecked;
-                    break;
-                case 35:
-                    MapModMain.config.showWilly = this.isChecked;
-                    break;
-                case 36:
-                    MapModMain.config.showSandy = this.isChecked;
-                    break;
-                case 37:
-                    MapModMain.config.showWizard = this.isChecked;
-                    break;
-                case 38:
-                    MapModMain.config.showMarlon = this.isChecked;
-                    break;
-                case 39:
-                    MapModMain.config.showCustomNPC1 = this.isChecked;
-                    break;
-                case 40:
-                    MapModMain.config.showCustomNPC2 = this.isChecked;
-                    break;
-                case 41:
-                    MapModMain.config.showCustomNPC3 = this.isChecked;
-                    break;
-                case 42:
-                    MapModMain.config.showCustomNPC4 = this.isChecked;
-                    break;
-                case 43:
-                    MapModMain.config.showCustomNPC5 = this.isChecked;
-                    break;
-                case 44:
-                    MapModMain.config.onlySameLocation = this.isChecked;
-                    break;
-                case 45:
-                    MapModMain.config.byHeartLevel = this.isChecked;
-                    break;
-                case 46:
-                    MapModMain.config.markQuests = this.isChecked;
-                    break;
-                case 47:
-                    MapModMain.config.showHiddenVillagers = this.isChecked;
-                    break;
-                case 48:
-                    MapModMain.config.showTravelingMerchant = this.isChecked;
-                    break;
-                default:
-                    break;
+                if (this.isChecked)
+                    MapModMain.config.NPCBlacklist.Remove(MapModConstants.Villagers[whichOption-7]);
+                else 
+                    MapModMain.config.NPCBlacklist.Add(MapModConstants.Villagers[whichOption-7]);
+            }
+            else 
+            {
+                switch (whichOption)
+                {
+                    case 39:
+                        MapModMain.config.ShowCustomNPC1 = this.isChecked;
+                        break;
+                    case 40:
+                        MapModMain.config.ShowCustomNPC2 = this.isChecked;
+                        break;
+                    case 41:
+                        MapModMain.config.ShowCustomNPC3 = this.isChecked;
+                        break;
+                    case 42:
+                        MapModMain.config.ShowCustomNPC4 = this.isChecked;
+                        break;
+                    case 43:
+                        MapModMain.config.ShowCustomNPC5 = this.isChecked;
+                        break;
+                    case 44:
+                        MapModMain.config.OnlySameLocation = this.isChecked;
+                        break;
+                    case 45:
+                        MapModMain.config.ByHeartLevel = this.isChecked;
+                        break;
+                    case 46:
+                        MapModMain.config.MarkQuests = this.isChecked;
+                        break;
+                    case 47:
+                        MapModMain.config.ShowHiddenVillagers = this.isChecked;
+                        break;
+                    case 48:
+                        MapModMain.config.ShowTravelingMerchant = this.isChecked;
+                        break;
+                    default:
+                        break;
+                }
             }
             MapModMain.modHelper.WriteJsonFile($"config/{MapModMain.saveName}.json", MapModMain.config);
         }
@@ -755,11 +579,11 @@ namespace NPCMapLocations
                     {
                         if (this.isChecked)
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         else
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MapModMain.markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         base.draw(b, slotX + 75, slotY);
                         break;
@@ -773,6 +597,7 @@ namespace NPCMapLocations
         }
     }
 
+    // Mod slider for heart level config
     internal class MapModSlider : OptionsElement
     {
         public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);
@@ -789,11 +614,11 @@ namespace NPCMapLocations
             valueLabel = MapModMain.modHelper.Translation.Get(label);
             if (whichOption == 0)
             {
-                this.value = MapModMain.config.heartLevelMin;
+                this.value = MapModMain.config.HeartLevelMin;
             }
             else if (whichOption == 1)
             {
-                this.value = MapModMain.config.heartLevelMax;
+                this.value = MapModMain.config.HeartLevelMax;
             }
         }
 
@@ -807,11 +632,11 @@ namespace NPCMapLocations
             this.value = ((x >= this.bounds.X) ? ((x <= this.bounds.Right - 10 * Game1.pixelZoom) ? ((int)((double)((float)(x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom)) * (double)this.sliderMaxValue)) : this.sliderMaxValue) : 0);
             if (this.whichOption == 0)
             {
-                MapModMain.config.heartLevelMin = this.value;
+                MapModMain.config.HeartLevelMin = this.value;
             }
             else if (this.whichOption == 1)
             {
-                MapModMain.config.heartLevelMax = this.value;
+                MapModMain.config.HeartLevelMax = this.value;
             }
             MapModMain.modHelper.WriteJsonFile($"config/{MapModMain.saveName}.json", MapModMain.config);
         }
@@ -832,7 +657,7 @@ namespace NPCMapLocations
             this.greyedOut = false;
             if (this.whichOption == 0 || this.whichOption == 1)
             {
-                this.greyedOut = !MapModMain.config.byHeartLevel;
+                this.greyedOut = !MapModMain.config.ByHeartLevel;
             }
             base.draw(b, slotX, slotY);
             IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X, slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, (float)Game1.pixelZoom, false);
