@@ -287,12 +287,6 @@ namespace NPCMapLocations
         {
         }
 
-        // Disable snapping cursor on controller
-        public override bool overrideSnappyMenuCursorMovementBan()
-        {
-            return false;
-        }
-
         public override void performHoverAction(int x, int y)
         {
             hoveredLocationText = "";
@@ -305,7 +299,7 @@ namespace NPCMapLocations
                 }
             }
 
-            hoveredNames = "";
+            List<string> hoveredList = new List<string>();
             const int markerWidth = 32;
             const int markerHeight = 30;
             // Have to use special character to separate strings for Chinese
@@ -316,22 +310,30 @@ namespace NPCMapLocations
                 if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                 {
                     if (npcNames.ContainsKey(npcMarker.Name) && !npcMarker.IsHidden)
-                    {
-                        hoveredNames += npcNames[npcMarker.Name] + separator;
-                        var lines = hoveredNames.Split('\n');
-                        if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + npcNames[npcMarker.Name]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
-                            hoveredNames += Environment.NewLine;
-                    }
+                        hoveredList.Add(npcNames[npcMarker.Name]);
                 }
                 if (!npcMarker.IsOutdoors && !hasIndoorNPC)
                 {
                     hasIndoorNPC = true;
                 }
             }
-            int trimLen = separator.Equals(", ") ? 2 : 1;
-            if (hoveredNames.Length > trimLen)
+
+            foreach (string name in hoveredList)
             {
-                hoveredNames = hoveredNames.Substring(0, hoveredNames.Length - trimLen);
+                hoveredNames = hoveredList[0];
+                for (int i = 1; i < hoveredList.Count; i++)
+                {
+                    var lines = hoveredNames.Split('\n');
+                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                    {
+                        hoveredNames += separator + Environment.NewLine;
+                        hoveredNames += hoveredList[i];
+                    }
+                    else
+                    {
+                        hoveredNames += separator + hoveredList[i];
+                    }
+                }
             }
         }
 
@@ -508,6 +510,18 @@ namespace NPCMapLocations
                 locationRects[location].width,
                 locationRects[location].height
             );
+        }
+    }
+
+    public class Rect
+    {
+        public int width;
+        public int height;
+
+        public Rect(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
         }
     }
 }

@@ -28,11 +28,12 @@ namespace NPCMapLocations
         public static string saveName;
         private static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static int customNpcId;
+        private static bool[] showSecondaryNPCs = new Boolean[5];
+        private static MapModMapPage modMapPage;
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, string> npcNames = new Dictionary<string, string>(); // For custom names
         private static HashSet<NPCMarker> npcMarkers = new HashSet<NPCMarker>();
-        private static bool[] showSecondaryNPCs = new Boolean[5];
-        private static MapModMapPage modMapPage;
+        private static Dictionary<string, Vector2> farmBuildings = new Dictionary<string, Vector2>();
 
         // For debug info
         private const bool DEBUG_MODE = true;
@@ -251,11 +252,12 @@ namespace NPCMapLocations
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
-            UpdateNPCMarkers();
+            GetFarmBuildingLocs();
+            UpdateMarkers();
         }
 
         // Update NPC marker data and names on hover
-        private void UpdateNPCMarkers()
+        private void UpdateMarkers()
         {
             foreach (NPCMarker npcMarker in npcMarkers)
             {
@@ -272,7 +274,7 @@ namespace NPCMapLocations
                     currentLocation = npc.currentLocation.name;
                 }
 
-                MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVectors[] npcLocation);
+                MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVector[] npcLocation);
                 if (npcLocation == null)
                     continue;
 
@@ -369,7 +371,7 @@ namespace NPCMapLocations
             {
                 if (DEBUG_MODE && alertFlag != "UnknownLocation:" + location)
                 {
-                    MapModMain.monitor.Log("Unknown Location " + location + ".", LogLevel.Alert);
+                    MapModMain.monitor.Log("Unknown Location: " + location + ".", LogLevel.Alert);
                     alertFlag = "UnknownLocation:" + location;
                 }
                 return new Vector2(-5000, -5000);
@@ -407,12 +409,12 @@ namespace NPCMapLocations
                 // Sort map vectors by distance to point
                 var vectors = locVectors.OrderBy(vector => Math.Sqrt(Math.Pow(vector.tileX - tileX, 2) + Math.Pow(vector.tileY - tileY, 2)));
 
-                MapVectors lower = null;
-                MapVectors upper = null;
+                MapVector lower = null;
+                MapVector upper = null;
                 var hasEqualTile = false;
 
                 // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
-                foreach (MapVectors vector in vectors)
+                foreach (MapVector vector in vectors)
                 {
                     if (lower != null && upper != null)
                     {
@@ -478,6 +480,45 @@ namespace NPCMapLocations
             return menu.currentTab == GameMenu.mapTab;
         }
 
+        // Get locations of farm buildings
+        private void GetFarmBuildingLocs()
+        {
+            foreach (Building building in Game1.getFarm().buildings)
+            {
+                if (building.baseNameOfIndoors == null)
+                {
+                    continue;
+                }
+
+                Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
+                if (building.baseNameOfIndoors.Equals("Shed"))
+                {
+                    farmBuildings["Shed"] = locVector;
+                }
+                else if (building.baseNameOfIndoors.Equals("Coop"))
+                {
+                    farmBuildings["Coop"] = locVector;
+                }
+                else if (building.baseNameOfIndoors.Equals("Barn"))
+                {
+                    locVector = new Vector2(locVector.X, locVector.Y + 2);
+                    farmBuildings["Barn"] = locVector;
+                }
+                else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
+                {
+                    farmBuildings["SlimeHutch"] = locVector;
+                }
+            }
+
+            // Greenhouse unlocked after pantry bundles completed
+            if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+            {
+                Vector2 locVector = MapModMain.LocationToMap("Greenhouse");
+                locVector = new Vector2((int)(locVector.X - 5 / 2 * 3f));
+                farmBuildings["SlimeHutch"] = locVector;
+            }
+        }
+
         // Draw event (when Map Page is opened)
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
@@ -498,40 +539,10 @@ namespace NPCMapLocations
 
             if (config.ShowFarmBuildings)
             {
-                float scale = 3;
-
-                // Draw farm buildings
-                foreach (Building building in Game1.getFarm().buildings)
+                float scale = 3f;
+                foreach (var building in farmBuildings)
                 {
-                    if (building.baseNameOfIndoors == null)
-                    {
-                        continue;
-                    }
-
-                    Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
-                    if (building.baseNameOfIndoors.Equals("Shed"))
-                    {
-                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(0, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                    }
-                    else if (building.baseNameOfIndoors.Equals("Coop"))
-                    {
-                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(5, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                    }
-                    else if (building.baseNameOfIndoors.Equals("Barn"))
-                    {
-                        b.Draw(buildings, new Vector2(locVector.X, locVector.Y + scale), new Rectangle?(new Rectangle(10, 0, 6, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                    }
-                    else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
-                    {
-                        b.Draw(buildings, locVector, new Rectangle?(new Rectangle(16, 0, 7, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                    }
-                }
-
-                // Greenhouse unlocked after pantry bundles completed
-                if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
-                {
-                    Vector2 locVector = MapModMain.LocationToMap("Greenhouse");
-                    b.Draw(buildings, new Vector2((int)(locVector.X - 5 / 2 * scale), (int)(locVector.Y - 7 / 2 * scale)), new Rectangle?(new Rectangle(23, 0, 5, 7)), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                    b.Draw(buildings, building.Value, new Rectangle?(MapModConstants.FarmBuildingRects[building.Key]), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
                 }
             }
 
@@ -691,5 +702,43 @@ namespace NPCMapLocations
         public bool IsOutdoors { get; set; } = false;
         public bool IsHidden { get; set; } = false;
         public int Layer { get; set; } = 0;
+    }
+
+    // Class for Location Vectors
+    public class MapVector
+    {
+        public int tileX;
+        public int tileY;
+        public int x;
+        public int y;
+
+        public MapVector()
+        {
+            this.tileX = 0;
+            this.tileY = 0;
+            this.x = 0;
+            this.y = 0;
+        }
+
+        public MapVector(int x, int y)
+        {
+            this.tileX = 0;
+            this.tileY = 0;
+            this.x = x;
+            this.y = y;
+        }
+
+        public MapVector(int tileX, int tileY, int x, int y)
+        {
+            this.tileX = tileX;
+            this.tileY = tileY;
+            this.x = x;
+            this.y = y;
+        }
+
+        public int[] GetValues()
+        {
+            return new int[] { this.tileX, this.tileY, this.x, this.y };
+        }
     }
 }
