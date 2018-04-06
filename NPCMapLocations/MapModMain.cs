@@ -65,7 +65,7 @@ namespace NPCMapLocations
             config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.MarkerCrop;
             customNPCs = config.CustomNPCs;
-            snappyMenuOption = Game1.options.SnappyMenus;
+            snappyMenuOption = Game1.options.snappyMenus;
             HandleCustomMods();
         }
 
@@ -255,7 +255,9 @@ namespace NPCMapLocations
             if (!Game1.hasLoadedGame) { return; }
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
-            modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
+            if (Game1.options.snappyMenus)
+                modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
+
             GetFarmBuildingLocs();
             UpdateMarkers();
         }
@@ -624,7 +626,7 @@ namespace NPCMapLocations
                 // Handle any option changes by the player
                 // Caveat: If player is turning snappy menu on, they MUST close the menu to update the stored menu option
                 {
-                    snappyMenuOption = Game1.options.SnappyMenus;
+                    snappyMenuOption = Game1.options.snappyMenus;
                 }
             }
         }
