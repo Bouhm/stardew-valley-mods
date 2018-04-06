@@ -358,8 +358,8 @@ public static class MapModConstants
         }
     }
 
-    // Resize region rectangles accord to modified map page
-    public static Dictionary<string, Rect> RegionRects
+    // Resize location rectangles accord to modified map page
+    public static Dictionary<string, Rect> LocationRects
     {
         get
         {
@@ -405,7 +405,7 @@ public static class MapModConstants
         }
     }
 
-    // To determine which region an indoor location belongs to
+    // To determine which location an indoor location belongs to
     public static Dictionary<string, string> IndoorLocations
     {
         get

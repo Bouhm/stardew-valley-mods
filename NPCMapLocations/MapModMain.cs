@@ -35,7 +35,7 @@ namespace NPCMapLocations
         private static MapModMapPage modMapPage;
 
         // For debug info
-        private const bool DEBUG_MODE = false;
+        private const bool DEBUG_MODE = true;
         private static Vector2 _tileLower; 
         private static Vector2 _tileUpper; 
         private static string alertFlag; 
@@ -257,8 +257,6 @@ namespace NPCMapLocations
         // Update NPC marker data and names on hover
         private void UpdateNPCMarkers()
         {
-            List<string> hoveredNames = new List<string>();
-
             foreach (NPCMarker npcMarker in npcMarkers)
             {
                 NPC npc = Game1.getCharacterFromName(npcMarker.Name, true);
@@ -314,8 +312,8 @@ namespace NPCMapLocations
                         int width = 32;
                         int height = 30;
                         // Get center of NPC marker 
-                        int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - width / 2;
-                        int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - height / 2;
+                        int x = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).X - width/2;
+                        int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
 
                         npcMarker.Location = new Rectangle(x, y, width, height);
                         npcMarker.Marker = npc.sprite.Texture;
@@ -345,21 +343,6 @@ namespace NPCMapLocations
                             }
                         }
 
-                        // Hovered NPCs
-                        if (Game1.getMouseX() >= x + 2 && Game1.getMouseX() <= x - 2 + width && Game1.getMouseY() >= y + 2 && Game1.getMouseY() <= y - 2 + height)
-                        {
-                            // Don't show names of hidden NPCs even if drawn
-                            if (npcNames.ContainsKey(npc.name) && !npcMarker.IsHidden)
-                            {
-                                string name = npcNames[npc.name];
-                                if (!npcMarker.IsOutdoors)
-                                {
-                                    name = "^" + name;
-                                }
-                                hoveredNames.Add(npcNames[npc.name]);
-                            }
-                        }
-
                         // Establish draw order, higher number infront
                         // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
                         // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
@@ -374,8 +357,7 @@ namespace NPCMapLocations
                     }
                 }
             }
-
-            modMapPage = new MapModMapPage(hoveredNames, npcNames, config.NameTooltipMode);
+            modMapPage = new MapModMapPage(npcMarkers, npcNames);
         }
 
         // MAIN METHOD FOR PINPOINTING NPCS ON THE MAP
@@ -383,8 +365,13 @@ namespace NPCMapLocations
         // Requires MapModConstants and modified map page in ./content 
         public static Vector2 LocationToMap(string location, int tileX = -1, int tileY = -1, bool isFarmer = false)
         {
-            if (location == null)
+            if (location == null || !MapModConstants.MapVectors.ContainsKey(location))
             {
+                if (DEBUG_MODE && alertFlag != "UnknownLocation:" + location)
+                {
+                    MapModMain.monitor.Log("Unknown Location " + location + ".", LogLevel.Alert);
+                    alertFlag = "UnknownLocation:" + location;
+                }
                 return new Vector2(-5000, -5000);
             }
 
@@ -694,7 +681,7 @@ namespace NPCMapLocations
     }
 
     // Class for NPC markers
-    internal class NPCMarker
+    public class NPCMarker
     {
         public string Name { get; set; } = "";
         public Texture2D Marker { get; set; } = null;

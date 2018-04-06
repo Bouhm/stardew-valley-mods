@@ -5,105 +5,105 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace NPCMapLocations
 {
 
     public class MapModMapPage : IClickableMenu
     {
-        private readonly Dictionary<string, Rect> regionRects = MapModConstants.RegionRects;
-        private string hoverText = "";
+        private readonly Dictionary<string, Rect> locationRects = MapModConstants.LocationRects;
+        private readonly int nameTooltipMode = MapModMain.config.NameTooltipMode;
+        private string hoveredNames = "";
+        private string hoveredLocationText = "";
         private Texture2D map;
         private int mapX;
         private int mapY;
         public List<ClickableComponent> points = new List<ClickableComponent>();
         public ClickableTextureComponent okButton;
-        private List<String> hoveredNames;
+        private bool hasIndoorNPC;
         private Vector2 indoorIconVector;
         private Dictionary<string, string> npcNames;
-        private int nameTooltipMode;
+        private HashSet<NPCMarker> npcMarkers;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public MapModMapPage(List<String> hoveredNames, Dictionary<string, string> npcNames, int nameTooltipMode)
+        public MapModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
         {
-            this.nameTooltipMode = nameTooltipMode;
-            this.hoveredNames = hoveredNames;
             this.npcNames = npcNames;
+            this.npcMarkers = npcMarkers;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             this.map = MapModMain.map;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Desert_Region"),
+                    GetLocationRect("Desert_Region"),
                     Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Farm_Region"),
+                    GetLocationRect("Farm_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName })
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Backwoods_Region"),
+                    GetLocationRect("Backwoods_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("BusStop_Region"),
+                    GetLocationRect("BusStop_Region"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("WizardHouse"),
+                    GetLocationRect("WizardHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("AnimalShop"),
+                    GetLocationRect("AnimalShop"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("LeahHouse"),
+                    GetLocationRect("LeahHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("SamHouse"),
+                    GetLocationRect("SamHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("HaleyHouse"),
+                    GetLocationRect("HaleyHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("TownSquare"),
+                    GetLocationRect("TownSquare"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Hospital"),
+                    GetLocationRect("Hospital"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("SeedShop"),
+                    GetLocationRect("SeedShop"),
                     string.Concat(new string[]
                     {
                         Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
@@ -114,63 +114,63 @@ namespace NPCMapLocations
                     })
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Blacksmith"),
+                    GetLocationRect("Blacksmith"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Saloon"),
+                    GetLocationRect("Saloon"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("ManorHouse"),
+                    GetLocationRect("ManorHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("ArchaeologyHouse"),
+                    GetLocationRect("ArchaeologyHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("ElliottHouse"),
+                    GetLocationRect("ElliottHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Sewer"),
+                    GetLocationRect("Sewer"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Graveyard"),
+                    GetLocationRect("Graveyard"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Trailer"),
+                    GetLocationRect("Trailer"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("JoshHouse"),
+                    GetLocationRect("JoshHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("ScienceHouse"),
+                    GetLocationRect("ScienceHouse"),
                     string.Concat(new string[]
                     {
                         Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
@@ -181,81 +181,81 @@ namespace NPCMapLocations
                     })
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Tent"),
+                    GetLocationRect("Tent"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Mine"),
+                    GetLocationRect("Mine"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("AdventureGuild"),
+                    GetLocationRect("AdventureGuild"),
                     (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Quarry"),
+                    GetLocationRect("Quarry"),
                     Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("JojaMart"),
+                    GetLocationRect("JojaMart"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("FishShop"),
+                    GetLocationRect("FishShop"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Spa"),
+                    GetLocationRect("Spa"),
                     Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Woods"),
+                    GetLocationRect("Woods"),
                     Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("RuinedHouse"),
+                    GetLocationRect("RuinedHouse"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("CommunityCenter"),
+                    GetLocationRect("CommunityCenter"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("SewerPipe"),
+                    GetLocationRect("SewerPipe"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0])
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("Railroad_Region"),
+                    GetLocationRect("Railroad_Region"),
                     Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???"
                 )
             );
-            this.points.Add(
+            points.Add(
                 new ClickableComponent(
-                    GetRegionRect("LonelyStone"),
+                    GetLocationRect("LonelyStone"),
                     Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])
                 )
             );
@@ -269,7 +269,7 @@ namespace NPCMapLocations
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            foreach (ClickableComponent current in this.points)
+            foreach (ClickableComponent current in points)
             {
                 string name = current.name;
                 if (name == "Lonely Stone")
@@ -290,113 +290,116 @@ namespace NPCMapLocations
         // Disable snapping cursor on controller
         public override bool overrideSnappyMenuCursorMovementBan()
         {
-            return true;
+            return false;
         }
 
         public override void performHoverAction(int x, int y)
         {
-            this.hoverText = "";
-            foreach (ClickableComponent current in this.points)
+            hoveredLocationText = "";
+            foreach (ClickableComponent current in points)
             {
                 if (current.containsPoint(x, y))
                 {
-                    this.hoverText = current.name;
-                    return;
+                    hoveredLocationText = current.name;
+                    break;
                 }
+            }
+
+            hoveredNames = "";
+            const int markerWidth = 32;
+            const int markerHeight = 30;
+            // Have to use special character to separate strings for Chinese
+            string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+            foreach (NPCMarker npcMarker in this.npcMarkers)
+            {
+                Rectangle npcLocation = npcMarker.Location;
+                if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
+                {
+                    if (npcNames.ContainsKey(npcMarker.Name) && !npcMarker.IsHidden)
+                    {
+                        hoveredNames += npcNames[npcMarker.Name] + separator;
+                        var lines = hoveredNames.Split('\n');
+                        if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + npcNames[npcMarker.Name]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                            hoveredNames += Environment.NewLine;
+                    }
+                }
+                if (!npcMarker.IsOutdoors && !hasIndoorNPC)
+                {
+                    hasIndoorNPC = true;
+                }
+            }
+            int trimLen = separator.Equals(", ") ? 2 : 1;
+            if (hoveredNames.Length > trimLen)
+            {
+                hoveredNames = hoveredNames.Substring(0, hoveredNames.Length - trimLen);
             }
         }
 
         // Draw location and name tooltips
         public override void draw(SpriteBatch b)
         {
-            string names = "";
             int x = Game1.getMouseX() + Game1.tileSize / 2;
             int y = Game1.getMouseY() + Game1.tileSize / 2;
+            int width;
+            int height;
             int offsetY = 0;
+
             this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
-            if (!this.hoverText.Equals(""))
+            if (!hoveredLocationText.Equals(""))
             {
-                IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1, -1, -1, 1f, null);
-                int textLength = (int)Game1.smallFont.MeasureString(hoverText).X + Game1.tileSize / 2;
-                foreach (KeyValuePair<string, string> customName in npcNames)
+                IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1, -1, -1, 1f, null);
+                int textLength = (int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2;
+                width = Math.Max((int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2, textLength);
+                height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + Game1.tileSize / 2);
+                if (x + width > Game1.viewport.Width)
                 {
-                    this.hoverText = this.hoverText.Replace(customName.Key, customName.Value);
-                }
-                int ttWidth = Math.Max((int)Game1.smallFont.MeasureString(hoverText).X + Game1.tileSize / 2, textLength);
-                int ttHeight = (int)Math.Max(60, Game1.smallFont.MeasureString(hoverText).Y + Game1.tileSize / 2);
-                if (x + ttWidth > Game1.viewport.Width)
-                {
-                    x = Game1.viewport.Width - ttWidth;
+                    x = Game1.viewport.Width - width;
                     y += Game1.tileSize / 4;
                 }
-                if (this.nameTooltipMode == 1)
+                if (nameTooltipMode == 1)
                 {
-                    if (y + ttHeight > Game1.viewport.Height)
+                    if (y + height > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height - ttHeight;
+                        y = Game1.viewport.Height - height;
                     }
                     offsetY = 4 - Game1.tileSize;
                 }
-                else if (this.nameTooltipMode == 2)
+                else if (nameTooltipMode == 2)
                 {
-                    if (y + ttHeight > Game1.viewport.Height)
+                    if (y + height > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height -ttHeight;
+                        y = Game1.viewport.Height - height;
                     }
-                    offsetY = ttHeight - 4;
+                    offsetY = height - 4;
                 }
                 else
                 {
-                    if (y + ttHeight > Game1.viewport.Height)
+                    if (y + height > Game1.viewport.Height)
                     {
                         x += Game1.tileSize / 4;
-                        y = Game1.viewport.Height - ttHeight;
+                        y = Game1.viewport.Height - height;
                     }
                 }
 
-                if (this.hoveredNames != null && this.hoveredNames.Count > 0)
-                {
-                    foreach (string name in this.hoveredNames)
-                    {
-                        if (names == "")
-                        {
-                            names += name;
-                            continue;
-                        }
+                // Draw name tooltip around location tooltip
+                DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
 
-                        // Have to use special character to separate strings for Chinese
-                        var separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
-                        var lines = names.Split('\n');
-                        if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + name).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
-                        {
-                            names += separator + Environment.NewLine;
-                            names += name;
-                        }
-                        else
-                        {
-                            names += separator + name;
-                        }
-                    }
-                }
-
-                // Name tooltip
-                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, ttHeight, nameTooltipMode);
-
-                // Location tooltips
-                IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, ttWidth, ttHeight, Color.White, 1f, false);
-                b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
-                b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
-                b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f), Game1.textShadowColor);
-                b.DrawString(Game1.smallFont, hoverText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
+                // Draw location tooltip
+                IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
+                b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f), Game1.textShadowColor);
+                b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f), Game1.textShadowColor);
+                b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f), Game1.textShadowColor);
+                b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
             }
-            else
-            {
-                DrawNPCNames(Game1.spriteBatch, names, x, y, offsetY, this.height, nameTooltipMode);
-            }
-            if (names.Length > 0)
+            // Draw name tooltip only
+            else 
+                DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
+            
+            // Draw indoor icon
+            if (hasIndoorNPC)
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
         }
 
@@ -425,85 +428,85 @@ namespace NPCMapLocations
         // Draw NPC name tooltips map page
         public void DrawNPCNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
-            if (!(names.Equals("")))
-            {
-                var lines = names.Split('\n');
-                int ttHeight = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
-                int ttWidth = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
+            if (hoveredNames.Equals("")) return;
 
-                if (nameTooltipMode == 1)
+            indoorIconVector = Vector2.Zero;
+            var lines = names.Split('\n');
+            int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
+            int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
+
+            if (nameTooltipMode == 1)
+            {
+                x = Game1.getOldMouseX() + Game1.tileSize / 2;
+                if (lines.Length > 1)
+                {
+                    y += offsetY - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                }
+                else
+                {
+                    y += offsetY;
+                }
+                // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
+                // without the cursor covering the tooltip
+                if (x + width > Game1.viewport.Width)
+                {
+                    x = Game1.viewport.Width - width;
+                    if (lines.Length > 1)
+                    {
+                        y += relocate - 8 + ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                    }
+                    else
+                    {
+                        y += relocate - 8 + Game1.tileSize;
+                    }
+                }
+            }
+            else if (nameTooltipMode == 2)
+            {
+                y += offsetY;
+                if (x + width > Game1.viewport.Width)
+                {
+                    x = Game1.viewport.Width - width;
+                }
+                // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
+                if (y + height > Game1.viewport.Height)
                 {
                     x = Game1.getOldMouseX() + Game1.tileSize / 2;
                     if (lines.Length > 1)
                     {
-                        y += offsetY - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                        y += -relocate + 8 - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
                     }
                     else
                     {
-                        y += offsetY;
-                    }
-                    // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
-                    // without the cursor covering the tooltip
-                    if (x + ttWidth > Game1.viewport.Width)
-                    {
-                        x = Game1.viewport.Width - ttWidth;
-                        if (lines.Length > 1)
-                        {
-                            y += relocate - 8 + ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
-                        }
-                        else
-                        {
-                            y += relocate - 8 + Game1.tileSize;
-                        }
+                        y += -relocate + 8 - Game1.tileSize;
                     }
                 }
-                else if (nameTooltipMode == 2)
-                {
-                    y += offsetY;
-                    if (x + ttWidth > Game1.viewport.Width)
-                    {
-                        x = Game1.viewport.Width - ttWidth;
-                    }
-                    // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
-                    if (y + ttHeight > Game1.viewport.Height)
-                    {
-                        x = Game1.getOldMouseX() + Game1.tileSize / 2;
-                        if (lines.Length > 1)
-                        {
-                            y += -relocate + 8 - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
-                        }
-                        else
-                        {
-                            y += -relocate + 8 - Game1.tileSize;
-                        }
-                    }
-                }
-                else
-                {
-                    x = Game1.activeClickableMenu.xPositionOnScreen - 145;
-                    y = Game1.activeClickableMenu.yPositionOnScreen + 650 - ttHeight / 2;
-                }
-
-                indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
-                Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
-
-                drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, ttWidth, ttHeight, Color.White, 1f, true);
-                b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-                b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
+            else
+            {
+                x = Game1.activeClickableMenu.xPositionOnScreen - 145;
+                y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
+            }
+
+            if (hasIndoorNPC) indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
+            Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
+
+            drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
+            b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f); 
         }
 
-        // Get location and area of region component
-        private Rectangle GetRegionRect(string region)
+        // Get location and area of location component
+        private Rectangle GetLocationRect(string location)
         {
             // Set origin to center
             return new Rectangle(
-                (int)MapModMain.LocationToMap(region).X - regionRects[region].width/2,
-                (int)MapModMain.LocationToMap(region).Y - regionRects[region].height/2,
-                regionRects[region].width,
-                regionRects[region].height
+                (int)MapModMain.LocationToMap(location).X - locationRects[location].width/2,
+                (int)MapModMain.LocationToMap(location).Y - locationRects[location].height/2,
+                locationRects[location].width,
+                locationRects[location].height
             );
         }
     }
