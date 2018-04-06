@@ -217,8 +217,8 @@ namespace NPCMapLocations
         {
             // Check unlocked NPCs (hidden to avoid spoilers)
             showSecondaryNPCs[0] = Game1.player.mailReceived.Contains("ccVault"); // Sandy
-            showSecondaryNPCs[1] = Game1.stats.DaysPlayed >= 5u; // Marlon
-            showSecondaryNPCs[2] = Game1.stats.DaysPlayed >= 5u; // Wizard
+            showSecondaryNPCs[1] = Game1.player.eventsSeen.Contains(100162); // Marlon
+            showSecondaryNPCs[2] = Game1.player.eventsSeen.Contains(112); // Wizard
             showSecondaryNPCs[3] = Game1.year >= 2; // Kent
             showSecondaryNPCs[4] = // Traveling Merchant
                 (Game1.dayOfMonth == 5
