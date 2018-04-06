@@ -38,7 +38,7 @@ namespace NPCMapLocations
         private static Dictionary<string, Vector2> farmBuildings = new Dictionary<string, Vector2>();
 
         // For debug info
-        private const bool DEBUG_MODE = true;
+        private const bool DEBUG_MODE = false;
         private static Vector2 _tileLower; 
         private static Vector2 _tileUpper; 
         private static string alertFlag; 
