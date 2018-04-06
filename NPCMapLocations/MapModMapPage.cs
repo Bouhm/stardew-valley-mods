@@ -366,7 +366,7 @@ namespace NPCMapLocations
                         x += Game1.tileSize / 4;
                         y = Game1.viewport.Height - height;
                     }
-                    offsetY = 4 - Game1.tileSize;
+                    offsetY = 2 - Game1.tileSize;
                 }
                 else if (nameTooltipMode == 2)
                 {

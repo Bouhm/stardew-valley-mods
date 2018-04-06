@@ -611,7 +611,6 @@ namespace NPCMapLocations
         }
 
         // Hack to disable snappy menu with Map Page since ModMapPage doesn't replace the menu
-        // And hence can't override the snappy control like I did in MapModMenu
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
             if (!Game1.hasLoadedGame || Game1.options == null) { return; }

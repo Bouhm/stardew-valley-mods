@@ -132,8 +132,6 @@ namespace NPCMapLocations
             {
                 this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1, markerCrop));
             }
-
-            overrideSnappyMenuCursorMovementBan();
         }
 
         // Override snappy controls on controller
