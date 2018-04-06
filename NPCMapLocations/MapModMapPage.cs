@@ -386,7 +386,7 @@ namespace NPCMapLocations
                     }
                 }
 
-                // Draw name tooltip around location tooltip
+                // Draw name tooltip positioned around location tooltip
                 DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
 
                 // Draw location tooltip
@@ -401,7 +401,7 @@ namespace NPCMapLocations
                 DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
             
             // Draw indoor icon
-            if (hasIndoorNPC)
+            if (hasIndoorNPC && !hoveredNames.Equals(""))
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
         }
 

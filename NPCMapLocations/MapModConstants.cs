@@ -313,6 +313,9 @@ public static class MapModConstants
             { "Mine", new MapVector[] {
                 new MapVector(861, 83)
             }},
+            { "UndergroundMine", new MapVector[] {
+                new MapVector(861, 83)
+            }},
             { "Quarry", new MapVector[] {
                 new MapVector(1032, 139)
             }},

@@ -514,8 +514,8 @@ namespace NPCMapLocations
             if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
             {
                 Vector2 locVector = MapModMain.LocationToMap("Greenhouse");
-                locVector = new Vector2((int)(locVector.X - 5 / 2 * 3f));
-                farmBuildings["SlimeHutch"] = locVector;
+                locVector = new Vector2((int)(locVector.X - 5 / 2 * 3), (int)(locVector.Y - 7 / 2 * 3));
+                farmBuildings["Greenhouse"] = locVector;
             }
         }
 
@@ -539,7 +539,7 @@ namespace NPCMapLocations
 
             if (config.ShowFarmBuildings)
             {
-                float scale = 3f;
+                float scale = 3;
                 foreach (var building in farmBuildings)
                 {
                     b.Draw(buildings, building.Value, new Rectangle?(MapModConstants.FarmBuildingRects[building.Key]), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
