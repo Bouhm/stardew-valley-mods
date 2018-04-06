@@ -15,6 +15,7 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NPCMapLocations
 {
@@ -26,10 +27,11 @@ namespace NPCMapLocations
         public static Texture2D map;
         public static Texture2D buildings;
         public static string saveName;
-        private static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static int customNpcId;
+        private static bool snappyMenuOption;
         private static bool[] showSecondaryNPCs = new Boolean[5];
         private static MapModMapPage modMapPage;
+        private static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, Dictionary<string, int>> customNPCs;
         private static Dictionary<string, string> npcNames = new Dictionary<string, string>(); // For custom names
         private static HashSet<NPCMarker> npcMarkers = new HashSet<NPCMarker>();
@@ -53,6 +55,7 @@ namespace NPCMapLocations
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
         }
 
         // Load config and other one-off data
@@ -62,6 +65,7 @@ namespace NPCMapLocations
             config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.MarkerCrop;
             customNPCs = config.CustomNPCs;
+            snappyMenuOption = Game1.options.SnappyMenus;
             HandleCustomMods();
         }
 
@@ -168,7 +172,7 @@ namespace NPCMapLocations
         private void HandleInput(GameMenu menu, SButton input)
         {
             if (menu.currentTab != GameMenu.mapTab) { return; }
-            if (input.ToString().Equals(config.MenuKey) || input is SButton.ControllerB)
+            if (input.ToString().Equals(config.MenuKey) || input is SButton.ControllerY)
             {
                 Game1.activeClickableMenu = new MapModMenu(
                     Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2,
@@ -251,7 +255,7 @@ namespace NPCMapLocations
             if (!Game1.hasLoadedGame) { return; }
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
-
+            modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
             GetFarmBuildingLocs();
             UpdateMarkers();
         }
@@ -477,7 +481,8 @@ namespace NPCMapLocations
         // Helper to check if map is opened
         private static bool IsMapOpen(GameMenu menu)
         {
-            return menu.currentTab == GameMenu.mapTab;
+            if (menu == null) { return false; }
+            return (menu.currentTab == GameMenu.mapTab);
         }
 
         // Get locations of farm buildings
@@ -523,7 +528,7 @@ namespace NPCMapLocations
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
             if (!Game1.hasLoadedGame) { return; }
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             DrawMapPage();
@@ -601,6 +606,27 @@ namespace NPCMapLocations
                 b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
             }
 
+        }
+
+        // Hack to disable snappy menu with Map Page since ModMapPage doesn't replace the menu
+        // And hence can't override the snappy control like I did in MapModMenu
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        {
+            if (!Game1.hasLoadedGame || Game1.options == null) { return; }
+            if (e.PriorMenu is GameMenu menu)
+            {
+                // Reset option after map sets option to false
+                if (IsMapOpen(menu))
+                {
+                    modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(snappyMenuOption);
+                }
+                else
+                // Handle any option changes by the player
+                // Caveat: If player is turning snappy menu on, they MUST close the menu to update the stored menu option
+                {
+                    snappyMenuOption = Game1.options.SnappyMenus;
+                }
+            }
         }
 
         // For debugging
