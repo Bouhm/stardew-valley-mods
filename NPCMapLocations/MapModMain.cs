@@ -311,7 +311,6 @@ namespace NPCMapLocations
                             >= config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name)
                             <= config.HeartLevelMax)
                            )
-
                     );
 
                     // NPCs that will be drawn onto the map
