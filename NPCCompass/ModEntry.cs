@@ -19,7 +19,6 @@ namespace NPCCompass
 
         // For debug info
         private static double _angle;
-        private static Vector2 _viewportPos;
         private static Vector2 _npcPos;
         private static Vector2 _playerPos;
         private static Vector2 _locatorPos;
@@ -49,12 +48,7 @@ namespace NPCCompass
             // Hypotenuse is the line from player to npc
             float opposite = npcPos.Y - playerPos.Y;
             float adjacent = npcPos.X - playerPos.X;
-            double angle = Math.Atan(opposite / adjacent);
-
-            if (opposite > 0 && adjacent > 0 || opposite < 0 && adjacent > 0)
-                angle += MathHelper.Pi;
-            else if (opposite > 0 && adjacent < 0)
-                angle += MathHelper.TwoPi;
+            double angle = Math.Atan2(opposite, adjacent) + MathHelper.Pi;
 
             return angle;
         }
@@ -67,22 +61,19 @@ namespace NPCCompass
         //  |   / \   |
         //  | /__4__\_|
         //
-        private int GetViewportQuadrant(double angle)
+        private int GetViewportQuadrant(double angle, Vector2 playerPos)
         {
-            float length = Game1.viewport.Height / 2; // Game1.player.position.X - Game1.viewport.X;
-            float width = Game1.viewport.Width / 2; // Game1.player.position.Y - Game1.viewport.Y;
-            //monitor.Log(Math.Atan(length / width) + ", " + length +", " + width);
             // Top half of left quadrant
-            if (angle < Math.Atan(length/width))
+            if (angle < Math.Atan2(playerPos.Y - Game1.viewport.Y, playerPos.X - Game1.viewport.X))
                 return 1;
             // Top quadrant
-            else if (angle < MathHelper.Pi - Math.Atan(length/width))
+            else if (angle < MathHelper.Pi - Math.Atan2(playerPos.Y - Game1.viewport.Y, Game1.viewport.X + Game1.viewport.Width - playerPos.X))
                 return 2;
             // Right quadrant
-            else if (angle < 3*MathHelper.PiOver2 - Math.Atan(length/width))
+            else if (angle < MathHelper.Pi + Math.Atan2(Game1.viewport.Y + Game1.viewport.Height - playerPos.Y, Game1.viewport.X + Game1.viewport.Width - playerPos.X))
                 return 3;
             // Bottom quadrant
-            else if (angle < MathHelper.TwoPi - Math.Atan(length/width))
+            else if (angle < MathHelper.TwoPi - Math.Atan2(Game1.viewport.Y + Game1.viewport.Height - playerPos.Y, playerPos.X - Game1.viewport.X))
                 return 4;
             // Bottom half of left quadrant
             else
@@ -98,30 +89,51 @@ namespace NPCCompass
 
         // Get position of location relative to viewport from
         // the viewport quadrant and positions of player/npc relative to map
-        private Vector2 GetLocatorPosition(double angle, int quadrant)
+        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos)
         {
-            float x;
-            float y;
+            float x = playerPos.X - Game1.viewport.X;
+            float y = playerPos.Y - Game1.viewport.Y;
 
             // Draw triangle such that the hypotenuse is
             // the line from player to the point of intersection of
             // the viewport quadrant and the line to the npc
             switch (quadrant)
             {
+                // Have to split each quadrant in half since player is not always centered in viewport
                 case 1:
-                    y = Game1.viewport.Height/2 - (Game1.viewport.Width/2 * (float)Math.Tan(angle));
+                    // Bottom half
+                    if (angle > MathHelper.TwoPi - angle)
+                        y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
+                    // Top half
+                    else
+                        y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
                     return new Vector2(0, y);
                 case 2:
-                    x = Game1.viewport.Width/2 - (Game1.viewport.Height/2 * (float)Math.Tan(MathHelper.PiOver2 - angle));
+                    // Left half
+                    if (angle < MathHelper.PiOver2)
+                        x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
+                    // Right half
+                    else 
+                        x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
                     return new Vector2(x, 0);
                 case 3:
-                    y = Game1.viewport.Height/2 - (Game1.viewport.Width/2 * (float)Math.Tan(MathHelper.Pi - angle));
+                    // Top half
+                    if (angle < MathHelper.Pi)
+                        y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
+                    // Bottom half
+                    else
+                        y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
                     return new Vector2(Game1.viewport.Width, y);
                 case 4:
-                    x = Game1.viewport.Width/2 - (Game1.viewport.Height/2 * (float)Math.Tan(3 * MathHelper.PiOver2 - angle));
+                    // Right half
+                    if (angle < 3*MathHelper.PiOver2)
+                        x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
+                    // Left half
+                    else
+                        x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
                     return new Vector2(x, Game1.viewport.Height);
                 default:
-                    return Vector2.Zero;
+                    return new Vector2(-5000, -5000);
             }
         }
 
@@ -138,9 +150,9 @@ namespace NPCCompass
                 if (constants.Location[npc.currentLocation.name] == null 
                     || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
                    ) { continue; }
-                //if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize)) { continue; }
+                if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize)) { continue; }
 
-                Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.pixelZoom * Game1.player.sprite.spriteWidth / 2, Game1.player.position.Y);
+                Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.pixelZoom * Game1.player.sprite.spriteWidth / 2, Game1.player.position.Y - 19);
                 Vector2 npcPos = new Vector2(npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth / 2, npc.position.Y);
                 Locator locator = new Locator
                 {
@@ -150,8 +162,8 @@ namespace NPCCompass
                 };
 
                 double angle = GetPlayerToNPCAngle(playerPos, npcPos);
-                int quadrant = GetViewportQuadrant(angle);
-                Vector2 locatorPos = GetLocatorPosition(angle, quadrant);
+                int quadrant = GetViewportQuadrant(angle, playerPos);
+                Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos);
 
                 locator.X = locatorPos.X; 
                 locator.Y = locatorPos.Y; 
@@ -160,7 +172,6 @@ namespace NPCCompass
                 if (DEBUG_MODE && locators.Count == 1)
                 {
                     ModEntry._angle = angle;
-                    ModEntry._viewportPos = new Vector2(Game1.viewport.X, Game1.viewport.Y);
                     ModEntry._playerPos = playerPos;
                     ModEntry._npcPos = npcPos;
                     ModEntry._locatorPos = locatorPos;
@@ -208,7 +219,7 @@ namespace NPCCompass
             DrawText("Locator: (" + (int)ModEntry._locatorPos.X + ", " + (int)ModEntry._locatorPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), color);
             DrawText("Player: (" + (int)ModEntry._playerPos.X + ", " + (int)ModEntry._playerPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), color);
             DrawText("NPC: (" + (int)ModEntry._npcPos.X + ", " + (int)ModEntry._npcPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), color);
-            DrawText("Viewport: (" + (int)ModEntry._viewportPos.X + ", " + (int)ModEntry._viewportPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 9 / 4 + 8 * 4), color);
+            DrawText("Viewport: (" + (int)Game1.viewport.X + ", " + (int)Game1.viewport.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 9 / 4 + 8 * 4), color);
             DrawText(Game1.viewport.Width + "x" + Game1.viewport.Height, new Vector2(Game1.tileSize / 4, Game1.tileSize * 11 / 4 + 8 * 5), color);
         }
 
@@ -237,7 +248,7 @@ namespace NPCCompass
                    ) { continue; }
 
                 float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.sprite.spriteWidth/2 - Game1.viewport.X;
-                float viewportY = Game1.player.position.Y - Game1.viewport.Y;
+                float viewportY = Game1.player.position.Y - 19 - Game1.viewport.Y;
                 float npcViewportX = npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth/2 - Game1.viewport.X;
                 float npcViewportY = npc.position.Y - Game1.viewport.Y;
                 // Draw NPC sprite noodle connecting center of screen to NPC for debugging
