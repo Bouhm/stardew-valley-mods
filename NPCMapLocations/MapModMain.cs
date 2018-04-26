@@ -47,8 +47,8 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
-            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map", ContentSource.ModFolder); // Load modified map page
-            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings", ContentSource.ModFolder); // Load cfarm buildings
+            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map.png", ContentSource.ModFolder); // Load modified map page
+            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings.png", ContentSource.ModFolder); // Load cfarm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
