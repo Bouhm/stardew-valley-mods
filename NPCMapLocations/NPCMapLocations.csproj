@@ -53,6 +53,20 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\buildings.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="content\map.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="i18n\de.json" />
+    <None Include="i18n\default.json" />
+    <None Include="i18n\es.json" />
+    <None Include="i18n\ja.json" />
+    <None Include="i18n\pt.json" />
+    <None Include="i18n\ru.json" />
+    <None Include="i18n\zh.json" />
+    <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
