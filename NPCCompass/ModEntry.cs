@@ -110,7 +110,7 @@ namespace NPCCompass
                     // Top half
                     else
                         y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
-                    return new Vector2(0 + Game1.tileSize/2, y);
+                    return new Vector2(0 + (Game1.tileSize/2 + 4), y);
                 case 2:
                     // Left half
                     if (angle < MathHelper.PiOver2)
@@ -118,7 +118,7 @@ namespace NPCCompass
                     // Right half
                     else
                         x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
-                    return new Vector2(x, 0 + Game1.tileSize / 2);
+                    return new Vector2(x, 0 + (Game1.tileSize/2 + 4));
                 case 3:
                     // Top half
                     if (angle < MathHelper.Pi)
@@ -126,7 +126,7 @@ namespace NPCCompass
                     // Bottom half
                     else
                         y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
-                    return new Vector2(Game1.viewport.Width - Game1.tileSize/2, y);
+                    return new Vector2(Game1.viewport.Width - (Game1.tileSize/2 + 4), y);
                 case 4:
                     // Right half
                     if (angle < 3 * MathHelper.PiOver2)
@@ -134,7 +134,7 @@ namespace NPCCompass
                     // Left half
                     else
                         x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
-                    return new Vector2(x, Game1.viewport.Height - Game1.tileSize / 2);
+                    return new Vector2(x, Game1.viewport.Height - (Game1.tileSize/2 + 4));
                 default:
                     return new Vector2(-5000, -5000);
             }
@@ -211,15 +211,17 @@ namespace NPCCompass
                 // NPC head
                 Game1.spriteBatch.Draw(
                     locator.Marker,
-                    new Vector2(locator.X + 32, locator.Y + 30),
+                    new Vector2(locator.X + 24, locator.Y + 12),
                     new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
                     Color.White * (float)alphaLevel,
                     0f,
                     new Vector2(16, 16),
-                    4f,
+                    3f,
                     SpriteEffects.None,
                     1f
                 );
+                string distanceString = Math.Round(locator.Proximity/Game1.tileSize, 0).ToString();
+                DrawText(distanceString, new Vector2(locator.X, locator.Y + 14), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize/4) * 0.5)), 0.35f);
             }
         }
 
@@ -250,13 +252,13 @@ namespace NPCCompass
         }
 
         // Draw outlined text
-        private static void DrawText(string text, Vector2 pos, Color? color = null)
+        private static void DrawText(string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
         {
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
