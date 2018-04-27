@@ -110,7 +110,7 @@ namespace NPCCompass
                     // Top half
                     else
                         y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
-                    return new Vector2(0 + (Game1.tileSize/2 + 4), y);
+                    return new Vector2(0 + (Game1.tileSize/2 + 8), y);
                 case 2:
                     // Left half
                     if (angle < MathHelper.PiOver2)
@@ -118,7 +118,7 @@ namespace NPCCompass
                     // Right half
                     else
                         x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
-                    return new Vector2(x, 0 + (Game1.tileSize/2 + 4));
+                    return new Vector2(x, 0 + (Game1.tileSize/2 + 8));
                 case 3:
                     // Top half
                     if (angle < MathHelper.Pi)
@@ -126,7 +126,7 @@ namespace NPCCompass
                     // Bottom half
                     else
                         y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
-                    return new Vector2(Game1.viewport.Width - (Game1.tileSize/2 + 4), y);
+                    return new Vector2(Game1.viewport.Width - (Game1.tileSize/2 + 8), y);
                 case 4:
                     // Right half
                     if (angle < 3 * MathHelper.PiOver2)
@@ -134,7 +134,7 @@ namespace NPCCompass
                     // Left half
                     else
                         x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
-                    return new Vector2(x, Game1.viewport.Height - (Game1.tileSize/2 + 4));
+                    return new Vector2(x, Game1.viewport.Height - (Game1.tileSize/2 + 8));
                 default:
                     return new Vector2(-5000, -5000);
             }
@@ -148,11 +148,14 @@ namespace NPCCompass
                 if ((npc.Schedule == null
                     && !npc.isMarried())
                     || npc.currentLocation == null
-                    || !constants.Location.ContainsKey(npc.currentLocation.name)
+                   // || !constants.Location.ContainsKey(npc.currentLocation.name)
                    ) { continue; }
+                if (!(npc.currentLocation.name.Equals(Game1.player.currentLocation.name))) { continue; }
+                /*
                 if (constants.Location[npc.currentLocation.name] == null
                     || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
                    ) { continue; }
+                */
                 if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize)) { continue; }
 
                 Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth/2 * Game1.pixelZoom, Game1.player.position.Y);
@@ -171,6 +174,7 @@ namespace NPCCompass
                 locator.X = locatorPos.X;
                 locator.Y = locatorPos.Y;
                 locator.Angle = angle;
+                locator.Quadrant = quadrant;
                 locators.Add(locator);
 
                 if (DEBUG_MODE && locators.Count == 1)
@@ -193,12 +197,16 @@ namespace NPCCompass
         {
             foreach (Locator locator in locators)
             {
-                double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.3 : 0.3 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.7;
+                double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.25 : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
+
+                int offsetX = 0;
+                if (locator.Quadrant == 2 || locator.Quadrant == 4)
+                    offsetX = -16;
 
                 // Pointer texture
                 Game1.spriteBatch.Draw(
                     pointer,
-                    new Vector2(locator.X, locator.Y),
+                    new Vector2(locator.X + offsetX, locator.Y),
                     new Rectangle?(new Rectangle(0, 0, 64, 64)),
                     Color.White * (float)alphaLevel,
                     (float)(locator.Angle - 3 * MathHelper.PiOver4),
@@ -211,7 +219,7 @@ namespace NPCCompass
                 // NPC head
                 Game1.spriteBatch.Draw(
                     locator.Marker,
-                    new Vector2(locator.X + 24, locator.Y + 12),
+                    new Vector2(locator.X + 24 + offsetX, locator.Y + 12),
                     new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
                     Color.White * (float)alphaLevel,
                     0f,
@@ -221,7 +229,7 @@ namespace NPCCompass
                     1f
                 );
                 string distanceString = Math.Round(locator.Proximity/Game1.tileSize, 0).ToString();
-                DrawText(distanceString, new Vector2(locator.X, locator.Y + 14), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize/4) * 0.5)), 0.35f);
+                DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 12), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize/4) * 0.5)), 0.37f);
             }
         }
 
@@ -269,11 +277,14 @@ namespace NPCCompass
                 if ((npc.Schedule == null
                     && !npc.isMarried())
                     || npc.currentLocation == null
-                    || !constants.Location.ContainsKey(npc.currentLocation.name)
+                   // || !constants.Location.ContainsKey(npc.currentLocation.name)
                    ) { continue; }
+                if (!(npc.currentLocation.name.Equals(Game1.player.currentLocation.name))) { continue; }
+                /*
                 if (constants.Location[npc.currentLocation.name] == null
                     || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
                    ) { continue; }
+                */
 
                 float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.spriteWidth / 2 - Game1.viewport.X;
                 float viewportY = Game1.player.position.Y - Game1.viewport.Y;
@@ -293,6 +304,7 @@ namespace NPCCompass
         public string Name { get; set; } = "";
         public Texture2D Marker { get; set; } = null;
         public double Proximity = 0;
+        public int Quadrant = 1;
         public float X { get; set; } = 0;
         public float Y { get; set; } = 0;
         public double Angle { get; set; } = 0.0;
