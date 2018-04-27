@@ -14,8 +14,10 @@ namespace NPCCompass
     {
         private IModHelper helper;
         public static IMonitor monitor;
+        private static Texture2D pointer;
         private static ModData constants;
         private static HashSet<Locator> locators;
+        private const int MAX_PROXIMITY = 4800;
 
         // For debug info
         private static double _angle;
@@ -29,9 +31,10 @@ namespace NPCCompass
         {
             this.helper = helper;
             monitor = this.Monitor;
+            ModEntry.pointer = helper.Content.Load<Texture2D>(@"content/locator", ContentSource.ModFolder); // Load pointer tex
             constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
             GameEvents.UpdateTick += GameEvents_UpdateTick;
-            GraphicsEvents.OnPostRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
+            GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
         }
 
@@ -107,15 +110,15 @@ namespace NPCCompass
                     // Top half
                     else
                         y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
-                    return new Vector2(0, y);
+                    return new Vector2(0 + Game1.tileSize/2, y);
                 case 2:
                     // Left half
                     if (angle < MathHelper.PiOver2)
                         x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
                     // Right half
-                    else 
+                    else
                         x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
-                    return new Vector2(x, 0);
+                    return new Vector2(x, 0 + Game1.tileSize / 2);
                 case 3:
                     // Top half
                     if (angle < MathHelper.Pi)
@@ -123,15 +126,15 @@ namespace NPCCompass
                     // Bottom half
                     else
                         y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
-                    return new Vector2(Game1.viewport.Width, y);
+                    return new Vector2(Game1.viewport.Width - Game1.tileSize/2, y);
                 case 4:
                     // Right half
-                    if (angle < 3*MathHelper.PiOver2)
+                    if (angle < 3 * MathHelper.PiOver2)
                         x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
                     // Left half
                     else
                         x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) * (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
-                    return new Vector2(x, Game1.viewport.Height);
+                    return new Vector2(x, Game1.viewport.Height - Game1.tileSize / 2);
                 default:
                     return new Vector2(-5000, -5000);
             }
@@ -142,18 +145,18 @@ namespace NPCCompass
             locators = new HashSet<Locator>();
             foreach (NPC npc in Utility.getAllCharacters())
             {
-                if ((npc.Schedule == null 
-                    && !npc.isMarried()) 
-                    || npc.currentLocation == null 
+                if ((npc.Schedule == null
+                    && !npc.isMarried())
+                    || npc.currentLocation == null
                     || !constants.Location.ContainsKey(npc.currentLocation.name)
                    ) { continue; }
-                if (constants.Location[npc.currentLocation.name] == null 
+                if (constants.Location[npc.currentLocation.name] == null
                     || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
                    ) { continue; }
                 if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize)) { continue; }
 
-                Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.pixelZoom * Game1.player.sprite.spriteWidth / 2, Game1.player.position.Y - 19);
-                Vector2 npcPos = new Vector2(npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth / 2, npc.position.Y);
+                Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth/2 * Game1.pixelZoom, Game1.player.position.Y);
+                Vector2 npcPos = new Vector2(npc.position.X + npc.sprite.spriteHeight/2 * Game1.pixelZoom, npc.position.Y);
                 Locator locator = new Locator
                 {
                     Name = npc.name,
@@ -165,8 +168,9 @@ namespace NPCCompass
                 int quadrant = GetViewportQuadrant(angle, playerPos);
                 Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos);
 
-                locator.X = locatorPos.X; 
-                locator.Y = locatorPos.Y; 
+                locator.X = locatorPos.X;
+                locator.Y = locatorPos.Y;
+                locator.Angle = angle;
                 locators.Add(locator);
 
                 if (DEBUG_MODE && locators.Count == 1)
@@ -182,16 +186,38 @@ namespace NPCCompass
         private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
+            DrawLocators();
+        }
+
+        private void DrawLocators()
+        {
             foreach (Locator locator in locators)
             {
+                double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.3 : 0.3 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.7;
+
+                // Pointer texture
+                Game1.spriteBatch.Draw(
+                    pointer,
+                    new Vector2(locator.X, locator.Y),
+                    new Rectangle?(new Rectangle(0, 0, 64, 64)),
+                    Color.White * (float)alphaLevel,
+                    (float)(locator.Angle - 3 * MathHelper.PiOver4),
+                    new Vector2(pointer.Width / 2, pointer.Height / 2),
+                    1f,
+                    SpriteEffects.None,
+                    0.0f
+                );
+
+                // NPC head
                 Game1.spriteBatch.Draw(
                     locator.Marker,
-                    new Vector2(locator.X - 32, locator.Y - 30), 
-                    new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)), 
-                    Color.White, 0f, 
-                    Vector2.Zero, 
-                    Game1.pixelZoom, 
-                    SpriteEffects.None, 
+                    new Vector2(locator.X + 32, locator.Y + 30),
+                    new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
+                    Color.White * (float)alphaLevel,
+                    0f,
+                    new Vector2(16, 16),
+                    4f,
+                    SpriteEffects.None,
                     1f
                 );
             }
@@ -247,8 +273,8 @@ namespace NPCCompass
                     || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
                    ) { continue; }
 
-                float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.sprite.spriteWidth/2 - Game1.viewport.X;
-                float viewportY = Game1.player.position.Y - 19 - Game1.viewport.Y;
+                float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.spriteWidth / 2 - Game1.viewport.X;
+                float viewportY = Game1.player.position.Y - Game1.viewport.Y;
                 float npcViewportX = npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth/2 - Game1.viewport.X;
                 float npcViewportY = npc.position.Y - Game1.viewport.Y;
                 // Draw NPC sprite noodle connecting center of screen to NPC for debugging
@@ -267,6 +293,7 @@ namespace NPCCompass
         public double Proximity = 0;
         public float X { get; set; } = 0;
         public float Y { get; set; } = 0;
+        public double Angle { get; set; } = 0.0;
     }
 }
 
