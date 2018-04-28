@@ -1,0 +1,72 @@
+{
+	"Format": "1.3",
+	"ConfigSchema": {
+		"Dog": {
+			"AllowValues": "shibainu, shephed, husky"
+			},
+		},
+
+	"Changes": [
+		//Cursors for Portraits
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "LooseSprites/Cursors",
+			"FromFile": "assets/shibePortrait.png",
+			"When": {
+				"Dog": "shibainu"
+			},
+			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
+			"Enabled": true
+		},
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "LooseSprites/Cursors",
+			"FromFile": "assets/shepherdPortrait.png",
+			"When": {
+				"Dog": "shepherd"
+			},
+			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
+			"Enabled": true
+		},
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "LooseSprites/Cursors",
+			"FromFile": "assets/huskyPortrait.png",
+			"When": {
+				"Dog": "husky"
+			},
+			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
+			"Enabled": true
+		},
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "Animals/dog",
+			"FromFile": "assets/shibainu.png",
+			"When": {
+				"Dog": "shibainu"
+			}
+		},
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "Animals/dog",
+			"FromFile": "assets/shepherd.png",
+			"When": {
+				"Dog": "shepherd"
+			}
+		},
+		{
+			"Action": "EditImage",
+			"PatchMode": "Replace",
+			"Target": "Animals/dog",
+			"FromFile": "assets/husky.png",
+			"When": {
+				"Dog": "husky"
+			}
+		},
+	]
+}
