@@ -307,7 +307,7 @@ namespace NPCMapLocations
             );
             yield return new ClickableComponent(
                 GetLocationRect("Farm_Region"),
-                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName.Value })
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName })
             );
             yield return new ClickableComponent(
                 GetLocationRect("Backwoods_Region"),

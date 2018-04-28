@@ -93,7 +93,7 @@ namespace NPCMapLocations
                 int idx = 1;
                 foreach (KeyValuePair<string, Dictionary<string, int>> customNPC in customNPCs)
                 {
-                    if (npc.Name.Equals(customNPC.Key))
+                    if (npc.name.Equals(customNPC.Key))
                     {
                         customNpcId = idx;
                     }
@@ -111,17 +111,17 @@ namespace NPCMapLocations
             }
             else
             {
-                if (npc.Schedule != null && IsCustomNPC(npc.Name))
+                if (npc.Schedule != null && IsCustomNPC(npc.name))
                 {
-                    if (!customNPCs.ContainsKey(npc.Name))
+                    if (!customNPCs.ContainsKey(npc.name))
                     {
                         var npcEntry = new Dictionary<string, int>
                         {
                             { "id", id },
                             { "crop", 0 }
                         };
-                        customNPCs.Add(npc.Name, npcEntry);
-                        markerCrop.Add(npc.Name, 0);
+                        customNPCs.Add(npc.name, npcEntry);
+                        markerCrop.Add(npc.name, 0);
                         id++;
                     }
                 }
@@ -133,14 +133,14 @@ namespace NPCMapLocations
         // Handle modified NPC names
         private void LoadCustomNames(NPC npc)
         {
-            if (!npcNames.ContainsKey(npc.Name))
+            if (!npcNames.ContainsKey(npc.name))
             {
                 var customName = npc.getName();
                 if (string.IsNullOrEmpty(customName))
                 {
-                    customName = npc.Name;
+                    customName = npc.name;
                 }
-                npcNames.Add(npc.Name, customName);
+                npcNames.Add(npc.name, customName);
             }
         }
 
@@ -151,9 +151,9 @@ namespace NPCMapLocations
             {
                 foreach (KeyValuePair<string, int> villager in config.VillagerCrop)
                 {
-                    if (npc.Name.Equals(villager.Key))
+                    if (npc.name.Equals(villager.Key))
                     {
-                        markerCrop[npc.Name] = villager.Value;
+                        markerCrop[npc.name] = villager.Value;
                     }
                 }
             }
@@ -239,10 +239,10 @@ namespace NPCMapLocations
             foreach (NPC npc in Utility.getAllCharacters())
             {
                 // Handle case where Kent appears even though he shouldn't
-                if (!npc.isVillager() || (npc.Name.Equals("Kent") && !showSecondaryNPCs[3])) { continue; }
+                if (!npc.isVillager() || (npc.name.Equals("Kent") && !showSecondaryNPCs[3])) { continue; }
                
                 NPCMarker npcMarker = new NPCMarker(){
-                    Name = npc.Name, 
+                    Name = npc.name, 
                     IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
                 };
                 npcMarkers.Add(npcMarker);
@@ -273,7 +273,7 @@ namespace NPCMapLocations
                 // Handle null locations at beginning of new game
                 if (npc.currentLocation == null)
                 {
-                    MapModConstants.StartingLocations.TryGetValue(npc.Name, out currentLocation);
+                    MapModConstants.StartingLocations.TryGetValue(npc.name, out currentLocation);
                 }
                 else
                 {
@@ -287,7 +287,7 @@ namespace NPCMapLocations
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).IsOutdoors;
 
-                if (npc.Schedule != null || npc.isMarried() || npc.Name.Equals("Sandy") || npc.Name.Equals("Marlon") || npc.Name.Equals("Wizard"))
+                if (npc.Schedule != null || npc.isMarried() || npc.name.Equals("Sandy") || npc.name.Equals("Marlon") || npc.name.Equals("Wizard"))
                 {
                     // For show NPCs in player's location option
                     bool sameLocation = false;
@@ -303,19 +303,19 @@ namespace NPCMapLocations
 
                     // NPCs that won't be shown on the map unless Show Hidden NPCs is checked
                     npcMarker.IsHidden = (
-                        (config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name))
-                        || (config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name))
+                        (config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.name))
+                        || (config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.name))
                         || (config.OnlySameLocation && !sameLocation)
                         || (config.ByHeartLevel
-                            && !(Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
-                            >= config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
+                            && !(Game1.player.getFriendshipHeartLevelForNPC(npc.name)
+                            >= config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.name)
                             <= config.HeartLevelMax)
                            )
 
                     );
 
                     // NPCs that will be drawn onto the map
-                    if (IsNPCShown(npc.Name) && (config.ShowHiddenVillagers || !npcMarker.IsHidden))
+                    if (IsNPCShown(npc.name) && (config.ShowHiddenVillagers || !npcMarker.IsHidden))
                     {
                         int width = 32;
                         int height = 30;
@@ -334,16 +334,16 @@ namespace NPCMapLocations
                                 switch (quest.questType)
                                 {
                                     case 3:
-                                        npcMarker.HasQuest = (((ItemDeliveryQuest)quest).target == npc.Name);
+                                        npcMarker.HasQuest = (((ItemDeliveryQuest)quest).target == npc.name);
                                         break;
                                     case 4:
-                                        npcMarker.HasQuest = (((SlayMonsterQuest)quest).target == npc.Name);
+                                        npcMarker.HasQuest = (((SlayMonsterQuest)quest).target == npc.name);
                                         break;
                                     case 7:
-                                        npcMarker.HasQuest = (((FishingQuest)quest).target == npc.Name);
+                                        npcMarker.HasQuest = (((FishingQuest)quest).target == npc.name);
                                         break;
                                     case 10:
-                                        npcMarker.HasQuest = (((ResourceCollectionQuest)quest).target == npc.Name);
+                                        npcMarker.HasQuest = (((ResourceCollectionQuest)quest).target == npc.name);
                                         break;
                                     default:
                                         break;
@@ -389,11 +389,11 @@ namespace NPCMapLocations
             {
                 foreach (Building farmBuilding in Game1.getFarm().buildings)
                 {
-                    if (farmBuilding.indoors != null && farmBuilding.indoors.Value.Name.Equals(location))
+                    if (farmBuilding.indoors != null && farmBuilding.indoors.name.Equals(location))
                     {
                         // Set origin to center
-                        tileX = (int)(farmBuilding.tileX.Value - farmBuilding.tilesWide.Value / 2);
-                        tileY = (int)(farmBuilding.tileY.Value - farmBuilding.tilesHigh.Value / 2);
+                        tileX = (int)(farmBuilding.tileX - farmBuilding.tilesWide / 2);
+                        tileY = (int)(farmBuilding.tileY - farmBuilding.tilesHigh / 2);
                         location = "Farm";
                     }
                 }
@@ -497,7 +497,7 @@ namespace NPCMapLocations
                     continue;
                 }
 
-                Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX.Value, building.tileY.Value);
+                Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX, building.tileY);
                 if (building.baseNameOfIndoors.Equals("Shed"))
                 {
                     farmBuildings["Shed"] = locVector;
