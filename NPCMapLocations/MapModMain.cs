@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace NPCMapLocations
 {
-    public class MapModMain : Mod
+    public class MapModMain : Mod, IAssetLoader
     {
         public static IModHelper modHelper;
         public static IMonitor monitor;
@@ -46,8 +46,7 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
-            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map.png", ContentSource.ModFolder); // Load modified map page
-            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings.png", ContentSource.ModFolder); // Load cfarm buildings
+            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
@@ -55,6 +54,17 @@ namespace NPCMapLocations
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+        }
+
+        // Replace game map with modified map
+        public bool CanLoad<T>(IAssetInfo asset)
+        {
+            return asset.AssetNameEquals(@"LooseSprites\Map");
+        }
+
+        public T Load<T>(IAssetInfo asset)
+        {
+            return (T)(object)MapModMain.modHelper.Content.Load<Texture2D>(@"assets\map.png"); // Replace map page
         }
 
         // Load config and other one-off data
@@ -269,7 +279,7 @@ namespace NPCMapLocations
                 string currentLocation;
 
                 // Handle null locations at beginning of new game
-                if (npc.currentLocation == null
+                if (npc.currentLocation == null)
                     MapModConstants.StartingLocations.TryGetValue(npc.name, out currentLocation);
                 else
                     currentLocation = npc.currentLocation.Name;

@@ -39,7 +39,7 @@ namespace NPCMapLocations
 
         public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
-            this.map = MapModMain.map;
+            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -187,7 +187,7 @@ namespace NPCMapLocations
         {
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
-                Game1.exitActiveMenu();
+                this.exitThisMenu(true);
                 return;
             }
             if (key.ToString().Equals(MapModMain.config.MenuKey) && this.readyToClose() && this.canClose)
