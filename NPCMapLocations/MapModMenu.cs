@@ -39,7 +39,7 @@ namespace NPCMapLocations
 
         public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
-            this.map = MapModMain.map;
+            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -187,7 +187,7 @@ namespace NPCMapLocations
         {
             if ((Game1.options.menuButton.Contains(new InputButton(key)) || Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
-                Game1.exitActiveMenu();
+                this.exitThisMenu(true);
                 return;
             }
             if (key.ToString().Equals(MapModMain.config.MenuKey) && this.readyToClose() && this.canClose)
@@ -585,11 +585,11 @@ namespace NPCMapLocations
                     {
                         if (this.isChecked)
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         else
                         {
-                            Game1.spriteBatch.Draw(npc.sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                            Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                         }
                         base.draw(b, slotX + 75, slotY);
                         break;

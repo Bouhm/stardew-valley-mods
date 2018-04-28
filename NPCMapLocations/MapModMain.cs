@@ -15,11 +15,10 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace NPCMapLocations
 {
-    public class MapModMain : Mod
+    public class MapModMain : Mod, IAssetLoader
     {
         public static IModHelper modHelper;
         public static IMonitor monitor;
@@ -47,8 +46,7 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
-            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"content/map", ContentSource.ModFolder); // Load modified map page
-            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"content/buildings", ContentSource.ModFolder); // Load cfarm buildings
+            MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
@@ -58,6 +56,17 @@ namespace NPCMapLocations
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
         }
 
+        // Replace game map with modified map
+        public bool CanLoad<T>(IAssetInfo asset)
+        {
+            return asset.AssetNameEquals(@"LooseSprites\Map");
+        }
+
+        public T Load<T>(IAssetInfo asset)
+        {
+            return (T)(object)MapModMain.modHelper.Content.Load<Texture2D>(@"assets\map.png"); // Replace map page
+        }
+
         // Load config and other one-off data
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
@@ -65,7 +74,7 @@ namespace NPCMapLocations
             config = modHelper.ReadJsonFile<MapModConfig>($"config/{saveName}.json") ?? new MapModConfig();
             markerCrop = MapModConstants.MarkerCrop;
             customNPCs = config.CustomNPCs;
-            snappyMenuOption = Game1.options.snappyMenus;
+            snappyMenuOption = Game1.options.SnappyMenus;
             HandleCustomMods();
         }
 
@@ -136,10 +145,9 @@ namespace NPCMapLocations
             if (!npcNames.ContainsKey(npc.name))
             {
                 var customName = npc.getName();
-                if (string.IsNullOrEmpty(customName))
-                {
+                if (customName == null)
                     customName = npc.name;
-                }
+                
                 npcNames.Add(npc.name, customName);
             }
         }
@@ -255,8 +263,8 @@ namespace NPCMapLocations
             if (!Game1.hasLoadedGame) { return; }
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
-            if (Game1.options.snappyMenus)
-                modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
+            if (Game1.options.SnappyMenus)
+                modHelper.Reflection.GetField<Boolean>(Game1.options, "SnappyMenus").SetValue(false);
 
             GetFarmBuildingLocs();
             UpdateMarkers();
@@ -272,20 +280,16 @@ namespace NPCMapLocations
 
                 // Handle null locations at beginning of new game
                 if (npc.currentLocation == null)
-                {
                     MapModConstants.StartingLocations.TryGetValue(npc.name, out currentLocation);
-                }
                 else
-                {
-                    currentLocation = npc.currentLocation.name;
-                }
-
+                    currentLocation = npc.currentLocation.Name;
+               
+                if (currentLocation == null) continue; 
                 MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVector[] npcLocation);
-                if (npcLocation == null)
-                    continue;
+                if (npcLocation == null) continue;
 
                 // For layering indoor/outdoor NPCs and indoor indicator
-                npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).isOutdoors;
+                npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).IsOutdoors;
 
                 if (npc.Schedule != null || npc.isMarried() || npc.name.Equals("Sandy") || npc.name.Equals("Marlon") || npc.name.Equals("Wizard"))
                 {
@@ -293,8 +297,8 @@ namespace NPCMapLocations
                     bool sameLocation = false;
                     if (config.OnlySameLocation)
                     {
-                        MapModConstants.IndoorLocations.TryGetValue(npc.currentLocation.name, out string indoorLocationNPC);
-                        MapModConstants.IndoorLocations.TryGetValue(Game1.player.currentLocation.name, out string indoorLocationPlayer);
+                        MapModConstants.IndoorLocations.TryGetValue(npc.currentLocation.Name, out string indoorLocationNPC);
+                        MapModConstants.IndoorLocations.TryGetValue(Game1.player.currentLocation.Name, out string indoorLocationPlayer);
                         if (indoorLocationPlayer != null && indoorLocationNPC != null)
                         {
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
@@ -323,7 +327,7 @@ namespace NPCMapLocations
                         int y = (int)LocationToMap(currentLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
 
                         npcMarker.Location = new Rectangle(x, y, width, height);
-                        npcMarker.Marker = npc.sprite.Texture;
+                        npcMarker.Marker = npc.Sprite.Texture;
 
                         // Check for daily quests
                         foreach (Quest quest in Game1.player.questLog)
@@ -595,7 +599,7 @@ namespace NPCMapLocations
                 }
             }
 
-            Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.name, Game1.player.getTileX(), Game1.player.getTileY(), true);
+            Vector2 playerLoc = MapModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), true);
             Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
 
             // Location and name tooltips
@@ -624,7 +628,7 @@ namespace NPCMapLocations
                 // Handle any option changes by the player
                 // Caveat: If player is turning snappy menu on, they MUST close the menu to update the stored menu option
                 {
-                    snappyMenuOption = Game1.options.snappyMenus;
+                    snappyMenuOption = Game1.options.SnappyMenus;
                 }
             }
         }
@@ -648,7 +652,7 @@ namespace NPCMapLocations
             Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 160), new Rectangle(6, 3, 1, 1), Color.Black);
 
             // Show map location and tile positions
-            DrawText(Game1.player.currentLocation.name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
+            DrawText(Game1.player.currentLocation.Name + " (" + Game1.player.getTileX() + ", " + Game1.player.getTileY() + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
 
             var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
 

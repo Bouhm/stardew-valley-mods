@@ -7,8 +7,8 @@
   "EntryDll": "NPCMapLocations.dll",
   "MinimumApiVersion": "2.0",
   "UpdateKeys": [
-  	"Nexus:541",
-  	"Chucklefish:3548",
-  	"Github:Bouhm/stardew-valley-mods"
+    "Nexus:541",
+    "Chucklefish:3548",
+    "Github:Bouhm/stardew-valley-mods"
   ]
 }

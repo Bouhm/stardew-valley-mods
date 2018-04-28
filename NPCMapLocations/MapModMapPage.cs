@@ -4,6 +4,7 @@ using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace NPCMapLocations
@@ -28,243 +29,28 @@ namespace NPCMapLocations
         // Map menu that uses modified map page and modified component locations for hover
         public MapModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
         {
+            // initialise
             this.npcNames = npcNames;
             this.npcMarkers = npcMarkers;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
-            this.map = MapModMain.map;
+            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Desert_Region"),
-                    Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Farm_Region"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName })
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Backwoods_Region"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("BusStop_Region"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("WizardHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("AnimalShop"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("LeahHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("SamHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("HaleyHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("TownSquare"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Hospital"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("SeedShop"),
-                    string.Concat(new string[]
-                    {
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
-                        Environment.NewLine,
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079", new object[0]),
-                        Environment.NewLine,
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080", new object[0])
-                    })
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Blacksmith"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Saloon"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("ManorHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("ArchaeologyHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("ElliottHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Sewer"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Graveyard"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Trailer"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("JoshHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("ScienceHouse"),
-                    string.Concat(new string[]
-                    {
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
-                        Environment.NewLine,
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095", new object[0]),
-                        Environment.NewLine,
-                        Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11096", new object[0])
-                    })
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Tent"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Mine"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("AdventureGuild"),
-                    (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Quarry"),
-                    Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("JojaMart"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("FishShop"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Spa"),
-                    Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Woods"),
-                    Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("RuinedHouse"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("CommunityCenter"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("SewerPipe"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0])
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("Railroad_Region"),
-                    Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???"
-                )
-            );
-            points.Add(
-                new ClickableComponent(
-                    GetLocationRect("LonelyStone"),
-                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])
-                )
-            );
+            this.points = this.GetMapPoints().ToList();
 
-            // Remove vanilla map tooltips
+            // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
             GameMenu menu = (GameMenu)Game1.activeClickableMenu;
             List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
             MapPage mapPage = (MapPage)menuPages[menu.currentTab];
-            MapModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").SetValue(new List<ClickableComponent>());
+            List<ClickableComponent> vanillaPoints = MapModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
+            vanillaPoints.Clear();
+            foreach (ClickableComponent point in this.GetMapPoints())
+            {
+                point.label = "";
+                point.scale = 0.1f;
+                vanillaPoints.Add(point);
+            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -397,9 +183,9 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
             }
             // Draw name tooltip only
-            else 
+            else
                 DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
-            
+
             // Draw indoor icon
             if (hasIndoorNPC && !hoveredNames.Equals(""))
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
@@ -434,8 +220,8 @@ namespace NPCMapLocations
 
             indoorIconVector = Vector2.Zero;
             var lines = names.Split('\n');
-            int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize/2);
-            int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize/2;
+            int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
+            int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
 
             if (nameTooltipMode == 1)
             {
@@ -497,7 +283,7 @@ namespace NPCMapLocations
             b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f); 
+            b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
         // Get location and area of location component
@@ -505,10 +291,168 @@ namespace NPCMapLocations
         {
             // Set origin to center
             return new Rectangle(
-                (int)MapModMain.LocationToMap(location).X - locationRects[location].width/2,
-                (int)MapModMain.LocationToMap(location).Y - locationRects[location].height/2,
+                (int)MapModMain.LocationToMap(location).X - locationRects[location].width / 2,
+                (int)MapModMain.LocationToMap(location).Y - locationRects[location].height / 2,
                 locationRects[location].width,
                 locationRects[location].height
+            );
+        }
+
+        /// <summary>Get the map points to display on a map.</summary>
+        private IEnumerable<ClickableComponent> GetMapPoints()
+        {
+            yield return new ClickableComponent(
+                GetLocationRect("Desert_Region"),
+                Game1.player.mailReceived.Contains("ccVault") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062", new object[0]) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Farm_Region"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", new object[] { Game1.player.farmName })
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Backwoods_Region"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11065", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("BusStop_Region"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11066", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("WizardHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("AnimalShop"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11069", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("LeahHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11070", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("SamHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11071", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11072", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("HaleyHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11073", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11074", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("TownSquare"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11075", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Hospital"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("SeedShop"),
+                string.Concat(new string[]
+                {
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078", new object[0]),
+                Environment.NewLine,
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079", new object[0]),
+                Environment.NewLine,
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080", new object[0])
+                })
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Blacksmith"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11081", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11082", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Saloon"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11083", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11084", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("ManorHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("ArchaeologyHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11087", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("ElliottHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Sewer"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11089", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Graveyard"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11090", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Trailer"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11091", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("JoshHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("ScienceHouse"),
+                string.Concat(
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094", new object[0]),
+                    Environment.NewLine,
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095", new object[0]),
+                    Environment.NewLine,
+                    Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11096", new object[0])
+                )
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Tent"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11097", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Mine"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("AdventureGuild"),
+                (Game1.stats.DaysPlayed >= 5u) ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11100", new object[0])) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Quarry"),
+                Game1.player.mailReceived.Contains("ccCraftsRoom") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11103", new object[0]) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("JojaMart"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11105", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11106", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("FishShop"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11108", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Spa"),
+                Game1.isLocationAccessible("Railroad") ? (Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110", new object[0]) + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111", new object[0])) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Woods"),
+                Game1.player.mailReceived.Contains("beenToWoods") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114", new object[0]) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("RuinedHouse"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11116", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("CommunityCenter"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("SewerPipe"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11118", new object[0])
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("Railroad_Region"),
+                Game1.isLocationAccessible("Railroad") ? Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119", new object[0]) : "???"
+            );
+            yield return new ClickableComponent(
+                GetLocationRect("LonelyStone"),
+                Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11122", new object[0])
             );
         }
     }
