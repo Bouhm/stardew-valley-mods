@@ -15,7 +15,6 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace NPCMapLocations
 {
@@ -136,10 +135,9 @@ namespace NPCMapLocations
             if (!npcNames.ContainsKey(npc.name))
             {
                 var customName = npc.getName();
-                if (string.IsNullOrEmpty(customName))
-                {
+                if (customName == null)
                     customName = npc.name;
-                }
+                
                 npcNames.Add(npc.name, customName);
             }
         }
@@ -271,18 +269,14 @@ namespace NPCMapLocations
                 string currentLocation;
 
                 // Handle null locations at beginning of new game
-                if (npc.currentLocation == null)
-                {
+                if (npc.currentLocation == null
                     MapModConstants.StartingLocations.TryGetValue(npc.name, out currentLocation);
-                }
                 else
-                {
                     currentLocation = npc.currentLocation.Name;
-                }
-
+               
+                if (currentLocation == null) continue; 
                 MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVector[] npcLocation);
-                if (npcLocation == null)
-                    continue;
+                if (npcLocation == null) continue;
 
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).IsOutdoors;
