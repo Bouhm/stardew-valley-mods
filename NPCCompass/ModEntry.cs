@@ -16,14 +16,9 @@ namespace NPCCompass
         public static IMonitor monitor;
         private static Texture2D pointer;
         private static ModData constants;
+        private static Dictionary<string, Point> buildings;
         private static HashSet<Locator> locators;
         private const int MAX_PROXIMITY = 4800;
-
-        // For debug info
-        private static double _angle;
-        private static Vector2 _npcPos;
-        private static Vector2 _playerPos;
-        private static Vector2 _locatorPos;
 
         private const bool DEBUG_MODE = true;
 
@@ -31,11 +26,24 @@ namespace NPCCompass
         {
             this.helper = helper;
             monitor = this.Monitor;
-            ModEntry.pointer = helper.Content.Load<Texture2D>(@"content/locator", ContentSource.ModFolder); // Load pointer tex
+            ModEntry.pointer = helper.Content.Load<Texture2D>(@"assets/locator", ContentSource.ModFolder); // Load pointer tex
             constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
+        }
+
+        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
+        {
+            // Buildings in player's location
+            buildings = new Dictionary<string, Point>();
+            GameLocation location = e.NewLocation;
+            foreach (KeyValuePair<Point, string> door in location.doors)
+            {
+                if (!buildings.ContainsKey(door.Value))
+                    buildings.Add(door.Value, door.Key);
+            }
         }
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
@@ -45,7 +53,7 @@ namespace NPCCompass
         }
 
         // Get angle (in radians) to determine which quadrant the NPC is in
-        // 0 rad will be at line from center of viewport to (0, viewportHeight/2) relative to viewport
+        // 0 rad will be at line from player position to (0, viewportHeight/2) relative to viewport
         private double GetPlayerToNPCAngle(Vector2 playerPos, Vector2 npcPos)
         {
             // Hypotenuse is the line from player to npc
@@ -143,28 +151,44 @@ namespace NPCCompass
         private void UpdateLocators()
         {
             locators = new HashSet<Locator>();
+            Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth / 2 * Game1.pixelZoom, Game1.player.position.Y);
+            Vector2 npcPos = Vector2.Zero;
+            bool isIndoors = false;
+
             foreach (NPC npc in Utility.getAllCharacters())
             {
                 if ((npc.Schedule == null
                     && !npc.isMarried())
                     || npc.currentLocation == null
-                   // || !constants.Location.ContainsKey(npc.currentLocation.name)
                    ) { continue; }
-                if (!(npc.currentLocation.name.Equals(Game1.player.currentLocation.name))) { continue; }
-                /*
-                if (constants.Location[npc.currentLocation.name] == null
-                    || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
-                   ) { continue; }
-                */
-                if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize)) { continue; }
 
-                Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth/2 * Game1.pixelZoom, Game1.player.position.Y);
-                Vector2 npcPos = new Vector2(npc.position.X + npc.sprite.spriteHeight/2 * Game1.pixelZoom, npc.position.Y);
+                if (npc.currentLocation.Equals(Game1.player.currentLocation))
+                {
+                    // Don't include locator if NPC is visible on screen
+                    if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize / 4)) { continue; }
+
+                    npcPos = new Vector2(npc.position.X + npc.sprite.spriteHeight / 2 * Game1.pixelZoom, npc.position.Y);
+                }
+                else
+                {
+                    if (buildings.ContainsKey(npc.currentLocation.Name))
+                    {
+                        npcPos = new Vector2(
+                                buildings[npc.currentLocation.Name].X,
+                                buildings[npc.currentLocation.Name].Y
+                            );
+                        isIndoors = true;
+                    }
+                    else
+                        continue;
+                }
+
                 Locator locator = new Locator
                 {
                     Name = npc.name,
                     Marker = npc.sprite.Texture,
-                    Proximity = GetDistance(playerPos, npcPos)
+                    Proximity = GetDistance(playerPos, npcPos),
+                    IsIndoors = isIndoors
                 };
 
                 double angle = GetPlayerToNPCAngle(playerPos, npcPos);
@@ -176,14 +200,6 @@ namespace NPCCompass
                 locator.Angle = angle;
                 locator.Quadrant = quadrant;
                 locators.Add(locator);
-
-                if (DEBUG_MODE && locators.Count == 1)
-                {
-                    ModEntry._angle = angle;
-                    ModEntry._playerPos = playerPos;
-                    ModEntry._npcPos = npcPos;
-                    ModEntry._locatorPos = locatorPos;
-                }
             }
         }
 
@@ -199,9 +215,22 @@ namespace NPCCompass
             {
                 double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.25 : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
 
+                // To offset the offsets used to keep all of the locators inside the viewport screen
                 int offsetX = 0;
                 if (locator.Quadrant == 2 || locator.Quadrant == 4)
                     offsetX = -16;
+
+                // Special case for marking doors of buildings with NPCs inside
+                // And the door is within viewport
+                if (locator.IsIndoors 
+                    && (locator.X + offsetX > 0
+                    && locator.X + offsetX < Game1.viewport.Width)
+                    && (locator.Y < 0
+                    && locator.Y > Game1.viewport.Height))
+                {
+                    locator.Angle = 3 * MathHelper.PiOver2;
+                    locator.Proximity = 0;
+                }
 
                 // Pointer texture
                 Game1.spriteBatch.Draw(
@@ -228,8 +257,12 @@ namespace NPCCompass
                     SpriteEffects.None,
                     1f
                 );
-                string distanceString = Math.Round(locator.Proximity/Game1.tileSize, 0).ToString();
-                DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 12), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize/4) * 0.5)), 0.37f);
+
+                if (locator.Proximity > 0)
+                {
+                    string distanceString = Math.Round(locator.Proximity / Game1.tileSize, 0).ToString();
+                    DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 12), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 0.37f);
+                }
             }
         }
 
@@ -241,22 +274,6 @@ namespace NPCCompass
             float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
             if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
             b.Draw(tex, r, null, Color.White, angle, Vector2.Zero, SpriteEffects.None, 0);
-        }
-
-        // Show debug info in top left corner
-        private static void ShowDebugInfo()
-        {
-            // Black background for legible text
-            Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 500, 286), new Rectangle(6, 3, 1, 1), Color.Black);
-
-            Color color = ModEntry.locators.Count == 0 ? Color.DimGray : Color.White;
-
-            DrawText("Angle (rad): " + Math.Round(ModEntry._angle, 2), new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), color);
-            DrawText("Locator: (" + (int)ModEntry._locatorPos.X + ", " + (int)ModEntry._locatorPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), color);
-            DrawText("Player: (" + (int)ModEntry._playerPos.X + ", " + (int)ModEntry._playerPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), color);
-            DrawText("NPC: (" + (int)ModEntry._npcPos.X + ", " + (int)ModEntry._npcPos.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), color);
-            DrawText("Viewport: (" + (int)Game1.viewport.X + ", " + (int)Game1.viewport.Y + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 9 / 4 + 8 * 4), color);
-            DrawText(Game1.viewport.Width + "x" + Game1.viewport.Height, new Vector2(Game1.tileSize / 4, Game1.tileSize * 11 / 4 + 8 * 5), color);
         }
 
         // Draw outlined text
@@ -272,29 +289,17 @@ namespace NPCCompass
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
         {
             if (!DEBUG_MODE || !Context.IsWorldReady) { return; }
-            foreach (NPC npc in Utility.getAllCharacters())
+            foreach (Locator locator in locators)
             {
-                if ((npc.Schedule == null
-                    && !npc.isMarried())
-                    || npc.currentLocation == null
-                   // || !constants.Location.ContainsKey(npc.currentLocation.name)
-                   ) { continue; }
-                if (!(npc.currentLocation.name.Equals(Game1.player.currentLocation.name))) { continue; }
-                /*
-                if (constants.Location[npc.currentLocation.name] == null
-                    || !constants.Location[npc.currentLocation.name].Equals(Game1.player.currentLocation.name)
-                   ) { continue; }
-                */
-
+                NPC npc = Game1.getCharacterFromName(locator.Name);
                 float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.spriteWidth / 2 - Game1.viewport.X;
                 float viewportY = Game1.player.position.Y - Game1.viewport.Y;
                 float npcViewportX = npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth/2 - Game1.viewport.X;
                 float npcViewportY = npc.position.Y - Game1.viewport.Y;
+
                 // Draw NPC sprite noodle connecting center of screen to NPC for debugging
                 DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.sprite.Texture);
             }
-            if (locators.Count == 1)
-                ShowDebugInfo();
         }
     }
 
@@ -308,6 +313,7 @@ namespace NPCCompass
         public float X { get; set; } = 0;
         public float Y { get; set; } = 0;
         public double Angle { get; set; } = 0.0;
+        public bool IsIndoors { get; set; } = true;
     }
 }
 
