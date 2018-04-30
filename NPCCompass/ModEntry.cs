@@ -39,7 +39,7 @@ namespace NPCCompass
             // Buildings/rooms in player's location
             doors = new Dictionary<string, Point>();
             GameLocation location = e.NewLocation;
-            foreach (KeyValuePair<Point, string> door in location.doors)
+            foreach (KeyValuePair<Point, string> door in location.doors.Pairs)
             {
                 if (!doors.ContainsKey(door.Value))
                     doors.Add(door.Value, door.Key);
@@ -155,7 +155,7 @@ namespace NPCCompass
         private void UpdateLocators()
         {
             locators = new HashSet<Locator>();
-            Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth / 2 * Game1.pixelZoom, Game1.player.position.Y);
+            Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom, Game1.player.position.Y);
             Vector2 npcPos = Vector2.Zero;
             bool isDoor = false;
             bool isOnScreen = false;
@@ -172,7 +172,7 @@ namespace NPCCompass
                     // Don't include locator if NPC is visible on screen
                     if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize / 4)) { continue; }
 
-                    npcPos = new Vector2(npc.position.X + npc.sprite.spriteHeight / 2 * Game1.pixelZoom, npc.position.Y);
+                    npcPos = new Vector2(npc.position.X + npc.Sprite.SpriteHeight / 2 * Game1.pixelZoom, npc.position.Y);
                 }
                 else
                 {
@@ -191,8 +191,8 @@ namespace NPCCompass
 
                 Locator locator = new Locator
                 {
-                    Name = npc.name,
-                    Marker = npc.sprite.Texture,
+                    Name = npc.Name,
+                    Marker = npc.Sprite.Texture,
                     Proximity = GetDistance(playerPos, npcPos),
                     IsDoor = isDoor,
                     IsOnScreen = isOnScreen
@@ -296,13 +296,13 @@ namespace NPCCompass
             foreach (Locator locator in locators)
             {
                 NPC npc = Game1.getCharacterFromName(locator.Name);
-                float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.spriteWidth / 2 - Game1.viewport.X;
+                float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
                 float viewportY = Game1.player.position.Y - Game1.viewport.Y;
-                float npcViewportX = npc.position.X + Game1.pixelZoom * npc.sprite.spriteWidth/2 - Game1.viewport.X;
+                float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth/2 - Game1.viewport.X;
                 float npcViewportY = npc.position.Y - Game1.viewport.Y;
 
                 // Draw NPC sprite noodle connecting center of screen to NPC for debugging
-                DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.sprite.Texture);
+                DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.Sprite.Texture);
             }
         }
     }
