@@ -16,11 +16,11 @@ namespace NPCCompass
         public static IMonitor monitor;
         private static Texture2D pointer;
         private static ModData constants;
-        private static Dictionary<string, Point> buildings;
+        private static Dictionary<string, Point> doors;
         private static HashSet<Locator> locators;
         private const int MAX_PROXIMITY = 4800;
 
-        private const bool DEBUG_MODE = true;
+        private const bool DEBUG_MODE = false;
 
         public override void Entry(IModHelper helper)
         {
@@ -36,13 +36,13 @@ namespace NPCCompass
 
         private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
         {
-            // Buildings in player's location
-            buildings = new Dictionary<string, Point>();
+            // Buildings/rooms in player's location
+            doors = new Dictionary<string, Point>();
             GameLocation location = e.NewLocation;
             foreach (KeyValuePair<Point, string> door in location.doors)
             {
-                if (!buildings.ContainsKey(door.Value))
-                    buildings.Add(door.Value, door.Key);
+                if (!doors.ContainsKey(door.Value))
+                    doors.Add(door.Value, door.Key);
             }
         }
 
@@ -100,10 +100,14 @@ namespace NPCCompass
 
         // Get position of location relative to viewport from
         // the viewport quadrant and positions of player/npc relative to map
-        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos)
+        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos)
         {
             float x = playerPos.X - Game1.viewport.X;
             float y = playerPos.Y - Game1.viewport.Y;
+
+            if (Utility.isOnScreen(npcPos, Game1.tileSize/4)) {
+                return new Vector2(npcPos.X - Game1.viewport.X + Game1.tileSize/2, npcPos.Y - Game1.viewport.Y - Game1.tileSize / 2);
+            }
 
             // Draw triangle such that the hypotenuse is
             // the line from player to the point of intersection of
@@ -153,7 +157,8 @@ namespace NPCCompass
             locators = new HashSet<Locator>();
             Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.spriteWidth / 2 * Game1.pixelZoom, Game1.player.position.Y);
             Vector2 npcPos = Vector2.Zero;
-            bool isIndoors = false;
+            bool isDoor = false;
+            bool isOnScreen = false;
 
             foreach (NPC npc in Utility.getAllCharacters())
             {
@@ -171,13 +176,14 @@ namespace NPCCompass
                 }
                 else
                 {
-                    if (buildings.ContainsKey(npc.currentLocation.Name))
+                    if (doors.ContainsKey(npc.currentLocation.Name))
                     {
                         npcPos = new Vector2(
-                                buildings[npc.currentLocation.Name].X,
-                                buildings[npc.currentLocation.Name].Y
+                                doors[npc.currentLocation.Name].X * Game1.tileSize,
+                                doors[npc.currentLocation.Name].Y * Game1.tileSize
                             );
-                        isIndoors = true;
+                        isDoor = true;
+                        isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
                     }
                     else
                         continue;
@@ -188,12 +194,13 @@ namespace NPCCompass
                     Name = npc.name,
                     Marker = npc.sprite.Texture,
                     Proximity = GetDistance(playerPos, npcPos),
-                    IsIndoors = isIndoors
+                    IsDoor = isDoor,
+                    IsOnScreen = isOnScreen
                 };
 
                 double angle = GetPlayerToNPCAngle(playerPos, npcPos);
                 int quadrant = GetViewportQuadrant(angle, playerPos);
-                Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos);
+                Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos, npcPos);
 
                 locator.X = locatorPos.X;
                 locator.Y = locatorPos.Y;
@@ -214,22 +221,19 @@ namespace NPCCompass
             foreach (Locator locator in locators)
             {
                 double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.25 : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
-
-                // To offset the offsets used to keep all of the locators inside the viewport screen
                 int offsetX = 0;
-                if (locator.Quadrant == 2 || locator.Quadrant == 4)
-                    offsetX = -16;
-
                 // Special case for marking doors of buildings with NPCs inside
                 // And the door is within viewport
-                if (locator.IsIndoors 
-                    && (locator.X + offsetX > 0
-                    && locator.X + offsetX < Game1.viewport.Width)
-                    && (locator.Y < 0
-                    && locator.Y > Game1.viewport.Height))
+                if (locator.IsOnScreen)
                 {
                     locator.Angle = 3 * MathHelper.PiOver2;
                     locator.Proximity = 0;
+                }
+                else
+                {
+                    // To offset the offsets used to keep all of the locators inside the viewport screen
+                    if (locator.Quadrant == 2 || locator.Quadrant == 4)
+                        offsetX = -16;
                 }
 
                 // Pointer texture
@@ -248,7 +252,7 @@ namespace NPCCompass
                 // NPC head
                 Game1.spriteBatch.Draw(
                     locator.Marker,
-                    new Vector2(locator.X + 24 + offsetX, locator.Y + 12),
+                    new Vector2(locator.X + 24 + offsetX, locator.Y + 20),
                     new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
                     Color.White * (float)alphaLevel,
                     0f,
@@ -261,7 +265,7 @@ namespace NPCCompass
                 if (locator.Proximity > 0)
                 {
                     string distanceString = Math.Round(locator.Proximity / Game1.tileSize, 0).ToString();
-                    DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 12), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 0.37f);
+                    DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 16), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 0.37f);
                 }
             }
         }
@@ -313,7 +317,8 @@ namespace NPCCompass
         public float X { get; set; } = 0;
         public float Y { get; set; } = 0;
         public double Angle { get; set; } = 0.0;
-        public bool IsIndoors { get; set; } = true;
+        public bool IsDoor { get; set; } = true;
+        public bool IsOnScreen { get; set; } = true;
     }
 }
 

@@ -33,4 +33,14 @@
 		"Willy": -1,
 		"Wizard": 0 
 	}
+	"ParentLocations": {
+		"HarveyRoom": "Town",
+		"WizardHouseBasement": "Forest",
+		"BathHouse_Entry": "Railroad",
+		"BathHouse_MensLocker": "Railroad",
+		"BathHouse_WomensLocker": "Railroad",
+		"BathHouse_Pool": "Railroad",
+		"Summit": "Railroad",
+		"Club": "Desert",
+	}
 }
