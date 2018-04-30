@@ -122,9 +122,9 @@ namespace NPCMapLocations
             {
                 if (npc.Schedule != null && IsCustomNPC(npc.Name))
                 {
-                    if (!customNPCs.ContainsKey(npc.Name))
+                    if (!customNPCs.TryGetValue(npc.Name, out Dictionary<string, int> npcEntry))
                     {
-                        var npcEntry = new Dictionary<string, int>
+                        npcEntry = new Dictionary<string, int>
                         {
                             { "id", id },
                             { "crop", 0 }
@@ -142,9 +142,9 @@ namespace NPCMapLocations
         // Handle modified NPC names
         private void LoadCustomNames(NPC npc)
         {
-            if (!npcNames.ContainsKey(npc.Name))
+            if (!npcNames.TryGetValue(npc.Name, out string customName))
             {
-                var customName = npc.getName();
+                customName = npc.getName();
                 if (customName == null)
                     customName = npc.Name;
                 
@@ -276,17 +276,13 @@ namespace NPCMapLocations
             foreach (NPCMarker npcMarker in npcMarkers)
             {
                 NPC npc = Game1.getCharacterFromName(npcMarker.Name, true);
-                string currentLocation;
 
-                // Handle null locations at beginning of new game
-                if (npc.currentLocation == null)
-                    MapModConstants.StartingLocations.TryGetValue(npc.Name, out currentLocation);
-                else
+                // Handle null keys
+                if (!MapModConstants.StartingLocations.TryGetValue(npc.Name, out string currentLocation))
                     currentLocation = npc.currentLocation.Name;
                
-                if (currentLocation == null) continue; 
-                MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVector[] npcLocation);
-                if (npcLocation == null) continue;
+                if (!MapModConstants.MapVectors.TryGetValue(currentLocation, out MapVector[] npcLocation))
+                    continue;
 
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = Game1.getLocationFromName(currentLocation).IsOutdoors;
@@ -297,12 +293,9 @@ namespace NPCMapLocations
                     bool sameLocation = false;
                     if (config.OnlySameLocation)
                     {
-                        MapModConstants.IndoorLocations.TryGetValue(npc.currentLocation.Name, out string indoorLocationNPC);
-                        MapModConstants.IndoorLocations.TryGetValue(Game1.player.currentLocation.Name, out string indoorLocationPlayer);
-                        if (indoorLocationPlayer != null && indoorLocationNPC != null)
-                        {
+                        if (!MapModConstants.IndoorLocations.TryGetValue(npc.currentLocation.Name, out string indoorLocationNPC)
+                          && !MapModConstants.IndoorLocations.TryGetValue(Game1.player.currentLocation.Name, out string indoorLocationPlayer))
                             sameLocation = indoorLocationNPC.Equals(indoorLocationPlayer);
-                        }
                     }
 
                     // NPCs that won't be shown on the map unless Show Hidden NPCs is checked
@@ -376,7 +369,7 @@ namespace NPCMapLocations
         // Requires MapModConstants and modified map page in ./content 
         public static Vector2 LocationToMap(string location, int tileX = -1, int tileY = -1, bool isFarmer = false)
         {
-            if (location == null || !MapModConstants.MapVectors.ContainsKey(location))
+            if (location == null)
             {
                 if (DEBUG_MODE && alertFlag != "UnknownLocation:" + location)
                 {
@@ -402,7 +395,9 @@ namespace NPCMapLocations
                 }
             }
 
-            var locVectors = MapModConstants.MapVectors[location];
+            if (!MapModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
+                return new Vector2(-5000, -5000);
+
             Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             int x = 0;
             int y = 0;

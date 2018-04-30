@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Network;
 
 namespace NPCCompass
 {
@@ -16,7 +17,6 @@ namespace NPCCompass
         public static IMonitor monitor;
         private static Texture2D pointer;
         private static ModData constants;
-        private static Dictionary<string, Point> doors;
         private static HashSet<Locator> locators;
         private const int MAX_PROXIMITY = 4800;
 
@@ -26,24 +26,11 @@ namespace NPCCompass
         {
             this.helper = helper;
             monitor = this.Monitor;
-            ModEntry.pointer = helper.Content.Load<Texture2D>(@"assets/locator", ContentSource.ModFolder); // Load pointer tex
+            ModEntry.pointer = helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
             constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
-        }
-
-        private void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
-        {
-            // Buildings/rooms in player's location
-            doors = new Dictionary<string, Point>();
-            GameLocation location = e.NewLocation;
-            foreach (KeyValuePair<Point, string> door in location.doors.Pairs)
-            {
-                if (!doors.ContainsKey(door.Value))
-                    doors.Add(door.Value, door.Key);
-            }
         }
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
@@ -176,16 +163,19 @@ namespace NPCCompass
                 }
                 else
                 {
-                    if (doors.ContainsKey(npc.currentLocation.Name))
+                    foreach (KeyValuePair<Point, string> door in Game1.player.currentLocation.doors.Pairs)
                     {
-                        npcPos = new Vector2(
-                                doors[npc.currentLocation.Name].X * Game1.tileSize,
-                                doors[npc.currentLocation.Name].Y * Game1.tileSize
-                            );
-                        isDoor = true;
-                        isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
+                        if (door.Value.Equals(npc.currentLocation.Name)) {
+                            npcPos = new Vector2(
+                                    door.Key.X * Game1.tileSize,
+                                    door.Key.Y * Game1.tileSize
+                                );
+                            isDoor = true;
+                            isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
+                            break;
+                        }
                     }
-                    else
+                    if (npcPos.Equals(Vector2.Zero))
                         continue;
                 }
 
