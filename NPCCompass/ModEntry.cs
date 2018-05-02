@@ -14,6 +14,8 @@ namespace NPCCompass
     public class ModEntry : Mod
     {
         private IModHelper helper;
+        private ModConfig config;
+        private bool showLocators;
         public static IMonitor monitor;
         private static Texture2D pointer;
         private static ModData constants;
@@ -26,17 +28,33 @@ namespace NPCCompass
         {
             this.helper = helper;
             monitor = this.Monitor;
+            config = helper.ReadConfig<ModConfig>();
             ModEntry.pointer = helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
             constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
             GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            ControlEvents.KeyReleased += ControlEvents_KeyReleased;
+        }
+
+        private void ControlEvents_KeyReleased(object sender, EventArgsKeyPressed e)
+        {
+            if (e.KeyPressed.ToString().Equals(config.ShowKeyCode) && !config.Toggle)
+                showLocators = false;        
+        }
+
+        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        {
+            if (e.KeyPressed.ToString().Equals(config.ShowKeyCode))
+                showLocators = true;
         }
 
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            UpdateLocators();
+            if (showLocators)
+                UpdateLocators();
         }
 
         // Get angle (in radians) to determine which quadrant the NPC is in
@@ -87,13 +105,21 @@ namespace NPCCompass
 
         // Get position of location relative to viewport from
         // the viewport quadrant and positions of player/npc relative to map
-        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos)
+        private static Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos, bool isOnScreen=false, bool isDoor=false)
         {
             float x = playerPos.X - Game1.viewport.X;
             float y = playerPos.Y - Game1.viewport.Y;
 
-            if (Utility.isOnScreen(npcPos, Game1.tileSize/4)) {
-                return new Vector2(npcPos.X - Game1.viewport.X + Game1.tileSize/2, npcPos.Y - Game1.viewport.Y - Game1.tileSize / 2);
+            if (isDoor)
+            {
+                if (Utility.isOnScreen(npcPos, Game1.tileSize / 4))
+                {
+                    return new Vector2(npcPos.X - Game1.viewport.X + Game1.tileSize / 2, npcPos.Y - Game1.viewport.Y - Game1.tileSize / 2);
+                }
+                else
+                {
+                    x += 3*Game1.tileSize/4;
+                }
             }
 
             // Draw triangle such that the hypotenuse is
@@ -152,6 +178,7 @@ namespace NPCCompass
                 if ((npc.Schedule == null
                     && !npc.isMarried())
                     || npc.currentLocation == null
+                    || config.NPCBlacklist.Contains(npc.Name)
                    ) { continue; }
 
                 if (npc.currentLocation.Equals(Game1.player.currentLocation))
@@ -190,7 +217,7 @@ namespace NPCCompass
 
                 double angle = GetPlayerToNPCAngle(playerPos, npcPos);
                 int quadrant = GetViewportQuadrant(angle, playerPos);
-                Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos, npcPos);
+                Vector2 locatorPos = GetLocatorPosition(angle, quadrant, playerPos, npcPos, isOnScreen, isDoor);
 
                 locator.X = locatorPos.X;
                 locator.Y = locatorPos.Y;
@@ -203,7 +230,8 @@ namespace NPCCompass
         private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            DrawLocators();
+            if (showLocators)
+                DrawLocators();
         }
 
         private void DrawLocators()
