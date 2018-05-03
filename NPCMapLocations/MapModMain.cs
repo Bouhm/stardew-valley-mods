@@ -495,26 +495,26 @@ namespace NPCMapLocations
         {
             foreach (Building building in Game1.getFarm().buildings)
             {
-                if (building.baseNameOfIndoors.Value == null)
+                if (building.nameOfIndoors == null)
                 {
                     continue;
                 }
 
                 Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX.Value, building.tileY.Value);
-                if (building.baseNameOfIndoors.Equals("Shed"))
+                if (building.nameOfIndoors.Equals("Shed"))
                 {
                     farmBuildings["Shed"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("Coop"))
+                else if (building.nameOfIndoors.Equals("Coop"))
                 {
                     farmBuildings["Coop"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("Barn"))
+                else if (building.nameOfIndoors.Equals("Barn"))
                 {
                     locVector = new Vector2(locVector.X, locVector.Y + 2);
                     farmBuildings["Barn"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
+                else if (building.nameOfIndoors.Equals("SlimeHutch"))
                 {
                     farmBuildings["SlimeHutch"] = locVector;
                 }
