@@ -1,4 +1,4 @@
-﻿/*
+/*
 NPC Map Locations Mod by Bouhm.
 Shows NPC locations on a modified map.
 */
