@@ -20,9 +20,10 @@ namespace NPCCompass
         private static Texture2D pointer;
         private static ModData constants;
         private static HashSet<Locator> locators;
+        private static Dictionary<string, HashSet<Locator>> doorLocatorMaps;
         private const int MAX_PROXIMITY = 4800;
 
-        private const bool DEBUG_MODE = false;
+        private const bool DEBUG_MODE = true;
 
         public override void Entry(IModHelper helper)
         {
@@ -53,7 +54,7 @@ namespace NPCCompass
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            if (showLocators)
+            if (!Game1.paused)
                 UpdateLocators();
         }
 
@@ -168,6 +169,7 @@ namespace NPCCompass
         private void UpdateLocators()
         {
             locators = new HashSet<Locator>();
+            doorLocatorMaps = new Dictionary<string, HashSet<Locator>>();
             Vector2 playerPos = new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom, Game1.player.position.Y);
             Vector2 npcPos = Vector2.Zero;
             bool isDoor = false;
@@ -223,37 +225,102 @@ namespace NPCCompass
                 locator.Y = locatorPos.Y;
                 locator.Angle = angle;
                 locator.Quadrant = quadrant;
-                locators.Add(locator);
+
+                if (isDoor && isOnScreen)
+                {
+                    if (doorLocatorMaps.TryGetValue(npc.currentLocation.Name, out HashSet<Locator> doorLocators)) 
+                        doorLocators.Add(locator);
+                    else
+                        doorLocators = new HashSet<Locator>{locator};
+
+                    doorLocatorMaps[npc.currentLocation.Name] = doorLocators;
+                }
+                else
+                    locators.Add(locator);
             }
         }
 
         private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            if (showLocators)
+            if (showLocators && !Game1.paused)
                 DrawLocators();
         }
 
         private void DrawLocators()
         {
+
+            foreach (KeyValuePair<string, HashSet<Locator>> doorLocators in doorLocatorMaps)
+            {
+                int count = doorLocators.Value.Count;
+                int i = 0;
+                double angleStep = 1;
+                double rotation = 0;
+
+                foreach (Locator locator in doorLocators.Value)
+                {
+                    switch (count)
+                    {
+                        case 1:
+                            rotation = 3 * MathHelper.PiOver4;
+                            break;
+                        case 2:
+                            angleStep = MathHelper.Pi / count;
+                            rotation = angleStep * i;
+                            break;
+                        case 3:
+                            angleStep = MathHelper.Pi;
+                            rotation = angleStep * i;
+                            break;
+                        case 4:
+                            angleStep = MathHelper.Pi / count;
+                            rotation = angleStep * i;
+                            break;
+                        default:
+                            angleStep = MathHelper.PiOver4 / count;
+                            rotation = angleStep * i + MathHelper.PiOver2;
+                            break;
+                    }
+
+                    // Pointer texture
+                    Game1.spriteBatch.Draw(
+                        pointer,
+                        new Vector2(locator.X, locator.Y - pointer.Height / 4),
+                        new Rectangle?(new Rectangle(0, 0, 64, 64)),
+                        Color.White,
+                        (float)rotation,
+                        new Vector2(pointer.Width, 0),
+                        1f,
+                        SpriteEffects.None,
+                        0.0f
+                    );
+
+                    // NPC head
+                    Game1.spriteBatch.Draw(
+                        locator.Marker,
+                        new Vector2(locator.X + 24, locator.Y + 20),
+                        new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
+                        Color.White,
+                        0f,
+                        new Vector2(16, 16),
+                        3f,
+                        SpriteEffects.None,
+                        1f
+                    );
+
+                    i++;
+                }
+            }
+        
             foreach (Locator locator in locators)
             {
                 double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.25 : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
                 int offsetX = 0;
-                // Special case for marking doors of buildings with NPCs inside
-                // And the door is within viewport
-                if (locator.IsOnScreen)
-                {
-                    locator.Angle = 3 * MathHelper.PiOver2;
-                    locator.Proximity = 0;
-                }
-                else
-                {
-                    // To offset the offsets used to keep all of the locators inside the viewport screen
-                    if (locator.Quadrant == 2 || locator.Quadrant == 4)
-                        offsetX = -16;
-                }
-
+              
+                // To offset the offsets used to keep all of the locators inside the viewport screen
+                if (locator.Quadrant == 2 || locator.Quadrant == 4)
+                    offsetX = -16;
+                
                 // Pointer texture
                 Game1.spriteBatch.Draw(
                     pointer,
@@ -286,8 +353,10 @@ namespace NPCCompass
                     DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 16), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 0.37f);
                 }
             }
+                
         }
 
+   
         // Draw line relative to viewport
         private void DrawLine(SpriteBatch b, Vector2 begin, Vector2 end, Texture2D tex)
         {
@@ -310,9 +379,10 @@ namespace NPCCompass
 
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
         {
-            if (!DEBUG_MODE || !Context.IsWorldReady) { return; }
+            if (!DEBUG_MODE || !Context.IsWorldReady || locators == null || doorLocatorMaps == null) { return; }
             foreach (Locator locator in locators)
             {
+                if (!locator.IsOnScreen) { continue; }
                 NPC npc = Game1.getCharacterFromName(locator.Name);
                 float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
                 float viewportY = Game1.player.position.Y - Game1.viewport.Y;

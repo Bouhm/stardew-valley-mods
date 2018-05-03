@@ -9,7 +9,7 @@ namespace NPCCompass
     class ModConfig
     {
         public bool Toggle { get; set; } = false;
-        public string ShowKeyCode { get; set; } = "OemQuotes"; // Quotes key
+        public string ShowKeyCode { get; set; } = "LeftAlt";
         public List<string> NPCBlacklist { get; set; } = new List<string>();
     }
 }
