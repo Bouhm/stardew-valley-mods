@@ -10,15 +10,17 @@ using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using StardewValley.Network;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Netcode;
 
 namespace NPCMapLocations
 {
-    public class MapModMain : Mod, IAssetLoader
+    public class MapModMain : Mod//, IAssetLoader
     {
         public static IModHelper modHelper;
         public static IMonitor monitor;
@@ -46,9 +48,10 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
+            MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/map.png", ContentSource.ModFolder); // Load modified map page
             MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            GameEvents.UpdateTick += GameEvents_UpdateTick;
+            GameEvents.FourthUpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
@@ -56,6 +59,7 @@ namespace NPCMapLocations
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
         }
 
+        /*
         // Replace game map with modified map
         public bool CanLoad<T>(IAssetInfo asset)
         {
@@ -66,6 +70,7 @@ namespace NPCMapLocations
         {
             return (T)(object)MapModMain.modHelper.Content.Load<Texture2D>(@"assets\map.png"); // Replace map page
         }
+        */
 
         // Load config and other one-off data
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
@@ -84,7 +89,7 @@ namespace NPCMapLocations
         {
             bool areCustomNPCsInstalled = (customNPCs != null && customNPCs.Count > 0);
             int id = 1;
-            foreach (NPC npc in Utility.getAllCharacters())
+            foreach (NPC npc in GetAllNPCs())
             {
                 id = LoadCustomNPCs(npc, id, areCustomNPCsInstalled);
                 LoadNPCCrop(npc);
@@ -224,6 +229,23 @@ namespace NPCMapLocations
             }
         }
 
+        private NetCollection<NPC> GetAllNPCs()
+        {
+            NetCollection<NPC> characters = new NetCollection<NPC>();
+            foreach (GameLocation location in Game1.locations)
+            {
+               // NetNPCRef npcRef;
+                //characters.Add(npcRef.Get(location));
+                
+                foreach (var character in location.characters)
+                {
+                    characters.Add(character);
+                }
+                
+            }
+            return characters;
+        }
+
         // Handle any checks that need to be made per day
         private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
         {
@@ -244,7 +266,7 @@ namespace NPCMapLocations
 
             // Reset NPC marker data daily
             npcMarkers = new HashSet<NPCMarker>();
-            foreach (NPC npc in Utility.getAllCharacters())
+            foreach (NPC npc in GetAllNPCs())
             {
                 // Handle case where Kent appears even though he shouldn't
                 if (!npc.isVillager() || (npc.Name.Equals("Kent") && !showSecondaryNPCs[3])) { continue; }
@@ -490,26 +512,26 @@ namespace NPCMapLocations
         {
             foreach (Building building in Game1.getFarm().buildings)
             {
-                if (building.baseNameOfIndoors.Value == null)
+                if (building.nameOfIndoorsWithoutUnique == null)
                 {
                     continue;
                 }
 
                 Vector2 locVector = MapModMain.LocationToMap("Farm", building.tileX.Value, building.tileY.Value);
-                if (building.baseNameOfIndoors.Equals("Shed"))
+                if (building.nameOfIndoorsWithoutUnique.Equals("Shed"))
                 {
                     farmBuildings["Shed"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("Coop"))
+                else if (building.nameOfIndoorsWithoutUnique.Equals("Coop"))
                 {
                     farmBuildings["Coop"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("Barn"))
+                else if (building.nameOfIndoorsWithoutUnique.Equals("Barn"))
                 {
                     locVector = new Vector2(locVector.X, locVector.Y + 2);
                     farmBuildings["Barn"] = locVector;
                 }
-                else if (building.baseNameOfIndoors.Equals("SlimeHutch"))
+                else if (building.nameOfIndoorsWithoutUnique.Equals("SlimeHutch"))
                 {
                     farmBuildings["SlimeHutch"] = locVector;
                 }
@@ -612,6 +634,7 @@ namespace NPCMapLocations
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
             if (!Game1.hasLoadedGame || Game1.options == null) { return; }
+
             if (e.PriorMenu is GameMenu menu)
             {
                 // Reset option after map sets option to false
