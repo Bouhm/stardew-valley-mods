@@ -386,12 +386,25 @@ namespace NPCMapLocations
                                 // Check inside buildings and rooms
                                 foreach (KeyValuePair<Point, string> door in Game1.player.currentLocation.doors.Pairs)
                                 {
-                                    if (npc.currentLocation.doors.Values.Contains(door.Value))
+                                    // Check buildings
+                                    if (door.Value.Equals(npc.currentLocation.Name))
                                     {
                                         isSameLocation = true;
                                         break;
                                     }
-                                }
+                                    // Check rooms
+                                    else
+                                    {
+                                        foreach (KeyValuePair<Point, string> roomDoor in npc.currentLocation.doors.Pairs)
+                                        {
+                                            if (door.Value.Equals(roomDoor.Value))
+                                            {
+                                                isSameLocation = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }                                
                             }
                         }
                     }
