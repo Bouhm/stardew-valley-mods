@@ -8,44 +8,6 @@ using System.Collections.Generic;
 
 public static class MapModConstants
 {
-    // Custom NPCs/NPC name changes directly change the name in the game... 
-    // So I have to compare it against these hard-coded names
-    public static string[] Villagers => new string[]
-    {
-        "Abigail",
-        "Alex",
-        "Caroline",
-        "Clint",
-        "Demetrius",
-        "Elliott",
-        "Emily",
-        "Evelyn",
-        "George",
-        "Gus",
-        "Haley",
-        "Harvey",
-        "Jas",
-        "Jodi",
-        "Kent",
-        "Leah",
-        "Lewis",
-        "Linus",
-        "Marlon",
-        "Marnie",
-        "Maru",
-        "Pam",
-        "Penny",
-        "Pierre",
-        "Robin",
-        "Sam",
-        "Sandy",
-        "Sebastian",
-        "Shane",
-        "Vincent",
-        "Willy",
-        "Wizard"
-    };
-
     // Cropping heads for NPC markers
     // Values shift the head up (negative) or down (positive)
     public static Dictionary<string, int> MarkerCrop => new Dictionary<string, int>

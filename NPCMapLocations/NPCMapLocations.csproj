@@ -43,11 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MapModConfig.cs" />
-    <Compile Include="MapModConstants.cs" />
-    <Compile Include="MapModMain.cs" />
-    <Compile Include="MapModMapPage.cs" />
-    <Compile Include="MapModMenu.cs" />
+    <Compile Include="ModConfig.cs" />
+    <Compile Include="ModConstants.cs" />
+    <Compile Include="ModMain.cs" />
+    <Compile Include="ModMapPage.cs" />
+    <Compile Include="ModMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

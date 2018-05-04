@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace NPCMapLocations
 {
-    public class MapModConfig
+    public class ModConfig
     {
         public string MenuKey { get; set; } = "Tab";
         public string TooltipKey { get; set; } = "Space";

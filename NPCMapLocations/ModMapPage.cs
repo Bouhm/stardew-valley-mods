@@ -10,10 +10,10 @@ using System.Reflection;
 namespace NPCMapLocations
 {
 
-    public class MapModMapPage : IClickableMenu
+    public class ModMapPage : IClickableMenu
     {
         private readonly Dictionary<string, Rect> locationRects = MapModConstants.LocationRects;
-        private readonly int nameTooltipMode = MapModMain.config.NameTooltipMode;
+        private readonly int nameTooltipMode = ModMain.config.NameTooltipMode;
         private string hoveredNames = "";
         private string hoveredLocationText = "";
         private Texture2D map;
@@ -28,14 +28,14 @@ namespace NPCMapLocations
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public MapModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
+        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
         {
             // initialise
             this.npcNames = npcNames;
             this.npcMarkers = npcMarkers;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             //this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
-            this.map = MapModMain.map;
+            this.map = ModMain.map;
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
             this.drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
             this.mapX = (int)centeringOnScreen.X;
@@ -46,7 +46,7 @@ namespace NPCMapLocations
             GameMenu menu = (GameMenu)Game1.activeClickableMenu;
             List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
             MapPage mapPage = (MapPage)menuPages[menu.currentTab];
-            List<ClickableComponent> vanillaPoints = MapModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
+            List<ClickableComponent> vanillaPoints = ModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
             vanillaPoints.Clear();
             foreach (ClickableComponent point in this.GetMapPoints())
             {
@@ -297,8 +297,8 @@ namespace NPCMapLocations
         {
             // Set origin to center
             return new Rectangle(
-                (int)MapModMain.LocationToMap(location).X - locationRects[location].width / 2,
-                (int)MapModMain.LocationToMap(location).Y - locationRects[location].height / 2,
+                (int)ModMain.LocationToMap(location).X - locationRects[location].width / 2,
+                (int)ModMain.LocationToMap(location).Y - locationRects[location].height / 2,
                 locationRects[location].width,
                 locationRects[location].height
             );
