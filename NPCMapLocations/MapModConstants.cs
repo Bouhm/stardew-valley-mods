@@ -8,6 +8,8 @@ using System.Collections.Generic;
 
 public static class MapModConstants
 {
+    // Custom NPCs/NPC name changes directly change the name in the game... 
+    // So I have to compare it against these hard-coded names
     public static string[] Villagers => new string[]
     {
         "Abigail",
@@ -44,45 +46,8 @@ public static class MapModConstants
         "Wizard"
     };
 
-    // For handling null locations at beginning of new game; basically used only once
-    public static Dictionary<string, string> StartingLocations => new Dictionary<string, string>
-    {
-        {"Abigail", "SeedShop"},
-        {"Alex", "JoshHouse"},
-        {"Caroline", "SeedShop"},
-        {"Clint", "Blacksmith"},
-        {"Demetrius", "ScienceHouse"},
-        {"Elliott", "ElliottHouse"},
-        {"Emily", "HaleyHouse"},
-        {"Evelyn", "JoshHouse"},
-        {"George", "JoshHouse"},
-        {"Gus", "Saloon"},
-        {"Haley", "HaleyHouse"},
-        {"Harvey", "HarveyRoom" },
-        {"Jas", "AnimalShop"},
-        {"Jodi", "SamHouse"},
-        {"Kent", "SamHouse"},
-        {"Leah", "LeahHouse"},
-        {"Lewis", "ManorHouse"},
-        {"Linus", "Tent"},
-        {"Marlon", "AdventureGuild" },
-        {"Marnie", "AnimalShop"},
-        {"Maru", "ScienceHouse"},
-        {"Pam", "Trailer"},
-        {"Penny", "Trailer"},
-        {"Pierre", "SeedShop"},
-        {"Robin", "ScienceHouse"},
-        {"Sam", "SamHouse"},
-        {"Sandy", "SandyHouse" },
-        {"Sebastian", "SebastianRoom"},
-        {"Shane", "AnimalShop"},
-        {"Vincent", "SamHouse"},
-        {"Willy", "FishShop"},
-        {"Wizard", "WizardHouse" }
-    };
-
     // Cropping heads for NPC markers
-    // Values shift the head up or down
+    // Values shift the head up (negative) or down (positive)
     public static Dictionary<string, int> MarkerCrop => new Dictionary<string, int>
     {
         {"Abigail", 3},
@@ -386,65 +351,5 @@ public static class MapModConstants
         { "Barn", new Rectangle(10, 0, 6, 7) },
         { "SlimeHutch", new Rectangle(16, 0, 7, 7) },
         { "Greenhouse", new Rectangle(23, 0, 5, 7) }
-    };
-
-    // To determine which location an indoor location belongs to
-    public static Dictionary<string, string> IndoorLocations => new Dictionary<string, string>
-    {
-        { "Farm", "Farm" },
-            { "FarmHouse", "Farm"},
-            { "Cellar", "Farm"},
-            { "Barn", "Farm"},
-            { "Big Barn", "Farm" },
-            { "Deluxe Barn", "Farm"},
-            { "Shed", "Farm" },
-            { "Coop", "Farm"},
-            { "Big Coop", "Farm"},
-            { "Deluxe Coop", "Farm"},
-            { "Greenhouse", "Farm"},
-            { "FarmCave", "Farm"},
-            { "Slime Hutch", "Farm" },
-        { "Town", "Town"},
-            { "SeedShop", "Town"},
-            { "Saloon", "Town"},
-            { "Hospital", "Town" },
-            { "HarveyRoom", "Town"},
-            { "JoshHouse", "Town" },
-            { "HaleyHouse", "Town"},
-            { "CommunityCenter", "Town"},
-            { "Blacksmith", "Town"},
-            { "JojaMart", "Town"},
-            { "SamHouse", "Town"},
-            { "ManorHouse", "Town"},
-            { "Trailer", "Town"},
-            { "Sewer", "Town"},
-        { "Forest", "Forest" },
-            { "AnimalShop", "Forest"},
-            { "LeahHouse", "Forest"},
-            { "WizardHouse", "Forest"},
-            { "WizardHouseBasement", "Forest"},
-        { "Mountain", "Mountain"},
-            { "ArchaeologyHouse", "Mountain"},
-            { "ScienceHouse", "Mountain"},
-            { "SebastianRoom", "Mountain"},
-            { "AdventureGuild", "Mountain"},
-            { "Tent", "Mountain"},
-            { "Mine", "Mountain" },
-        { "Railroad", "Railroad" },
-            { "BathHouse_Entry", "Railroad"},
-            { "BathHouse_MensLocker", "Railroad"},
-            { "BathHouse_WomensLocker", "Railroad"},
-            { "BathHouse_Pool", "Railroad"},
-            { "WitchWarpCave", "Railroad"},
-            { "WitchSwamp", "Railroad"},
-            { "WitchHut", "Railroad"},
-            { "Summit", "Railroad"},
-        { "Beach", "Beach"},
-            { "ElliottHouse", "Beach"},
-            { "FishShop", "Beach"},
-        { "Desert", "Desert" },
-            { "SandyHouse", "Desert"},
-            { "Club", "Desert"},
-            { "SkullCave", "Desert"}
     };
 }

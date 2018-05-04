@@ -37,7 +37,7 @@ namespace NPCMapLocations
         private bool canClose;
         private int optionsSlotHeld = -1;
 
-        public MapModMenu(int x, int y, int width, int height, bool[] showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
+        public MapModMenu(int x, int y, int width, int height, Dictionary<string, bool> showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop, Dictionary<string, string> npcNames) : base(x, y, width, height, false)
         {
             //this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             this.map = MapModMain.map;
@@ -103,14 +103,14 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1, markerCrop));
-            if (showSecondaryNPCs[3])
+            if (showSecondaryNPCs["Kent"])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1, markerCrop));
             }
             this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1, markerCrop));
-            if (showSecondaryNPCs[1])
+            if (showSecondaryNPCs[npcNames["Marlon"]])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1, markerCrop));
             }
@@ -121,7 +121,7 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1, markerCrop));
-            if (showSecondaryNPCs[0])
+            if (showSecondaryNPCs[npcNames["Sandy"]])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1, markerCrop));
             }
@@ -129,7 +129,7 @@ namespace NPCMapLocations
             this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1, markerCrop));
             this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1, markerCrop));
-            if (showSecondaryNPCs[2])
+            if (showSecondaryNPCs[npcNames["Wizard"]])
             {
                 this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1, markerCrop));
             }
