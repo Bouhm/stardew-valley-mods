@@ -259,37 +259,22 @@ namespace NPCCompass
 
                 foreach (Locator locator in doorLocators.Value)
                 {
-                    switch (count)
+                    double alphaLevel = locator.Proximity > MAX_PROXIMITY ? 0.25 : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
+
+                    if (locator.IsOnScreen)
                     {
-                        case 1:
-                            rotation = 3 * MathHelper.PiOver4;
-                            break;
-                        case 2:
-                            angleStep = MathHelper.Pi / count;
-                            rotation = angleStep * i;
-                            break;
-                        case 3:
-                            angleStep = MathHelper.Pi;
-                            rotation = angleStep * i;
-                            break;
-                        case 4:
-                            angleStep = MathHelper.Pi / count;
-                            rotation = angleStep * i;
-                            break;
-                        default:
-                            angleStep = MathHelper.PiOver4 / count;
-                            rotation = angleStep * i + MathHelper.PiOver2;
-                            break;
+                        locator.Angle = 3 * MathHelper.PiOver2;
+                        locator.Proximity = 0;
                     }
 
                     // Pointer texture
                     Game1.spriteBatch.Draw(
                         pointer,
-                        new Vector2(locator.X, locator.Y - pointer.Height / 4),
+                        new Vector2(locator.X, locator.Y),
                         new Rectangle?(new Rectangle(0, 0, 64, 64)),
-                        Color.White,
-                        (float)rotation,
-                        new Vector2(pointer.Width, 0),
+                        Color.White * (float)alphaLevel,
+                        (float)(locator.Angle - 3 * MathHelper.PiOver4),
+                        new Vector2(pointer.Width / 2, pointer.Height / 2),
                         1f,
                         SpriteEffects.None,
                         0.0f
@@ -300,15 +285,13 @@ namespace NPCCompass
                         locator.Marker,
                         new Vector2(locator.X + 24, locator.Y + 20),
                         new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
-                        Color.White,
+                        Color.White * (float)alphaLevel,
                         0f,
                         new Vector2(16, 16),
                         3f,
                         SpriteEffects.None,
                         1f
                     );
-
-                    i++;
                 }
             }
         

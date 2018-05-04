@@ -51,7 +51,7 @@ namespace NPCMapLocations
             MapModMain.map = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/map.png", ContentSource.ModFolder); // Load modified map page
             MapModMain.buildings = MapModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            GameEvents.FourthUpdateTick += GameEvents_UpdateTick;
+            GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;

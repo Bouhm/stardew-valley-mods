@@ -25,6 +25,7 @@ namespace NPCMapLocations
         private Vector2 indoorIconVector;
         private Dictionary<string, string> npcNames;
         private HashSet<NPCMarker> npcMarkers;
+        private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
         public MapModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
@@ -33,10 +34,12 @@ namespace NPCMapLocations
             this.npcNames = npcNames;
             this.npcMarkers = npcMarkers;
             this.okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
+            //this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             this.map = MapModMain.map;
-            Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-            this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
-            this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
+            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
+            this.drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
+            this.mapX = (int)centeringOnScreen.X;
+            this.mapY = (int)centeringOnScreen.Y;
             this.points = this.GetMapPoints().ToList();
 
             // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
@@ -211,6 +214,9 @@ namespace NPCMapLocations
                     b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
+
+            if (this.drawPamHouseUpgrade)
+                b.Draw(this.map, new Vector2((float)(this.mapX + 780), (float)(this.mapY + 348)), new Rectangle?(new Rectangle(263, 181, 8, 8)), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         }
 
         // Draw NPC name tooltips map page
