@@ -46,6 +46,17 @@ public static class MapModConstants
         {"Wizard", 0 }
     };
 
+    // NPCs with no schedules 
+    public static List<string> ExcludedVillagers => new List<string>()
+    {
+        "Dwarf",
+        "Mister Qi",
+        "Bouncer",
+        "Henchman",
+        "Gunther",
+        "Krobus"
+    };
+
     // tileX and tileY (the first two values) are tile positions in the game for that location
     // x and y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
     // MapModMain handles all the calculations to make sure the positions are center-based.

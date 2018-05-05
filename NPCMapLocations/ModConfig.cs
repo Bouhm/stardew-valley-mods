@@ -7,8 +7,8 @@ namespace NPCMapLocations
 {
     public class ModConfig
     {
-        public string MenuKey { get; set; } = "Tab";
-        public string TooltipKey { get; set; } = "Space";
+        public string MenuKey { get; set; } = "tab";
+        public string TooltipKey { get; set; } = "space";
         public int NameTooltipMode { get; set; } = 1;
         public int ImmersionOption { get; set; } = 1;
         public bool ByHeartLevel { get; set; } = false;

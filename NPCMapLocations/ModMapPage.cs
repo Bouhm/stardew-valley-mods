@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
@@ -28,7 +29,7 @@ namespace NPCMapLocations
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames)
+        public ModMapPage(HashSet<NPCMarker> npcMarkers=null, Dictionary<string, string> npcNames=null)
         {
             // initialise
             this.npcNames = npcNames;
@@ -88,39 +89,41 @@ namespace NPCMapLocations
                 }
             }
 
-            List<string> hoveredList = new List<string>();
-            const int markerWidth = 32;
-            const int markerHeight = 30;
-            // Have to use special character to separate strings for Chinese
-            string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
-            foreach (NPCMarker npcMarker in this.npcMarkers)
+            if (!Context.IsMultiplayer)
             {
-                Rectangle npcLocation = npcMarker.Location;
-                if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
+                List<string> hoveredList = new List<string>();
+                const int markerWidth = 32;
+                const int markerHeight = 30;
+                // Have to use special character to separate strings for Chinese
+                string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+                foreach (NPCMarker npcMarker in this.npcMarkers)
                 {
-                    if (npcNames.ContainsKey(npcMarker.Name) && !npcMarker.IsHidden)
-                        hoveredList.Add(npcNames[npcMarker.Name]);
-                }
-                if (!npcMarker.IsOutdoors && !hasIndoorNPC)
-                {
-                    hasIndoorNPC = true;
-                }
-            }
+                    Rectangle npcLocation = npcMarker.Location;
+                    if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
+                    {
+                        if (npcNames.ContainsKey(npcMarker.Name) && !npcMarker.IsHidden)
+                            hoveredList.Add(npcNames[npcMarker.Name]);
 
-            foreach (string name in hoveredList)
-            {
-                hoveredNames = hoveredList[0];
-                for (int i = 1; i < hoveredList.Count; i++)
+                        if (!npcMarker.IsOutdoors && !hasIndoorNPC)
+                            hasIndoorNPC = true;
+                    } 
+                }
+
+                foreach (string name in hoveredList)
                 {
-                    var lines = hoveredNames.Split('\n');
-                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                    hoveredNames = hoveredList[0];
+                    for (int i = 1; i < hoveredList.Count; i++)
                     {
-                        hoveredNames += separator + Environment.NewLine;
-                        hoveredNames += hoveredList[i];
-                    }
-                    else
-                    {
-                        hoveredNames += separator + hoveredList[i];
+                        var lines = hoveredNames.Split('\n');
+                        if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X > (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
+                        {
+                            hoveredNames += separator + Environment.NewLine;
+                            hoveredNames += hoveredList[i];
+                        }
+                        else
+                        {
+                            hoveredNames += separator + hoveredList[i];
+                        }
                     }
                 }
             }
@@ -175,8 +178,11 @@ namespace NPCMapLocations
                     }
                 }
 
-                // Draw name tooltip positioned around location tooltip
-                DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
+                if (!Context.IsMultiplayer)
+                {
+                    // Draw name tooltip positioned around location tooltip
+                    DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
+                }
 
                 // Draw location tooltip
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
@@ -186,11 +192,11 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
             }
             // Draw name tooltip only
-            else
+            else if (!Context.IsMultiplayer)
                 DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
 
             // Draw indoor icon
-            if (hasIndoorNPC && !hoveredNames.Equals(""))
+            if (hasIndoorNPC && !String.IsNullOrEmpty(hoveredNames))
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
         }
 
@@ -268,7 +274,7 @@ namespace NPCMapLocations
                     x = Game1.getOldMouseX() + Game1.tileSize / 2;
                     if (lines.Length > 1)
                     {
-                        y += -relocate + 8 - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                        y += -relocate - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
                     }
                     else
                     {
@@ -282,7 +288,7 @@ namespace NPCMapLocations
                 y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
             }
 
-            if (hasIndoorNPC) indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
+            if (hasIndoorNPC) { indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2); }
             Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
 
             drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);

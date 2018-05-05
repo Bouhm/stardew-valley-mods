@@ -65,7 +65,7 @@ namespace NPCMapLocations
 
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
-            this.options.Add(new OptionsElement("NPC Map Locations Mod Version"));
+            this.options.Add(new OptionsElement("NPC Map Locations"));
             this.options.Add(new OptionsElement(immersionLabel));
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
@@ -412,7 +412,7 @@ namespace NPCMapLocations
         public const int pixelsWide = 9;
         public bool isActive;
         public Rectangle rect;
-
+        
         public MapModButton(string label, int whichOption, int x, int y, int width, int height) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.label = ModMain.modHelper.Translation.Get(label);
@@ -469,7 +469,6 @@ namespace NPCMapLocations
             this.markerCrop = markerCrop;
             orderedNames = ModMain.npcNames.Keys.ToList();
             orderedNames.Sort();
-
             if (whichOption > 6 && whichOption < 39)
             {
                 this.isChecked = !ModMain.config.NPCBlacklist.Contains(orderedNames[whichOption-7]);
@@ -580,13 +579,11 @@ namespace NPCMapLocations
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X), (float)(slotY + this.bounds.Y)), new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked), Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
             if (whichOption > 6 && whichOption < 39)
             {
-                foreach (NPC npc in Utility.getAllCharacters())
+                foreach (string name in ModMain.npcNames.Keys)
                 {
-                    var name = npc.getName();
-                    if (string.IsNullOrEmpty(name))
-                    {
-                        name = npc.Name;
-                    }
+                    NPC npc = Game1.getCharacterFromName(name);
+                    if (npc == null) { continue; }
+
                     if (name.Equals(this.label))
                     {
                         if (this.isChecked)
