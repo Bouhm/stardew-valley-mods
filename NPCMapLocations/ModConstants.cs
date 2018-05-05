@@ -198,6 +198,12 @@ public static class MapModConstants
             { "LonelyStone", new MapVector[] {
                 new MapVector(714, 636)
             }},
+            { "MermaidHouse", new MapVector[] {
+                new MapVector(867, 640)
+            }},
+            { "Submarine", new MapVector[] {
+                new MapVector(742, 651)
+            }},
         { "Railroad", new MapVector[] {
             new MapVector(0, 34, 589, 0),
             new MapVector(70, 62, 794, 81)
@@ -323,6 +329,10 @@ public static class MapModConstants
         { "Coop", new Rectangle(5, 0, 5, 7) },
         { "Barn", new Rectangle(10, 0, 6, 7) },
         { "SlimeHutch", new Rectangle(16, 0, 7, 7) },
-        { "Greenhouse", new Rectangle(23, 0, 5, 7) }
+        { "Greenhouse", new Rectangle(23, 0, 5, 7) },
+        { "Cabin", new Rectangle(28, 0, 4, 7) },
+        { "Log Cabin", new Rectangle(28, 0, 4, 7) },
+        { "Stone Cabin", new Rectangle(28, 0, 4, 7) },
+        { "Plank Cabin", new Rectangle(28, 0, 4, 7) }
     };
 }

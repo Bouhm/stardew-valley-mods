@@ -89,7 +89,7 @@ namespace NPCMapLocations
                 }
             }
 
-            if (!Context.IsMultiplayer)
+            if (Context.IsMainPlayer)
             {
                 List<string> hoveredList = new List<string>();
                 const int markerWidth = 32;
@@ -178,7 +178,7 @@ namespace NPCMapLocations
                     }
                 }
 
-                if (!Context.IsMultiplayer)
+                if (Context.IsMainPlayer)
                 {
                     // Draw name tooltip positioned around location tooltip
                     DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
@@ -192,7 +192,7 @@ namespace NPCMapLocations
                 b.DrawString(Game1.smallFont, hoveredLocationText, new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
             }
             // Draw name tooltip only
-            else if (!Context.IsMultiplayer)
+            else if (Context.IsMainPlayer)
                 DrawNPCNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
 
             // Draw indoor icon
@@ -274,11 +274,11 @@ namespace NPCMapLocations
                     x = Game1.getOldMouseX() + Game1.tileSize / 2;
                     if (lines.Length > 1)
                     {
-                        y += -relocate - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
+                        y += -relocate + 8 - ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
                     }
                     else
                     {
-                        y += -relocate + 8 - Game1.tileSize;
+                        y += -relocate + 6 - Game1.tileSize;
                     }
                 }
             }

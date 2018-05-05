@@ -39,7 +39,7 @@ namespace NPCMapLocations
         private static HashSet<NPCMarker> npcMarkers;
 
         // For debug info
-        private const bool DEBUG_MODE = false;
+        private const bool DEBUG_MODE = true;
         private static Vector2 _tileLower; 
         private static Vector2 _tileUpper; 
         private static string alertFlag; 
@@ -221,7 +221,7 @@ namespace NPCMapLocations
         private void HandleInput(GameMenu menu, SButton input)
         {
             if (menu.currentTab != GameMenu.mapTab) { return; }
-            if (!Context.IsMultiplayer)
+            if (Context.IsMainPlayer)
             {
                 if (input.ToString().Equals(config.MenuKey) || input is SButton.ControllerY)
                 {
@@ -345,7 +345,7 @@ namespace NPCMapLocations
 
             GetFarmBuildingLocs();
 
-            if (!Context.IsMultiplayer)
+            if (Context.IsMainPlayer)
                 UpdateNPCMarkers();
             else
                 modMapPage = new ModMapPage();
@@ -493,19 +493,37 @@ namespace NPCMapLocations
             }
 
             // Get tile location of farm buildings in farm
-            string[] buildings = { "Coop", "Big Coop", "Deluxe Coop", "Barn", "Big Barn", "Deluxe Barn", "Slime Hutch", "Shed" };
+            string[] buildings = {
+                "Coop",
+                "Big Coop",
+                "Deluxe Coop",
+                "Barn",
+                "Big Barn",
+                "Deluxe Barn",
+                "Slime Hutch",
+                "Shed",
+                "Cabin",
+            };
+
             if (buildings.Contains(location))
             {
                 foreach (Building farmBuilding in Game1.getFarm().buildings)
                 {
-                    if (farmBuilding.indoors.Value != null && farmBuilding.indoors.Value.Name.Equals(location))
+                    // Set origin to center
+                    tileX = (int)(farmBuilding.tileX.Value - farmBuilding.tilesWide.Value / 2);
+                    tileY = (int)(farmBuilding.tileY.Value - farmBuilding.tilesHigh.Value / 2);
+                    location = "Farm";
+
+                    if (location.Equals("Cabin"))
                     {
-                        // Set origin to center
-                        tileX = (int)(farmBuilding.tileX.Value - farmBuilding.tilesWide.Value / 2);
-                        tileY = (int)(farmBuilding.tileY.Value - farmBuilding.tilesHigh.Value / 2);
-                        location = "Farm";
+                        break;
+                    }
+                    else if (farmBuilding.indoors.Value != null && farmBuilding.indoors.Value.Name.Equals(location))
+                    {
+                        break;
                     }
                 }
+                
             }
 
             if (!MapModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
@@ -626,6 +644,11 @@ namespace NPCMapLocations
                 {
                     farmBuildings["SlimeHutch"] = locVector;
                 }
+                else if (building.indoors.Value.Equals("Cabin"))
+                {
+                    locVector = new Vector2((int)(locVector.X - 5), (int)(locVector.Y - 3));
+                    farmBuildings["Cabin"] = locVector;
+                }
             }
 
             // Greenhouse unlocked after pantry bundles completed
@@ -654,6 +677,39 @@ namespace NPCMapLocations
             SpriteBatch b = Game1.spriteBatch;
 
             modMapPage.DrawMap(b);
+
+            /*
+            if (Context.IsMultiplayer)
+            {
+                foreach (Farmer farmer in Game1.getOnlineFarmers())
+                {
+                    if (farmer == null || (farmer != null && farmer.currentLocation == null)) { continue; }
+                    if (Game1.player.currentLocation is Cabin)
+                    {
+                        Cabin cabin = farmer.currentLocation as Cabin;
+                        long id = cabin.getFarmhand().Value.UniqueMultiplayerID;
+
+                        foreach (Building building in Game1.getFarm().buildings)
+                        {
+                            if (id == ) {
+                                
+                                farmBuildings["Cabin" + farmer.UniqueMultiplayerID] = ModMain.LocationToMap("Cabin", building.tileX.Value, building.tileY.Value);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Vector2 farmerLoc = ModMain.LocationToMap(farmer.currentLocation.Name, farmer.getTileX(), farmer.getTileY(), true);
+                        farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farmerLoc.X - 16, farmerLoc.Y - 15), 0.00011f, 2f, 1, farmer);
+                    }
+                }
+            }
+            else
+            {
+                Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), true);
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
+            }
+            */
 
             if (config.ShowFarmBuildings)
             {
@@ -705,21 +761,6 @@ namespace NPCMapLocations
                         b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                     }
                 }
-            }
-
-            if (Context.IsMultiplayer)
-            {
-                foreach (Farmer farmer in Game1.getAllFarmers())
-                {
-                    if (farmer == null || (farmer != null && farmer.currentLocation == null)) { continue; }
-                    Vector2 farmerLoc = ModMain.LocationToMap(farmer.currentLocation.Name, farmer.getTileX(), farmer.getTileY(), true);
-                    farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farmerLoc.X - 16, farmerLoc.Y - 15), 0.00011f, 2f, 1, farmer);
-                }
-            }
-            else
-            {
-                Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), true);
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
             }
 
             // Location and name tooltips
