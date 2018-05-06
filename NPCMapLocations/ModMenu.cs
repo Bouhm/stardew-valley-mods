@@ -533,7 +533,7 @@ namespace NPCMapLocations
                         break;
                 }
             }
-            ModMain.modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.config);
+            ModMain.modHelper.WriteConfig(ModMain.config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -608,7 +608,7 @@ namespace NPCMapLocations
             {
                 ModMain.config.HeartLevelMax = this.value;
             }
-            ModMain.modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.config);
+            ModMain.modHelper.WriteConfig(ModMain.config);
         }
 
         public override void receiveLeftClick(int x, int y)

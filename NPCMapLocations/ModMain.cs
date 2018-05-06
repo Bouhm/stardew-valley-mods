@@ -47,7 +47,7 @@ namespace NPCMapLocations
         {
             modHelper = helper;
             monitor = this.Monitor;
-            config = modHelper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+            config = modHelper.ReadConfig<ModConfig>();
             // Make the mod selfishly replace the map in case of conflict with other mods 
             ModMain.map = ModMain.modHelper.Content.Load<Texture2D>(@"assets/map.png", ContentSource.ModFolder); // Load modified map page
             ModMain.buildingMarkers = ModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
@@ -227,7 +227,7 @@ namespace NPCMapLocations
                 {
                     config.NameTooltipMode = 1;
                 }
-                modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", config);
+                modHelper.WriteConfig(config);
             }
             else
             {
@@ -235,7 +235,7 @@ namespace NPCMapLocations
                 {
                     config.NameTooltipMode = 3;
                 }
-                modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", config);
+                modHelper.WriteConfig(config);
             }
         }
 
