@@ -29,7 +29,7 @@ namespace NPCMapLocations
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(HashSet<NPCMarker> npcMarkers=null, Dictionary<string, string> npcNames=null)
+        public ModMapPage(Dictionary<string, string> npcNames, HashSet<NPCMarker> npcMarkers)
         {
             // initialise
             this.npcNames = npcNames;

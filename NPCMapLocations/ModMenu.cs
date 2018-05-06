@@ -7,7 +7,9 @@ Settings loaded from config file and changes saved onto config file.
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
@@ -36,12 +38,12 @@ namespace NPCMapLocations
         private bool scrolling;
         private bool canClose;
         private int optionsSlotHeld = -1;
+      
 
-        public ModMenu(int x, int y, int width, int height, Dictionary<string, bool> showSecondaryNPCs, Dictionary<string, Dictionary<string, int>> customNPCs, int customNpcId, Dictionary<string, int> markerCrop) : base(x, y, width, height, false)
+        public ModMenu(int x, int y, int width, int height, Dictionary<string, bool> secondaryNPCs, Dictionary<string, object> customNPCs, Dictionary<string, string> npcNames, Dictionary<string, int> markerCrop) : base(x, y, width, height, false)
         {
             //this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             this.map = ModMain.map;
-            var npcNames = ModMain.npcNames;
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -82,57 +84,27 @@ namespace NPCMapLocations
             // Custom NPCs
             if (customNPCs != null)
             {
-                foreach (KeyValuePair<string, Dictionary<string, int>> entry in customNPCs)
-                {
-                    if (customNpcId > 0)
-                    {
-                        this.options.Add(new MapModCheckbox(npcNames[entry.Key], 39 + customNpcId, -1, -1, markerCrop));
+                for (int i = 1; i <= customNPCs.Count; i++)
+                    this.options.Add(new MapModCheckbox(customNPCs.Keys.ElementAt(i), 39 + i, -1, -1, npcNames, markerCrop, customNPCs));
+            }
+            // Villagers
+            var orderedNames = npcNames.Keys.ToList();
+            orderedNames.Sort();
+            int idx = 7;
+            foreach (var name in orderedNames)
+            {
+                if (secondaryNPCs.Keys.Contains(name))
+                    if (secondaryNPCs[name]) {
+                        this.options.Add(new MapModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
                     }
+                    else
+                    {
+                        continue;
+                    }
+                else
+                {
+                    this.options.Add(new MapModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
                 }
-            }
-            this.options.Add(new MapModCheckbox(npcNames["Abigail"], 7, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Alex"], 8, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Caroline"], 9, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Clint"], 10, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Demetrius"], 11, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Elliott"], 12, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Emily"], 13, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Evelyn"], 14, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["George"], 15, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Gus"], 16, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Haley"], 17, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Harvey"], 18, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Jas"], 19, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Jodi"], 20, -1, -1, markerCrop));
-            if (showSecondaryNPCs["Kent"])
-            {
-                this.options.Add(new MapModCheckbox(npcNames["Kent"], 21, -1, -1, markerCrop));
-            }
-            this.options.Add(new MapModCheckbox(npcNames["Leah"], 22, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Lewis"], 23, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Linus"], 24, -1, -1, markerCrop));
-            if (showSecondaryNPCs["Marlon"])
-            {
-                this.options.Add(new MapModCheckbox(npcNames["Marlon"], 25, -1, -1, markerCrop));
-            }
-            this.options.Add(new MapModCheckbox(npcNames["Marnie"], 26, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Maru"], 27, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Pam"], 28, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Penny"], 29, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Pierre"], 30, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Robin"], 31, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Sam"], 32, -1, -1, markerCrop));
-            if (showSecondaryNPCs["Sandy"])
-            {
-                this.options.Add(new MapModCheckbox(npcNames["Sandy"], 33, -1, -1, markerCrop));
-            }
-            this.options.Add(new MapModCheckbox(npcNames["Sebastian"], 34, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Shane"], 35, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Vincent"], 36, -1, -1, markerCrop));
-            this.options.Add(new MapModCheckbox(npcNames["Willy"], 37, -1, -1, markerCrop));
-            if (showSecondaryNPCs["Wizard"])
-            {
-                this.options.Add(new MapModCheckbox(npcNames["Wizard"], 38, -1, -1, markerCrop));
             }
         }
 
@@ -461,18 +433,33 @@ namespace NPCMapLocations
         public bool isChecked;
         public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
         public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
+        private Dictionary<string, string> npcNames;
         private Dictionary<string, int> markerCrop;
+        private Dictionary<string, object> customNPCs;
         private List<string> orderedNames;
 
-        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, int> markerCrop = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, string> npcNames = null, Dictionary<string, int> markerCrop = null, Dictionary<string, object> customNPCs = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.markerCrop = markerCrop;
-            orderedNames = ModMain.npcNames.Keys.ToList();
-            orderedNames.Sort();
-            if (whichOption > 6 && whichOption < 39)
+            this.npcNames = npcNames;
+            this.customNPCs = customNPCs;
+            this.label = label;
+
+            if (whichOption < 44)
             {
-                this.isChecked = !ModMain.config.NPCBlacklist.Contains(orderedNames[whichOption-7]);
-                return;
+                orderedNames = npcNames.Keys.ToList();
+                orderedNames.Sort();
+
+                if (whichOption > 6 && whichOption < 39)
+                {
+                    this.isChecked = !ModMain.config.NPCBlacklist.Contains(orderedNames[whichOption - 7]);
+                    return;
+                }
+                else if (whichOption > 38 && whichOption < 44)
+                {
+                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption - 4));
+                    return;
+                }
             }
             else if (whichOption > 43)
             {
@@ -480,21 +467,6 @@ namespace NPCMapLocations
             }
             switch (whichOption)
             {
-                case 39:
-                    this.isChecked = ModMain.config.ShowCustomNPC1;
-                    return;
-                case 40:
-                    this.isChecked = ModMain.config.ShowCustomNPC2;
-                    return;
-                case 41:
-                    this.isChecked = ModMain.config.ShowCustomNPC3;
-                    return;
-                case 42:
-                    this.isChecked = ModMain.config.ShowCustomNPC4;
-                    return;
-                case 43:
-                    this.isChecked = ModMain.config.ShowCustomNPC5;
-                    return;
                 case 44:
                     this.isChecked = ModMain.config.OnlySameLocation;
                     return;
@@ -526,32 +498,22 @@ namespace NPCMapLocations
             this.isChecked = !this.isChecked;
             int whichOption = this.whichOption;
 
-            if (whichOption > 6 && whichOption < 39) 
+            if (whichOption > 6 && whichOption < 39)
             {
                 if (this.isChecked)
-                    ModMain.config.NPCBlacklist.Remove(orderedNames[whichOption-7]);
-                else 
-                    ModMain.config.NPCBlacklist.Add(orderedNames[whichOption-7]);
+                    ModMain.config.NPCBlacklist.Remove(orderedNames[whichOption - 7]);
+                else
+                    ModMain.config.NPCBlacklist.Add(orderedNames[whichOption - 7]);
             }
-            else 
+            else if (whichOption > 38 && whichOption < 44)
             {
-                switch (whichOption)
-                {
-                    case 39:
-                        ModMain.config.ShowCustomNPC1 = this.isChecked;
-                        break;
-                    case 40:
-                        ModMain.config.ShowCustomNPC2 = this.isChecked;
-                        break;
-                    case 41:
-                        ModMain.config.ShowCustomNPC3 = this.isChecked;
-                        break;
-                    case 42:
-                        ModMain.config.ShowCustomNPC4 = this.isChecked;
-                        break;
-                    case 43:
-                        ModMain.config.ShowCustomNPC5 = this.isChecked;
-                        break;
+                if (this.isChecked)
+                    ModMain.config.CustomNPCBlacklist.Remove(customNPCs.Keys.ElementAt(whichOption - 7));
+                else
+                    ModMain.config.CustomNPCBlacklist.Add(customNPCs.Keys.ElementAt(whichOption - 7));
+            }
+            else { 
+                switch (whichOption) { 
                     case 44:
                         ModMain.config.OnlySameLocation = this.isChecked;
                         break;
@@ -571,7 +533,7 @@ namespace NPCMapLocations
                         break;
                 }
             }
-            ModMain.modHelper.WriteJsonFile($"config/{ModMain.saveName}.json", ModMain.config);
+            ModMain.modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -579,25 +541,24 @@ namespace NPCMapLocations
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X), (float)(slotY + this.bounds.Y)), new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked), Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
             if (whichOption > 6 && whichOption < 39)
             {
-                foreach (string name in ModMain.npcNames.Keys)
-                {
-                    NPC npc = Game1.getCharacterFromName(name);
-                    if (npc == null) { continue; }
+                NPC npc = Game1.getCharacterFromName(label);
+                if (npc == null) { return; }
 
-                    if (name.Equals(this.label))
-                    {
-                        if (this.isChecked)
-                        {
-                            Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
-                        }
-                        else
-                        {
-                            Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
-                        }
-                        base.draw(b, slotX + 75, slotY);
-                        break;
-                    }
+                if (this.isChecked)
+                {
+                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                 }
+                else
+                {
+                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                }
+
+                // Draw names
+                slotX += 75;
+                if (this.whichOption == -1)
+                    SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f, 0.1f, false, -1, "", -1);
+                else
+                    Utility.drawTextWithShadow(b, npcNames[label], Game1.dialogueFont, new Vector2((float)(slotX + this.bounds.X + this.bounds.Width + 8), (float)(slotY + this.bounds.Y)), this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
             }
             else
             {
@@ -647,7 +608,7 @@ namespace NPCMapLocations
             {
                 ModMain.config.HeartLevelMax = this.value;
             }
-            ModMain.modHelper.WriteJsonFile($"config/{ModMain.saveName}.json", ModMain.config);
+            ModMain.modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.config);
         }
 
         public override void receiveLeftClick(int x, int y)

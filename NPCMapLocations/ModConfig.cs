@@ -7,8 +7,8 @@ namespace NPCMapLocations
 {
     public class ModConfig
     {
-        public string MenuKey { get; set; } = "tab";
-        public string TooltipKey { get; set; } = "space";
+        public string MenuKey { get; set; } = "Tab";
+        public string TooltipKey { get; set; } = "Space";
         public int NameTooltipMode { get; set; } = 1;
         public int ImmersionOption { get; set; } = 1;
         public bool ByHeartLevel { get; set; } = false;
@@ -20,12 +20,8 @@ namespace NPCMapLocations
         public HashSet<string> NPCBlacklist { get; set; } = new HashSet<string>() { "Marlon", "Sandy" };
         public bool ShowTravelingMerchant { get; set; } = true;
         public Dictionary<string, int> VillagerCrop { get; set; } = new Dictionary<string, int>();
-        public bool ShowCustomNPC1 { get; set; } = true;
-        public bool ShowCustomNPC2 { get; set; } = true;
-        public bool ShowCustomNPC3 { get; set; } = true;
-        public bool ShowCustomNPC4 { get; set; } = true;
-        public bool ShowCustomNPC5 { get; set; } = true;
+        public List<string> CustomNPCBlacklist = new List<string>();
         public bool ShowFarmBuildings { get; set; } = true;
-        public Dictionary<string, Dictionary<string, int>> CustomNPCs { get; set; } = new Dictionary<string, Dictionary<string, int>>();
+        public Dictionary<string, object> CustomNPCs { get; set; } = new Dictionary<string, object>();
     }
 }
