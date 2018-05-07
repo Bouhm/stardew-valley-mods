@@ -22,12 +22,11 @@ using System.Threading.Tasks;
 
 namespace NPCMapLocations
 {
-    public class ModMain : Mod
+    public class ModMain : Mod, IAssetLoader
     {
         public static IModHelper modHelper;
         public static IMonitor monitor;
         public static ModConfig config;
-        public static Texture2D map;
         private static Texture2D buildingMarkers;
         private const int BUILDING_SCALE = 3;
         private static ModCustomHandler CustomHandler;
@@ -53,38 +52,33 @@ namespace NPCMapLocations
         public override void Entry(IModHelper helper)
         {
             modHelper = helper;
-
             config = modHelper.ReadConfig<ModConfig>();
-            // Make the mod selfishly replace the map in case of conflict with other mods 
-            ModMain.map = ModMain.modHelper.Content.Load<Texture2D>(@"assets/map.png", ContentSource.ModFolder); // Load modified map page
-            ModMain.buildingMarkers = ModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
             markerCrop = ModConstants.MarkerCrop;
             farmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
             CustomHandler = new ModCustomHandler(config, modHelper, markerCrop);
+            ModMain.buildingMarkers = ModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-            GameEvents.QuarterSecondTick += GameEvents_UpdateTick;
+            GameEvents.UpdateTick += GameEvents_UpdateTick;
+            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
-
         }
 
-        /*
-            // Replace game map with modified map
-            public bool CanLoad<T>(IAssetInfo asset)
-            {
-                return asset.AssetNameEquals(@"LooseSprites\Map");
-            }
+        // Replace game map with modified map
+        public bool CanLoad<T>(IAssetInfo asset)
+        {
+            return asset.AssetNameEquals(@"LooseSprites\Map");
+        }
 
-            public T Load<T>(IAssetInfo asset)
-            {
-                return (T)(object)MapModMain.modHelper.Content.Load<Texture2D>(@"assets\map.png"); // Replace map page
-            }
-        */
+        public T Load<T>(IAssetInfo asset)
+        {
+            return (T)(object)ModMain.modHelper.Content.Load<Texture2D>($@"assets\{CustomHandler.LoadMap()}.png"); // Replace map page
+        }
 
         // For drawing farm buildings on the map 
         // and getting positions relative to the farm 
@@ -145,6 +139,7 @@ namespace NPCMapLocations
         // Load config and other one-off data
         private void SaveEvents_AfterLoad(object sender, EventArgs e)
         {
+            
             snappyMenuOption = Game1.options.SnappyMenus;
             secondaryNPCs = new Dictionary<string, bool>
             {
@@ -180,7 +175,7 @@ namespace NPCMapLocations
         // Handle opening mod menu and changing tooltip options
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
-            if (Game1.hasLoadedGame && Game1.activeClickableMenu is GameMenu)
+            if (Context.IsWorldReady && Game1.activeClickableMenu is GameMenu)
             {
                 HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
             }
@@ -292,20 +287,26 @@ namespace NPCMapLocations
             }
         }
 
-        // Handle updating NPC marker data when map is open
+        // Map page updates
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
-            if (!Game1.hasLoadedGame) { return; }
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
+            if (!Context.IsWorldReady) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             if (Game1.options.SnappyMenus)
                 modHelper.Reflection.GetField<Boolean>(Game1.options, "SnappyMenus").SetValue(false);
 
+            modMapPage = new ModMapPage(npcNames, npcMarkers);
+        }
+
+        // Handle updating NPC marker data when map is open
+        private void GameEvents_QuarterSecondTick(object sender, EventArgs e)
+        {
+            if (!Context.IsWorldReady) { return; }
+            if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
+
             if (Context.IsMainPlayer)
                 UpdateNPCMarkers();
-            else
-                modMapPage = new ModMapPage(npcNames, npcMarkers);
 
             UpdateActiveFarmersAsync();        
         }
@@ -493,7 +494,7 @@ namespace NPCMapLocations
                         alertFlag = "UnknownLocation:" + location.Name;
                     }
                 }
-                return new Vector2(-10000, -10000);
+                return new Vector2(-5000, -5000);
             }
 
             // Handle farm buildings
@@ -618,7 +619,7 @@ namespace NPCMapLocations
         // Draw event (when Map Page is opened)
         private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
         {
-            if (!Game1.hasLoadedGame) { return; }
+            if (!Context.IsWorldReady) { return; }
             if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
@@ -713,7 +714,7 @@ namespace NPCMapLocations
         // and thus cannot override snappyMovement
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
-            if (!Game1.hasLoadedGame || Game1.options == null) { return; }
+            if (!Context.IsWorldReady || Game1.options == null) { return; }
 
             if (e.PriorMenu is GameMenu menu)
             {
@@ -734,7 +735,7 @@ namespace NPCMapLocations
         // For debugging
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
         {
-            if (!Game1.hasLoadedGame || Game1.player == null) { return; }
+            if (!Context.IsWorldReady || Game1.player == null) { return; }
             if (DEBUG_MODE)
                 #pragma warning disable CS0162 // Unreachable code detected
                 ShowDebugInfo();

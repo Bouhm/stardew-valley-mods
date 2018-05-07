@@ -42,8 +42,7 @@ namespace NPCMapLocations
 
         public ModMenu(int x, int y, int width, int height, Dictionary<string, bool> secondaryNPCs, Dictionary<string, object> customNPCs, Dictionary<string, string> npcNames, Dictionary<string, int> markerCrop) : base(x, y, width, height, false)
         {
-            //this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
-            this.map = ModMain.map;
+            this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;

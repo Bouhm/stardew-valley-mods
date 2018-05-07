@@ -1,4 +1,5 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Reflection;
 
 namespace NPCMapLocations
 {
-    // Handles all custom NPCs, custom sprites, custom names, etc.`n`n
+    // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
     internal class ModCustomHandler
     {
         private Dictionary<string, string> npcNames; // For handling custom names
@@ -41,6 +42,26 @@ namespace NPCMapLocations
                 }
             }
             helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", config);
+        }
+
+        // Load recolored map if user has recolor mods
+        public string LoadMap()
+        {
+            // Eemie's Map Recolour
+            if (helper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
+            {
+                return "eemie_recolour_map";
+            }
+            // Starblue Valley
+            else if (helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
+            {
+                return "starblue_map";
+            }
+            // Default
+            else
+            {
+                return "default_map";
+            }
         }
 
         public Dictionary<string, object> GetCustomNPCs()
