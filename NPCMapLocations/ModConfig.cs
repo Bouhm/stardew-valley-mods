@@ -19,9 +19,9 @@ namespace NPCMapLocations
         public bool MarkQuests { get; set; } = true;
         public HashSet<string> NPCBlacklist { get; set; } = new HashSet<string>() { "Marlon", "Sandy" };
         public bool ShowTravelingMerchant { get; set; } = true;
+        public bool ShowFarmBuildings { get; set; } = true;
         public Dictionary<string, int> VillagerCrop { get; set; } = new Dictionary<string, int>();
         public List<string> CustomNPCBlacklist = new List<string>();
-        public bool ShowFarmBuildings { get; set; } = true;
         public Dictionary<string, object> CustomNPCs { get; set; } = new Dictionary<string, object>();
     }
 }

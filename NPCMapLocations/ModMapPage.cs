@@ -101,8 +101,8 @@ namespace NPCMapLocations
                     Rectangle npcLocation = npcMarker.Location;
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
-                        if (npcNames.ContainsKey(npcMarker.Name) && !npcMarker.IsHidden)
-                            hoveredList.Add(npcNames[npcMarker.Name]);
+                        if (npcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
+                            hoveredList.Add(npcNames[npcMarker.Npc.Name]);
 
                         if (!npcMarker.IsOutdoors && !hasIndoorNPC)
                             hasIndoorNPC = true;
