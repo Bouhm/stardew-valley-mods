@@ -27,14 +27,15 @@ namespace NPCMapLocations
         public static IMonitor monitor;
         public static ModConfig config;
         public static Texture2D map;
-        public static Texture2D buildingMarkers;
+        private static Texture2D buildingMarkers;
+        private const int BUILDING_SCALE = 3;
         private static ModCustomHandler CustomHandler;
         private static bool snappyMenuOption;
         private static ModMapPage modMapPage;
         private static Dictionary<string, int> markerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private static Dictionary<string, bool> secondaryNPCs;
         private static Dictionary<string, string> npcNames;
-        private static Dictionary<string, Vector2> farmBuildings;
+        private static Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings;
         private static HashSet<NPCMarker> npcMarkers;
 
         // For debug info
@@ -51,14 +52,14 @@ namespace NPCMapLocations
             // Make the mod selfishly replace the map in case of conflict with other mods 
             ModMain.map = ModMain.modHelper.Content.Load<Texture2D>(@"assets/map.png", ContentSource.ModFolder); // Load modified map page
             ModMain.buildingMarkers = ModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
-            markerCrop = MapModConstants.MarkerCrop;
-            farmBuildings = new Dictionary<string, Vector2>();
+            markerCrop = ModConstants.MarkerCrop;
+            farmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
             CustomHandler = new ModCustomHandler(config, modHelper, markerCrop);
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
-            LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
+            LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
@@ -78,53 +79,59 @@ namespace NPCMapLocations
             }
         */
 
-        // Get locations of farm buildings
+        // For drawing farm buildings on the map 
+        // and getting positions relative to the farm 
         private void UpdateFarmBuildingLocs()
         {
             foreach (Building building in Game1.getFarm().buildings)
             {
-                if (building.nameOfIndoorsWithoutUnique == null)
+                if (building.nameOfIndoorsWithoutUnique == null 
+                  || building.nameOfIndoors == null
+                  || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
                 {
                     continue;
                 }
 
-                Vector2 locVector = ModMain.LocationToMap("Farm", building.tileX.Value, building.tileY.Value);
-                if (building.nameOfIndoorsWithoutUnique.Equals("Shed"))
+                Vector2 locVector = LocationToMap(
+                    "Farm", // Get building position in farm
+                    building.tileX.Value, 
+                    building.tileY.Value
+                ); 
+                // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
+                // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
+                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
+
+                // buildingType of Cabin includes Log/Stone/Plank
+                if (commonName.Contains("Cabin"))
                 {
-                    farmBuildings["Shed"] = locVector;
+                    locVector.X += 1;
+                    locVector.Y -= 3;
+                    farmBuildings[building.nameOfIndoors] = new KeyValuePair<string, Vector2>(building.nameOfIndoorsWithoutUnique, locVector);
+                    continue;
                 }
-                else if (building.nameOfIndoorsWithoutUnique.Equals("Coop"))
+                else if (commonName.Contains("Barn"))
                 {
-                    farmBuildings["Coop"] = locVector;
+                    locVector.Y += 3;
                 }
-                else if (building.nameOfIndoorsWithoutUnique.Equals("Barn"))
-                {
-                    locVector = new Vector2(locVector.X, locVector.Y + 2);
-                    farmBuildings["Barn"] = locVector;
-                }
-                else if (building.nameOfIndoorsWithoutUnique.Equals("SlimeHutch"))
-                {
-                    farmBuildings["SlimeHutch"] = locVector;
-                }
-                else if (building.indoors.Value.Equals("Cabin"))
-                {
-                    locVector = new Vector2((int)(locVector.X - 5), (int)(locVector.Y - 3));
-                    farmBuildings["Cabin"] = locVector;
-                }
+
+                // Format: { uniqueName: { commonName: positionOnFarm } }
+                // buildingType will match currentLocation.Name for commonName
+                farmBuildings[building.nameOfIndoors] = new KeyValuePair<string, Vector2>(building.buildingType.Value, locVector);
             }
 
             // Greenhouse unlocked after pantry bundles completed
             if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
             {
                 Vector2 locVector = ModMain.LocationToMap("Greenhouse");
-                locVector = new Vector2((int)(locVector.X - 5 / 2 * 3), (int)(locVector.Y - 7 / 2 * 3));
-                farmBuildings["Greenhouse"] = locVector;
+                locVector.X -= 5 / 2 * BUILDING_SCALE;
+                locVector.Y -= 7 / 2 * BUILDING_SCALE;
+                farmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", locVector);
             }
         }
 
-        private void LocationEvents_LocationsChanged(object sender, EventArgsGameLocationsChanged e)
+        private void LocationEvents_BuildingsChanged(object sender, EventArgsLocationBuildingsChanged e)
         {
-            if (e.NewLocations.Any(x => Game1.getFarm().buildings.Any(y => y.nameOfIndoors == x.Name))) 
+            if (e.Location.Name.Equals("Farm"))
                 UpdateFarmBuildingLocs();
         }
 
@@ -142,23 +149,7 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNPCs();
             npcNames = CustomHandler.GetNPCNames();
-            if (Context.IsMultiplayer)
-                GetCabins();
-        }
-
-        private void GetCabins()
-        {
-
-            foreach (Farmer farmer in Game1.getOnlineFarmers())
-            {
-                Cabin cabin = farmer.currentLocation as Cabin;
-                long id = cabin.getFarmhand().Value.UniqueMultiplayerID;
-                var getCabins = this.Helper.Reflection.GetMethod(Game1.server, "cabins").MethodInfo;
-                var cabins = getCabins.Invoke(Game1.server, new object[0]);
-               
-            }
-           
-            
+            UpdateFarmBuildingLocs();
         }
 
         private NetCollection<NPC> GetAllVillagers()
@@ -171,12 +162,11 @@ namespace NPCMapLocations
                 {
                     if (npc == null) { continue; }
                     if (!allNPCs.Contains(npc) 
-                      && !MapModConstants.ExcludedVillagers.Contains(npc.Name) 
+                      && !ModConstants.ExcludedVillagers.Contains(npc.Name) 
                       && npc.isVillager())
                         allNPCs.Add(npc);
                 }
             }
-
             return allNPCs;
         }
 
@@ -323,21 +313,23 @@ namespace NPCMapLocations
             {
                 NPC npc = npcMarker.Npc;
                 string locationName;
+                GameLocation npcLocation = npc.currentLocation;
 
                 // Handle null locations at beginning of new day
                 // !currentLocation is null for FarmHands in MP
-                if (npc.currentLocation == null)
+                if (npcLocation == null) { 
                     locationName = npc.DefaultMap;
+                    npcLocation = Game1.getLocationFromName(locationName);
+                }
                 else
                     locationName = npc.currentLocation.Name;
 
                 if (locationName == null) { continue; }
 
                 // Isn't mapped by the mod; skip
-                if (!MapModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos))
+                if (!ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos))
                     continue;
 
-                GameLocation npcLocation = Game1.getLocationFromName(locationName);
 
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = npcLocation.IsOutdoors;
@@ -390,8 +382,8 @@ namespace NPCMapLocations
                     int width = 32;
                     int height = 30;
                     // Get center of NPC marker 
-                    int x = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY()).X - width/2;
-                    int y = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY()).Y - height/2;
+                    int x = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width/2;
+                    int y = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
 
                     npcMarker.Location = new Rectangle(x, y, width, height);
                     npcMarker.Marker = npc.Sprite.Texture;
@@ -437,63 +429,54 @@ namespace NPCMapLocations
             modMapPage = new ModMapPage(npcNames, npcMarkers);
         }
 
-        // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
-        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
-        // Requires MapModConstants and modified map page in ./content 
-        public static Vector2 LocationToMap(string location, int tileX = -1, int tileY = -1, bool isFarmer = false)
+        // Helper method for LocationToMap
+        private static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
         {
             if (location == null)
             {
-                if (DEBUG_MODE && alertFlag != "UnknownLocation:" + location)
+                if (alertFlag != "UnknownLocation:" + location.Name)
                 {
-                    ModMain.monitor.Log("Unknown Location: " + location + ".", LogLevel.Alert);
+                    ModMain.monitor.Log("Unknown location: " + location.Name + ".", LogLevel.Alert);
+                    alertFlag = "UnknownLocation:" + location.Name;
+                }
+                return new Vector2(-5000, -5000);
+            }
+
+            // Handle farm buildings
+            // Match currentLocation.Name with buildingType 
+            // and use uniqueName to get location of buildings with the same currentLocation.Name
+            if (location.IsFarm && !location.Name.Equals("FarmHouse"))
+            {
+                if (location.uniqueName.Value != null 
+                  && farmBuildings[location.uniqueName.Value].Key.Equals(location.Name)) 
+                {
+                    return farmBuildings[location.uniqueName.Value].Value;
+                }         
+            }
+
+            return LocationToMap(location.Name, tileX, tileY);
+        }
+
+        // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
+        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
+        // Requires MapModConstants and modified map page in ./assets
+        public static Vector2 LocationToMap(string location, int tileX=-1, int tileY=-1)
+        {
+            if (!ModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
+            {
+                if (alertFlag != "UnknownLocation:" + location)
+                {
+                    ModMain.monitor.Log("Unknown location: " + location + ".", LogLevel.Alert);
                     alertFlag = "UnknownLocation:" + location;
                 }
                 return new Vector2(-5000, -5000);
             }
 
-            // Get tile location of farm buildings in farm
-            string[] buildings = {
-                "Coop",
-                "Big Coop",
-                "Deluxe Coop",
-                "Barn",
-                "Big Barn",
-                "Deluxe Barn",
-                "Slime Hutch",
-                "Shed",
-                "Cabin",
-            };
-
-            if (buildings.Contains(location))
-            {
-                foreach (Building farmBuilding in Game1.getFarm().buildings)
-                {
-                    // Set origin to center
-                    tileX = (int)(farmBuilding.tileX.Value - farmBuilding.tilesWide.Value / 2);
-                    tileY = (int)(farmBuilding.tileY.Value - farmBuilding.tilesHigh.Value / 2);
-                    location = "Farm";
-
-                    if (location.Equals("Cabin"))
-                    {
-                        break;
-                    }
-                    else if (farmBuilding.indoors.Value != null && farmBuilding.indoors.Value.Name.Equals(location))
-                    {
-                        break;
-                    }
-                }
-                
-            }
-
-            if (!MapModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
-                return new Vector2(-5000, -5000);
-
             Vector2 mapPagePos = Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             int x = 0;
             int y = 0;
 
-            // Handle regions and indoor locations
+            // Precise (static) regions and indoor locations
             if (locVectors.Count() == 1 || (tileX == -1 || tileY == -1))
             {
                 x = locVectors.FirstOrDefault().x;
@@ -538,9 +521,9 @@ namespace NPCMapLocations
                 string tilePos = "(" + tileX + ", " + tileY + ")";
                 if (lower == null)
                 {
-                    if (isFarmer && DEBUG_MODE && alertFlag != "NullBound:" + tilePos)
+                    if (alertFlag != "NullBound:" + tilePos)
                     {
-                        ModMain.monitor.Log("Null lower bound - No vector less than " + tilePos + " to calculate location.", LogLevel.Alert);
+                        ModMain.monitor.Log("Null lower bound: No vector less than " + tilePos + " in " + location, LogLevel.Alert);
                         alertFlag = "NullBound:" + tilePos;
                     }
 
@@ -548,21 +531,23 @@ namespace NPCMapLocations
                 }
                 if (upper == null)
                 {
-                    if (DEBUG_MODE && isFarmer && alertFlag != "NullBound:" + tilePos)
+                    if (alertFlag != "NullBound:" + tilePos)
                     {
-                        ModMain.monitor.Log("Null upper bound - No vector greater than " + tilePos + " to calculate location.", LogLevel.Alert);
+                        ModMain.monitor.Log("Null upper bound: No vector greater than " + tilePos + " in " + location, LogLevel.Alert);
                         alertFlag = "NullBound:" + tilePos;
                     }
 
                     upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
                 }
 
-                x = (int)(lower.x + (double)(tileX - lower.tileX) / (double)(upper.tileX - lower.tileX) * (upper.x - lower.x));
-                y = (int)(lower.y + (double)(tileY - lower.tileY) / (double)(upper.tileY - lower.tileY) * (upper.y - lower.y));
+                x = (int)(lower.x + (tileX - lower.tileX) / (double)(upper.tileX - lower.tileX) * (upper.x - lower.x));
+                y = (int)(lower.y + (tileY - lower.tileY) / (double)(upper.tileY - lower.tileY) * (upper.y - lower.y));
 
-                if (DEBUG_MODE && isFarmer)
+                if (DEBUG_MODE)
                 {
+                    #pragma warning disable CS0162 // Unreachable code detected
                     ModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
+                    #pragma warning restore CS0162 // Unreachable code detected
                     ModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
                 }
             }
@@ -596,10 +581,10 @@ namespace NPCMapLocations
          
             if (config.ShowFarmBuildings)
             {
-                float scale = 3;
-                foreach (var building in farmBuildings)
+                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in farmBuildings)
                 {
-                    b.Draw(buildingMarkers, building.Value, new Rectangle?(MapModConstants.FarmBuildingRects[building.Key]), Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
+                    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
+                        b.Draw(buildingMarkers, new Vector2(building.Value.Value.X - buildingRect.Width/2, building.Value.Value.Y - buildingRect.Height/2), new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, BUILDING_SCALE, SpriteEffects.None, 1f);
                 }
             }
 
@@ -646,9 +631,20 @@ namespace NPCMapLocations
                 }
             }
 
-            // Farmer
-            Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), true);
-            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
+            // Farmers
+            if (Context.IsMultiplayer)
+            {
+                foreach (Farmer farmer in Game1.getOnlineFarmers())
+                {
+                    Vector2 farmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
+                    farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farmerLoc.X - 16, farmerLoc.Y - 15), 0.00011f, 2f, 1, farmer);
+                }
+            }
+            else
+            {
+                Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(), Game1.player.getTileY());
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
+            }
 
             // Location and name tooltips
             modMapPage.draw(b);
@@ -656,16 +652,17 @@ namespace NPCMapLocations
             // Cursor
             if (!Game1.options.hardwareCursor)
             {
-                b.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                b.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
             }
 
         }
 
-        // Hack to disable snappy menu with Map Page since ModMapPage doesn't replace the menu
+        // Hack to disable snappy menu with MapPage since ModMapPage doesn't replace the menu
+        // and thus cannot override snappyMovement
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
             if (!Game1.hasLoadedGame || Game1.options == null) { return; }
-            //test();
+
             if (e.PriorMenu is GameMenu menu)
             {
                 // Reset option after map sets option to false
@@ -675,7 +672,7 @@ namespace NPCMapLocations
                 }
                 else
                 // Handle any option changes by the player
-                // Caveat: If player is turning snappy menu on, they MUST close the menu to update the stored menu option
+                // Caveat: If player is turning snappy menu on, they MUST close the menu first to update the stored menu option
                 {
                     snappyMenuOption = Game1.options.SnappyMenus;
                 }

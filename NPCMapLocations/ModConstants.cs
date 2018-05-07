@@ -6,7 +6,7 @@ using NPCMapLocations;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-public static class MapModConstants
+public static class ModConstants
 {
     // Cropping heads for NPC markers
     // Values shift the head up (negative) or down (positive)
@@ -323,16 +323,21 @@ public static class MapModConstants
     };
 
     // Custom farm markers
+    // Also used to do a quick check for currentLocation is farm building
     public static Dictionary<string, Rectangle> FarmBuildingRects => new Dictionary<string, Rectangle>
     {
         { "Shed", new Rectangle(0, 0, 5, 7) },
         { "Coop", new Rectangle(5, 0, 5, 7) },
+        { "Big Coop", new Rectangle(5, 0, 5, 7) },
+        { "Deluxe Coop", new Rectangle(5, 0, 5, 7) },
         { "Barn", new Rectangle(10, 0, 6, 7) },
+        { "Big Barn", new Rectangle(10, 0, 6, 7) },
+        { "Deluxe Barn", new Rectangle(10, 0, 6, 7) },
         { "SlimeHutch", new Rectangle(16, 0, 7, 7) },
         { "Greenhouse", new Rectangle(23, 0, 5, 7) },
         { "Cabin", new Rectangle(28, 0, 4, 7) },
         { "Log Cabin", new Rectangle(28, 0, 4, 7) },
         { "Stone Cabin", new Rectangle(28, 0, 4, 7) },
-        { "Plank Cabin", new Rectangle(28, 0, 4, 7) }
+        { "Plank Cabin", new Rectangle(28, 0, 4, 7) },
     };
 }

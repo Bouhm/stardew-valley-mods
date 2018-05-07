@@ -72,20 +72,20 @@ namespace NPCMapLocations
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
             this.options.Add(immersionButton3);
-            this.options.Add(new MapModCheckbox("immersion.option4", 44, -1, -1));
-            this.options.Add(new MapModCheckbox("immersion.option5", 45, -1, -1));
+            this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1));
+            this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1));
             this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1));
             this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1));
             this.options.Add(new OptionsElement(extraLabel));
-            this.options.Add(new MapModCheckbox("extra.option1", 46, -1, -1));
-            this.options.Add(new MapModCheckbox("extra.option2", 47, -1, -1));
-            this.options.Add(new MapModCheckbox("extra.option3", 48, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1));
             this.options.Add(new OptionsElement(villagersLabel));
             // Custom NPCs
             if (customNPCs != null)
             {
                 for (int i = 1; i <= customNPCs.Count; i++)
-                    this.options.Add(new MapModCheckbox(customNPCs.Keys.ElementAt(i), 39 + i, -1, -1, npcNames, markerCrop, customNPCs));
+                    this.options.Add(new ModCheckbox(customNPCs.Keys.ElementAt(i), 39 + i, -1, -1, npcNames, markerCrop, customNPCs));
             }
             // Villagers
             var orderedNames = npcNames.Keys.ToList();
@@ -95,7 +95,7 @@ namespace NPCMapLocations
             {
                 if (secondaryNPCs.Keys.Contains(name))
                     if (secondaryNPCs[name]) {
-                        this.options.Add(new MapModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
+                        this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
                     }
                     else
                     {
@@ -103,7 +103,7 @@ namespace NPCMapLocations
                     }
                 else
                 {
-                    this.options.Add(new MapModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
+                    this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
                 }
             }
         }
@@ -427,7 +427,7 @@ namespace NPCMapLocations
     }
 
     // Mod checkbox for immersion settings and npc blacklst
-    internal class MapModCheckbox : OptionsElement
+    internal class ModCheckbox : OptionsElement
     {
         public const int pixelsWide = 9;
         public bool isChecked;
@@ -438,7 +438,7 @@ namespace NPCMapLocations
         private Dictionary<string, object> customNPCs;
         private List<string> orderedNames;
 
-        public MapModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, string> npcNames = null, Dictionary<string, int> markerCrop = null, Dictionary<string, object> customNPCs = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public ModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, string> npcNames = null, Dictionary<string, int> markerCrop = null, Dictionary<string, object> customNPCs = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.markerCrop = markerCrop;
             this.npcNames = npcNames;

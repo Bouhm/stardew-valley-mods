@@ -13,7 +13,7 @@ namespace NPCMapLocations
 
     public class ModMapPage : IClickableMenu
     {
-        private readonly Dictionary<string, Rect> locationRects = MapModConstants.LocationRects;
+        private readonly Dictionary<string, Rect> locationRects = ModConstants.LocationRects;
         private readonly int nameTooltipMode = ModMain.config.NameTooltipMode;
         private string hoveredNames = "";
         private string hoveredLocationText = "";

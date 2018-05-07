@@ -34,7 +34,7 @@ namespace NPCMapLocations
             {
                 if (npc == null) { continue; }
                 LoadCustomNPCs(npc, areCustomNPCsInstalled);
-                if (!MapModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
+                if (!ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
                 {
                     LoadNPCCrop(npc);
                     LoadCustomNames(npc);
@@ -78,7 +78,7 @@ namespace NPCMapLocations
             }
             else
             {
-                if (npc.Schedule != null && !MapModConstants.MarkerCrop.Keys.Contains(npc.Name))
+                if (npc.Schedule != null && !ModConstants.MarkerCrop.Keys.Contains(npc.Name))
                 {
                     if (!customNPCs.TryGetValue(npc.Name, out object npcEntry))
                     {
