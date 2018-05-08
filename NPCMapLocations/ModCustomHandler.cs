@@ -63,13 +63,11 @@ namespace NPCMapLocations
             // Eemie's Map Recolour
             if (ModMain.modHelper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
             {
-                ModMain.monitor.Log("Loaded recolored map for Eemie's Recolour", LogLevel.Info);
                 return "eemie_recolour_map";
             }
             // Starblue Valley
             else if (ModMain.modHelper.ModRegistry.IsLoaded("Lita.StarblueValley"))
             {
-                ModMain.monitor.Log("Loaded recolored map for Starblue Valley", LogLevel.Info);
                 return "starblue_map";
             }
             // Default

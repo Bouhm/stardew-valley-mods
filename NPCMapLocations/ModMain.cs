@@ -75,7 +75,18 @@ namespace NPCMapLocations
 
         public T Load<T>(IAssetInfo asset)
         {
-            return (T)(object)ModMain.modHelper.Content.Load<Texture2D>($@"assets\{CustomHandler.LoadMap()}.png"); // Replace map page
+            T map;
+            try
+            {
+                ModMain.monitor.Log($"Detected recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
+                map = (T)(object)modHelper.Content.Load<Texture2D>($@"assets\{CustomHandler.LoadMap()}.png"); // Replace map page
+            }
+            catch 
+            {
+                ModMain.monitor.Log($"Unable to find {CustomHandler.LoadMap()}; loaded default map instead.", LogLevel.Info);
+                map = (T)(object)modHelper.Content.Load<Texture2D>($@"assets\default_map.png"); 
+            }
+            return map;
         }
 
         // For drawing farm buildings on the map 
