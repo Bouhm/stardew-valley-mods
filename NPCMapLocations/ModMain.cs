@@ -291,22 +291,25 @@ namespace NPCMapLocations
         private void GameEvents_UpdateTick(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             if (Game1.options.SnappyMenus)
                 modHelper.Reflection.GetField<Boolean>(Game1.options, "SnappyMenus").SetValue(false);
 
-            modMapPage = new ModMapPage(npcNames, npcMarkers);
+            modMapPage = new ModMapPage(npcNames, npcMarkers, activeFarmers);
         }
 
         // Handle updating NPC marker data when map is open
         private void GameEvents_QuarterSecondTick(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
-            if (Context.IsMainPlayer)
+            if (Context.IsMainPlayer) { 
                 UpdateNPCMarkers();
+            }
 
             UpdateActiveFarmersAsync();        
         }
@@ -431,7 +434,7 @@ namespace NPCMapLocations
                     npcMarker.Location = new Rectangle();
                 }
             }
-            modMapPage = new ModMapPage(npcNames, npcMarkers);
+            modMapPage = new ModMapPage(npcNames, npcMarkers, activeFarmers);
         }
 
         // Async to handle mismatch of farmer position/location when changing locations
