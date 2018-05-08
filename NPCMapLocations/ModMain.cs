@@ -10,14 +10,12 @@ using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
-using StardewValley.Network;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Netcode;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace NPCMapLocations
@@ -446,26 +444,25 @@ namespace NPCMapLocations
                 if (farmer == null || (farmer != null && farmer.currentLocation == null)) { continue; }
 
                 long farmerId = farmer.UniqueMultiplayerID;
-                Vector2 farmerLoc;
+                Vector2 farmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
+
                 if (farmerLocationChanges.ContainsKey(farmerId))
                 {
-                    var deltaX = farmer.getTileX() - farmerLocationChanges[farmerId].Value.X;
-                    var deltaY = farmer.getTileY() - farmerLocationChanges[farmerId].Value.Y;
-                    if (farmerLocationChanges[farmerId].Key.Equals(farmer.currentLocation.Name) && MathHelper.Distance(deltaX, deltaY) < 10)
-                    {
-                        farmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
+                    var deltaX = farmerLoc.X - farmerLocationChanges[farmerId].Value.X;
+                    var deltaY = farmerLoc.Y - farmerLocationChanges[farmerId].Value.Y;
+
+                    if (farmerLocationChanges[farmerId].Key.Equals(farmer.currentLocation.Name) && MathHelper.Distance(deltaX, deltaY) < 35)
                         activeFarmers[farmer] = farmerLoc;
-                    }
                     else
                     {
                         // This prevents the farmer "blinking" across the map before location change
                         await Task.Run(() =>
                         {
-                            Task.Delay(1000).ContinueWith(t =>
+                            Task.Delay(500).ContinueWith(t =>
                             {
-                                farmerLocationChanges[farmerId] = new KeyValuePair<string, Vector2>(farmer.currentLocation.Name, new Vector2(farmer.getTileX(), farmer.getTileY()));
-                                Vector2 farmerLoc2 = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
-                                activeFarmers[farmer] = farmerLoc2;
+                                Vector2 newFarmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
+                                farmerLocationChanges[farmerId] = new KeyValuePair<string, Vector2>(farmer.currentLocation.Name, newFarmerLoc);
+                                activeFarmers[farmer] = newFarmerLoc;
                             });
                         });
                         continue;

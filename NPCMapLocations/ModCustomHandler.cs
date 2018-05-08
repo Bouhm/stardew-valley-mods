@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
