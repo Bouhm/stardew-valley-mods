@@ -456,7 +456,7 @@ namespace NPCMapLocations
                 }
                 else if (whichOption > 38 && whichOption < 44)
                 {
-                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption - 4));
+                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption));
                     return;
                 }
             }

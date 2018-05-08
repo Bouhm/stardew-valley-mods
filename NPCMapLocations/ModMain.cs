@@ -61,7 +61,6 @@ namespace NPCMapLocations
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             GameEvents.UpdateTick += GameEvents_UpdateTick;
-            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
@@ -297,21 +296,13 @@ namespace NPCMapLocations
             if (Game1.options.SnappyMenus)
                 modHelper.Reflection.GetField<Boolean>(Game1.options, "SnappyMenus").SetValue(false);
 
-            modMapPage = new ModMapPage(npcNames, npcMarkers, activeFarmers);
-        }
-
-        // Handle updating NPC marker data when map is open
-        private void GameEvents_QuarterSecondTick(object sender, EventArgs e)
-        {
-            if (!Context.IsWorldReady) { return; }
-            if (!(Game1.activeClickableMenu is GameMenu)) { return; }
-            if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
-
-            if (Context.IsMainPlayer) { 
+            if (Context.IsMainPlayer)
+            {
                 UpdateNPCMarkers();
             }
 
-            UpdateActiveFarmersAsync();        
+            UpdateActiveFarmersAsync();
+            modMapPage = new ModMapPage(npcNames, npcMarkers, activeFarmers);
         }
 
         // Update NPC marker data and names on hover
