@@ -39,9 +39,8 @@ namespace NPCMapLocations
         private static HashSet<NPCMarker> npcMarkers;
 
         // Multiplayer
-        private static Dictionary<Farmer, Vector2> activeFarmers = new Dictionary<Farmer, Vector2>();
-        private static Dictionary<long, KeyValuePair<string, Vector2>> farmerLocationChanges = 
-            new Dictionary<long, KeyValuePair<string, Vector2>>();
+        private static Dictionary<Farmer, Vector2> activeFarmers;
+        private static Dictionary<long, KeyValuePair<string, Vector2>> farmerLocationChanges;
 
         // For debug info
         private const bool DEBUG_MODE = false;
@@ -52,10 +51,10 @@ namespace NPCMapLocations
         public override void Entry(IModHelper helper)
         {
             modHelper = helper;
+            monitor = this.Monitor;
             config = modHelper.ReadConfig<ModConfig>();
             markerCrop = ModConstants.MarkerCrop;
-            farmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
-            CustomHandler = new ModCustomHandler(config, modHelper, markerCrop);
+            CustomHandler = new ModCustomHandler(markerCrop);
             ModMain.buildingMarkers = ModMain.modHelper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
@@ -83,6 +82,8 @@ namespace NPCMapLocations
         // and getting positions relative to the farm 
         private void UpdateFarmBuildingLocs()
         {
+            farmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
+
             foreach (Building building in Game1.getFarm().buildings)
             {
                 if (building.nameOfIndoorsWithoutUnique == null 
@@ -101,15 +102,7 @@ namespace NPCMapLocations
                 // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
                 string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
 
-                // buildingType of Cabin includes Log/Stone/Plank
-                if (commonName.Contains("Cabin"))
-                {
-                    locVector.X += 1;
-                    locVector.Y -= 3;
-                    farmBuildings[building.nameOfIndoors] = new KeyValuePair<string, Vector2>(building.nameOfIndoorsWithoutUnique, locVector);
-                    continue;
-                }
-                else if (commonName.Contains("Barn"))
+                if (commonName.Contains("Barn"))
                 {
                     locVector.Y += 3;
                 }
@@ -435,6 +428,9 @@ namespace NPCMapLocations
         {
             if (!Context.IsMultiplayer) { return; }
 
+            activeFarmers = new Dictionary<Farmer, Vector2>();
+            farmerLocationChanges = new Dictionary<long, KeyValuePair<string, Vector2>>();
+
             foreach (Farmer farmer in Game1.getOnlineFarmers())
             {
                 if (farmer == null || (farmer != null && farmer.currentLocation == null)) { continue; }
@@ -484,7 +480,7 @@ namespace NPCMapLocations
                 {
                     if (alertFlag != "UnknownLocation:" + location.Name)
                     {
-                        ModMain.monitor.Log("Unknown location: " + location.Name + ".", LogLevel.Alert);
+                        ModMain.monitor.Log("Unknown location: " + location.Name + ".", LogLevel.Trace);
                         alertFlag = "UnknownLocation:" + location.Name;
                     }
                 }
@@ -497,7 +493,8 @@ namespace NPCMapLocations
             if (location.IsFarm && !location.Name.Equals("FarmHouse"))
             {
                 if (location.uniqueName.Value != null 
-                  && farmBuildings[location.uniqueName.Value].Key.Equals(location.Name)) 
+                  && (farmBuildings[location.uniqueName.Value].Key.Equals(location.Name)
+                  || farmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
                 {
                     return farmBuildings[location.uniqueName.Value].Value;
                 }         
@@ -515,7 +512,7 @@ namespace NPCMapLocations
             {
                 if (alertFlag != "UnknownLocation:" + location)
                 {
-                    ModMain.monitor.Log("Unknown location: " + location + ".", LogLevel.Alert);
+                    ModMain.monitor.Log("Unknown location: " + location + ".", LogLevel.Trace);
                     alertFlag = "UnknownLocation:" + location;
                 }
                 return new Vector2(-5000, -5000);
@@ -572,7 +569,7 @@ namespace NPCMapLocations
                 {
                     if (alertFlag != "NullBound:" + tilePos)
                     {
-                        //ModMain.monitor.Log("Null lower bound: No vector less than " + tilePos + " in " + location, LogLevel.Alert);
+                        ModMain.monitor.Log("Null lower bound: No vector less than " + tilePos + " in " + location, LogLevel.Trace);
                         alertFlag = "NullBound:" + tilePos;
                     }
 
@@ -582,7 +579,7 @@ namespace NPCMapLocations
                 {
                     if (alertFlag != "NullBound:" + tilePos)
                     {
-                        //ModMain.monitor.Log("Null upper bound: No vector greater than " + tilePos + " in " + location, LogLevel.Alert);
+                        ModMain.monitor.Log("Null upper bound: No vector greater than " + tilePos + " in " + location, LogLevel.Trace);
                         alertFlag = "NullBound:" + tilePos;
                     }
 
@@ -631,7 +628,10 @@ namespace NPCMapLocations
          
             if (config.ShowFarmBuildings)
             {
-                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in farmBuildings)
+                var sortedBuildings = farmBuildings.ToList();
+                sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
+
+                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
                 {
                     if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
                         b.Draw(buildingMarkers, new Vector2(building.Value.Value.X - buildingRect.Width/2, building.Value.Value.Y - buildingRect.Height/2), new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, BUILDING_SCALE, SpriteEffects.None, 1f);
@@ -775,10 +775,6 @@ namespace NPCMapLocations
         // Config show/hide 
         private bool IsNPCShown(string npc)
         {
-            if (npc.Equals("Robin")) {
-                //yey
-                var s = npc;
-            }
             bool showNPC = !config.NPCBlacklist.Contains(npc);   
             if (!CustomHandler.GetCustomNPCs().ContainsKey(npc)) {
                 if (npc.Equals("Sandy")) { return showNPC && secondaryNPCs["Sandy"]; }

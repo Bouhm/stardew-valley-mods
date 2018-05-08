@@ -13,17 +13,17 @@ namespace NPCMapLocations
     {
         private Dictionary<string, string> npcNames; // For handling custom names
         private Dictionary<string, object> customNPCs;
-        private ModConfig config;
-        private IModHelper helper;
         private Dictionary<string, int> markerCrop;
+        private HashSet<string> npcCustomizations;
+        private string customNPCNames;
 
-        public ModCustomHandler(ModConfig config, IModHelper helper, Dictionary<string, int> markerCrop)
+        public ModCustomHandler(Dictionary<string, int> markerCrop)
         {
-            this.config = config;
-            this.helper = helper;
             this.markerCrop = markerCrop;
-            customNPCs = config.CustomNPCs;
+            customNPCs = ModMain.config.CustomNPCs;
             npcNames = new Dictionary<string, string>();
+            npcCustomizations = new HashSet<string>();
+            customNPCNames = "";
         }
 
         // Handles customizations for NPCs
@@ -41,20 +41,35 @@ namespace NPCMapLocations
                     LoadCustomNames(npc);
                 }
             }
-            helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", config);
+
+            if (npcCustomizations.Count != 0)
+            {
+                string names = "Loaded customizations for: ";
+                foreach (string name in npcCustomizations)
+                {
+                    names += name + ", ";
+                }
+                ModMain.monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Info);
+            }
+
+            if (customNPCNames != "")
+                ModMain.monitor.Log("Loaded custom NPCs: " + customNPCNames.Substring(0, customNPCNames.Length-2), LogLevel.Info);
+            ModMain.modHelper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.config);
         }
 
         // Load recolored map if user has recolor mods
         public string LoadMap()
         {
             // Eemie's Map Recolour
-            if (helper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
+            if (ModMain.modHelper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
             {
+                ModMain.monitor.Log("Loaded recolored map for Eemie's Recolour", LogLevel.Info);
                 return "eemie_recolour_map";
             }
             // Starblue Valley
-            else if (helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
+            else if (ModMain.modHelper.ModRegistry.IsLoaded("Lita.StarblueValley"))
             {
+                ModMain.monitor.Log("Loaded recolored map for Starblue Valley", LogLevel.Info);
                 return "starblue_map";
             }
             // Default
@@ -88,6 +103,7 @@ namespace NPCMapLocations
                         {
                             Dictionary<string, int> npcEntry = new Dictionary<string, int> { { "crop", 0 } };
                             customNPCs.Add(customNPC.Key, npcEntry);
+                            customNPCNames += customNPC.Key + ", ";
 
                             if (!markerCrop.ContainsKey(customNPC.Key))
                             {
@@ -126,20 +142,25 @@ namespace NPCMapLocations
                 if (npc.displayName == null)
                     npcNames.Add(npc.Name, npc.Name);
                 else
+                {
                     npcNames.Add(npc.Name, npc.displayName);
+                    if (!npc.Name.Equals(npc.displayName))
+                        npcCustomizations.Add(npc.Name);
+                }
             }
         }
 
         // Load user-specified NPC crops for custom sprites
         private void LoadNPCCrop(NPC npc)
         {
-            if (config.VillagerCrop != null && config.VillagerCrop.Count > 0)
+            if (ModMain.config.VillagerCrop != null && ModMain.config.VillagerCrop.Count > 0)
             {
-                foreach (KeyValuePair<string, int> villager in config.VillagerCrop)
+                foreach (KeyValuePair<string, int> villager in ModMain.config.VillagerCrop)
                 {
                     if (npc.Name.Equals(villager.Key))
                     {
                         markerCrop[npc.Name] = villager.Value;
+                        npcCustomizations.Add(npc.Name);
                     }
                 }
             }

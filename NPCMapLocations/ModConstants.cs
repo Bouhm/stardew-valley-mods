@@ -82,9 +82,13 @@ public static class ModConstants
             { "FarmCave", new MapVector[] {
                 new MapVector(410, 244)
             }},
+            { "Cellar", new MapVector[] {
+                new MapVector(478, 268)
+            }},
             { "Greenhouse", new MapVector[] {
                 new MapVector(393, 268)
             }},
+
         { "BusStop", new MapVector[] {
             new MapVector(0, 0, 517, 182),
             new MapVector(35, 30, 594, 300)
@@ -335,9 +339,10 @@ public static class ModConstants
         { "Deluxe Barn", new Rectangle(10, 0, 6, 7) },
         { "SlimeHutch", new Rectangle(16, 0, 7, 7) },
         { "Greenhouse", new Rectangle(23, 0, 5, 7) },
-        { "Cabin", new Rectangle(28, 0, 4, 7) },
-        { "Log Cabin", new Rectangle(28, 0, 4, 7) },
-        { "Stone Cabin", new Rectangle(28, 0, 4, 7) },
-        { "Plank Cabin", new Rectangle(28, 0, 4, 7) },
+        { "FarmHouse", new Rectangle(28, 0, 5, 7) },
+        { "Cabin", new Rectangle(33, 0, 4, 7) },
+        { "Log Cabin", new Rectangle(33, 0, 4, 7) },
+        { "Plank Cabin", new Rectangle(37, 0, 4, 7) },
+        { "Stone Cabin", new Rectangle(41, 0, 4, 7) },
     };
 }
