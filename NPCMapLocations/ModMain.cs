@@ -154,6 +154,8 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNPCs();
             npcNames = CustomHandler.GetNPCNames();
+            activeFarmers = new Dictionary<Farmer, Vector2>();
+            farmerLocationChanges = new Dictionary<long, KeyValuePair<string, Vector2>>();
             UpdateFarmBuildingLocs();
         }
 
@@ -438,9 +440,6 @@ namespace NPCMapLocations
         private static async void UpdateActiveFarmersAsync()
         {
             if (!Context.IsMultiplayer) { return; }
-
-            activeFarmers = new Dictionary<Farmer, Vector2>();
-            farmerLocationChanges = new Dictionary<long, KeyValuePair<string, Vector2>>();
 
             foreach (Farmer farmer in Game1.getOnlineFarmers())
             {
