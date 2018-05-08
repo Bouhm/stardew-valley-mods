@@ -83,7 +83,7 @@ namespace NPCMapLocations
             // Custom NPCs
             if (customNPCs != null)
             {
-                for (int i = 1; i <= customNPCs.Count; i++)
+                for (int i = 0; i < customNPCs.Count; i++)
                     this.options.Add(new ModCheckbox(customNPCs.Keys.ElementAt(i), 39 + i, -1, -1, npcNames, markerCrop, customNPCs));
             }
             // Villagers
@@ -98,6 +98,7 @@ namespace NPCMapLocations
                     }
                     else
                     {
+                        idx++;
                         continue;
                     }
                 else
@@ -456,7 +457,7 @@ namespace NPCMapLocations
                 }
                 else if (whichOption > 38 && whichOption < 44)
                 {
-                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption));
+                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption - 39));
                     return;
                 }
             }
@@ -507,9 +508,9 @@ namespace NPCMapLocations
             else if (whichOption > 38 && whichOption < 44)
             {
                 if (this.isChecked)
-                    ModMain.config.CustomNPCBlacklist.Remove(customNPCs.Keys.ElementAt(whichOption - 7));
+                    ModMain.config.CustomNPCBlacklist.Remove(customNPCs.Keys.ElementAt(whichOption - 39));
                 else
-                    ModMain.config.CustomNPCBlacklist.Add(customNPCs.Keys.ElementAt(whichOption - 7));
+                    ModMain.config.CustomNPCBlacklist.Add(customNPCs.Keys.ElementAt(whichOption - 39));
             }
             else { 
                 switch (whichOption) { 

@@ -775,6 +775,10 @@ namespace NPCMapLocations
         // Config show/hide 
         private bool IsNPCShown(string npc)
         {
+            if (npc.Equals("Robin")) {
+                //yey
+                var s = npc;
+            }
             bool showNPC = !config.NPCBlacklist.Contains(npc);   
             if (!CustomHandler.GetCustomNPCs().ContainsKey(npc)) {
                 if (npc.Equals("Sandy")) { return showNPC && secondaryNPCs["Sandy"]; }
@@ -785,7 +789,7 @@ namespace NPCMapLocations
             else 
             {
                 var customNPCs = CustomHandler.GetCustomNPCs();
-                for (int i = 1; i <= customNPCs.Count; i++) 
+                for (int i = 0; i < customNPCs.Count; i++) 
                 {
                     if (customNPCs.Keys.ElementAt(i).Equals(npc))
                     {
