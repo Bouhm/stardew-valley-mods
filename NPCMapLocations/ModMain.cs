@@ -298,7 +298,7 @@ namespace NPCMapLocations
             if (!IsMapOpen((GameMenu)Game1.activeClickableMenu)) { return; }
 
             if (Game1.options.SnappyMenus)
-                modHelper.Reflection.GetField<Boolean>(Game1.options, "SnappyMenus").SetValue(false);
+                modHelper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
 
             if (Context.IsMainPlayer)
             {
