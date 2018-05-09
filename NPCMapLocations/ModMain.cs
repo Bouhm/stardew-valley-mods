@@ -37,7 +37,7 @@ namespace NPCMapLocations
         private static HashSet<NPCMarker> npcMarkers;
 
         // Multiplayer
-        private static Dictionary<Farmer, Vector2> activeFarmers;
+        private static Dictionary<long, KeyValuePair<Farmer, Vector2>> activeFarmers;
         private static Dictionary<long, KeyValuePair<string, Vector2>> farmerLocationChanges;
 
         // For debug info
@@ -99,6 +99,7 @@ namespace NPCMapLocations
 
             foreach (Building building in Game1.getFarm().buildings)
             {
+                if (building == null) { continue; }
                 if (building.nameOfIndoorsWithoutUnique == null 
                   || building.nameOfIndoors == null
                   || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
@@ -156,8 +157,6 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNPCs();
             npcNames = CustomHandler.GetNPCNames();
-            activeFarmers = new Dictionary<Farmer, Vector2>();
-            farmerLocationChanges = new Dictionary<long, KeyValuePair<string, Vector2>>();
             UpdateFarmBuildingLocs();
         }
 
@@ -291,6 +290,11 @@ namespace NPCMapLocations
                     IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
                 };
                 npcMarkers.Add(npcMarker);
+            }
+
+            if (Context.IsMultiplayer) {
+                activeFarmers = new Dictionary<long, KeyValuePair<Farmer, Vector2>>();
+                farmerLocationChanges = new Dictionary<long, KeyValuePair<string, Vector2>>();
             }
         }
 
@@ -456,7 +460,7 @@ namespace NPCMapLocations
                     var deltaY = farmerLoc.Y - farmerLocationChanges[farmerId].Value.Y;
 
                     if (farmerLocationChanges[farmerId].Key.Equals(farmer.currentLocation.Name) && MathHelper.Distance(deltaX, deltaY) < 35)
-                        activeFarmers[farmer] = farmerLoc;
+                        activeFarmers[farmerId] = new KeyValuePair<Farmer, Vector2>(farmer, farmerLoc);
                     else
                     {
                         // This prevents the farmer "blinking" across the map before location change
@@ -466,7 +470,7 @@ namespace NPCMapLocations
                             {
                                 Vector2 newFarmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
                                 farmerLocationChanges[farmerId] = new KeyValuePair<string, Vector2>(farmer.currentLocation.Name, newFarmerLoc);
-                                activeFarmers[farmer] = newFarmerLoc;
+                                activeFarmers[farmerId] = new KeyValuePair<Farmer, Vector2>(farmer, newFarmerLoc);
                             });
                         });
                         continue;
@@ -477,7 +481,7 @@ namespace NPCMapLocations
                     var newLoc = new KeyValuePair<string, Vector2>(farmer.currentLocation.Name, new Vector2(farmer.getTileX(), farmer.getTileY()));
                     farmerLocationChanges.Add(farmer.UniqueMultiplayerID, newLoc);
                     farmerLoc = ModMain.GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
-                    activeFarmers[farmer] = farmerLoc;
+                    activeFarmers[farmerId] = new KeyValuePair<Farmer, Vector2>(farmer, farmerLoc);
                 }
             }
         }
@@ -695,7 +699,7 @@ namespace NPCMapLocations
             // Farmers
             if (Context.IsMultiplayer)
             {
-                foreach (KeyValuePair<Farmer, Vector2> farmer in activeFarmers)
+                foreach (KeyValuePair<Farmer, Vector2> farmer in activeFarmers.Values)
                     farmer.Key.FarmerRenderer.drawMiniPortrat(b, new Vector2(farmer.Value.X - 16, farmer.Value.Y - 15), 0.00011f, 2f, 1, farmer.Key);
             }
             else
@@ -716,6 +720,7 @@ namespace NPCMapLocations
 
         private void GraphicsEvents_Resize(object sender, EventArgs e)
         {
+            if (!Context.IsWorldReady) { return; }
             UpdateFarmBuildingLocs();
         }
 

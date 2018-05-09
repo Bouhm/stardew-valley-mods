@@ -27,10 +27,10 @@ namespace NPCMapLocations
         private Dictionary<string, string> npcNames;
         private HashSet<NPCMarker> npcMarkers;
         private bool drawPamHouseUpgrade;
-        private Dictionary<Farmer, Vector2> farmers;
+        private Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(Dictionary<string, string> npcNames, HashSet<NPCMarker> npcMarkers, Dictionary<Farmer, Vector2> farmers)
+        public ModMapPage(Dictionary<string, string> npcNames, HashSet<NPCMarker> npcMarkers, Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers)
         {
             // initialise
             this.npcNames = npcNames;
@@ -113,7 +113,7 @@ namespace NPCMapLocations
             }
             if (Context.IsMultiplayer)
             {
-                foreach (KeyValuePair<Farmer, Vector2> farmer in farmers)
+                foreach (KeyValuePair<Farmer, Vector2> farmer in farmers.Values)
                 {
                     if (Game1.getMouseX() >= farmer.Value.X - markerWidth / 2 && Game1.getMouseX() <= farmer.Value.X + markerWidth / 2 && Game1.getMouseY() >= farmer.Value.Y - markerHeight / 2 && Game1.getMouseY() <= farmer.Value.Y + markerHeight / 2)
                     {
