@@ -63,6 +63,7 @@ namespace NPCMapLocations
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
+            GraphicsEvents.Resize += GraphicsEvents_Resize;
         }
 
         // Replace game map with modified map
@@ -74,14 +75,17 @@ namespace NPCMapLocations
         public T Load<T>(IAssetInfo asset)
         {
             T map;
+            string mapName = CustomHandler.LoadMap();
             try
             {
-                ModMain.monitor.Log($"Detected recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
-                map = (T)(object)modHelper.Content.Load<Texture2D>($@"assets\{CustomHandler.LoadMap()}.png"); // Replace map page
+                if (!mapName.Equals("default_map"))
+                    ModMain.monitor.Log($"Detected recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
+
+                map = (T)(object)modHelper.Content.Load<Texture2D>($@"assets\{mapName}.png"); // Replace map page
             }
             catch 
             {
-                ModMain.monitor.Log($"Unable to find {CustomHandler.LoadMap()}; loaded default map instead.", LogLevel.Info);
+                ModMain.monitor.Log($"Unable to find {mapName}; loaded default map instead.", LogLevel.Info);
                 map = (T)(object)modHelper.Content.Load<Texture2D>($@"assets\default_map.png"); 
             }
             return map;
@@ -708,7 +712,11 @@ namespace NPCMapLocations
             {
                 b.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
             }
+        }
 
+        private void GraphicsEvents_Resize(object sender, EventArgs e)
+        {
+            UpdateFarmBuildingLocs();
         }
 
         // Hack to disable snappy menu with MapPage since ModMapPage doesn't replace the menu
