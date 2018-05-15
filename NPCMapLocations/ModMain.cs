@@ -57,13 +57,19 @@ namespace NPCMapLocations
 
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-            GameEvents.UpdateTick += GameEvents_UpdateTick;
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             GraphicsEvents.Resize += GraphicsEvents_Resize;
+
+            if (config.LessFrequentRefresh) {
+                GameEvents.EighthUpdateTick += GameEvents_EighthUpdateTick;
+            }
+            else {
+                GameEvents.UpdateTick += GameEvents_UpdateTick;
+            }
         }
 
         // Replace game map with modified map
@@ -299,7 +305,17 @@ namespace NPCMapLocations
         }
 
         // Map page updates
+        void GameEvents_EighthUpdateTick(object sender, EventArgs e) 
+        {
+            MapPageUpdates();
+        }
+       
         private void GameEvents_UpdateTick(object sender, EventArgs e)
+        {
+            MapPageUpdates();
+        }
+
+        private void MapPageUpdates()
         {
             if (!Context.IsWorldReady) { return; }
             if (!(Game1.activeClickableMenu is GameMenu)) { return; }

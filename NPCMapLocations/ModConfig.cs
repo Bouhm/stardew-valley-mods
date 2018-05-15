@@ -23,5 +23,6 @@ namespace NPCMapLocations
         public Dictionary<string, int> VillagerCrop { get; set; } = new Dictionary<string, int>();
         public List<string> CustomNPCBlacklist = new List<string>();
         public Dictionary<string, object> CustomNPCs { get; set; } = new Dictionary<string, object>();
+        public bool LessFrequentRefresh { get; set; } = true;
     }
 }
