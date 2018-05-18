@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace NPCMapLocations
 {
-    // Handles custom maps (recolors of the mod map), custom Npcs, custom sprites, custom names, etc.
+    // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
     internal class ModCustomHandler
     {
         private readonly IModHelper Helper;
@@ -31,8 +31,8 @@ namespace NPCMapLocations
             this.CustomNpcNames = "";
         }
 
-        // Handles customizations for Npcs
-        // Custom Npcs and custom names or sprites for existing Npcs
+        // Handles customizations for NPCs
+        // Custom NPCs and custom names or sprites for existing NPCs
         public void UpdateCustomNpcs()
         {
             bool areCustomNpcsInstalled = (this.CustomNpcs != null && this.CustomNpcs.Count > 0);
@@ -93,7 +93,7 @@ namespace NPCMapLocations
             return this.NpcNames;
         }
 
-        // Handle modified or custom Npcs
+        // Handle modified or custom NPCs
         private void LoadCustomNpcs(NPC npc, bool areCustomNpcsInstalled)
         {
             if (areCustomNpcsInstalled)

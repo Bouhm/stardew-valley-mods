@@ -47,9 +47,9 @@ namespace NPCMapLocations
             points = this.GetMapPoints().ToList();
 
             // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
-            GameMenu menu = (GameMenu)Game1.activeClickableMenu;
-            List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
-            MapPage mapPage = (MapPage)menuPages[menu.currentTab];
+            GameMenu gameMenu = (GameMenu)Game1.activeClickableMenu;
+            List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameMenu);
+            MapPage mapPage = (MapPage)menuPages[gameMenu.currentTab];
             List<ClickableComponent> vanillaPoints = helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
             vanillaPoints.Clear();
             foreach (ClickableComponent point in this.GetMapPoints())

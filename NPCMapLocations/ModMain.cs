@@ -87,7 +87,7 @@ namespace NPCMapLocations
 
         void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            if (IsMapOpen())
+            if (IsMapOpen()) 
                 ModMapPage = new ModMapPage(NpcMarkers, NpcNames, ActiveFarmers, Helper, Config);
         }
 
@@ -307,9 +307,6 @@ namespace NPCMapLocations
         private void MapPageUpdates()
         {
             if (IsMapOpen()) {
-                if (Game1.options.SnappyMenus)
-                    this.Helper.Reflection.GetField<Boolean>(Game1.options, "snappyMenus").SetValue(false);
-
                 if (Context.IsMainPlayer)
                 {
                     UpdateNPCMarkers();
@@ -344,7 +341,7 @@ namespace NPCMapLocations
                     continue;
 
 
-                // For layering indoor/outdoor Npcs and indoor indicator
+                // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = npcLocation.IsOutdoors;
 
                 // For show Npcs in player's location option
@@ -377,7 +374,7 @@ namespace NPCMapLocations
                     }
                 }
 
-                // Npcs that won't be shown on the map unless Show Hidden Npcs is checked
+                // NPCs that won't be shown on the map unless Show Hidden Npcs is checked
                 npcMarker.IsHidden = (
                     (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name))
                     || (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name))
@@ -389,7 +386,7 @@ namespace NPCMapLocations
                         )
                 );
 
-                // Npcs that will be drawn onto the map
+                // NPCs that will be drawn onto the map
                 if (IsNPCShown(npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
                 {
                     int width = 32;
@@ -427,8 +424,8 @@ namespace NPCMapLocations
                     }
 
                     // Establish draw order, higher number infront
-                    // Layers 4 - 7: Outdoor Npcs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-                    // Layers 0 - 3: Indoor Npcs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+                    // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+                    // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
                     npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
                     if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
                     if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
@@ -441,9 +438,6 @@ namespace NPCMapLocations
             }
         }
 
-        // Async to handle mismatch of farmer position/location when changing locations
-        // Locaction updates before position, which causes the farmer to jump 
-        // to the old position in the the new map before 
         private static void UpdateActiveFarmers(
             Dictionary<long, KeyValuePair<Farmer, Vector2>>  activeFarmers, 
             Dictionary<long, KeyValuePair<string, Vector2>>  farmerLocationChanges
@@ -647,7 +641,7 @@ namespace NPCMapLocations
                 b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
             }
 
-            // Npcs
+            // NPCs
             // Sort by drawing order
             var sortedMarkers = NpcMarkers.ToList();
             sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
