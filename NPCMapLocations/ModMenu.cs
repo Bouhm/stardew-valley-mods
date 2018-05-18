@@ -1,7 +1,7 @@
 ﻿/*
 Menu settings for the mod. 
 Menu code regurgitated from the game code
-Settings loaded from config file and changes saved onto config file.
+Settings loaded from this.Config file and changes saved onto this.Config file.
 */
 
 using Microsoft.Xna.Framework;
@@ -13,17 +13,15 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using StardewModdingAPI;
 
 namespace NPCMapLocations
 {
     public class ModMenu : IClickableMenu
     {
-        private const int itemsPerPage = 7;
-        private const int indexOfGraphicsPage = 6;
-        private int currentItemIndex;
+        private readonly IModHelper Helper;
+        private readonly ModConfig Config;
         private readonly Texture2D map;
-        private readonly int mapX;
-        private readonly int mapY;
         private readonly List<ClickableComponent> optionSlots = new List<ClickableComponent>();
         private readonly ClickableTextureComponent upArrow;
         private readonly ClickableTextureComponent downArrow;
@@ -34,13 +32,30 @@ namespace NPCMapLocations
         private readonly List<OptionsElement> options = new List<OptionsElement>();
         private readonly Rectangle scrollBarRunner;
         private readonly ClickableTextureComponent okButton;
+        private readonly int mapX;
+        private readonly int mapY;
+        private const int itemsPerPage = 7;
+        private const int indexOfGraphicsPage = 6;
+        private int currentItemIndex;
         private bool scrolling;
         private bool canClose;
         private int optionsSlotHeld = -1;
-      
-
-        public ModMenu(int x, int y, int width, int height, Dictionary<string, bool> secondaryNPCs, Dictionary<string, object> customNPCs, Dictionary<string, string> npcNames, Dictionary<string, int> markerCrop) : base(x, y, width, height, false)
+            
+        public ModMenu(
+            int x, 
+            int y, 
+            int width, 
+            int height, 
+            Dictionary<string, bool> secondaryNpcs, 
+            Dictionary<string, object> customNpcs, 
+            Dictionary<string, string> npcNames, 
+            Dictionary<string, int> markerCrop, 
+            IModHelper helper, 
+            ModConfig config
+        ) : base(x, y, width, height, false)
         {
+            this.Helper = helper;
+            this.Config = config;
             this.map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
@@ -56,12 +71,12 @@ namespace NPCMapLocations
             }
 
             // Translate labels and initialize buttons to handle button press
-            string immersionLabel = ModMain.modHelper.Translation.Get("immersion.label");
-            string extraLabel = ModMain.modHelper.Translation.Get("extra.label");
-            string villagersLabel = ModMain.modHelper.Translation.Get("villagers.label");
-            immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("immersion.option3", 6, -1, -1, -1, -1);
+            string immersionLabel = helper.Translation.Get("immersion.label");
+            string extraLabel = helper.Translation.Get("extra.label");
+            string villagersLabel = helper.Translation.Get("villagers.label");
+            immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1, helper, config);
+            immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1, helper, config);
+            immersionButton3 = new MapModButton("immersion.option3", 6, -1, -1, -1, -1, helper, config);
 
             //this.options.Add(new OptionsElement("Menu Key:"));
             //this.options.Add(new MapModInputListener("Change menu key", 37, this.optionSlots[0].bounds.Width, -1, -1));
@@ -70,20 +85,20 @@ namespace NPCMapLocations
             this.options.Add(immersionButton1);
             this.options.Add(immersionButton2);
             this.options.Add(immersionButton3);
-            this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1));
-            this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1));
-            this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1));
-            this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1));
+            this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+            this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+            this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1, helper, config));
+            this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1, helper, config));
             this.options.Add(new OptionsElement(extraLabel));
-            this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1));
-            this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1));
-            this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+            this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+            this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
             this.options.Add(new OptionsElement(villagersLabel));
-            // Custom NPCs
-            if (customNPCs != null)
+            // Custom Npcs
+            if (customNpcs != null)
             {
-                for (int i = 0; i < customNPCs.Count; i++)
-                    this.options.Add(new ModCheckbox(customNPCs.Keys.ElementAt(i), 39 + i, -1, -1, npcNames, markerCrop, customNPCs));
+                for (int i = 0; i < customNpcs.Count; i++)
+                    this.options.Add(new ModCheckbox(customNpcs.Keys.ElementAt(i), 39 + i, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
             }
             // Villagers
             var orderedNames = npcNames.Keys.ToList();
@@ -91,10 +106,11 @@ namespace NPCMapLocations
             int idx = 7;
             foreach (var name in orderedNames)
             {
-                if (secondaryNPCs.Keys.Contains(name))
-                    if (secondaryNPCs[name]) {
-                        this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
-                    }
+                if (secondaryNpcs.ContainsKey(name))
+                    if (secondaryNpcs[name])
+                    {
+                    this.options.Add(new ModCheckbox(name, idx++, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+                    }   
                     else
                     {
                         idx++;
@@ -102,7 +118,7 @@ namespace NPCMapLocations
                     }
                 else
                 {
-                    this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, markerCrop, customNPCs));
+                    this.options.Add(new ModCheckbox(name, idx++, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
                 }
             }
         }
@@ -163,7 +179,7 @@ namespace NPCMapLocations
                 this.exitThisMenu(true);
                 return;
             }
-            if (key.ToString().Equals(ModMain.config.MenuKey) && this.readyToClose() && this.canClose)
+            if (key.ToString().Equals(this.Config.MenuKey) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
@@ -324,7 +340,7 @@ namespace NPCMapLocations
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
             this.okButton.draw(b);
-            int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModMain.modHelper.Translation.Get("immersion.option3")).X;
+            int buttonWidth = (int)Game1.dialogueFont.MeasureString(this.Helper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
                 this.upArrow.draw(b);
@@ -377,18 +393,32 @@ namespace NPCMapLocations
         }
     }
 
-    // Mod button for the three main modes
-    public class MapModButton : OptionsElement
+     // Mod button for the three main modes
+    internal class MapModButton : OptionsElement
     {
+        private readonly IModHelper Helper;
+        private ModConfig Config;
         public const int pixelsWide = 9;
         public bool isActive;
         public Rectangle rect;
-        
-        public MapModButton(string label, int whichOption, int x, int y, int width, int height) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+
+        public MapModButton(
+            string label, 
+            int whichOption, 
+            int x, 
+            int y, 
+            int width, 
+            int height, 
+            IModHelper helper,
+            ModConfig config
+        ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            this.label = ModMain.modHelper.Translation.Get(label);
+            this.Helper = helper;
+            this.Config = config;
+            this.label = helper.Translation.Get(label);
             this.rect = new Rectangle(x, y, width, height);
-            if (ModMain.config.ImmersionOption == whichOption - 3)
+
+            if (config.ImmersionOption == whichOption - 3)
             {
                 this.greyedOut = false;
             }
@@ -408,7 +438,7 @@ namespace NPCMapLocations
                     base.receiveLeftClick(x, y);
                     this.isActive = true;
                     this.greyedOut = false;
-                    ModMain.config.ImmersionOption = whichOption - 3;
+                    this.Config.ImmersionOption = whichOption - 3;
                 }
             }
         }
@@ -425,23 +455,37 @@ namespace NPCMapLocations
         }
     }
 
-    // Mod checkbox for immersion settings and npc blacklst
+    // Mod checkbox for settings and npc blacklst
     internal class ModCheckbox : OptionsElement
     {
+        private readonly IModHelper Helper;
+        private readonly Dictionary<string, string> NpcNames;
+        private readonly Dictionary<string, int> MarkerCrop;
+        private readonly Dictionary<string, object> CustomNpcs;
+        private ModConfig Config;
+        private List<string> orderedNames;
         public const int pixelsWide = 9;
         public bool isChecked;
         public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
         public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
-        private Dictionary<string, string> npcNames;
-        private Dictionary<string, int> markerCrop;
-        private Dictionary<string, object> customNPCs;
-        private List<string> orderedNames;
 
-        public ModCheckbox(string label, int whichOption, int x = -1, int y = -1, Dictionary<string, string> npcNames = null, Dictionary<string, int> markerCrop = null, Dictionary<string, object> customNPCs = null) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public ModCheckbox(
+            string label,
+            int whichOption,
+            int x,
+            int y,
+            Dictionary<string, object> customNpcs,
+            Dictionary<string, string> npcNames,
+            Dictionary<string, int> markerCrop,
+            IModHelper helper,
+            ModConfig config
+        ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)                                                       
         {
-            this.markerCrop = markerCrop;
-            this.npcNames = npcNames;
-            this.customNPCs = customNPCs;
+            this.Helper = helper;
+            this.Config = config;
+            this.MarkerCrop = markerCrop;
+            this.NpcNames = npcNames;
+            this.CustomNpcs = customNpcs;
             this.label = label;
 
             if (whichOption < 44)
@@ -451,35 +495,35 @@ namespace NPCMapLocations
 
                 if (whichOption > 6 && whichOption < 39)
                 {
-                    this.isChecked = !ModMain.config.NPCBlacklist.Contains(orderedNames[whichOption - 7]);
+                    this.isChecked = !this.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
                     return;
                 }
                 else if (whichOption > 38 && whichOption < 44)
                 {
-                    this.isChecked = !ModMain.config.CustomNPCBlacklist.Contains(customNPCs.Keys.ElementAt(whichOption - 39));
+                    this.isChecked = !this.Config.CustomNpcBlacklist.Contains(customNpcs.Keys.ElementAt(whichOption - 39));
                     return;
                 }
             }
             else if (whichOption > 43)
             {
-                this.label = ModMain.modHelper.Translation.Get(label);
+                this.label = this.Helper.Translation.Get(label);
             }
             switch (whichOption)
             {
                 case 44:
-                    this.isChecked = ModMain.config.OnlySameLocation;
+                    this.isChecked = this.Config.OnlySameLocation;
                     return;
                 case 45:
-                    this.isChecked = ModMain.config.ByHeartLevel;
+                    this.isChecked = this.Config.ByHeartLevel;
                     return;
                 case 46:
-                    this.isChecked = ModMain.config.MarkQuests;
+                    this.isChecked = this.Config.MarkQuests;
                     return;
                 case 47:
-                    this.isChecked = ModMain.config.ShowHiddenVillagers;
+                    this.isChecked = this.Config.ShowHiddenVillagers;
                     return;
                 case 48:
-                    this.isChecked = ModMain.config.ShowTravelingMerchant;
+                    this.isChecked = this.Config.ShowTravelingMerchant;
                     return;
                 default:
                     return;
@@ -500,39 +544,41 @@ namespace NPCMapLocations
             if (whichOption > 6 && whichOption < 39)
             {
                 if (this.isChecked)
-                    ModMain.config.NPCBlacklist.Remove(orderedNames[whichOption - 7]);
+                    this.Config.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
                 else
-                    ModMain.config.NPCBlacklist.Add(orderedNames[whichOption - 7]);
+                    this.Config.NpcBlacklist.Add(orderedNames[whichOption - 7]);
             }
             else if (whichOption > 38 && whichOption < 44)
             {
                 if (this.isChecked)
-                    ModMain.config.CustomNPCBlacklist.Remove(customNPCs.Keys.ElementAt(whichOption - 39));
+                    this.Config.CustomNpcBlacklist.Remove(this.CustomNpcs.Keys.ElementAt(whichOption - 39));
                 else
-                    ModMain.config.CustomNPCBlacklist.Add(customNPCs.Keys.ElementAt(whichOption - 39));
+                    this.Config.CustomNpcBlacklist.Add(this.CustomNpcs.Keys.ElementAt(whichOption - 39));
             }
-            else { 
-                switch (whichOption) { 
+            else
+            {
+                switch (whichOption)
+                {
                     case 44:
-                        ModMain.config.OnlySameLocation = this.isChecked;
+                        this.Config.OnlySameLocation = this.isChecked;
                         break;
                     case 45:
-                        ModMain.config.ByHeartLevel = this.isChecked;
+                        this.Config.ByHeartLevel = this.isChecked;
                         break;
                     case 46:
-                        ModMain.config.MarkQuests = this.isChecked;
+                        this.Config.MarkQuests = this.isChecked;
                         break;
                     case 47:
-                        ModMain.config.ShowHiddenVillagers = this.isChecked;
+                        this.Config.ShowHiddenVillagers = this.isChecked;
                         break;
                     case 48:
-                        ModMain.config.ShowTravelingMerchant = this.isChecked;
+                        this.Config.ShowTravelingMerchant = this.isChecked;
                         break;
                     default:
                         break;
                 }
             }
-            ModMain.modHelper.WriteConfig(ModMain.config);
+            this.Helper.WriteConfig(this.Config);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -545,11 +591,11 @@ namespace NPCMapLocations
 
                 if (this.isChecked)
                 {
-                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MarkerCrop[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                 }
                 else
                 {
-                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, markerCrop[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                    Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle?(new Rectangle(0, MarkerCrop[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.4f);
                 }
 
                 // Draw names
@@ -557,7 +603,7 @@ namespace NPCMapLocations
                 if (this.whichOption == -1)
                     SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f, 0.1f, false, -1, "", -1);
                 else
-                    Utility.drawTextWithShadow(b, npcNames[label], Game1.dialogueFont, new Vector2((float)(slotX + this.bounds.X + this.bounds.Width + 8), (float)(slotY + this.bounds.Y)), this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
+                    Utility.drawTextWithShadow(b, NpcNames[label], Game1.dialogueFont, new Vector2((float)(slotX + this.bounds.X + this.bounds.Width + 8), (float)(slotY + this.bounds.Y)), this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
             }
             else
             {
@@ -566,9 +612,11 @@ namespace NPCMapLocations
         }
     }
 
-    // Mod slider for heart level config
+    // Mod slider for heart level this.Config
     internal class MapModSlider : OptionsElement
     {
+        private readonly IModHelper Helper;
+        private ModConfig Config;
         public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);
         public static Rectangle sliderButtonRect = new Rectangle(420, 441, 10, 6);
         public const int pixelsWide = 48;
@@ -578,16 +626,26 @@ namespace NPCMapLocations
         public int value;
         public string valueLabel;
 
-        public MapModSlider(string label, int whichOption, int x = -1, int y = -1) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
+        public MapModSlider(
+            string label,
+            int whichOption,
+            int x,
+            int y,
+            IModHelper helper,
+            ModConfig config
+        ) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
         {
-            valueLabel = ModMain.modHelper.Translation.Get(label);
+            this.Helper = helper;
+            this.Config = config;
+            valueLabel = helper.Translation.Get(label);
+
             if (whichOption == 0)
             {
-                this.value = ModMain.config.HeartLevelMin;
+                this.value = this.Config.HeartLevelMin;
             }
             else if (whichOption == 1)
             {
-                this.value = ModMain.config.HeartLevelMax;
+                this.value = this.Config.HeartLevelMax;
             }
         }
 
@@ -601,13 +659,13 @@ namespace NPCMapLocations
             this.value = ((x >= this.bounds.X) ? ((x <= this.bounds.Right - 10 * Game1.pixelZoom) ? ((int)((double)((float)(x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom)) * (double)this.sliderMaxValue)) : this.sliderMaxValue) : 0);
             if (this.whichOption == 0)
             {
-                ModMain.config.HeartLevelMin = this.value;
+                this.Config.HeartLevelMin = this.value;
             }
             else if (this.whichOption == 1)
             {
-                ModMain.config.HeartLevelMax = this.value;
+                this.Config.HeartLevelMax = this.value;
             }
-            ModMain.modHelper.WriteConfig(ModMain.config);
+            this.Helper.WriteConfig(this.Config);
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -626,12 +684,12 @@ namespace NPCMapLocations
             this.greyedOut = false;
             if (this.whichOption == 0 || this.whichOption == 1)
             {
-                this.greyedOut = !ModMain.config.ByHeartLevel;
+                this.greyedOut = !this.Config.ByHeartLevel;
             }
             base.draw(b, slotX, slotY);
             IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X, slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, (float)Game1.pixelZoom, false);
             b.Draw(Game1.mouseCursors, new Vector2((float)(slotX + this.bounds.X) + (float)(this.bounds.Width - 10 * Game1.pixelZoom) * ((float)this.value / (float)this.sliderMaxValue), (float)(slotY + this.bounds.Y)), new Rectangle?(OptionsSlider.sliderButtonRect), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom, SpriteEffects.None, 0.9f);
         }
-    }
+    }    
 }
 

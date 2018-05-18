@@ -17,12 +17,11 @@ namespace NPCMapLocations
         public bool OnlySameLocation { get; set; } = false;
         public bool ShowHiddenVillagers { get; set; } = false;
         public bool MarkQuests { get; set; } = true;
-        public HashSet<string> NPCBlacklist { get; set; } = new HashSet<string>() { "Marlon", "Sandy" };
+        public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { "Marlon", "Sandy" };
         public bool ShowTravelingMerchant { get; set; } = true;
         public bool ShowFarmBuildings { get; set; } = true;
         public Dictionary<string, int> VillagerCrop { get; set; } = new Dictionary<string, int>();
-        public List<string> CustomNPCBlacklist = new List<string>();
-        public Dictionary<string, object> CustomNPCs { get; set; } = new Dictionary<string, object>();
-        public bool LessFrequentRefresh { get; set; } = true;
+        public List<string> CustomNpcBlacklist = new List<string>();
+        public Dictionary<string, object> CustomNpcs { get; set; } = new Dictionary<string, object>();
     }
 }

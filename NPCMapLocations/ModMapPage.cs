@@ -13,8 +13,12 @@ namespace NPCMapLocations
 
     public class ModMapPage : IClickableMenu
     {
+        private readonly IModHelper Helper;
+        private readonly ModConfig Config;
+        private readonly HashSet<NPCMarker> NpcMarkers;
+        private readonly Dictionary<string, string> NpcNames;
+        private readonly Dictionary<long, KeyValuePair<Farmer, Vector2>> Farmers;
         private readonly Dictionary<string, Rect> locationRects = ModConstants.LocationRects;
-        private readonly int nameTooltipMode = ModMain.config.NameTooltipMode;
         private string hoveredNames = "";
         private string hoveredLocationText = "";
         private Texture2D map;
@@ -24,18 +28,16 @@ namespace NPCMapLocations
         public ClickableTextureComponent okButton;
         private bool hasIndoorCharacter;
         private Vector2 indoorIconVector;
-        private Dictionary<string, string> npcNames;
-        private HashSet<NPCMarker> npcMarkers;
         private bool drawPamHouseUpgrade;
-        private Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(Dictionary<string, string> npcNames, HashSet<NPCMarker> npcMarkers, Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers)
+        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames, Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers, IModHelper helper, ModConfig config)
         {
-            // initialise
-            this.npcNames = npcNames;
-            this.npcMarkers = npcMarkers;
-            this.farmers = farmers;
+            this.Helper = helper;
+            this.Config = config;
+            this.NpcMarkers = npcMarkers;
+            this.NpcNames = npcNames;
+            this.Farmers = farmers;
             okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
@@ -48,7 +50,7 @@ namespace NPCMapLocations
             GameMenu menu = (GameMenu)Game1.activeClickableMenu;
             List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
             MapPage mapPage = (MapPage)menuPages[menu.currentTab];
-            List<ClickableComponent> vanillaPoints = ModMain.modHelper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
+            List<ClickableComponent> vanillaPoints = helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
             vanillaPoints.Clear();
             foreach (ClickableComponent point in this.GetMapPoints())
             {
@@ -98,13 +100,13 @@ namespace NPCMapLocations
             string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
             if (Context.IsMainPlayer)
             {
-                foreach (NPCMarker npcMarker in this.npcMarkers)
+                foreach (NPCMarker npcMarker in this.NpcMarkers)
                 {
                     Rectangle npcLocation = npcMarker.Location;
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
-                        if (npcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
-                            hoveredList.Add(npcNames[npcMarker.Npc.Name]);
+                        if (this.NpcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
+                            hoveredList.Add(this.NpcNames[npcMarker.Npc.Name]);
 
                         if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
                             hasIndoorCharacter = true;
@@ -113,7 +115,7 @@ namespace NPCMapLocations
             }
             if (Context.IsMultiplayer)
             {
-                foreach (KeyValuePair<Farmer, Vector2> farmer in farmers.Values)
+                foreach (KeyValuePair<Farmer, Vector2> farmer in Farmers.Values)
                 {
                     if (Game1.getMouseX() >= farmer.Value.X - markerWidth / 2 && Game1.getMouseX() <= farmer.Value.X + markerWidth / 2 && Game1.getMouseY() >= farmer.Value.Y - markerHeight / 2 && Game1.getMouseY() <= farmer.Value.Y + markerHeight / 2)
                     {
@@ -167,7 +169,7 @@ namespace NPCMapLocations
                     x = Game1.viewport.Width - width;
                     y += Game1.tileSize / 4;
                 }
-                if (nameTooltipMode == 1)
+                if (this.Config.NameTooltipMode == 1)
                 {
                     if (y + height > Game1.viewport.Height)
                     {
@@ -176,7 +178,7 @@ namespace NPCMapLocations
                     }
                     offsetY = 2 - Game1.tileSize;
                 }
-                else if (nameTooltipMode == 2)
+                else if (this.Config.NameTooltipMode == 2)
                 {
                     if (y + height > Game1.viewport.Height)
                     {
@@ -195,7 +197,7 @@ namespace NPCMapLocations
                 }
 
                 // Draw name tooltip positioned around location tooltip
-                DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, nameTooltipMode);
+                DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, this.Config.NameTooltipMode);
 
                 // Draw location tooltip
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
@@ -207,7 +209,7 @@ namespace NPCMapLocations
             else
             {
                 // Draw name tooltip only
-                DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, nameTooltipMode);
+                DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, this.Config.NameTooltipMode);
             }
 
             // Draw indoor icon
