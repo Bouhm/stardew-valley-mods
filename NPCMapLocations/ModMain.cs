@@ -55,7 +55,6 @@ namespace NPCMapLocations
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GameEvents.QuarterSecondTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
@@ -95,16 +94,6 @@ namespace NPCMapLocations
                     ModMapPage.ReplaceMapPoints();
                 ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
             }
-            // Update for config changes
-            if (e.PriorMenu is ModMenu)
-                UpdateMarkers(true);
-        }
-
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
-        {
-            // Update for config changes
-            if (e.PriorMenu is ModMenu)
-                UpdateMarkers(true);
         }
 
         // For drawing farm buildings on the map 
@@ -348,11 +337,8 @@ namespace NPCMapLocations
 
                 if (!forceUpdate)
                 {
-                    if (npcMarker.Location != Rectangle.Empty
-                        && (!npcLocation.IsOutdoors // Indoors
-                        || !npcMarker.Npc.isMoving() // Not moving
-                        || locationName == null // Couldn't resolve location name
-                        || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos)) // Location not mapped
+                    if (locationName == null // Couldn't resolve location name
+                        || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos) // Location not mapped
                     )
                         continue;
                 }
@@ -405,15 +391,6 @@ namespace NPCMapLocations
                 // NPCs that will be drawn onto the map
                 if (IsNPCShown(npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
                 {
-                    int width = 32;
-                    int height = 30;
-                    // Get center of NPC marker 
-                    int x = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width/2;
-                    int y = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
-
-                    npcMarker.Location = new Rectangle(x, y, width, height);
-                    npcMarker.Marker = npc.Sprite.Texture;
-
                     // Check for daily quests
                     foreach (Quest quest in Game1.player.questLog)
                     {
@@ -439,12 +416,31 @@ namespace NPCMapLocations
                         }
                     }
 
+                    npcMarker.Marker = npc.Sprite.Texture;
+
                     // Establish draw order, higher number infront
                     // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
                     // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
                     npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
                     if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
                     if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
+
+                    // Only do calculations if NPCs are moving
+                    if (!forceUpdate 
+                        && (npcMarker.Location != Rectangle.Empty
+                        && (!npcLocation.IsOutdoors // Indoors
+                        || !npcMarker.Npc.isMoving()))) // Not moving
+                    {
+                        continue;
+                    }
+
+                    int width = 32;
+                    int height = 30;
+                    // Get center of NPC marker 
+                    int x = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width/2;
+                    int y = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
+
+                    npcMarker.Location = new Rectangle(x, y, width, height);
                 }
                 else
                 {
