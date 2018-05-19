@@ -335,13 +335,10 @@ namespace NPCMapLocations
                 else
                     locationName = npc.currentLocation.Name;
 
-                if (!forceUpdate)
-                {
-                    if (locationName == null // Couldn't resolve location name
-                        || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos) // Location not mapped
-                    )
-                        continue;
-                }
+                if (locationName == null // Couldn't resolve location name
+                    || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos) // Location not mapped
+                )
+                    continue;
                              
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = npcLocation.IsOutdoors;
@@ -725,6 +722,8 @@ namespace NPCMapLocations
             {
                 UpdateMarkers(true);
                 UpdateFarmBuildingLocs();
+                ModMapPage.HandleResize();
+                ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
             }
         }
 
