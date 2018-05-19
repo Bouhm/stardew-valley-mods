@@ -32,8 +32,7 @@ namespace NPCMapLocations
         private HashSet<NPCMarker> NpcMarkers;
         private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
         private const int BUILDING_SCALE = 3;
-        private const int DRAW_DELAY = 1;
-        private bool IsUpdating = false;
+        private const int DRAW_DELAY = 1;       
 
         // Multiplayer
         private Dictionary<long, FarmerMarker> FarmerMarkers; 
@@ -89,10 +88,8 @@ namespace NPCMapLocations
 
         void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            if (IsMapOpen()) {
-                UpdateMarkers();
-                ModMapPage = new ModMapPage(NpcMarkers, NpcNames, FarmerMarkers, Helper, Config);   
-            }
+            //if (IsMapOpen()) 
+                //ModMapPage = new ModMapPage(NpcMarkers, NpcNames, FarmerMarkers, Helper, Config);   
         }
 
             
@@ -160,7 +157,12 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNpcs();
             NpcNames = CustomHandler.GetNpcNames();
+
+            // Preload
             UpdateFarmBuildingLocs();
+            ResetMarkers();
+            UpdateMarkers(true);
+            ModMapPage = new ModMapPage(NpcMarkers, NpcNames, FarmerMarkers, Helper, Config);  
         }
 
         private List<NPC> GetVillagers()
@@ -276,22 +278,26 @@ namespace NPCMapLocations
                     }
                 }
             }
+            // Reset markers data daily
+            ResetMarkers();
+        }
 
-            // Reset NPC marker data daily
+        private void ResetMarkers() {
             NpcMarkers = new HashSet<NPCMarker>();
             foreach (NPC npc in GetVillagers())
             {
                 // Handle case where Kent appears even though he shouldn't
                 if ((npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"])) { continue; }
 
-                NPCMarker npcMarker = new NPCMarker() {
+                NPCMarker npcMarker = new NPCMarker()
+                {
                     Npc = npc,
                     IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
                 };
                 NpcMarkers.Add(npcMarker);
             }
 
-            if (Context.IsMultiplayer) 
+            if (Context.IsMultiplayer)
                 FarmerMarkers = new Dictionary<long, FarmerMarker>();
         }
 
@@ -301,26 +307,20 @@ namespace NPCMapLocations
             UpdateMarkers();
         }
 
-        private void UpdateMarkers()
+        private void UpdateMarkers(bool forceUpdate = false)
         {
-            // Prevent double update when
-            // Map open + quarter tick update
-            if (IsMapOpen() && !IsUpdating) {
-                IsUpdating = true;
-
+            if (IsMapOpen() || forceUpdate) {
                 if (Context.IsMainPlayer)
-                    UpdateNPCMarkers();
+                    UpdateNPCMarkers(forceUpdate);
                 if (Context.IsMultiplayer)
                     UpdateFarmerMarkers();
                 if (ModMapPage != null)
                     ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
-                
-                IsUpdating = false;
             }
         }
 
         // Update NPC marker data and names on hover
-        private void UpdateNPCMarkers()
+        private void UpdateNPCMarkers(bool forceUpdate)
         {
             foreach (NPCMarker npcMarker in NpcMarkers)
             {
@@ -336,12 +336,16 @@ namespace NPCMapLocations
                 else
                     locationName = npc.currentLocation.Name;
 
-                if (npcMarker.Location != Rectangle.Empty 
-                    && (!npcLocation.IsOutdoors // Indoors
-                    || !npcMarker.Npc.isMoving() // Not moving
-                    || locationName == null // Couldn't resolve location name
-                    || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos))) // Location not mapped
-                    continue;
+                if (!forceUpdate)
+                {
+                    if (npcMarker.Location != Rectangle.Empty
+                        && (!npcLocation.IsOutdoors // Indoors
+                        || !npcMarker.Npc.isMoving() // Not moving
+                        || locationName == null // Couldn't resolve location name
+                        || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos)) // Location not mapped
+                    )
+                        continue;
+                }
                              
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = npcLocation.IsOutdoors;
@@ -376,7 +380,7 @@ namespace NPCMapLocations
                     }
                 }
 
-                // NPCs that won't be shown on the map unless Show Hidden Npcs is checked
+                // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
                 npcMarker.IsHidden = (
                    (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name))
                     || (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name))
@@ -707,7 +711,11 @@ namespace NPCMapLocations
         private void GraphicsEvents_Resize(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            UpdateFarmBuildingLocs();
+            if (ModMapPage != null)
+            {
+                UpdateMarkers(true);
+                UpdateFarmBuildingLocs();
+            }
         }
 
         // For debugging
