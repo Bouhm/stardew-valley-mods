@@ -329,7 +329,6 @@ namespace NPCMapLocations
                 GameLocation npcLocation = npc.currentLocation;
 
                 // Handle null locations at beginning of new day
-                // !currentLocation is null for FarmHands in MP
                 if (npcLocation == null) { 
                     locationName = npc.DefaultMap;
                     npcLocation = Game1.getLocationFromName(locationName);
@@ -337,12 +336,13 @@ namespace NPCMapLocations
                 else
                     locationName = npc.currentLocation.Name;
 
-                if (locationName == null) { continue; }
-
-                // Isn't mapped by the mod; skip
-                if (!ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos))
+                if (npcMarker.Location != Rectangle.Empty 
+                    && (!npcLocation.IsOutdoors // Indoors
+                    || !npcMarker.Npc.isMoving() // Not moving
+                    || locationName == null // Couldn't resolve location name
+                    || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos))) // Location not mapped
                     continue;
-                
+                             
                 // For layering indoor/outdoor NPCs and indoor indicator
                 npcMarker.IsOutdoors = npcLocation.IsOutdoors;
 
@@ -378,7 +378,7 @@ namespace NPCMapLocations
 
                 // NPCs that won't be shown on the map unless Show Hidden Npcs is checked
                 npcMarker.IsHidden = (
-                    (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name))
+                   (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name))
                     || (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name))
                     || (Config.OnlySameLocation && !isSameLocation)
                     || (Config.ByHeartLevel
