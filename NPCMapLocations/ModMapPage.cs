@@ -16,9 +16,13 @@ namespace NPCMapLocations
         private readonly IModHelper Helper;
         private readonly ModConfig Config;
         private readonly Dictionary<string, string> NpcNames;
+        private Dictionary<string, bool> SecondaryNpcs { get; }
         private readonly Dictionary<string, Rect> locationRects = ModConstants.LocationRects;
         private HashSet<NPCMarker> NpcMarkers;
         private Dictionary<long, FarmerMarker> FarmerMarkers;
+        private Dictionary<string, int> MarkerCrop { get; }
+        private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
+        private readonly Texture2D BuildingMarkers;
         private string hoveredNames = "";
         private string hoveredLocationText = "";
         private Texture2D map;
@@ -31,17 +35,50 @@ namespace NPCMapLocations
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames, Dictionary<long, FarmerMarker> farmerMarkers, IModHelper helper, ModConfig config)
+        public ModMapPage(
+            HashSet<NPCMarker> npcMarkers, 
+            Dictionary<string, string> npcNames,
+            Dictionary<string, bool> secondaryNpcs,
+            Dictionary<long, FarmerMarker> farmerMarkers, 
+            Dictionary<string, int> markerCrop,
+            Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
+            Texture2D buildingMarkers,
+            IModHelper helper, 
+            ModConfig config
+        )
         {
+            this.NpcMarkers = npcMarkers;
+            this.NpcNames = npcNames;
+            this.SecondaryNpcs = secondaryNpcs;
+            this.FarmerMarkers = farmerMarkers;
+            this.MarkerCrop = markerCrop;
+            this.FarmBuildings = farmBuildings;
+            this.BuildingMarkers = buildingMarkers;
             this.Helper = helper;
             this.Config = config;
-            this.NpcNames = npcNames;
-            this.RecieveMarkerUpdates(npcMarkers, farmerMarkers);
-    
+
             okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-            HandleResize();
+            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
+            mapX = (int)centeringOnScreen.X;
+            mapY = (int)centeringOnScreen.Y;
+
+            if (Game1.activeClickableMenu != null)
+            {
+                // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
+                GameMenu menu = (GameMenu)Game1.activeClickableMenu;
+                List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
+                MapPage mapPage = (MapPage)menuPages[menu.currentTab];
+                List<ClickableComponent> vanillaPoints = Helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
+                vanillaPoints.Clear();
+                foreach (ClickableComponent point in this.GetMapPoints())
+                {
+                    point.label = "";
+                    point.scale = 0.1f;
+                    vanillaPoints.Add(point);
+                }
+            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -139,6 +176,9 @@ namespace NPCMapLocations
         // Draw location and name tooltips
         public override void draw(SpriteBatch b)
         {
+            DrawMap(b);
+            DrawMarkers(b);
+
             int x = Game1.getMouseX() + Game1.tileSize / 2;
             int y = Game1.getMouseY() + Game1.tileSize / 2;
             int width;
@@ -186,7 +226,7 @@ namespace NPCMapLocations
                 }
 
                 // Draw name tooltip positioned around location tooltip
-                DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, height, this.Config.NameTooltipMode);
+                DrawNames(b, hoveredNames, x, y, offsetY, height, this.Config.NameTooltipMode);
 
                 // Draw location tooltip
                 IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, false);
@@ -204,6 +244,10 @@ namespace NPCMapLocations
             // Draw indoor icon
             if (hasIndoorCharacter && !String.IsNullOrEmpty(hoveredNames))
                 b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+
+            // Cursor
+            if (!Game1.options.hardwareCursor)
+                b.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
         }
 
         // Draw map to cover base rendering 
@@ -228,7 +272,83 @@ namespace NPCMapLocations
             }
 
             if (this.drawPamHouseUpgrade)
-                b.Draw(this.map, new Vector2((float)(this.mapX + 780), (float)(this.mapY + 348)), new Rectangle?(new Rectangle(263, 181, 8, 8)), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                b.Draw(this.map, new Vector2((float)(this.mapX + 813), (float)(this.mapY + 365)), new Rectangle?(new Rectangle(263, 181, 8, 8)), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        }
+
+        // Draw event
+        // Subtractions within location vectors are to set the origin to the center of the sprite
+        public void DrawMarkers(SpriteBatch b)
+        {
+            if (Config.ShowFarmBuildings)
+            {
+                var sortedBuildings = ModMain.FarmBuildings.ToList();
+                sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
+
+                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
+                {
+                    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
+                        b.Draw(BuildingMarkers, new Vector2(building.Value.Value.X - buildingRect.Width / 2, building.Value.Value.Y - buildingRect.Height / 2), new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                }
+            }
+
+            // Traveling Merchant
+            if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
+            {
+                Vector2 merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
+                b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+            }
+
+            // Farmers
+            if (Context.IsMultiplayer)
+            {
+                foreach (Farmer farmer in Game1.getOnlineFarmers())
+                {
+                    // Temporary solution to handle desync of farmhand location/tile position when changing location
+                    if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
+                        if (farMarker.DrawDelay == 0)
+                            farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farMarker.Location.X - 16, farMarker.Location.Y - 15), 0.00011f, 2f, 1, farmer);
+                }
+            }
+            else
+            {
+                Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(), Game1.player.getTileY());
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
+            }
+
+            // NPCs
+            // Sort by drawing order
+            var sortedMarkers = NpcMarkers.ToList();
+            sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
+
+            foreach (NPCMarker npcMarker in sortedMarkers)
+            {
+                if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null || !MarkerCrop.ContainsKey(npcMarker.Npc.Name)) { continue; }
+
+                // Tint/dim hidden markers
+                if (npcMarker.IsHidden)
+                {
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                    if (npcMarker.HasQuest)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                }
+                else
+                {
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
+                    if (npcMarker.IsBirthday)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                    if (npcMarker.HasQuest)
+                    {
+                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                    }
+                }
+            }
         }
 
         // Draw NPC name tooltips map page
@@ -304,17 +424,10 @@ namespace NPCMapLocations
             b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
 
-        public void RecieveMarkerUpdates(HashSet<NPCMarker> npcMarkers, Dictionary<long, FarmerMarker> farmerMarkers)
+        // Override snappy controls on controller
+        public override bool overrideSnappyMenuCursorMovementBan()
         {
-            this.NpcMarkers = npcMarkers;
-            this.FarmerMarkers = farmerMarkers;
-        }
-
-        public void HandleResize()
-        {
-            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
-            mapX = (int)centeringOnScreen.X;
-            mapY = (int)centeringOnScreen.Y;
+            return true;
         }
 
         public void ReplaceMapPoints()
