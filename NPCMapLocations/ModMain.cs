@@ -670,7 +670,7 @@ namespace NPCMapLocations
                 // Tint/dim hidden markers
                 if (npcMarker.IsHidden)
                 {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f, 0f, Vector2.Zero, (float)Game1.pixelZoom/2, SpriteEffects.None, 0f);
                     if (npcMarker.IsBirthday)
                     {
                         b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
@@ -682,7 +682,7 @@ namespace NPCMapLocations
                 }
                 else
                 {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom/2, SpriteEffects.None, 0f);
                     if (npcMarker.IsBirthday)
                     {
                         b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
