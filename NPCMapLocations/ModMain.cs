@@ -55,6 +55,7 @@ namespace NPCMapLocations
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             GameEvents.QuarterSecondTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
@@ -86,7 +87,7 @@ namespace NPCMapLocations
             return map;
         }
 
-        void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
             if (IsMapOpen())
             {
@@ -94,8 +95,18 @@ namespace NPCMapLocations
                     ModMapPage.ReplaceMapPoints();
                 ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
             }
+            // Update for config changes
+            if (e.PriorMenu is ModMenu)
+                UpdateMarkers(true);
         }
-            
+
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        {
+            // Update for config changes
+            if (e.PriorMenu is ModMenu)
+                UpdateMarkers(true);
+        }
+
         // For drawing farm buildings on the map 
         // and getting positions relative to the farm 
         private static void UpdateFarmBuildingLocs()
