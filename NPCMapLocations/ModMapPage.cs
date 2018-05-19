@@ -44,20 +44,6 @@ namespace NPCMapLocations
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
             mapX = (int)centeringOnScreen.X;
             mapY = (int)centeringOnScreen.Y;
-            points = this.GetMapPoints().ToList();
-
-            // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
-            GameMenu gameMenu = (GameMenu)Game1.activeClickableMenu;
-            List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameMenu);
-            MapPage mapPage = (MapPage)menuPages[gameMenu.currentTab];
-            List<ClickableComponent> vanillaPoints = helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
-            vanillaPoints.Clear();
-            foreach (ClickableComponent point in this.GetMapPoints())
-            {
-                point.label = "";
-                point.scale = 0.1f;
-                vanillaPoints.Add(point);
-            }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -324,6 +310,26 @@ namespace NPCMapLocations
         {
             this.NpcMarkers = npcMarkers;
             this.FarmerMarkers = farmerMarkers;
+        }
+
+        public void ReplaceMapPoints()
+        {
+            points = this.GetMapPoints().ToList();
+            // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
+            if (Game1.activeClickableMenu != null)
+            {
+                GameMenu gameMenu = (GameMenu)Game1.activeClickableMenu;
+                List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameMenu);
+                MapPage mapPage = (MapPage)menuPages[gameMenu.currentTab];
+                List<ClickableComponent> vanillaPoints = Helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
+                vanillaPoints.Clear();
+                foreach (ClickableComponent point in this.GetMapPoints())
+                {
+                    point.label = "";
+                    point.scale = 0.1f;
+                    vanillaPoints.Add(point);
+                }
+            }
         }
 
         // Get location and area of location component

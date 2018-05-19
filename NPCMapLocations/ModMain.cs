@@ -88,10 +88,13 @@ namespace NPCMapLocations
 
         void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            //if (IsMapOpen()) 
-                //ModMapPage = new ModMapPage(NpcMarkers, NpcNames, FarmerMarkers, Helper, Config);   
+            if (IsMapOpen())
+            {
+                if (ModMapPage.points.Count == 0)
+                    ModMapPage.ReplaceMapPoints();
+                ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
+            }
         }
-
             
         // For drawing farm buildings on the map 
         // and getting positions relative to the farm 
@@ -263,9 +266,7 @@ namespace NPCMapLocations
                             SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(100162);
                             break;
                         case "Merchant":
-                            SecondaryNpcs[name] =
-                                      (Game1.shortDayNameFromDayOfSeason(Game1.dayOfMonth).Equals("Friday")
-                                    || Game1.shortDayNameFromDayOfSeason(Game1.dayOfMonth).Equals("Sunday"));
+                            SecondaryNpcs[name] = (Game1.getLocationFromName("Forest") as Forest).travelingMerchantDay;
                             break;
                         case "Sandy":
                             SecondaryNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
@@ -314,8 +315,6 @@ namespace NPCMapLocations
                     UpdateNPCMarkers(forceUpdate);
                 if (Context.IsMultiplayer)
                     UpdateFarmerMarkers();
-                if (ModMapPage != null)
-                    ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
             }
         }
 
@@ -640,7 +639,7 @@ namespace NPCMapLocations
             // Traveling Merchant
             if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
             {
-                Vector2 merchantLoc = LocationToMap("Forest", 27, 11);
+                Vector2 merchantLoc = LocationToMap("Forest", 28, 11);
                 b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
             }
 
