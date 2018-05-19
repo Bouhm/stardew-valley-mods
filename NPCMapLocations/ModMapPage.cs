@@ -17,7 +17,7 @@ namespace NPCMapLocations
         private readonly ModConfig Config;
         private readonly HashSet<NPCMarker> NpcMarkers;
         private readonly Dictionary<string, string> NpcNames;
-        private readonly Dictionary<long, KeyValuePair<Farmer, Vector2>> Farmers;
+        private readonly Dictionary<long, FarmerMarker> FarmerMarkers;
         private readonly Dictionary<string, Rect> locationRects = ModConstants.LocationRects;
         private string hoveredNames = "";
         private string hoveredLocationText = "";
@@ -31,13 +31,13 @@ namespace NPCMapLocations
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
-        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames, Dictionary<long, KeyValuePair<Farmer, Vector2>> farmers, IModHelper helper, ModConfig config)
+        public ModMapPage(HashSet<NPCMarker> npcMarkers, Dictionary<string, string> npcNames, Dictionary<long, FarmerMarker> farmerMarkers, IModHelper helper, ModConfig config)
         {
             this.Helper = helper;
             this.Config = config;
             this.NpcMarkers = npcMarkers;
             this.NpcNames = npcNames;
-            this.Farmers = farmers;
+            this.FarmerMarkers = farmerMarkers;
             okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
@@ -102,7 +102,7 @@ namespace NPCMapLocations
             {
                 foreach (NPCMarker npcMarker in this.NpcMarkers)
                 {
-                    Rectangle npcLocation = npcMarker.Location;
+                    Vector2 npcLocation = npcMarker.Location;
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
                         if (this.NpcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
@@ -115,13 +115,16 @@ namespace NPCMapLocations
             }
             if (Context.IsMultiplayer)
             {
-                foreach (KeyValuePair<Farmer, Vector2> farmer in Farmers.Values)
+                foreach (FarmerMarker farMarker in FarmerMarkers.Values)
                 {
-                    if (Game1.getMouseX() >= farmer.Value.X - markerWidth / 2 && Game1.getMouseX() <= farmer.Value.X + markerWidth / 2 && Game1.getMouseY() >= farmer.Value.Y - markerHeight / 2 && Game1.getMouseY() <= farmer.Value.Y + markerHeight / 2)
+                    if (Game1.getMouseX() >= farMarker.Location.X - markerWidth / 2 
+                        && Game1.getMouseX() <= farMarker.Location.X + markerWidth / 2 
+                        && Game1.getMouseY() >= farMarker.Location.Y - markerHeight / 2 
+                        && Game1.getMouseY() <= farMarker.Location.Y + markerHeight / 2)
                     {
-                        hoveredList.Add(farmer.Key.Name);
+                        hoveredList.Add(farMarker.Name);
 
-                        if (!farmer.Key.currentLocation.IsOutdoors && !hasIndoorCharacter)
+                        if (!farMarker.IsOutdoors && !hasIndoorCharacter)
                             hasIndoorCharacter = true;
                     }
                 }

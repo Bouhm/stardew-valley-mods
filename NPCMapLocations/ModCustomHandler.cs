@@ -147,7 +147,6 @@ namespace NPCMapLocations
                     this.NpcNames.Add(npc.Name, npc.Name);
                 else
                 {
-                    this.Monitor.Log(npc.displayName);
                     this.NpcNames.Add(npc.Name, npc.displayName);
                     if (!npc.Name.Equals(npc.displayName) || this.Config.VillagerCrop.ContainsKey(npc.Name))
                           this.NpcCustomizations.Add(npc.Name);
