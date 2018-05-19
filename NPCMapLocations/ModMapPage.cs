@@ -15,10 +15,10 @@ namespace NPCMapLocations
     {
         private readonly IModHelper Helper;
         private readonly ModConfig Config;
-        private readonly HashSet<NPCMarker> NpcMarkers;
         private readonly Dictionary<string, string> NpcNames;
-        private readonly Dictionary<long, FarmerMarker> FarmerMarkers;
         private readonly Dictionary<string, Rect> locationRects = ModConstants.LocationRects;
+        private HashSet<NPCMarker> NpcMarkers;
+        private Dictionary<long, FarmerMarker> FarmerMarkers;
         private string hoveredNames = "";
         private string hoveredLocationText = "";
         private Texture2D map;
@@ -35,9 +35,9 @@ namespace NPCMapLocations
         {
             this.Helper = helper;
             this.Config = config;
-            this.NpcMarkers = npcMarkers;
             this.NpcNames = npcNames;
-            this.FarmerMarkers = farmerMarkers;
+            this.RecieveMarkerUpdates(npcMarkers, farmerMarkers);
+    
             okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
@@ -83,6 +83,8 @@ namespace NPCMapLocations
         public override void performHoverAction(int x, int y)
         {
             hoveredLocationText = "";
+            hoveredNames = "";
+            hasIndoorCharacter = false;
             foreach (ClickableComponent current in points)
             {
                 if (current.containsPoint(x, y))
@@ -102,7 +104,7 @@ namespace NPCMapLocations
             {
                 foreach (NPCMarker npcMarker in this.NpcMarkers)
                 {
-                    Vector2 npcLocation = npcMarker.Location;
+                    Rectangle npcLocation = npcMarker.Location;
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth && Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
                         if (this.NpcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
@@ -316,6 +318,12 @@ namespace NPCMapLocations
             b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        }
+
+        public void RecieveMarkerUpdates(HashSet<NPCMarker> npcMarkers, Dictionary<long, FarmerMarker> farmerMarkers)
+        {
+            this.NpcMarkers = npcMarkers;
+            this.FarmerMarkers = farmerMarkers;
         }
 
         // Get location and area of location component

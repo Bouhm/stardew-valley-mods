@@ -306,13 +306,14 @@ namespace NPCMapLocations
             // Prevent double update when
             // Map open + quarter tick update
             if (IsMapOpen() && !IsUpdating) {
-                IsUpdating = true; 
+                IsUpdating = true;
 
                 if (Context.IsMainPlayer)
                     UpdateNPCMarkers();
-                
                 if (Context.IsMultiplayer)
                     UpdateFarmerMarkers();
+                if (ModMapPage != null)
+                    ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
                 
                 IsUpdating = false;
             }
@@ -396,7 +397,7 @@ namespace NPCMapLocations
                     int x = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width/2;
                     int y = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
 
-                    npcMarker.Location = new Vector2(x, y);
+                    npcMarker.Location = new Rectangle(x, y, width, height);
                     npcMarker.Marker = npc.Sprite.Texture;
 
                     // Check for daily quests
@@ -434,7 +435,7 @@ namespace NPCMapLocations
                 else
                 {
                     // Set no location so they don't get drawn
-                    npcMarker.Location = Vector2.Zero;
+                    npcMarker.Location = Rectangle.Empty;
                 }
             }
         }
@@ -665,13 +666,12 @@ namespace NPCMapLocations
 
             foreach (NPCMarker npcMarker in sortedMarkers)
             {
-                if (npcMarker.Location == Vector2.Zero || npcMarker.Marker == null || !MarkerCrop.ContainsKey(npcMarker.Npc.Name)) { continue; }
+                if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null || !MarkerCrop.ContainsKey(npcMarker.Npc.Name)) { continue; }
 
                 // Tint/dim hidden markers
                 if (npcMarker.IsHidden)
                 {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f, 0f, Vector2.Zero, (float)Game1.pixelZoom/2, SpriteEffects.None, 0f);
-                    if (npcMarker.IsBirthday)
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
                     {
                         b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                     }
@@ -682,7 +682,7 @@ namespace NPCMapLocations
                 }
                 else
                 {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero, (float)Game1.pixelZoom/2, SpriteEffects.None, 0f);
+                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
                     if (npcMarker.IsBirthday)
                     {
                         b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
@@ -786,7 +786,7 @@ namespace NPCMapLocations
     {
         public NPC Npc { get; set; } = null;
         public Texture2D Marker { get; set; } = null;
-        public Vector2 Location { get; set; } = Vector2.Zero;
+        public Rectangle Location { get; set; } = Rectangle.Empty;
         public bool IsBirthday { get; set; } = false;
         public bool HasQuest { get; set; } = false;
         public bool IsOutdoors { get; set; } = true;
