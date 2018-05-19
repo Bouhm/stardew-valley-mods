@@ -55,7 +55,7 @@ namespace NPCMapLocations
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            GameEvents.QuarterSecondTick += GameEvents_UpdateTick;
+            GameEvents.EighthUpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             GraphicsEvents.Resize += GraphicsEvents_Resize;
