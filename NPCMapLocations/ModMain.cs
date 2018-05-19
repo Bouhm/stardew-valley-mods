@@ -32,7 +32,7 @@ namespace NPCMapLocations
         private HashSet<NPCMarker> NpcMarkers;
         private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
         private const int BUILDING_SCALE = 3;
-        private const int DRAW_DELAY = 1;       
+        private const int DRAW_DELAY = 3;       
 
         // Multiplayer
         private Dictionary<long, FarmerMarker> FarmerMarkers; 
@@ -459,10 +459,15 @@ namespace NPCMapLocations
                 Vector2 farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
 
                 if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker)) {
+                    var deltaX = farmerLoc.X - farMarker.PrevLocation.X;
+                    var deltaY = farmerLoc.Y - farMarker.PrevLocation.Y;
+
                     // Location changes before tile position, causing farmhands to blink
                     // to the wrong position upon entering new location. Handle this in draw.
-                    if (farmer.currentLocation.Name != farMarker.PrevLocationName)
+                    if (farmer.currentLocation.Name == farMarker.PrevLocationName && MathHelper.Distance(deltaX, deltaY) > 15)
+                    {
                         FarmerMarkers[farmerId].DrawDelay = DRAW_DELAY;
+                    }
                     else if (farMarker.DrawDelay > 0)
                         FarmerMarkers[farmerId].DrawDelay--;
                 }
@@ -478,6 +483,7 @@ namespace NPCMapLocations
                 }
 
                 FarmerMarkers[farmerId].Location = farmerLoc;
+                FarmerMarkers[farmerId].PrevLocation = farmerLoc;
                 FarmerMarkers[farmerId].PrevLocationName = farmer.currentLocation.Name;
                 FarmerMarkers[farmerId].IsOutdoors = farmer.currentLocation.IsOutdoors;
             }
@@ -657,10 +663,8 @@ namespace NPCMapLocations
                 {
                     // Temporary solution to handle desync of farmhand location/tile position when changing location
                     if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
-                    {
                         if (farMarker.DrawDelay == 0)
                             farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farMarker.Location.X - 16, farMarker.Location.Y - 15), 0.00011f, 2f, 1, farmer);
-                    }
                 }
             }
             else
@@ -813,6 +817,7 @@ namespace NPCMapLocations
     {
         public string Name { get; set; } = null;
         public Vector2 Location { get; set; } = Vector2.Zero;
+        public Vector2 PrevLocation { get; set; } = Vector2.Zero;
         public string PrevLocationName { get; set; } = "";
         public bool IsOutdoors { get; set; } = true;
         public int DrawDelay { get; set; } = 0;
