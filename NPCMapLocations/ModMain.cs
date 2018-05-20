@@ -421,6 +421,7 @@ namespace NPCMapLocations
                     if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
                     if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
 
+                    /*
                     // Only do calculations if NPCs are moving
                     if (!forceUpdate 
                         && (npcMarker.Location != Rectangle.Empty
@@ -429,6 +430,7 @@ namespace NPCMapLocations
                     {
                         continue;
                     }
+                    */
 
                     int width = 32;
                     int height = 30;
