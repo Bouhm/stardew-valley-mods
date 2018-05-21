@@ -15,6 +15,7 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Netcode;
 
 namespace NPCMapLocations
 {
@@ -170,6 +171,7 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNpcs();
             NpcNames = CustomHandler.GetNpcNames();
+            MarkerCrop = CustomHandler.GetMarkerCrop();
 
             ModMapPage = new ModMapPage(
                 NpcMarkers,
@@ -438,6 +440,7 @@ namespace NPCMapLocations
                     if (npcMarker.IsHidden) { npcMarker.Layer -= 2; }
                     if (npcMarker.HasQuest || npcMarker.IsBirthday) { npcMarker.Layer++; }
 
+                    /*
                     // Only do calculations if NPCs are moving
                     if (!forceUpdate 
                         && (npcMarker.Location != Rectangle.Empty
@@ -446,6 +449,7 @@ namespace NPCMapLocations
                     {
                         continue;
                     }
+                    */
 
                     int width = 32;
                     int height = 30;

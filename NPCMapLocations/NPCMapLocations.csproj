@@ -41,9 +41,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="0Harmony">
-      <HintPath>references\Harmony 1.1.0\0Harmony.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModConfig.cs" />
