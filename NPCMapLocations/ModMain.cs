@@ -159,6 +159,7 @@ namespace NPCMapLocations
             };
             CustomHandler.UpdateCustomNpcs();
             NpcNames = CustomHandler.GetNpcNames();
+            MarkerCrop = CustomHandler.GetMarkerCrop();
 
             // Preload
             UpdateFarmBuildingLocs();

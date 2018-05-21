@@ -58,8 +58,8 @@ namespace NPCMapLocations
             }
 
             if (this.CustomNpcNames != "")
-                this.Monitor.Log("Handled custom Npcs: " + this.CustomNpcNames.Substring(0, this.CustomNpcNames.Length-2), LogLevel.Info);
-                    
+                this.Monitor.Log("Handled custom Npcs: " + this.CustomNpcNames.Substring(0, this.CustomNpcNames.Length - 2), LogLevel.Info);
+
             this.Helper.WriteConfig(Config);
         }
 
@@ -91,6 +91,11 @@ namespace NPCMapLocations
         public Dictionary<string, string> GetNpcNames()
         {
             return this.NpcNames;
+        }
+
+        public Dictionary<string, int> GetMarkerCrop()
+        {
+            return this.MarkerCrop;
         }
 
         // Handle modified or custom NPCs
