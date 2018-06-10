@@ -42,17 +42,16 @@ namespace NPCMapLocations
         private int optionsSlotHeld = -1;
             
         public ModMenu(
-            int x, 
-            int y, 
-            int width, 
-            int height, 
             Dictionary<string, bool> secondaryNpcs, 
             Dictionary<string, object> customNpcs, 
             Dictionary<string, string> npcNames, 
             Dictionary<string, int> markerCrop, 
             IModHelper helper, 
             ModConfig config
-        ) : base(x, y, width, height, false)
+        ) : base(Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2,
+            Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2,
+            1100 + IClickableMenu.borderWidth * 2,
+            650 + IClickableMenu.borderWidth * 2, false)
         {
             this.Helper = helper;
             this.Config = config;
@@ -60,7 +59,7 @@ namespace NPCMapLocations
             Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
-            this.okButton = new ClickableTextureComponent("OK", new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
+            this.okButton = new ClickableTextureComponent("OK", new Rectangle(this.xPositionOnScreen + width - Game1.tileSize * 2, this.yPositionOnScreen + height - (int)(7*Game1.tileSize/4), Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             this.upArrow = new ClickableTextureComponent(new Rectangle(this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(421, 459, 11, 12), (float)Game1.pixelZoom);
             this.downArrow = new ClickableTextureComponent(new Rectangle(this.xPositionOnScreen + width + Game1.tileSize / 4, this.yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(421, 472, 11, 12), (float)Game1.pixelZoom);
             this.scrollBar = new ClickableTextureComponent(new Rectangle(this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(435, 463, 6, 10), (float)Game1.pixelZoom);
@@ -183,7 +182,7 @@ namespace NPCMapLocations
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
-                (Game1.activeClickableMenu as GameMenu).changeTab(3);
+                (Game1.activeClickableMenu as GameMenu).changeTab(GameMenu.mapTab);
                 return;
             }
             this.canClose = true;

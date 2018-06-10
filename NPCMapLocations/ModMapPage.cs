@@ -2,16 +2,16 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace NPCMapLocations
 {
 
-    public class ModMapPage : IClickableMenu
+    public class ModMapPage : MapPage
     {
         private readonly IModHelper Helper;
         private readonly ModConfig Config;
@@ -28,24 +28,22 @@ namespace NPCMapLocations
         private Texture2D map;
         private int mapX;
         private int mapY;
-        public List<ClickableComponent> points = new List<ClickableComponent>();
-        public ClickableTextureComponent okButton;
         private bool hasIndoorCharacter;
         private Vector2 indoorIconVector;
         private bool drawPamHouseUpgrade;
 
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
-            HashSet<NPCMarker> npcMarkers, 
+            HashSet<NPCMarker> npcMarkers,
             Dictionary<string, string> npcNames,
             Dictionary<string, bool> secondaryNpcs,
-            Dictionary<long, FarmerMarker> farmerMarkers, 
+            Dictionary<long, FarmerMarker> farmerMarkers,
             Dictionary<string, int> markerCrop,
             Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
             Texture2D buildingMarkers,
-            IModHelper helper, 
+            IModHelper helper,
             ModConfig config
-        )
+        ) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2)
         {
             this.NpcMarkers = npcMarkers;
             this.NpcNames = npcNames;
@@ -57,48 +55,19 @@ namespace NPCMapLocations
             this.Helper = helper;
             this.Config = config;
 
-            okButton = new ClickableTextureComponent(Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11059", new object[0]), new Rectangle(this.xPositionOnScreen + width + Game1.tileSize, this.yPositionOnScreen + height - IClickableMenu.borderWidth - Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null, Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-            Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(this.map.Bounds.Width * 4, 720, 0, 0);
-            mapX = (int)centeringOnScreen.X;
-            mapY = (int)centeringOnScreen.Y;
+            Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(map.Bounds.Width * 4, 720, 0, 0);
+            mapX = (int)center.X;
+            mapY = (int)center.Y;
 
-            if (Game1.activeClickableMenu != null)
+            this.points.Clear();
+            foreach (ClickableComponent point in this.GetMapPoints())
             {
-                // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
-                GameMenu menu = (GameMenu)Game1.activeClickableMenu;
-                List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(menu);
-                MapPage mapPage = (MapPage)menuPages[menu.currentTab];
-                List<ClickableComponent> vanillaPoints = Helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
-                vanillaPoints.Clear();
-                foreach (ClickableComponent point in this.GetMapPoints())
-                {
-                    point.label = "";
-                    point.scale = 0.1f;
-                    vanillaPoints.Add(point);
-                }
+                point.label = "";
+                point.scale = 0.1f;
+                this.points.Add(point);
             }
-        }
-
-        public override void receiveLeftClick(int x, int y, bool playSound = true)
-        {
-            foreach (ClickableComponent current in points)
-            {
-                string name = current.name;
-                if (name == "Lonely Stone")
-                {
-                    Game1.playSound("stoneCrack");
-                }
-            }
-            if (Game1.activeClickableMenu != null)
-            {
-                (Game1.activeClickableMenu as GameMenu).changeTab(0);
-            }
-        }
-
-        public override void receiveRightClick(int x, int y, bool playSound = true)
-        {
         }
 
         public override void performHoverAction(int x, int y)
@@ -121,6 +90,7 @@ namespace NPCMapLocations
             const int markerHeight = 30;
             // Have to use special character to separate strings for Chinese
             string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh) ? "，" : ", ";
+
             if (Context.IsMainPlayer)
             {
                 foreach (NPCMarker npcMarker in this.NpcMarkers)
@@ -140,9 +110,9 @@ namespace NPCMapLocations
             {
                 foreach (FarmerMarker farMarker in FarmerMarkers.Values)
                 {
-                    if (Game1.getMouseX() >= farMarker.Location.X - markerWidth / 2 
-                        && Game1.getMouseX() <= farMarker.Location.X + markerWidth / 2 
-                        && Game1.getMouseY() >= farMarker.Location.Y - markerHeight / 2 
+                    if (Game1.getMouseX() >= farMarker.Location.X - markerWidth / 2
+                        && Game1.getMouseX() <= farMarker.Location.X + markerWidth / 2
+                        && Game1.getMouseY() >= farMarker.Location.Y - markerHeight / 2
                         && Game1.getMouseY() <= farMarker.Location.Y + markerHeight / 2)
                     {
                         hoveredList.Add(farMarker.Name);
@@ -170,7 +140,6 @@ namespace NPCMapLocations
                     }
                 }
             }
-            
         }
 
         // Draw location and name tooltips
@@ -253,26 +222,109 @@ namespace NPCMapLocations
         // Draw map to cover base rendering 
         public void DrawMap(SpriteBatch b)
         {
-            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24, (this.map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
-            b.Draw(this.map, new Vector2((float)this.mapX, (float)this.mapY), new Rectangle?(new Rectangle(0, 0, 300, 180)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            int boxY = mapY - 96;
+            int mY = mapY;
+            Game1.drawDialogueBox(mapX - 32, boxY, (map.Bounds.Width + 16) * 4, 848, false, true, null, false);
+            b.Draw(map, new Vector2((float)mapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
                 case 1:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(map, new Vector2((float)mapX, (float)(mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 2:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 180, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(map, new Vector2((float)mapX, (float)(mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 3:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(0, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(map, new Vector2((float)mapX, (float)(mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 4:
-                    b.Draw(this.map, new Vector2((float)this.mapX, (float)(this.mapY + 43 * Game1.pixelZoom)), new Rectangle?(new Rectangle(131, 241, 131, 61)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(map, new Vector2((float)mapX, (float)(mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
+            if (drawPamHouseUpgrade)
+            {
+                b.Draw(map, new Vector2((float)(mapX + 780), (float)(mapY + 348)), new Rectangle(263, 181, 8, 8), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+            }
 
-            if (this.drawPamHouseUpgrade)
-                b.Draw(this.map, new Vector2((float)(this.mapX + 813), (float)(this.mapY + 365)), new Rectangle?(new Rectangle(263, 181, 8, 8)), Color.White, 0.0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+            var player = Game1.player;
+            int x = player.getTileX();
+            int y = player.getTileY();
+            string playerLocationName = null;
+            switch (player.currentLocation.Name)
+            {
+                case "Saloon":
+                    playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11172");
+                    break;
+                case "Beach":
+                    playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11174");
+                    break;
+                case "Mountain":
+                    if (x < 38)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11176");
+                    else if (x < 96)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11177");
+                    else
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11178");
+                    break;
+                case "Tunnel":
+                case "Backwoods":
+                    playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11180");
+                    break;
+                case "FarmHouse":
+                case "Barn":
+                case "Big Barn":
+                case "Deluxe Barn":
+                case "Coop":
+                case "Big Coop":
+                case "Deluxe Coop":
+                case "Cabin":
+                case "Slime Hutch":
+                case "Greenhouse":
+                case "FarmCave":
+                case "Shed":
+                case "Farm":
+                    playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", player.farmName.Value);
+                    break;
+                case "Forest":
+                    if (y > 51)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
+                    else if (x < 58)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
+                    else
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11188");
+                    break;
+                case "Town":
+                    if (x > 84 && y < 68)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    else if (x > 80 && y >= 68)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    else if (y <= 42)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    else if (y > 42 && y < 76)
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    else
+                        playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    break;
+                case "Temp":
+                    if (player.currentLocation.Map.Id.Contains("Town"))
+                    {
+                        if (x > 84 && y < 68)
+                            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                        else if (x > 80 && y >= 68)
+                            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                        else if (y <= 42)
+                            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                        else if (y > 42 && y < 76)
+                            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                        else
+                            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+                    }
+                    break;
+            }
+            if (playerLocationName != null)
+            {
+                SpriteText.drawStringWithScrollCenteredAt(b, playerLocationName, base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen + base.height + 32 + 16, "", 1f, -1, 0, 0.88f, false);
+            }
         }
 
         // Draw event
@@ -428,26 +480,6 @@ namespace NPCMapLocations
         public override bool overrideSnappyMenuCursorMovementBan()
         {
             return true;
-        }
-
-        public void ReplaceMapPoints()
-        {
-            points = this.GetMapPoints().ToList();
-            // update vanilla points (for compatibility with mods that check them), but make sure they don't peek out from under new map
-            if (Game1.activeClickableMenu != null)
-            {
-                GameMenu gameMenu = (GameMenu)Game1.activeClickableMenu;
-                List<IClickableMenu> menuPages = (List<IClickableMenu>)typeof(GameMenu).GetField("pages", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gameMenu);
-                MapPage mapPage = (MapPage)menuPages[gameMenu.currentTab];
-                List<ClickableComponent> vanillaPoints = Helper.Reflection.GetField<List<ClickableComponent>>(mapPage, "points").GetValue();
-                vanillaPoints.Clear();
-                foreach (ClickableComponent point in this.GetMapPoints())
-                {
-                    point.label = "";
-                    point.scale = 0.1f;
-                    vanillaPoints.Add(point);
-                }
-            }
         }
 
         // Get location and area of location component
