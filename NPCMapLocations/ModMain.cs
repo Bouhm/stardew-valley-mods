@@ -15,7 +15,6 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Netcode;
 
 namespace NPCMapLocations
 {
@@ -24,13 +23,12 @@ namespace NPCMapLocations
         private ModConfig Config;
         private Texture2D BuildingMarkers;
         private ModCustomHandler CustomHandler;
-        private ModMapPage ModMapPage;
         private Dictionary<string, int> MarkerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
         private Dictionary<string, bool> SecondaryNpcs;
         private Dictionary<string, string> NpcNames;
         private HashSet<NPCMarker> NpcMarkers;
-        private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
-        private const int BUILDING_SCALE = 3;
+        public static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+        private bool isMapOpen = false;
         private const int DRAW_DELAY = 3;       
 
         // Multiplayer
@@ -48,16 +46,30 @@ namespace NPCMapLocations
             MarkerCrop = ModConstants.MarkerCrop;
             CustomHandler = new ModCustomHandler(helper, Config, this.Monitor);
             BuildingMarkers = this.Helper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
-
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
             LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-            GameEvents.EighthUpdateTick += GameEvents_UpdateTick;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            GameEvents.EighthUpdateTick += GameEvents_EighthUpdateTick;
+            GameEvents.UpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-            GraphicsEvents.OnPostRenderGuiEvent += GraphicsEvents_OnPostRenderGuiEvent;
             GraphicsEvents.Resize += GraphicsEvents_Resize;
+        }
+
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        {
+            isMapOpen = false;
+        }
+
+        private void GameEvents_UpdateTick(object sender, EventArgs e)
+        {
+            if (isMapOpen || Game1.activeClickableMenu == null) { return; }
+            if (!(Game1.activeClickableMenu is GameMenu gameMenu)) { return; }
+
+            isMapOpen = gameMenu.currentTab == GameMenu.mapTab;
+            if (isMapOpen)
+                openModMap(gameMenu);
         }
 
         // Replace game map with modified map
@@ -83,16 +95,6 @@ namespace NPCMapLocations
                 map = (T)(object)this.Helper.Content.Load<T>($@"assets\default_map.png");
             }
             return map;
-        }
-
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
-        {
-            if (IsMapOpen())
-            {
-                if (ModMapPage.points.Count == 0)
-                    ModMapPage.ReplaceMapPoints();
-                ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
-            }
         }
 
         // For drawing farm buildings on the map 
@@ -134,9 +136,9 @@ namespace NPCMapLocations
             if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
             {
                 Vector2 locVector = ModMain.LocationToMap("Greenhouse");
-                locVector.X -= 5 / 2 * BUILDING_SCALE;
-                locVector.Y -= 7 / 2 * BUILDING_SCALE;
-                FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", locVector);
+                locVector.X -= 5 / 2 * 3;
+                locVector.Y -= 7 / 2 * 3;
+                FarmBuildings["Greenhouse"]= new KeyValuePair<string, Vector2>("Greenhouse", locVector);
             }
         }
 
@@ -160,12 +162,7 @@ namespace NPCMapLocations
             CustomHandler.UpdateCustomNpcs();
             NpcNames = CustomHandler.GetNpcNames();
             MarkerCrop = CustomHandler.GetMarkerCrop();
-
-            // Preload
             UpdateFarmBuildingLocs();
-            ResetMarkers();
-            UpdateMarkers(true);
-            ModMapPage = new ModMapPage(NpcMarkers, NpcNames, FarmerMarkers, Helper, Config);  
         }
 
         private List<NPC> GetVillagers()
@@ -190,24 +187,19 @@ namespace NPCMapLocations
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
             if (Context.IsWorldReady && Game1.activeClickableMenu is GameMenu)
-            {
                 HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
-            }
         }
 
         // Handle keyboard/controller inputs
         private void HandleInput(GameMenu menu, SButton input)
         {
             if (menu.currentTab != GameMenu.mapTab) { return; }
+
             if (Context.IsMainPlayer)
             {
                 if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
                 {
                     Game1.activeClickableMenu = new ModMenu(
-                        Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2,
-                        Game1.viewport.Height / 2 - (725 + IClickableMenu.borderWidth * 2) / 2,
-                        1100 + IClickableMenu.borderWidth * 2,
-                        650 + IClickableMenu.borderWidth * 2,
                         SecondaryNpcs,
                         CustomHandler.GetCustomNpcs(),
                         NpcNames,
@@ -303,14 +295,35 @@ namespace NPCMapLocations
         }
 
         // Map page updates
-        void GameEvents_UpdateTick(object sender, EventArgs e) 
+        void GameEvents_EighthUpdateTick(object sender, EventArgs e) 
         {
             UpdateMarkers();
+            if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is GameMenu gameMenu)
+                openModMap(gameMenu);
+            
+        }
+
+        private void openModMap(GameMenu gameMenu)
+        {
+            List<IClickableMenu> pages = this.Helper.Reflection
+                .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
+
+            pages[GameMenu.mapTab] = new ModMapPage(
+                NpcMarkers,
+                NpcNames,
+                SecondaryNpcs,
+                FarmerMarkers,
+                MarkerCrop,
+                FarmBuildings,
+                BuildingMarkers,
+                Helper,
+                Config
+            );
         }
 
         private void UpdateMarkers(bool forceUpdate = false)
         {
-            if (IsMapOpen() || forceUpdate) {
+            if (isMapOpen || forceUpdate) {
                 if (Context.IsMainPlayer)
                     UpdateNPCMarkers(forceUpdate);
                 if (Context.IsMultiplayer)
@@ -319,7 +332,7 @@ namespace NPCMapLocations
         }
 
         // Update NPC marker data and names on hover
-        private void UpdateNPCMarkers(bool forceUpdate)
+        private void UpdateNPCMarkers(bool forceUpdate=false)
         {
             foreach (NPCMarker npcMarker in NpcMarkers)
             {
@@ -335,6 +348,7 @@ namespace NPCMapLocations
                 else
                     locationName = npc.currentLocation.Name;
 
+                var le = npcLocation.Map.DisplayHeight;
                 if (locationName == null // Couldn't resolve location name
                     || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos) // Location not mapped
                 )
@@ -432,13 +446,13 @@ namespace NPCMapLocations
                         continue;
                     }
                     */
-
+              
                     int width = 32;
                     int height = 30;
                     // Get center of NPC marker 
                     int x = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width/2;
                     int y = (int)GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height/2;
-
+                    
                     npcMarker.Location = new Rectangle(x, y, width, height);
                 }
                 else
@@ -489,7 +503,7 @@ namespace NPCMapLocations
         }
 
         // Helper method for LocationToMap
-        private static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
+        public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
         {
             if (location == null || tileX < 0 || tileY < 0)
             {
@@ -609,127 +623,15 @@ namespace NPCMapLocations
             return new Vector2((int)mapPagePos.X + x, (int)mapPagePos.Y + y);
         }
 
-        // Helper to check if map is opened
-        private bool IsMapOpen()
-        {
-            if (!Context.IsWorldReady) return false; 
-            if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu)) return false;
-
-            IList<IClickableMenu> pages = this.Helper.Reflection.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
-            IClickableMenu page = pages[gameMenu.currentTab];
-            return (page is MapPage);
-        }
-
-        // Draw event (when Map Page is opened)
-        private void GraphicsEvents_OnPostRenderGuiEvent(object sender, EventArgs e)
-        {
-            if (IsMapOpen() && ModMapPage != null)
-                DrawMapPage();
-        }
-
-        // Draw event
-        // Subtractions within location vectors are to set the origin to the center of the sprite
-        private void DrawMapPage()
-        {
-            SpriteBatch b = Game1.spriteBatch;
-
-            if (ModMapPage == null) { return; }
-            ModMapPage.DrawMap(b);
-         
-            if (Config.ShowFarmBuildings)
-            {
-                var sortedBuildings = FarmBuildings.ToList();
-                sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
-
-                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
-                {
-                    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
-                        b.Draw(BuildingMarkers, new Vector2(building.Value.Value.X - buildingRect.Width/2, building.Value.Value.Y - buildingRect.Height/2), new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, BUILDING_SCALE, SpriteEffects.None, 1f);
-                }
-            }
-
-            // Traveling Merchant
-            if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
-            {
-                Vector2 merchantLoc = LocationToMap("Forest", 28, 11);
-                b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15), new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
-            }
-
-            // Farmers
-            if (Context.IsMultiplayer)
-            {
-                foreach (Farmer farmer in Game1.getOnlineFarmers())
-                {
-                    // Temporary solution to handle desync of farmhand location/tile position when changing location
-                    if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
-                        if (farMarker.DrawDelay == 0)
-                            farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(farMarker.Location.X - 16, farMarker.Location.Y - 15), 0.00011f, 2f, 1, farmer);
-                }
-            }
-            else
-            {
-                Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(), Game1.player.getTileY());
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
-            }
-
-            // NPCs
-            // Sort by drawing order
-            var sortedMarkers = NpcMarkers.ToList();
-            sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
-
-            foreach (NPCMarker npcMarker in sortedMarkers)
-            {
-                if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null || !MarkerCrop.ContainsKey(npcMarker.Npc.Name)) { continue; }
-
-                // Tint/dim hidden markers
-                if (npcMarker.IsHidden)
-                {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                    }
-                    if (npcMarker.HasQuest)
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                    }
-                }
-                else
-                {
-                    b.Draw(npcMarker.Marker, npcMarker.Location, new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
-                    if (npcMarker.IsBirthday)
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y), new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                    }
-                    if (npcMarker.HasQuest)
-                    {
-                        b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3), new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                    }
-                }
-            }
-
-            // Location and name tooltips
-            ModMapPage.draw(b);
-
-            // Cursor
-            if (!Game1.options.hardwareCursor)
-            {
-                b.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
-            }
-        }
-
         private void GraphicsEvents_Resize(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady) { return; }
-            if (ModMapPage != null)
-            {
-                UpdateMarkers(true);
-                UpdateFarmBuildingLocs();
-                ModMapPage.HandleResize();
-                ModMapPage.RecieveMarkerUpdates(NpcMarkers, FarmerMarkers);
-            }
+            UpdateMarkers(true);
+            UpdateFarmBuildingLocs();
+            
         }
 
-        // For debugging
+        // DEBUG 
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
         {
             if (!Context.IsWorldReady || Game1.player == null) { return; }
@@ -749,9 +651,9 @@ namespace NPCMapLocations
 
             // Show map location and tile positions
             DrawText(Game1.player.currentLocation.Name + " (" + Game1.player.Position.X/Game1.tileSize + ", " + Game1.player.Position.Y/Game1.tileSize + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
-
+       
             var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
-
+            
             // Show lower & upper bound tiles used for calculations 
             if (currMenu != null && currMenu.currentTab == GameMenu.mapTab)
             {
