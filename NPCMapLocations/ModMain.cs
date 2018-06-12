@@ -15,6 +15,7 @@ using StardewModdingAPI.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Netcode;
 
 namespace NPCMapLocations
 {
@@ -47,15 +48,16 @@ namespace NPCMapLocations
 			CustomHandler = new ModCustomHandler(helper, Config, this.Monitor);
 			BuildingMarkers =
 				this.Helper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
-			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
-			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-			MenuEvents.MenuClosed += MenuEvents_MenuClosed;
-			GameEvents.EighthUpdateTick += GameEvents_EighthUpdateTick;
-			GameEvents.UpdateTick += GameEvents_UpdateTick;
-			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-			GraphicsEvents.Resize += GraphicsEvents_Resize;
+
+			SaveEvents.AfterLoad += this.SaveEvents_AfterLoad;
+			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
+			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
+			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
+			MenuEvents.MenuClosed += this.MenuEvents_MenuClosed;
+			GameEvents.EighthUpdateTick += this.GameEvents_EighthUpdateTick;
+			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
+			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
+			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
 		}
 
 		private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
@@ -65,19 +67,12 @@ namespace NPCMapLocations
 
 		private void GameEvents_UpdateTick(object sender, EventArgs e)
 		{
-			if (isMapOpen || Game1.activeClickableMenu == null)
-			{
-				return;
-			}
-
-			if (!(Game1.activeClickableMenu is GameMenu gameMenu))
-			{
-				return;
-			}
+			if (isMapOpen || Game1.activeClickableMenu == null) return;
+			if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
 
 			isMapOpen = gameMenu.currentTab == GameMenu.mapTab;
 			if (isMapOpen)
-				openModMap(gameMenu);
+				OpenModMap(gameMenu);
 		}
 
 		// Replace game map with modified map
@@ -106,6 +101,28 @@ namespace NPCMapLocations
 			return map;
 		}
 
+		private NetCollection<NPC> GetVillagers()
+		{
+			var allNpcs = new NetCollection<NPC>();
+			var locationList = Context.IsMainPlayer
+				? this.Helper.Multiplayer.GetActiveLocations().Concat(Game1.locations)
+				: this.Helper.Multiplayer.GetActiveLocations();
+
+			foreach (GameLocation location in locationList)
+			{
+				foreach (NPC npc in location.characters)
+				{
+					if (npc == null) continue;
+					if (!allNpcs.Contains(npc)
+					    && !ModConstants.ExcludedVillagers.Contains(npc.Name)
+					    && npc.isVillager())
+						allNpcs.Add(npc);
+				}
+			}
+
+			return allNpcs;
+		}
+
 		// For drawing farm buildings on the map 
 		// and getting positions relative to the farm 
 		private static void UpdateFarmBuildingLocs()
@@ -114,11 +131,7 @@ namespace NPCMapLocations
 
 			foreach (Building building in Game1.getFarm().buildings)
 			{
-				if (building == null)
-				{
-					continue;
-				}
-
+				if (building == null) continue;
 				if (building.nameOfIndoorsWithoutUnique == null
 				    || building.nameOfIndoors == null
 				    || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
@@ -165,7 +178,7 @@ namespace NPCMapLocations
 		// Load config and other one-off data
 		private void SaveEvents_AfterLoad(object sender, EventArgs e)
 		{
-			SecondaryNpcs = new Dictionary<string, bool>
+      SecondaryNpcs = new Dictionary<string, bool>
 			{
 				{"Kent", false},
 				{"Marlon", false},
@@ -173,33 +186,10 @@ namespace NPCMapLocations
 				{"Sandy", false},
 				{"Wizard", false}
 			};
-			CustomHandler.UpdateCustomNpcs();
+      CustomHandler.UpdateCustomNpcs();
 			NpcNames = CustomHandler.GetNpcNames();
 			MarkerCrop = CustomHandler.GetMarkerCrop();
 			UpdateFarmBuildingLocs();
-		}
-
-		private List<NPC> GetVillagers()
-		{
-			var allNpcs = new List<NPC>();
-
-			foreach (GameLocation location in Game1.locations)
-			{
-				foreach (NPC npc in location.characters)
-				{
-					if (npc == null)
-					{
-						continue;
-					}
-
-					if (!allNpcs.Contains(npc)
-					    && !ModConstants.ExcludedVillagers.Contains(npc.Name)
-					    && npc.isVillager())
-						allNpcs.Add(npc);
-				}
-			}
-
-			return allNpcs;
 		}
 
 		// Handle opening mod menu and changing tooltip options
@@ -265,37 +255,32 @@ namespace NPCMapLocations
 		private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
 		{
 			var npcEntries = new Dictionary<string, bool>(SecondaryNpcs);
-			foreach (KeyValuePair<string, bool> npcEntry in npcEntries)
+			foreach (KeyValuePair<string, bool> npc in npcEntries)
 			{
-				string name = npcEntry.Key;
-
-				if (!npcEntry.Value)
+				string name = npc.Key;
+				switch (name)
 				{
-					switch (name)
-					{
-						case "Kent":
-							SecondaryNpcs[name] = Game1.year >= 2;
-							break;
-						case "Marlon":
-							SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(100162);
-							break;
-						case "Merchant":
-							SecondaryNpcs[name] = (Game1.getLocationFromName("Forest") as Forest).travelingMerchantDay;
-							break;
-						case "Sandy":
-							SecondaryNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
-							break;
-						case "Wizard":
-							SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(112);
-							break;
-						default: break;
-					}
+					case "Kent":
+						SecondaryNpcs[name] = Game1.year >= 2;
+						break;
+					case "Marlon":
+						SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(100162);
+						break;
+					case "Merchant":
+						SecondaryNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+						break;
+					case "Sandy":
+						SecondaryNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
+						break;
+					case "Wizard":
+						SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(112);
+						break;
+					default: break;
 				}
 			}
 
-			// Reset markers data daily
 			ResetMarkers();
-		}
+	}
 
 		private void ResetMarkers()
 		{
@@ -323,12 +308,13 @@ namespace NPCMapLocations
 		// Map page updates
 		void GameEvents_EighthUpdateTick(object sender, EventArgs e)
 		{
+			if (!Context.IsWorldReady) return;
 			UpdateMarkers();
 			if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is GameMenu gameMenu)
-				openModMap(gameMenu);
+				OpenModMap(gameMenu);
 		}
 
-		private void openModMap(GameMenu gameMenu)
+		private void OpenModMap(GameMenu gameMenu)
 		{
 			List<IClickableMenu> pages = this.Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -350,8 +336,7 @@ namespace NPCMapLocations
 		{
 			if (isMapOpen || forceUpdate)
 			{
-				if (Context.IsMainPlayer)
-					UpdateNPCMarkers(forceUpdate);
+				UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
 					UpdateFarmerMarkers();
 			}
@@ -375,7 +360,6 @@ namespace NPCMapLocations
 				else
 					locationName = npc.currentLocation.Name;
 
-				var le = npcLocation.Map.DisplayHeight;
 				if (locationName == null // Couldn't resolve location name
 				    || !ModConstants.MapVectors.TryGetValue(locationName, out MapVector[] npcPos) // Location not mapped
 				)
@@ -506,6 +490,27 @@ namespace NPCMapLocations
 			}
 		}
 
+		// Only works for Farm atm which isn't very useful
+		// Get synced NPCs in active locations 
+		//private void UpdateSyncedNpcs()
+		//{
+		//	foreach (GameLocation location in this.Helper.Multiplayer.GetActiveLocations())
+		//	{
+		//		NpcMarkers = new HashSet<NPCMarker>();
+		//		var syncedNpcs =
+		//			location.characters.Where(npc => !ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager());
+		//		foreach (NPC npc in syncedNpcs)
+		//		{
+		//			NPCMarker npcMarker = new NPCMarker()
+		//			{
+		//				Npc = npc,
+		//				IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+		//			};
+		//			NpcMarkers.Add(npcMarker);
+		//		}
+		//	}
+		//}
+
 		private void UpdateFarmerMarkers()
 		{
 			foreach (Farmer farmer in Game1.getOnlineFarmers())
@@ -527,6 +532,9 @@ namespace NPCMapLocations
 					// to the wrong position upon entering new location. Handle this in draw.
 					if (farmer.currentLocation.Name == farMarker.PrevLocationName && MathHelper.Distance(deltaX, deltaY) > 15)
 					{
+						// When a farmer changes location, active location changes
+						//if (!farmer.IsMainPlayer)
+						//	UpdateSyncedNpcs();
 						FarmerMarkers[farmerId].DrawDelay = DRAW_DELAY;
 					}
 					else if (farMarker.DrawDelay > 0)
@@ -668,9 +676,7 @@ namespace NPCMapLocations
 
 				if (DEBUG_MODE)
 				{
-#pragma warning disable CS0162 // Unreachable code detected
 					ModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
-#pragma warning restore CS0162 // Unreachable code detected
 					ModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
 				}
 			}
