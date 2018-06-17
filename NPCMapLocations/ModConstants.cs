@@ -58,8 +58,8 @@ public static class ModConstants
 		"Krobus"
 	};
 
-	// tileX and tileY (the first two values) are tile positions in the game for that location
-	// x and y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
+	// tileX and TileY (the first two values) are tile positions in the game for that location
+	// X and Y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
 	// MapModMain handles all the calculations to make sure the positions are center-based.
 	public static Dictionary<string, MapVector[]> MapVectors => new Dictionary<string, MapVector[]>
 	{

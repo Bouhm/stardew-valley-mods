@@ -13,7 +13,6 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework.Input;
 
 namespace NPCMapLocations
 {
@@ -23,7 +22,7 @@ namespace NPCMapLocations
 		private readonly ModConfig Config;
 		private readonly Dictionary<string, string> NpcNames;
 		private Dictionary<string, bool> SecondaryNpcs { get; }
-		private HashSet<NPCMarker> NpcMarkers;
+		private HashSet<NpcMarker> NpcMarkers;
 		private Dictionary<long, FarmerMarker> FarmerMarkers;
 		private Dictionary<string, int> MarkerCrop { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
@@ -39,7 +38,7 @@ namespace NPCMapLocations
 
 		// Map menu that uses modified map page and modified component locations for hover
 		public ModMapPage(
-			HashSet<NPCMarker> npcMarkers,
+			HashSet<NpcMarker> npcMarkers,
 			Dictionary<string, string> npcNames,
 			Dictionary<string, bool> secondaryNpcs,
 			Dictionary<long, FarmerMarker> farmerMarkers,
@@ -69,7 +68,7 @@ namespace NPCMapLocations
 			mapY = (int) center.Y;
 
 			var regionRects = RegionRects().ToList();
-			for (int i = 0; i < this.points.Count-1; i++)
+			for (int i = 0; i < this.points.Count; i++)
 			{
 				var rect = regionRects.ElementAt(i);
 				this.points[i].bounds = new Rectangle(
@@ -108,7 +107,7 @@ namespace NPCMapLocations
 
 			if (Context.IsMainPlayer)
 			{
-				foreach (NPCMarker npcMarker in this.NpcMarkers)
+				foreach (NpcMarker npcMarker in this.NpcMarkers)
 				{
 					Rectangle npcLocation = npcMarker.Location;
 					if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
@@ -283,7 +282,7 @@ namespace NPCMapLocations
 
 			if (drawPamHouseUpgrade)
 			{
-				b.Draw(map, new Vector2((float) (mapX + ModConstants.MapVectors["Trailer"][0].x), (float) (mapY + ModConstants.MapVectors["Trailer"][0].y)), new Rectangle(263, 181, 8, 8), Color.White,
+				b.Draw(map, new Vector2((float) (mapX + ModConstants.MapVectors["Trailer"][0].X), (float) (mapY + ModConstants.MapVectors["Trailer"][0].Y)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
@@ -426,7 +425,7 @@ namespace NPCMapLocations
 			var sortedMarkers = NpcMarkers.ToList();
 			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-			foreach (NPCMarker npcMarker in sortedMarkers)
+			foreach (NpcMarker npcMarker in sortedMarkers)
 			{
 				if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
 				    !MarkerCrop.ContainsKey(npcMarker.Npc.Name))
@@ -562,7 +561,7 @@ namespace NPCMapLocations
 			{"Farm_Region", new Rectangle(-1, -1, 188, 148)},
 			{"Backwoods_Region", new Rectangle(-1, -1, 148, 120)},
 			{"BusStop_Region", new Rectangle(-1, -1, 76, 100)},
-			{"WizardTower", new Rectangle(-1, -1, 36, 76)},
+			{"WizardHouse", new Rectangle(-1, -1, 36, 76)},
 			{"AnimalShop", new Rectangle(-1, -1, 76, 40)},
 			{"LeahHouse", new Rectangle(-1, -1, 32, 24)},
 			{"SamHouse", new Rectangle(-1, -1, 36, 52)},

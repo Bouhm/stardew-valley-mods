@@ -24,12 +24,13 @@ namespace NPCMapLocations
 		private ModConfig Config;
 		private Texture2D BuildingMarkers;
 		private ModCustomHandler CustomHandler;
-		private Dictionary<string, int> MarkerCrop; // NPC head crops, top left corner (0, y), width = 16, height = 15 
+		private Dictionary<string, int> MarkerCrop; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private Dictionary<string, bool> SecondaryNpcs;
 		private Dictionary<string, string> NpcNames;
-		private HashSet<NPCMarker> NpcMarkers;
+		private HashSet<NpcMarker> NpcMarkers;
 		public static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
-		private bool isMapOpen = false;
+		private bool hasOpenedMap = false;
+		private bool isModMapOpen = false;
 		private const int DRAW_DELAY = 3;
 
 		// Multiplayer
@@ -47,22 +48,22 @@ namespace NPCMapLocations
 			MarkerCrop = ModConstants.MarkerCrop;
 			CustomHandler = new ModCustomHandler(helper, Config, this.Monitor);
 			BuildingMarkers =
-				this.Helper.Content.Load<Texture2D>(@"assets/buildings.png", ContentSource.ModFolder); // Load farm buildings
+				this.Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
 
 			SaveEvents.AfterLoad += this.SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
 			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
-			MenuEvents.MenuClosed += this.MenuEvents_MenuClosed;
+			//MenuEvents.MenuClosed += this.MenuEvents_MenuClosed;
 			GameEvents.EighthUpdateTick += this.GameEvents_EighthUpdateTick;
 			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
 			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
 		}
 
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+    private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
 		{
-			isMapOpen = false;
+			hasOpenedMap = false;
 		}
 
     // Replace game map with modified map
@@ -152,7 +153,7 @@ namespace NPCMapLocations
 			// Greenhouse unlocked after pantry bundles completed
 			if (((CommunityCenter) Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
 			{
-				Vector2 locVector = ModMain.LocationToMap("Greenhouse");
+				Vector2 locVector = LocationToMap("Greenhouse");
 				locVector.X -= 5 / 2 * 3;
 				locVector.Y -= 7 / 2 * 3;
 				FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", locVector);
@@ -209,11 +210,11 @@ namespace NPCMapLocations
 				}
 			}
 
-			if (input.ToString().Equals(Config.TooltipKey) || input is SButton.DPadUp || input is SButton.DPadRight)
+			if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
 			{
 				ChangeTooltipConfig();
 			}
-			else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.DPadDown || input is SButton.DPadLeft)
+			else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.LeftShoulder)
 			{
 				ChangeTooltipConfig(false);
 			}
@@ -274,7 +275,7 @@ namespace NPCMapLocations
 
 		private void ResetMarkers()
 		{
-			NpcMarkers = new HashSet<NPCMarker>();
+			NpcMarkers = new HashSet<NpcMarker>();
 			foreach (NPC npc in GetVillagers())
 			{
 				// Handle case where Kent appears even though he shouldn't
@@ -283,7 +284,7 @@ namespace NPCMapLocations
 					continue;
 				}
 
-				NPCMarker npcMarker = new NPCMarker()
+				NpcMarker npcMarker = new NpcMarker()
 				{
 					Npc = npc,
 					IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
@@ -298,11 +299,15 @@ namespace NPCMapLocations
 		// To initialize ModMap quicker for smoother rendering when opening map
 		private void GameEvents_UpdateTick(object sender, EventArgs e)
 		{
-			if (isMapOpen || Game1.activeClickableMenu == null) return;
-			if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
+			if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
+			{
+				isModMapOpen = false;
+				return;
+			}
 
-			isMapOpen = gameMenu.currentTab == GameMenu.mapTab;
-			if (isMapOpen && !(Game1.activeClickableMenu is ModMapPage)) // Only run once on map open
+			hasOpenedMap = gameMenu.currentTab == GameMenu.mapTab; // When map accessed by switching GameMenu tab or pressing M
+			isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
+			if (hasOpenedMap && !isModMapOpen) // Only run once on map open
 				OpenModMap(gameMenu);
 		}
 
@@ -315,6 +320,7 @@ namespace NPCMapLocations
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
+			isModMapOpen = true;
 			UpdateNPCMarkers(true);
 			List<IClickableMenu> pages = this.Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -332,11 +338,11 @@ namespace NPCMapLocations
 				Helper,
 				Config
 			);
-    }
+		}
 
 		private void UpdateMarkers(bool forceUpdate = false)
 		{
-			if (isMapOpen || forceUpdate)
+			if (hasOpenedMap || forceUpdate)
 			{
 				UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
@@ -347,7 +353,7 @@ namespace NPCMapLocations
 		// Update NPC marker data and names on hover
 		private void UpdateNPCMarkers(bool forceUpdate = false)
 		{
-			foreach (NPCMarker npcMarker in NpcMarkers)
+			foreach (NpcMarker npcMarker in NpcMarkers)
 			{
 				NPC npc = npcMarker.Npc;
 				string locationName;
@@ -517,7 +523,7 @@ namespace NPCMapLocations
 		{
 			foreach (Farmer farmer in Game1.getOnlineFarmers())
 			{
-				if (farmer == null || (farmer != null && farmer.currentLocation == null))
+				if (farmer == null || farmer.currentLocation == null)
 				{
 					continue;
 				}
@@ -574,10 +580,10 @@ namespace NPCMapLocations
 			if (location.IsFarm && !location.Name.Equals("FarmHouse"))
 			{
 				if (location.uniqueName.Value != null
-				    && (ModMain.FarmBuildings[location.uniqueName.Value].Key.Equals(location.Name)
-				        || ModMain.FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
+				    && (FarmBuildings[location.uniqueName.Value].Key.Equals(location.Name)
+				        || FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
 				{
-					return ModMain.FarmBuildings[location.uniqueName.Value].Value;
+					return FarmBuildings[location.uniqueName.Value].Value;
 				}
 			}
 
@@ -603,19 +609,19 @@ namespace NPCMapLocations
 			Vector2 mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
 			int x = 0;
-			int y = 0;
+			int y;
 
 			// Precise (static) regions and indoor locations
 			if (locVectors.Count() == 1 || (tileX == -1 || tileY == -1))
 			{
-				x = locVectors.FirstOrDefault().x;
-				y = locVectors.FirstOrDefault().y;
+				x = locVectors.FirstOrDefault().X;
+				y = locVectors.FirstOrDefault().Y;
 			}
 			else
 			{
 				// Sort map vectors by distance to point
 				var vectors = locVectors.OrderBy(vector =>
-					Math.Sqrt(Math.Pow(vector.tileX - tileX, 2) + Math.Pow(vector.tileY - tileY, 2)));
+					Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)));
 
 				MapVector lower = null;
 				MapVector upper = null;
@@ -626,7 +632,7 @@ namespace NPCMapLocations
 				{
 					if (lower != null && upper != null)
 					{
-						if (lower.tileX == upper.tileX || lower.tileY == upper.tileY)
+						if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
 						{
 							hasEqualTile = true;
 						}
@@ -636,13 +642,13 @@ namespace NPCMapLocations
 						}
 					}
 
-					if ((lower == null || hasEqualTile) && (tileX >= vector.tileX && tileY >= vector.tileY))
+					if ((lower == null || hasEqualTile) && (tileX >= vector.TileX && tileY >= vector.TileY))
 					{
 						lower = vector;
 						continue;
 					}
 
-					if ((upper == null || hasEqualTile) && (tileX <= vector.tileX && tileY <= vector.tileY))
+					if ((upper == null || hasEqualTile) && (tileX <= vector.TileX && tileY <= vector.TileY))
 					{
 						upper = vector;
 					}
@@ -673,13 +679,13 @@ namespace NPCMapLocations
 					upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 				}
 
-				x = (int) (lower.x + (tileX - lower.tileX) / (double) (upper.tileX - lower.tileX) * (upper.x - lower.x));
-				y = (int) (lower.y + (tileY - lower.tileY) / (double) (upper.tileY - lower.tileY) * (upper.y - lower.y));
+				x = (int) (lower.X + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.X - lower.X));
+				y = (int) (lower.Y + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.Y - lower.Y));
 
 				if (DEBUG_MODE)
 				{
-					ModMain._tileUpper = new Vector2(upper.tileX, upper.tileY);
-					ModMain._tileLower = new Vector2(lower.tileX, lower.tileY);
+					ModMain._tileUpper = new Vector2(upper.TileX, upper.TileY);
+					ModMain._tileLower = new Vector2(lower.TileX, lower.TileY);
 				}
 			}
 
@@ -731,16 +737,16 @@ namespace NPCMapLocations
 			// Show lower & upper bound tiles used for calculations 
 			if (currMenu != null && currMenu.currentTab == GameMenu.mapTab)
 			{
-				DrawText("Lower bound: (" + ModMain._tileLower.X + ", " + ModMain._tileLower.Y + ")",
+				DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
 					new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8));
-				DrawText("Upper bound: (" + ModMain._tileUpper.X + ", " + ModMain._tileUpper.Y + ")",
+				DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
 					new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
 			}
 			else
 			{
-				DrawText("Lower bound: (" + ModMain._tileLower.X + ", " + ModMain._tileLower.Y + ")",
+				DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
 					new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.DimGray);
-				DrawText("Upper bound: (" + ModMain._tileUpper.X + ", " + ModMain._tileUpper.Y + ")",
+				DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
 					new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
 			}
 		}
@@ -792,64 +798,64 @@ namespace NPCMapLocations
 	}
 
 	// Class for NPC markers
-	public class NPCMarker
+	public class NpcMarker
 	{
-		public NPC Npc { get; set; } = null;
-		public Texture2D Marker { get; set; } = null;
-		public Rectangle Location { get; set; } = Rectangle.Empty;
-		public bool IsBirthday { get; set; } = false;
-		public bool HasQuest { get; set; } = false;
-		public bool IsOutdoors { get; set; } = true;
-		public bool IsHidden { get; set; } = false;
-		public int Layer { get; set; } = 0;
+		public NPC Npc { get; set; }
+		public Texture2D Marker { get; set; }
+		public Rectangle Location { get; set; }
+		public bool IsBirthday { get; set; }
+		public bool HasQuest { get; set; }
+		public bool IsOutdoors { get; set; } 
+		public bool IsHidden { get; set; } 
+		public int Layer { get; set; } 
 	}
 
 	// Class for Active Farmers
 	public class FarmerMarker
 	{
-		public string Name { get; set; } = null;
-		public Vector2 Location { get; set; } = Vector2.Zero;
-		public Vector2 PrevLocation { get; set; } = Vector2.Zero;
-		public string PrevLocationName { get; set; } = "";
-		public bool IsOutdoors { get; set; } = true;
-		public int DrawDelay { get; set; } = 0;
+		public string Name { get; set; }
+		public Vector2 Location { get; set; } 
+		public Vector2 PrevLocation { get; set; } 
+		public string PrevLocationName { get; set; }
+		public bool IsOutdoors { get; set; } 
+		public int DrawDelay { get; set; }
 	}
 
 	// Class for Location Vectors
 	public class MapVector
 	{
-		public int tileX;
-		public int tileY;
-		public int x;
-		public int y;
+		public int TileX;
+		public int TileY;
+		public int X;
+		public int Y;
 
 		public MapVector()
 		{
-			this.tileX = 0;
-			this.tileY = 0;
-			this.x = 0;
-			this.y = 0;
+			this.TileX = 0;
+			this.TileY = 0;
+			this.X = 0;
+			this.Y = 0;
 		}
 
 		public MapVector(int x, int y)
 		{
-			this.tileX = 0;
-			this.tileY = 0;
-			this.x = x;
-			this.y = y;
+			this.TileX = 0;
+			this.TileY = 0;
+			this.X = x;
+			this.Y = y;
 		}
 
 		public MapVector(int tileX, int tileY, int x, int y)
 		{
-			this.tileX = tileX;
-			this.tileY = tileY;
-			this.x = x;
-			this.y = y;
+			this.TileX = tileX;
+			this.TileY = tileY;
+			this.X = x;
+			this.Y = y;
 		}
 
 		public int[] GetValues()
 		{
-			return new int[] {this.tileX, this.tileY, this.x, this.y};
+			return new[] {this.TileX, this.TileY, this.X, this.Y};
 		}
 	}
 }
