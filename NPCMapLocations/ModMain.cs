@@ -60,23 +60,13 @@ namespace NPCMapLocations
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
 		}
 
-		private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
 		{
 			isMapOpen = false;
 		}
 
-		private void GameEvents_UpdateTick(object sender, EventArgs e)
-		{
-			if (isMapOpen || Game1.activeClickableMenu == null) return;
-			if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
-
-			isMapOpen = gameMenu.currentTab == GameMenu.mapTab;
-			if (isMapOpen)
-				OpenModMap(gameMenu);
-		}
-
-		// Replace game map with modified map
-		public bool CanLoad<T>(IAssetInfo asset)
+    // Replace game map with modified map
+    public bool CanLoad<T>(IAssetInfo asset)
 		{
 			return asset.AssetNameEquals(@"LooseSprites\Map");
 		}
@@ -305,20 +295,32 @@ namespace NPCMapLocations
 				FarmerMarkers = new Dictionary<long, FarmerMarker>();
 		}
 
-		// Map page updates
-		void GameEvents_EighthUpdateTick(object sender, EventArgs e)
+		// To initialize ModMap quicker for smoother rendering when opening map
+		private void GameEvents_UpdateTick(object sender, EventArgs e)
+		{
+			if (isMapOpen || Game1.activeClickableMenu == null) return;
+			if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
+
+			isMapOpen = gameMenu.currentTab == GameMenu.mapTab;
+			if (isMapOpen && !(Game1.activeClickableMenu is ModMapPage)) // Only run once on map open
+				OpenModMap(gameMenu);
+		}
+
+    // Map page updates
+    void GameEvents_EighthUpdateTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
 			UpdateMarkers();
-			if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is GameMenu gameMenu)
-				OpenModMap(gameMenu);
 		}
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
+			UpdateNPCMarkers(true);
 			List<IClickableMenu> pages = this.Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
+			// Changing the page in GameMenu instead of changing Game1.activeClickableMenu
+			// allows for better compatibility with other mods that use MapPage
 			pages[GameMenu.mapTab] = new ModMapPage(
 				NpcMarkers,
 				NpcNames,
@@ -330,7 +332,7 @@ namespace NPCMapLocations
 				Helper,
 				Config
 			);
-		}
+    }
 
 		private void UpdateMarkers(bool forceUpdate = false)
 		{
@@ -704,9 +706,7 @@ namespace NPCMapLocations
 			}
 
 			if (DEBUG_MODE)
-#pragma warning disable CS0162 // Unreachable code detected
 				ShowDebugInfo();
-#pragma warning restore CS0162 // Unreachable code detected
 		}
 
 		// Show debug info in top left corner

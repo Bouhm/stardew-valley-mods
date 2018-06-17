@@ -489,48 +489,7 @@ public static class ModConstants
 			}
 		}
 	};
-
-	// Resize location rectangles accord to modified map page
-	public static Dictionary<string, Rect> LocationRects => new Dictionary<string, Rect>
-	{
-		{"Desert_Region", new Rect(261, 175)},
-		{"Farm_Region", new Rect(188, 148)},
-		{"Backwoods_Region", new Rect(148, 120)},
-		{"BusStop_Region", new Rect(76, 100)},
-		{"WizardHouse", new Rect(36, 76)},
-		{"AnimalShop", new Rect(76, 40)},
-		{"LeahHouse", new Rect(32, 24)},
-		{"SamHouse", new Rect(36, 52)},
-		{"HaleyHouse", new Rect(40, 36)},
-		{"TownSquare", new Rect(48, 45)},
-		{"Hospital", new Rect(16, 32)},
-		{"SeedShop", new Rect(28, 40)},
-		{"Blacksmith", new Rect(80, 36)},
-		{"Saloon", new Rect(28, 40)},
-		{"ManorHouse", new Rect(44, 56)},
-		{"ArchaeologyHouse", new Rect(32, 28)},
-		{"ElliottHouse", new Rect(28, 20)},
-		{"Sewer", new Rect(24, 20)},
-		{"Graveyard", new Rect(40, 32)},
-		{"Trailer", new Rect(20, 12)},
-		{"AlexHouse", new Rect(36, 36)},
-		{"JoshHouse", new Rect(36, 36)},
-		{"ScienceHouse", new Rect(48, 32)},
-		{"Tent", new Rect(12, 16)},
-		{"Mine", new Rect(16, 24)},
-		{"AdventureGuild", new Rect(32, 36)},
-		{"Quarry", new Rect(88, 76)},
-		{"JojaMart", new Rect(52, 52)},
-		{"FishShop", new Rect(36, 40)},
-		{"Spa", new Rect(48, 36)},
-		{"Woods", new Rect(196, 176)},
-		{"RuinedHouse", new Rect(20, 20)},
-		{"CommunityCenter", new Rect(44, 36)},
-		{"SewerPipe", new Rect(24, 32)},
-		{"Railroad_Region", new Rect(200, 69)},
-		{"LonelyStone", new Rect(28, 28)},
-	};
-
+		
 	// Custom farm markers
 	// Also used to do a quick check for currentLocation is farm building
 	public static Dictionary<string, Rectangle> FarmBuildingRects => new Dictionary<string, Rectangle>
