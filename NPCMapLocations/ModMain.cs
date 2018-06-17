@@ -54,16 +54,10 @@ namespace NPCMapLocations
 			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
 			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
-			//MenuEvents.MenuClosed += this.MenuEvents_MenuClosed;
 			GameEvents.EighthUpdateTick += this.GameEvents_EighthUpdateTick;
 			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
 			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
-		}
-
-    private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
-		{
-			hasOpenedMap = false;
 		}
 
     // Replace game map with modified map
