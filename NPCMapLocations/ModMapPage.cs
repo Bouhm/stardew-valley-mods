@@ -427,6 +427,7 @@ namespace NPCMapLocations
 
 			foreach (NpcMarker npcMarker in sortedMarkers)
 			{
+				// Skip if no specified location
 				if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
 				    !MarkerCrop.ContainsKey(npcMarker.Npc.Name))
 				{
@@ -438,13 +439,16 @@ namespace NPCMapLocations
 				{
 					b.Draw(npcMarker.Marker, npcMarker.Location,
 						new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
-					{
+					if (npcMarker.IsBirthday)
+          {
+						// Gift icon
 						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
 					if (npcMarker.HasQuest)
 					{
+						// Quest icon
 						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
@@ -456,14 +460,15 @@ namespace NPCMapLocations
 						new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
 					if (npcMarker.IsBirthday)
 					{
-						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y),
+						// Gift icon
+            b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
-
 					if (npcMarker.HasQuest)
 					{
-						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3),
+						// Quest icon
+            b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
