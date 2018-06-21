@@ -336,7 +336,7 @@ namespace NPCMapLocations
 
 		private void UpdateMarkers(bool forceUpdate = false)
 		{
-			if (hasOpenedMap || forceUpdate)
+			if (isModMapOpen || forceUpdate)
 			{
 				UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
@@ -347,6 +347,7 @@ namespace NPCMapLocations
 		// Update NPC marker data and names on hover
 		private void UpdateNPCMarkers(bool forceUpdate = false)
 		{
+			if (NpcMarkers == null) return;
 			foreach (NpcMarker npcMarker in NpcMarkers)
 			{
 				NPC npc = npcMarker.Npc;
