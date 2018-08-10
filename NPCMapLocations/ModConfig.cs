@@ -23,6 +23,7 @@ namespace NPCMapLocations
 		public bool ShowFarmBuildings { get; set; } = true;
 		public Dictionary<string, int> VillagerCrop { get; set; } = new Dictionary<string, int>();
 		public List<string> CustomNpcBlacklist = new List<string>();
-		public Dictionary<string, object> CustomNpcs { get; set; } = new Dictionary<string, object>();
+		public Dictionary<string, Dictionary<string, int>> CustomNpcs { get; set; } =
+			new Dictionary<string, Dictionary<string, int>>();
 	}
 }

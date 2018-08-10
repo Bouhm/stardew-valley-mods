@@ -43,7 +43,7 @@ namespace NPCMapLocations
 
 		public ModMenu(
 			Dictionary<string, bool> secondaryNpcs,
-			Dictionary<string, object> customNpcs,
+			Dictionary<string, Dictionary<string, int>> customNpcs,
 			Dictionary<string, string> npcNames,
 			Dictionary<string, int> markerCrop,
 			IModHelper helper,
@@ -526,7 +526,7 @@ namespace NPCMapLocations
 		private readonly IModHelper Helper;
 		private readonly Dictionary<string, string> NpcNames;
 		private readonly Dictionary<string, int> MarkerCrop;
-		private readonly Dictionary<string, object> CustomNpcs;
+		private readonly Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private ModConfig Config;
 		private List<string> orderedNames;
 		public const int pixelsWide = 9;
@@ -539,7 +539,7 @@ namespace NPCMapLocations
 			int whichOption,
 			int x,
 			int y,
-			Dictionary<string, object> customNpcs,
+			Dictionary<string, Dictionary<string, int>> customNpcs,
 			Dictionary<string, string> npcNames,
 			Dictionary<string, int> markerCrop,
 			IModHelper helper,

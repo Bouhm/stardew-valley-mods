@@ -16,7 +16,7 @@ namespace NPCMapLocations
 		private Dictionary<string, string> NpcNames; // For handling custom names
 		private Dictionary<string, int> MarkerCrop;
 		private HashSet<string> NpcCustomizations;
-		Dictionary<string, object> CustomNpcs;
+		private Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private string CustomNpcNames;
 
 		public ModCustomHandler(IModHelper helper, ModConfig config, IMonitor monitor)
@@ -89,7 +89,7 @@ namespace NPCMapLocations
 			}
 		}
 
-		public Dictionary<string, object> GetCustomNpcs()
+		public Dictionary<string, Dictionary<string, int>> GetCustomNpcs()
 		{
 			return this.CustomNpcs;
 		}
@@ -109,43 +109,37 @@ namespace NPCMapLocations
 		{
 			if (areCustomNpcsInstalled)
 			{
-				foreach (KeyValuePair<string, object> customNpc in this.CustomNpcs)
+				foreach (KeyValuePair<string, Dictionary<string, int>> customNpc in CustomNpcs)
 				{
-					Type obj = customNpc.Value.GetType();
-					foreach (PropertyInfo prop in obj.GetProperties())
+					if (!customNpc.Value.ContainsKey("crop"))
 					{
-						if (!prop.Name.Equals("crop"))
-						{
-							Dictionary<string, int> npcEntry = new Dictionary<string, int> {{"crop", 0}};
-							this.CustomNpcs.Add(customNpc.Key, npcEntry);
-							this.CustomNpcNames += customNpc.Key + ", ";
-
-							if (!this.MarkerCrop.ContainsKey(customNpc.Key))
-							{
-								this.MarkerCrop.Add(customNpc.Key, (int) prop.GetValue(customNpc.Value));
-							}
-						}
+						customNpc.Value.Add("crop", 0);
+						this.CustomNpcNames += customNpc.Key + ", ";
+                    }
+					if (!MarkerCrop.ContainsKey(customNpc.Key))
+					{
+						MarkerCrop.Add(customNpc.Key, customNpc.Value["crop"]);
 					}
 				}
 			}
 			else
 			{
-				if (npc.Schedule != null && !this.MarkerCrop.ContainsKey(npc.Name))
+				if (npc.Schedule != null && !MarkerCrop.Keys.Contains(npc.Name))
 				{
-					if (!this.CustomNpcs.TryGetValue(npc.Name, out object npcEntry))
+					if (!CustomNpcs.TryGetValue(npc.Name, out Dictionary<string, int> npcEntry))
 					{
 						npcEntry = new Dictionary<string, int>
 						{
-							{"crop", 0}
+							{ "crop", 0 }
 						};
-						this.CustomNpcs.Add(npc.Name, npcEntry);
+						CustomNpcs.Add(npc.Name, npcEntry);
 
-						if (!this.MarkerCrop.ContainsKey(npc.Name))
-							this.MarkerCrop.Add(npc.Name, 0);
+						if (!MarkerCrop.ContainsKey(npc.Name))
+							MarkerCrop.Add(npc.Name, 0);
 					}
 				}
 			}
-		}
+     }
 
 		// Handle any modified NPC names 
 		// Specifically mods that change names in dialogue files (displayName)
