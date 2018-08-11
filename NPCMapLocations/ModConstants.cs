@@ -11,7 +11,7 @@ public static class ModConstants
 {
 	// Cropping heads for NPC markers
 	// Values shift the head up (negative) or down (positive)
-	public static Dictionary<string, int> MarkerCrop => new Dictionary<string, int>
+	public static Dictionary<string, int> MarkerCropOffsets => new Dictionary<string, int>
 	{
 		{"Abigail", 3},
 		{"Alex", 0},

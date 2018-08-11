@@ -24,7 +24,7 @@ namespace NPCMapLocations
 		private ModConfig Config;
 		private Texture2D BuildingMarkers;
 		private ModCustomHandler CustomHandler;
-		private Dictionary<string, int> MarkerCrop; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
+		private Dictionary<string, int> MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private Dictionary<string, bool> SecondaryNpcs;
 		private Dictionary<string, string> NpcNames;
 		private HashSet<NpcMarker> NpcMarkers;
@@ -45,7 +45,7 @@ namespace NPCMapLocations
 		public override void Entry(IModHelper helper)
 		{
 			Config = this.Helper.ReadConfig<ModConfig>();
-			MarkerCrop = ModConstants.MarkerCrop;
+			MarkerCropOffsets = ModConstants.MarkerCropOffsets;
 			CustomHandler = new ModCustomHandler(helper, Config, this.Monitor);
 			BuildingMarkers =
 				this.Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
@@ -100,12 +100,11 @@ namespace NPCMapLocations
 					if (npc == null) continue;
 					if (!allNpcs.Contains(npc)
 					    && !ModConstants.ExcludedVillagers.Contains(npc.Name)
-					    && npc.isVillager())
+					    && npc.isVillager())	
 						allNpcs.Add(npc);
 				}
 			}
-
-			return allNpcs;
+      return allNpcs;
 		}
 
 		// For drawing farm buildings on the map 
@@ -173,7 +172,7 @@ namespace NPCMapLocations
 			};
       CustomHandler.UpdateCustomNpcs();
 			NpcNames = CustomHandler.GetNpcNames();
-			MarkerCrop = CustomHandler.GetMarkerCrop();
+			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
 		}
 
@@ -195,9 +194,8 @@ namespace NPCMapLocations
 				{
 					Game1.activeClickableMenu = new ModMenu(
 						SecondaryNpcs,
-						CustomHandler.GetCustomNpcs(),
 						NpcNames,
-						MarkerCrop,
+						MarkerCropOffsets,
 						this.Helper,
 						this.Config
 					);
@@ -326,7 +324,7 @@ namespace NPCMapLocations
 				NpcNames,
 				SecondaryNpcs,
 				FarmerMarkers,
-				MarkerCrop,
+				MarkerCropOffsets,
 				FarmBuildings,
 				BuildingMarkers,
 				Helper,
@@ -414,7 +412,7 @@ namespace NPCMapLocations
 				);
 
 				// NPCs that will be drawn onto the map
-				if (IsNPCShown(npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+				if (!Config.NpcBlacklist.Contains(npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
 				{
 					// Check if gifted for birthday
 					if (npcMarker.IsBirthday)
@@ -754,41 +752,6 @@ namespace NPCMapLocations
 			Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
 			Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
 			Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
-		}
-
-		// Config show/hide 
-		private bool IsNPCShown(string npc)
-		{
-			bool showNPC = !Config.NpcBlacklist.Contains(npc);
-			if (!CustomHandler.GetCustomNpcs().ContainsKey(npc))
-			{
-				if (npc.Equals("Sandy"))
-				{
-					return showNPC && SecondaryNpcs["Sandy"];
-				}
-				else if (npc.Equals("Marlon"))
-				{
-					return showNPC && SecondaryNpcs["Marlon"];
-				}
-				else if (npc.Equals("Wizard"))
-				{
-					return showNPC && SecondaryNpcs["Wizard"];
-				}
-				else return showNPC;
-			}
-			else
-			{
-				var customNpcs = CustomHandler.GetCustomNpcs();
-				for (int i = 0; i < customNpcs.Count; i++)
-				{
-					if (customNpcs.Keys.ElementAt(i).Equals(npc))
-					{
-						return Config.CustomNpcBlacklist.Contains(npc);
-					}
-				}
-			}
-
-			return true;
 		}
 	}
 

@@ -24,7 +24,7 @@ namespace NPCMapLocations
 		private Dictionary<string, bool> SecondaryNpcs { get; }
 		private HashSet<NpcMarker> NpcMarkers;
 		private Dictionary<long, FarmerMarker> FarmerMarkers;
-		private Dictionary<string, int> MarkerCrop { get; }
+		private Dictionary<string, int> MarkerCropOffsets { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 		private readonly Texture2D BuildingMarkers;
 		private string hoveredNames = "";
@@ -42,7 +42,7 @@ namespace NPCMapLocations
 			Dictionary<string, string> npcNames,
 			Dictionary<string, bool> secondaryNpcs,
 			Dictionary<long, FarmerMarker> farmerMarkers,
-			Dictionary<string, int> markerCrop,
+			Dictionary<string, int> MarkerCropOffsets,
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
 			IModHelper helper,
@@ -55,7 +55,7 @@ namespace NPCMapLocations
 			this.NpcNames = npcNames;
 			this.SecondaryNpcs = secondaryNpcs;
 			this.FarmerMarkers = farmerMarkers;
-			this.MarkerCrop = markerCrop;
+			this.MarkerCropOffsets = MarkerCropOffsets;
 			this.FarmBuildings = farmBuildings;
 			this.BuildingMarkers = buildingMarkers;
 			this.Helper = helper;
@@ -429,7 +429,7 @@ namespace NPCMapLocations
 			{
 				// Skip if no specified location
 				if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
-				    !MarkerCrop.ContainsKey(npcMarker.Npc.Name))
+				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
 				{
 					continue;
 				}
@@ -438,7 +438,7 @@ namespace NPCMapLocations
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker, npcMarker.Location,
-						new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
+						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
           {
 						// Gift icon
@@ -457,7 +457,7 @@ namespace NPCMapLocations
 				else
 				{
 					b.Draw(npcMarker.Marker, npcMarker.Location,
-						new Rectangle?(new Rectangle(0, MarkerCrop[npcMarker.Npc.Name], 16, 15)), Color.White);
+						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon

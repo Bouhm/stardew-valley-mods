@@ -43,9 +43,8 @@ namespace NPCMapLocations
 
 		public ModMenu(
 			Dictionary<string, bool> secondaryNpcs,
-			Dictionary<string, Dictionary<string, int>> customNpcs,
 			Dictionary<string, string> npcNames,
-			Dictionary<string, int> markerCrop,
+			Dictionary<string, int> MarkerCropOffsets,
 			IModHelper helper,
 			ModConfig config
 		) : base(Game1.viewport.Width / 2 - (1100 + IClickableMenu.borderWidth * 2) / 2,
@@ -103,24 +102,17 @@ namespace NPCMapLocations
 			this.options.Add(immersionButton1);
 			this.options.Add(immersionButton2);
 			this.options.Add(immersionButton3);
-			this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1, customNpcs, npcNames, markerCrop, helper,
+			this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1, npcNames, MarkerCropOffsets, helper,
 				config));
-			this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1, customNpcs, npcNames, markerCrop, helper,
+			this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1, npcNames, MarkerCropOffsets, helper,
 				config));
 			this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1, helper, config));
 			this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1, helper, config));
 			this.options.Add(new OptionsElement(extraLabel));
-			this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
-			this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
-			this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+			this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			this.options.Add(new OptionsElement(villagersLabel));
-			// Custom Npcs
-			if (customNpcs != null)
-			{
-				for (int i = 0; i < customNpcs.Count; i++)
-					this.options.Add(new ModCheckbox(customNpcs.Keys.ElementAt(i), 39 + i, -1, -1, customNpcs, npcNames,
-						markerCrop, helper, config));
-			}
 
 			// Villagers
 			var orderedNames = npcNames.Keys.ToList();
@@ -131,7 +123,7 @@ namespace NPCMapLocations
 				if (secondaryNpcs.ContainsKey(name))
 					if (secondaryNpcs[name])
 					{
-						this.options.Add(new ModCheckbox(name, idx++, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+						this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 					}
 					else
 					{
@@ -140,7 +132,7 @@ namespace NPCMapLocations
 					}
 				else
 				{
-					this.options.Add(new ModCheckbox(name, idx++, -1, -1, customNpcs, npcNames, markerCrop, helper, config));
+					this.options.Add(new ModCheckbox(name, idx++, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 				}
 			}
 		}
@@ -525,7 +517,7 @@ namespace NPCMapLocations
 	{
 		private readonly IModHelper Helper;
 		private readonly Dictionary<string, string> NpcNames;
-		private readonly Dictionary<string, int> MarkerCrop;
+		private readonly Dictionary<string, int> MarkerCropOffsets;
 		private readonly Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private ModConfig Config;
 		private List<string> orderedNames;
@@ -539,18 +531,16 @@ namespace NPCMapLocations
 			int whichOption,
 			int x,
 			int y,
-			Dictionary<string, Dictionary<string, int>> customNpcs,
 			Dictionary<string, string> npcNames,
-			Dictionary<string, int> markerCrop,
+			Dictionary<string, int> MarkerCropOffsets,
 			IModHelper helper,
 			ModConfig config
 		) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
 		{
 			this.Helper = helper;
 			this.Config = config;
-			this.MarkerCrop = markerCrop;
+			this.MarkerCropOffsets = MarkerCropOffsets;
 			this.NpcNames = npcNames;
-			this.CustomNpcs = customNpcs;
 			this.label = label;
 
 			if (whichOption < 44)
@@ -561,11 +551,6 @@ namespace NPCMapLocations
 				if (whichOption > 6 && whichOption < 39)
 				{
 					this.isChecked = !this.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
-					return;
-				}
-				else if (whichOption > 38 && whichOption < 44)
-				{
-					this.isChecked = !this.Config.CustomNpcBlacklist.Contains(customNpcs.Keys.ElementAt(whichOption - 39));
 					return;
 				}
 			}
@@ -615,13 +600,6 @@ namespace NPCMapLocations
 				else
 					this.Config.NpcBlacklist.Add(orderedNames[whichOption - 7]);
 			}
-			else if (whichOption > 38 && whichOption < 44)
-			{
-				if (this.isChecked)
-					this.Config.CustomNpcBlacklist.Remove(this.CustomNpcs.Keys.ElementAt(whichOption - 39));
-				else
-					this.Config.CustomNpcBlacklist.Add(this.CustomNpcs.Keys.ElementAt(whichOption - 39));
-			}
 			else
 			{
 				switch (whichOption)
@@ -666,13 +644,13 @@ namespace NPCMapLocations
 				if (this.isChecked)
 				{
 					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + this.bounds.X + 50, slotY),
-						new Rectangle?(new Rectangle(0, MarkerCrop[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero,
+						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npc.Name], 16, 15)), Color.White, 0f, Vector2.Zero,
 						(float) Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				}
 				else
 				{
 					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + this.bounds.X + 50, slotY),
-						new Rectangle?(new Rectangle(0, MarkerCrop[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero,
+						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npc.Name], 16, 15)), Color.White * 0.33f, 0f, Vector2.Zero,
 						(float) Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				}
 

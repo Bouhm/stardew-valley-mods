@@ -14,28 +14,24 @@ namespace NPCMapLocations
 		private readonly IMonitor Monitor;
 		private ModConfig Config;
 		private Dictionary<string, string> NpcNames; // For handling custom names
-		private Dictionary<string, int> MarkerCrop;
+		private Dictionary<string, int> MarkerCropOffsets;
 		private HashSet<string> NpcCustomizations;
-		private Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private string CustomNpcNames;
 
 		public ModCustomHandler(IModHelper helper, ModConfig config, IMonitor monitor)
 		{
-			this.MarkerCrop = ModConstants.MarkerCrop;
+			this.MarkerCropOffsets = ModConstants.MarkerCropOffsets;
 			this.Helper = helper;
 			this.Config = config;
 			this.Monitor = monitor;
 			this.NpcNames = new Dictionary<string, string>();
-			this.CustomNpcs = config.CustomNpcs;
 			this.NpcCustomizations = new HashSet<string>();
-			this.CustomNpcNames = "";
 		}
 
 		// Handles customizations for NPCs
 		// Custom NPCs and custom names or sprites for existing NPCs
 		public void UpdateCustomNpcs()
 		{
-			bool areCustomNpcsInstalled = (this.CustomNpcs != null && this.CustomNpcs.Count > 0);
 			foreach (NPC npc in Utility.getAllCharacters())
 			{
 				if (npc == null)
@@ -43,7 +39,6 @@ namespace NPCMapLocations
 					continue;
 				}
 
-				LoadCustomNpcs(npc, areCustomNpcsInstalled);
 				if (!ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
 				{
 					LoadNPCCrop(npc);
@@ -53,7 +48,7 @@ namespace NPCMapLocations
 
 			if (this.NpcCustomizations.Count != 0)
 			{
-				string names = "Handled customizations for: ";
+				string names = "Handled custom NPCs: ";
 				foreach (string name in this.NpcCustomizations)
 				{
 					names += name + ", ";
@@ -61,11 +56,6 @@ namespace NPCMapLocations
 
 				this.Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Info);
 			}
-
-			if (this.CustomNpcNames != "")
-				this.Monitor.Log("Handled custom Npcs: " + this.CustomNpcNames.Substring(0, this.CustomNpcNames.Length - 2),
-					LogLevel.Info);
-
 			this.Helper.WriteConfig(Config);
 		}
 
@@ -89,57 +79,15 @@ namespace NPCMapLocations
 			}
 		}
 
-		public Dictionary<string, Dictionary<string, int>> GetCustomNpcs()
-		{
-			return this.CustomNpcs;
-		}
-
 		public Dictionary<string, string> GetNpcNames()
 		{
 			return this.NpcNames;
 		}
 
-		public Dictionary<string, int> GetMarkerCrop()
+		public Dictionary<string, int> GetMarkerCropOffsets()
 		{
-			return this.MarkerCrop;
+			return this.MarkerCropOffsets;
 		}
-
-		// Handle modified or custom NPCs
-		private void LoadCustomNpcs(NPC npc, bool areCustomNpcsInstalled)
-		{
-			if (areCustomNpcsInstalled)
-			{
-				foreach (KeyValuePair<string, Dictionary<string, int>> customNpc in CustomNpcs)
-				{
-					if (!customNpc.Value.ContainsKey("crop"))
-					{
-						customNpc.Value.Add("crop", 0);
-						this.CustomNpcNames += customNpc.Key + ", ";
-                    }
-					if (!MarkerCrop.ContainsKey(customNpc.Key))
-					{
-						MarkerCrop.Add(customNpc.Key, customNpc.Value["crop"]);
-					}
-				}
-			}
-			else
-			{
-				if (npc.Schedule != null && !MarkerCrop.Keys.Contains(npc.Name))
-				{
-					if (!CustomNpcs.TryGetValue(npc.Name, out Dictionary<string, int> npcEntry))
-					{
-						npcEntry = new Dictionary<string, int>
-						{
-							{ "crop", 0 }
-						};
-						CustomNpcs.Add(npc.Name, npcEntry);
-
-						if (!MarkerCrop.ContainsKey(npc.Name))
-							MarkerCrop.Add(npc.Name, 0);
-					}
-				}
-			}
-     }
 
 		// Handle any modified NPC names 
 		// Specifically mods that change names in dialogue files (displayName)
@@ -152,7 +100,7 @@ namespace NPCMapLocations
 				else
 				{
 					this.NpcNames.Add(npc.Name, npc.displayName);
-					if (!npc.Name.Equals(npc.displayName) || this.Config.VillagerCrop.ContainsKey(npc.Name))
+					if (!npc.Name.Equals(npc.displayName) || this.Config.CustomCropOffsets.ContainsKey(npc.Name))
 						this.NpcCustomizations.Add(npc.Name);
 				}
 			}
@@ -161,13 +109,13 @@ namespace NPCMapLocations
 		// Load user-specified NPC crops for custom sprites
 		private void LoadNPCCrop(NPC npc)
 		{
-			if (this.Config.VillagerCrop != null && this.Config.VillagerCrop.Count > 0)
+			if (this.Config.CustomCropOffsets != null && this.Config.CustomCropOffsets.Count > 0)
 			{
-				foreach (KeyValuePair<string, int> villager in this.Config.VillagerCrop)
+				foreach (KeyValuePair<string, int> villager in this.Config.CustomCropOffsets)
 				{
 					if (npc.Name.Equals(villager.Key))
 					{
-						this.MarkerCrop[npc.Name] = villager.Value;
+						this.MarkerCropOffsets[npc.Name] = villager.Value;
 						this.NpcCustomizations.Add(npc.Name);
 					}
 				}
