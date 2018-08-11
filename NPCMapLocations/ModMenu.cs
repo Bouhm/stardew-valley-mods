@@ -34,8 +34,6 @@ namespace NPCMapLocations
 		private readonly ClickableTextureComponent okButton;
 		private readonly int mapX;
 		private readonly int mapY;
-		private const int itemsPerPage = 7;
-		private const int indexOfGraphicsPage = 6;
 		private int currentItemIndex;
 		private bool scrolling;
 		private bool canClose;
@@ -102,19 +100,19 @@ namespace NPCMapLocations
 			this.options.Add(immersionButton1);
 			this.options.Add(immersionButton2);
 			this.options.Add(immersionButton3);
-			this.options.Add(new ModCheckbox("immersion.option4", 44, -1, -1, npcNames, MarkerCropOffsets, helper,
+			this.options.Add(new ModCheckbox("immersion.option4", 49, -1, -1, npcNames, MarkerCropOffsets, helper,
 				config));
-			this.options.Add(new ModCheckbox("immersion.option5", 45, -1, -1, npcNames, MarkerCropOffsets, helper,
+			this.options.Add(new ModCheckbox("immersion.option5", 50, -1, -1, npcNames, MarkerCropOffsets, helper,
 				config));
 			this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1, helper, config));
 			this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1, helper, config));
 			this.options.Add(new OptionsElement(extraLabel));
-			this.options.Add(new ModCheckbox("extra.option1", 46, -1, -1, npcNames, MarkerCropOffsets, helper, config));
-			this.options.Add(new ModCheckbox("extra.option2", 47, -1, -1, npcNames, MarkerCropOffsets, helper, config));
-			this.options.Add(new ModCheckbox("extra.option3", 48, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("extra.option1", 51, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("extra.option2", 52, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("extra.option3", 53, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			this.options.Add(new OptionsElement(villagersLabel));
 
-			// Villagers
+			// Villagers + up to 10 custom NPCs
 			var orderedNames = npcNames.Keys.ToList();
 			orderedNames.Sort();
 			int idx = 7;
@@ -453,9 +451,7 @@ namespace NPCMapLocations
 	// Mod button for the three main modes
 	internal class MapModButton : OptionsElement
 	{
-		private readonly IModHelper Helper;
 		private ModConfig Config;
-		public const int pixelsWide = 9;
 		public bool isActive;
 		public Rectangle rect;
 
@@ -470,7 +466,6 @@ namespace NPCMapLocations
 			ModConfig config
 		) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
 		{
-			this.Helper = helper;
 			this.Config = config;
 			this.label = helper.Translation.Get(label);
 			this.rect = new Rectangle(x, y, width, height);
@@ -521,10 +516,7 @@ namespace NPCMapLocations
 		private readonly Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private ModConfig Config;
 		private List<string> orderedNames;
-		public const int pixelsWide = 9;
 		public bool isChecked;
-		public static Rectangle sourceRectUnchecked = new Rectangle(227, 425, 9, 9);
-		public static Rectangle sourceRectChecked = new Rectangle(236, 425, 9, 9);
 
 		public ModCheckbox(
 			string label,
@@ -543,37 +535,37 @@ namespace NPCMapLocations
 			this.NpcNames = npcNames;
 			this.label = label;
 
-			if (whichOption < 44)
+			if (whichOption < 49)
 			{
 				orderedNames = npcNames.Keys.ToList();
 				orderedNames.Sort();
 
-				if (whichOption > 6 && whichOption < 39)
+				if (whichOption > 6 && whichOption < 49)
 				{
 					this.isChecked = !this.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
 					return;
 				}
 			}
-			else if (whichOption > 43)
+			else if (whichOption > 48)
 			{
 				this.label = this.Helper.Translation.Get(label);
 			}
 
 			switch (whichOption)
 			{
-				case 44:
+				case 49:
 					this.isChecked = this.Config.OnlySameLocation;
 					return;
-				case 45:
+				case 50:
 					this.isChecked = this.Config.ByHeartLevel;
 					return;
-				case 46:
+				case 51:
 					this.isChecked = this.Config.MarkQuests;
 					return;
-				case 47:
+				case 52:
 					this.isChecked = this.Config.ShowHiddenVillagers;
 					return;
-				case 48:
+				case 53:
 					this.isChecked = this.Config.ShowTravelingMerchant;
 					return;
 				default:
@@ -593,7 +585,7 @@ namespace NPCMapLocations
 			this.isChecked = !this.isChecked;
 			int whichOption = this.whichOption;
 
-			if (whichOption > 6 && whichOption < 39)
+			if (whichOption > 6 && whichOption < 49)
 			{
 				if (this.isChecked)
 					this.Config.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
@@ -604,19 +596,19 @@ namespace NPCMapLocations
 			{
 				switch (whichOption)
 				{
-					case 44:
+					case 49:
 						this.Config.OnlySameLocation = this.isChecked;
 						break;
-					case 45:
+					case 50:
 						this.Config.ByHeartLevel = this.isChecked;
 						break;
-					case 46:
+					case 51:
 						this.Config.MarkQuests = this.isChecked;
 						break;
-					case 47:
+					case 52:
 						this.Config.ShowHiddenVillagers = this.isChecked;
 						break;
-					case 48:
+					case 53:
 						this.Config.ShowTravelingMerchant = this.isChecked;
 						break;
 					default:
@@ -633,7 +625,7 @@ namespace NPCMapLocations
 				new Rectangle?(this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked),
 				Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, (float) Game1.pixelZoom, SpriteEffects.None,
 				0.4f);
-			if (whichOption > 6 && whichOption < 39)
+			if (whichOption > 6 && whichOption < 49)
 			{
 				NPC npc = Game1.getCharacterFromName(label);
 				if (npc == null)
@@ -676,11 +668,6 @@ namespace NPCMapLocations
 	{
 		private readonly IModHelper Helper;
 		private ModConfig Config;
-		public static Rectangle sliderBGSource = new Rectangle(403, 383, 6, 6);
-		public static Rectangle sliderButtonRect = new Rectangle(420, 441, 10, 6);
-		public const int pixelsWide = 48;
-		public const int pixelsHigh = 6;
-		public const int sliderButtonWidth = 10;
 		public int sliderMaxValue = 12;
 		public int value;
 		public string valueLabel;

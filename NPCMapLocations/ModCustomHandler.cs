@@ -41,7 +41,7 @@ namespace NPCMapLocations
 
 				if (!ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
 				{
-					LoadNPCCrop(npc);
+					LoadNpcCrop(npc);
 					LoadCustomNames(npc);
 				}
 			}
@@ -107,7 +107,7 @@ namespace NPCMapLocations
 		}
 
 		// Load user-specified NPC crops for custom sprites
-		private void LoadNPCCrop(NPC npc)
+		private void LoadNpcCrop(NPC npc)
 		{
 			if (this.Config.CustomCropOffsets != null && this.Config.CustomCropOffsets.Count > 0)
 			{
@@ -120,6 +120,12 @@ namespace NPCMapLocations
 					}
 				}
 			}
+
+			// If custom crop offset is not specified, default to 0
+			if (!this.MarkerCropOffsets.TryGetValue(npc.Name, out int crop))
+			{
+				this.MarkerCropOffsets[npc.Name] = 0;
+      }
 		}
 	}
 }
