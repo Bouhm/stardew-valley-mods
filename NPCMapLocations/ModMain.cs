@@ -113,7 +113,7 @@ namespace NPCMapLocations
 		{
 			FarmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
 
-			foreach (Building building in Game1.getFarm().buildings)
+			foreach (Building building in Game1.getFarm().buildings)    
 			{
 				if (building == null) continue;
 				if (building.nameOfIndoorsWithoutUnique == null
@@ -598,9 +598,7 @@ namespace NPCMapLocations
 
 				return Vector2.Zero;
 			}
-
-			Vector2 mapPagePos =
-				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+            
 			int x = 0;
 			int y;
 
@@ -682,7 +680,7 @@ namespace NPCMapLocations
 				}
 			}
 
-			return new Vector2((int) mapPagePos.X + x, (int) mapPagePos.Y + y);
+			return new Vector2(x, y);
 		}
 
 		private void GraphicsEvents_Resize(object sender, EventArgs e)

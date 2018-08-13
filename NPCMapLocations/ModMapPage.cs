@@ -376,6 +376,9 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
+			Vector2 mapPagePos =
+    Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+			
 			if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
 				var sortedBuildings = ModMain.FarmBuildings.ToList();
@@ -395,7 +398,7 @@ namespace NPCMapLocations
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
 				Vector2 merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
-				b.Draw(Game1.mouseCursors, new Vector2(merchantLoc.X - 16, merchantLoc.Y - 15),
+				b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + merchantLoc.X - 16, mapPagePos.Y + merchantLoc.Y - 15),
 					new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 					1f);
 			}
@@ -409,14 +412,14 @@ namespace NPCMapLocations
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
 						if (farMarker.DrawDelay == 0)
 							farmer.FarmerRenderer.drawMiniPortrat(b,
-								new Vector2(farMarker.Location.X - 16, farMarker.Location.Y - 15), 0.00011f, 2f, 1, farmer);
+						                                          new Vector2(mapPagePos.X + farMarker.Location.X - 16, mapPagePos.Y + farMarker.Location.Y - 15), 0.00011f, 2f, 1, farmer);
 				}
 			}
 			else
 			{
 				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
 					Game1.player.getTileY());
-				Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(playerLoc.X - 16, playerLoc.Y - 15), 0.00011f, 2f, 1,
+				Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(mapPagePos.X + playerLoc.X - 16, mapPagePos.Y + playerLoc.Y - 15), 0.00011f, 2f, 1,
 					Game1.player);
 			}
 
@@ -442,14 +445,14 @@ namespace NPCMapLocations
 					if (npcMarker.IsBirthday)
           {
 						// Gift icon
-						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y),
+						b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + npcMarker.Location.X + 20, mapPagePos.Y + npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
 					if (npcMarker.HasQuest)
 					{
 						// Quest icon
-						b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3),
+						b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + npcMarker.Location.X + 22, mapPagePos.Y + npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
@@ -461,14 +464,14 @@ namespace NPCMapLocations
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon
-            b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 20, npcMarker.Location.Y),
+						b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + npcMarker.Location.X + 20, mapPagePos.Y + npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
 					if (npcMarker.HasQuest)
 					{
 						// Quest icon
-            b.Draw(Game1.mouseCursors, new Vector2(npcMarker.Location.X + 22, npcMarker.Location.Y - 3),
+						b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + npcMarker.Location.X + 22, mapPagePos.Y + npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
