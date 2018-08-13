@@ -54,14 +54,14 @@ namespace NPCMapLocations
 			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
 			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
-			GameEvents.EighthUpdateTick += this.GameEvents_EighthUpdateTick;
+            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
 			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
 			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
 		}
 
-    // Replace game map with modified map
-    public bool CanLoad<T>(IAssetInfo asset)
+        // Replace game map with modified map
+        public bool CanLoad<T>(IAssetInfo asset)
 		{
 			return asset.AssetNameEquals(@"LooseSprites\Map");
 		}
@@ -303,8 +303,8 @@ namespace NPCMapLocations
 				OpenModMap(gameMenu);
 		}
 
-    // Map page updates
-    void GameEvents_EighthUpdateTick(object sender, EventArgs e)
+        // Map page updates
+		private void GameEvents_QuarterSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
 			UpdateMarkers();
@@ -588,7 +588,9 @@ namespace NPCMapLocations
 		// Requires MapModConstants and modified map page in ./assets
 		public static Vector2 LocationToMap(string location, int tileX = -1, int tileY = -1, IMonitor monitor = null)
 		{
-			if (!ModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
+			Vector2 mapPagePos =
+				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
+            if (!ModConstants.MapVectors.TryGetValue(location, out MapVector[] locVectors))
 			{
 				if (monitor != null && alertFlag != "UnknownLocation:" + location)
 				{
