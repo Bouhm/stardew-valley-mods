@@ -22,6 +22,7 @@ namespace NPCMapLocations
 	public class ModMain : Mod, IAssetLoader
 	{
 		private ModConfig Config;
+		private ModMapPage ModMap;
 		private Texture2D BuildingMarkers;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, int> MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
@@ -35,6 +36,9 @@ namespace NPCMapLocations
 
 		// Multiplayer
 		private Dictionary<long, FarmerMarker> FarmerMarkers;
+
+		// Minimap
+		private Vector2 center;
 
 		// For debug info
 		private const bool DEBUG_MODE = false;
@@ -263,7 +267,18 @@ namespace NPCMapLocations
 			}
 
 			ResetMarkers();
-	}
+			ModMap = new ModMapPage(
+				NpcMarkers,
+				NpcNames,
+				SecondaryNpcs,
+				FarmerMarkers,
+				MarkerCropOffsets,
+				FarmBuildings,
+				BuildingMarkers,
+				Helper,
+				Config
+			);
+    }
 
 		private void ResetMarkers()
 		{
@@ -319,7 +334,7 @@ namespace NPCMapLocations
 
 			// Changing the page in GameMenu instead of changing Game1.activeClickableMenu
 			// allows for better compatibility with other mods that use MapPage
-			pages[GameMenu.mapTab] = new ModMapPage(
+			ModMap = new ModMapPage(
 				NpcMarkers,
 				NpcNames,
 				SecondaryNpcs,
@@ -330,13 +345,19 @@ namespace NPCMapLocations
 				Helper,
 				Config
 			);
+
+			pages[GameMenu.mapTab] = ModMap;
+
 		}
 
 		private void UpdateMarkers(bool forceUpdate = false)
 		{
-			if (isModMapOpen || forceUpdate)
+			if (isModMapOpen || forceUpdate || true)
 			{
-				UpdateNPCMarkers(forceUpdate);
+				center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
+					Game1.player.getTileY());
+
+                UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
 					UpdateFarmerMarkers();
 			}
@@ -516,7 +537,7 @@ namespace NPCMapLocations
 		{
 			foreach (Farmer farmer in Game1.getOnlineFarmers())
 			{
-				if (farmer == null || farmer.currentLocation == null)
+				if (farmer?.currentLocation == null)
 				{
 					continue;
 				}
@@ -699,6 +720,11 @@ namespace NPCMapLocations
 		// DEBUG 
 		private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
 		{
+			if (ModMap != null)
+			{
+				ModMap.DrawMiniMap(Game1.spriteBatch, center);
+			}
+
 			if (!Context.IsWorldReady || Game1.player == null)
 			{
 				return;
@@ -717,7 +743,7 @@ namespace NPCMapLocations
 			}
 
 			// Black backgronud for legible text
-			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 160), new Rectangle(6, 3, 1, 1),
+			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(50, 50, 425, 160), new Rectangle(1, 80, 1, 1),
 				Color.Black);
 
 			// Show map location and tile positions
