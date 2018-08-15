@@ -38,10 +38,10 @@ namespace NPCMapLocations
 		private bool drawPamHouseUpgrade;
 
 		// For minimap
-		private const int mmX = 16;
-		private const int mmY = 16;
-		private const int mmWidth = 300;
-		private const int mmHeight = 180;
+		private const int mmX = 12;
+		private const int mmY = 12;
+		private const int mmWidth = 450;
+		private const int mmHeight = 270;
 
 		// Map menu that uses modified map page and modified component locations for hover
 		public ModMapPage(
@@ -596,6 +596,8 @@ namespace NPCMapLocations
 					(int) mmY - center.Y + mmHeight / 2); // Offsets for map markers
 			Vector2 playerLoc = center;
 
+			// Top-left corner of minimap cropped from the whole map
+			// Centered around the player's location on the maap
 			var cropX = center.X - mmWidth/2;
 			var cropY = center.Y - mmHeight/2;
 
@@ -627,31 +629,35 @@ namespace NPCMapLocations
 				cropY = 720 - mmHeight;
 			}
 
+			// Crop and draw minimap
 			b.Draw(map, new Vector2((float) mmX, (float) mmY),
 				new Rectangle((int) cropX / Game1.pixelZoom,
-					(int) cropY / Game1.pixelZoom, mmWidth / Game1.pixelZoom,
-					mmHeight / Game1.pixelZoom), Color.White, 0f, Vector2.Zero,
+					(int) cropY / Game1.pixelZoom, mmWidth / Game1.pixelZoom + 2,
+					mmHeight / Game1.pixelZoom + 2), Color.White, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
+			// Farm overlay
+			int farmCropWidth =(int) MathHelper.Min(131, (mmWidth - mmPos.X + Game1.tileSize/4) / Game1.pixelZoom);
+			int farmCropHeight = (int) MathHelper.Min(61, (mmHeight - mmPos.Y - 172 + Game1.tileSize / 4) / Game1.pixelZoom);
 			switch (Game1.whichFarm)
 			{
 				case 1:
-					b.Draw(map, new Vector2((float) mmX, (float) (mmY + 172)), new Rectangle(0, 180, 131, 61), Color.White,
+					b.Draw(map, new Vector2((float) mmPos.X, (float) (mmPos.Y + 172)), new Rectangle(0, 180, farmCropWidth, farmCropHeight), Color.White,
 						0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 2:
-					b.Draw(map, new Vector2((float) mmX, (float) (mmY + 172)), new Rectangle(131, 180, 131, 61), Color.White,
+					b.Draw(map, new Vector2((float) mmPos.X, (float) (mmPos.Y + 172)), new Rectangle(131, 180, farmCropWidth, farmCropHeight), Color.White,
 						0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 3:
-					b.Draw(map, new Vector2((float) mmX, (float) (mmY + 172)), new Rectangle(0, 241, 131, 61), Color.White,
+					b.Draw(map, new Vector2((float) mmPos.X, (float) (mmPos.Y + 172)), new Rectangle(0, 241, farmCropWidth, farmCropHeight), Color.White,
 						0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 4:
-					b.Draw(map, new Vector2((float) mmX, (float) (mmY + 172)), new Rectangle(131, 241, 131, 61), Color.White,
+					b.Draw(map, new Vector2((float) mmPos.X, (float) (mmPos.Y + 172)), new Rectangle(131, 241, farmCropWidth, farmCropHeight), Color.White,
 						0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
@@ -692,12 +698,11 @@ namespace NPCMapLocations
 					}
 			}
 
-
 			// Traveling Merchant
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
 				Vector2 merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
-				if (IsWithinMapArea(merchantLoc.X, merchantLoc.Y, center))
+				if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16, center))
 				{
 					b.Draw(Game1.mouseCursors, new Vector2(mmPos.X + merchantLoc.X - 16, mmPos.Y + merchantLoc.Y - 15),
 						new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
@@ -733,10 +738,6 @@ namespace NPCMapLocations
 
 			foreach (NpcMarker npcMarker in sortedMarkers)
 			{
-				if (npcMarker.Npc.Name == "Willy")
-				{
-					var p = "Asdf";
-				}
                 // Skip if no specified location
                 if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name) ||
@@ -828,10 +829,10 @@ namespace NPCMapLocations
 		private bool IsWithinMapArea(float x, float y, Vector2 center)
 		{
 			return (
-				x > center.X - mmWidth / 2 - Game1.tileSize / 4
-				&& x < center.X + mmWidth / 2 - Game1.tileSize / 4
-				&& y > center.Y - mmHeight / 2 - Game1.tileSize / 4
-				&& y < center.Y + mmHeight / 2 - Game1.tileSize / 4);
+				x > center.X - mmWidth / 2 - (Game1.tileSize / 4 + 2)
+				&& x < center.X + mmWidth / 2 - (Game1.tileSize / 4 + 2)
+				&& y > center.Y - mmHeight / 2 - (Game1.tileSize / 4 + 2)
+				&& y < center.Y + mmHeight / 2 - (Game1.tileSize / 4 + 2));
 		}
 
 		// For borders
