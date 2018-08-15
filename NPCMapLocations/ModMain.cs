@@ -58,7 +58,7 @@ namespace NPCMapLocations
 			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
 			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
-            GameEvents.QuarterSecondTick += GameEvents_QuarterSecondTick;
+      GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
 			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
 			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
@@ -319,7 +319,7 @@ namespace NPCMapLocations
 		}
 
         // Map page updates
-		private void GameEvents_QuarterSecondTick(object sender, EventArgs e)
+		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
 			UpdateMarkers();
