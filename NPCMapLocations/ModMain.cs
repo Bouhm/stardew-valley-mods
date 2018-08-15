@@ -23,6 +23,7 @@ namespace NPCMapLocations
 	{
 		private ModConfig Config;
 		private ModMapPage ModMap;
+		private ModMinimap Minimap;
 		private Texture2D BuildingMarkers;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, int> MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
@@ -267,15 +268,13 @@ namespace NPCMapLocations
 			}
 
 			ResetMarkers();
-			ModMap = new ModMapPage(
+			Minimap = new ModMinimap(
 				NpcMarkers,
-				NpcNames,
 				SecondaryNpcs,
 				FarmerMarkers,
 				MarkerCropOffsets,
 				FarmBuildings,
 				BuildingMarkers,
-				Helper,
 				Config
 			);
     }
@@ -722,7 +721,7 @@ namespace NPCMapLocations
 		{
 			if (ModMap != null)
 			{
-				ModMap.DrawMiniMap(Game1.spriteBatch, center);
+				Minimap.DrawMiniMap(Game1.spriteBatch, center);
 			}
 
 			if (!Context.IsWorldReady || Game1.player == null)

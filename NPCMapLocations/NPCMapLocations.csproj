@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModMinimap.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModConstants.cs" />
     <Compile Include="ModCustomHandler.cs" />
