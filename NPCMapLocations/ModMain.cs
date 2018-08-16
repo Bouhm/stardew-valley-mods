@@ -22,21 +22,20 @@ namespace NPCMapLocations
 	public class ModMain : Mod, IAssetLoader
 	{
 		private ModConfig Config;
-		private ModMapPage ModMap;
 		private ModMinimap Minimap;
 		private Texture2D BuildingMarkers;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, int> MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private Dictionary<string, bool> SecondaryNpcs;
 		private Dictionary<string, string> NpcNames;
-		private HashSet<NpcMarker> NpcMarkers;
+		private HashSet<MapMarker> NpcMarkers;
 		public static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private bool hasOpenedMap = false;
 		private bool isModMapOpen = false;
 		private const int DRAW_DELAY = 3;
 
 		// Multiplayer
-		private Dictionary<long, FarmerMarker> FarmerMarkers;
+		private Dictionary<long, MapMarker> FarmerMarkers;
 
 		// Minimap
 		private Vector2 center;
@@ -65,8 +64,8 @@ namespace NPCMapLocations
 			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
 		}
 
-        // Replace game map with modified map
-        public bool CanLoad<T>(IAssetInfo asset)
+    // Replace game map with modified map
+    public bool CanLoad<T>(IAssetInfo asset)
 		{
 			return asset.AssetNameEquals(@"LooseSprites\Map");
 		}
@@ -281,7 +280,7 @@ namespace NPCMapLocations
 
 		private void ResetMarkers()
 		{
-			NpcMarkers = new HashSet<NpcMarker>();
+			NpcMarkers = new HashSet<MapMarker>();
 			foreach (NPC npc in GetVillagers())
 			{
 				// Handle case where Kent appears even though he shouldn't
@@ -290,7 +289,7 @@ namespace NPCMapLocations
 					continue;
 				}
 
-				NpcMarker npcMarker = new NpcMarker()
+				MapMarker npcMarker = new MapMarker()
 				{
 					Npc = npc,
 					IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
@@ -299,7 +298,7 @@ namespace NPCMapLocations
 			}
 
 			if (Context.IsMultiplayer)
-				FarmerMarkers = new Dictionary<long, FarmerMarker>();
+				FarmerMarkers = new Dictionary<long, MapMarker>();
 		}
 
 		// To initialize ModMap quicker for smoother rendering when opening map
@@ -331,9 +330,9 @@ namespace NPCMapLocations
 			List<IClickableMenu> pages = this.Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
-			// Changing the page in GameMenu instead of changing Game1.activeClickableMenu
-			// allows for better compatibility with other mods that use MapPage
-			ModMap = new ModMapPage(
+      // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
+      // allows for better compatibility with other mods that use MapPage
+			pages[GameMenu.mapTab] = new ModMapPage(
 				NpcMarkers,
 				NpcNames,
 				SecondaryNpcs,
@@ -344,9 +343,6 @@ namespace NPCMapLocations
 				Helper,
 				Config
 			);
-
-			pages[GameMenu.mapTab] = ModMap;
-
 		}
 
 		private void UpdateMarkers(bool forceUpdate = false)
@@ -358,7 +354,7 @@ namespace NPCMapLocations
 
                 UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
-					UpdateFarmerMarkers();
+					UpdateMapMarkers();
 			}
 		}
 
@@ -366,7 +362,7 @@ namespace NPCMapLocations
 		private void UpdateNPCMarkers(bool forceUpdate = false)
 		{
 			if (NpcMarkers == null) return;
-			foreach (NpcMarker npcMarker in NpcMarkers)
+			foreach (MapMarker npcMarker in NpcMarkers)
 			{
 				NPC npc = npcMarker.Npc;
 				string locationName;
@@ -495,18 +491,16 @@ namespace NPCMapLocations
 					}
 					*/
 
-					int width = 32;
-					int height = 30;
 					// Get center of NPC marker 
-					int x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - width / 2;
-					int y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - height / 2;
+					int x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - 16;
+					int y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - 15;
 
-					npcMarker.Location = new Rectangle(x, y, width, height);
+					npcMarker.Location = new Vector2(x, y);
 				}
 				else
 				{
 					// Set no location so they don't get drawn
-					npcMarker.Location = Rectangle.Empty;
+					npcMarker.Location = Vector2.Zero;
 				}
 			}
 		}
@@ -517,7 +511,7 @@ namespace NPCMapLocations
 		//{
 		//	foreach (GameLocation location in this.Helper.Multiplayer.GetActiveLocations())
 		//	{
-		//		NpcMarkers = new HashSet<NPCMarker>();
+		//		MapMarkers = new HashSet<NPCMarker>();
 		//		var syncedNpcs =
 		//			location.characters.Where(npc => !ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager());
 		//		foreach (NPC npc in syncedNpcs)
@@ -527,12 +521,12 @@ namespace NPCMapLocations
 		//				Npc = npc,
 		//				IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
 		//			};
-		//			NpcMarkers.Add(npcMarker);
+		//			MapMarkers.Add(npcMarker);
 		//		}
 		//	}
 		//}
 
-		private void UpdateFarmerMarkers()
+		private void UpdateMapMarkers()
 		{
 			foreach (Farmer farmer in Game1.getOnlineFarmers())
 			{
@@ -544,7 +538,7 @@ namespace NPCMapLocations
 				long farmerId = farmer.UniqueMultiplayerID;
 				Vector2 farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
 
-				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
+				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
 				{
 					var deltaX = farmerLoc.X - farMarker.PrevLocation.X;
 					var deltaY = farmerLoc.Y - farMarker.PrevLocation.Y;
@@ -563,7 +557,7 @@ namespace NPCMapLocations
 				}
 				else
 				{
-					FarmerMarker newMarker = new FarmerMarker
+					MapMarker newMarker = new MapMarker
 					{
 						Name = farmer.Name,
 						DrawDelay = 0
@@ -719,7 +713,7 @@ namespace NPCMapLocations
 		// DEBUG 
 		private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
 		{
-			if (ModMap != null)
+			if (Minimap != null)
 			{
 				Minimap.DrawMiniMap(Game1.spriteBatch, center);
 			}
@@ -780,29 +774,22 @@ namespace NPCMapLocations
 		}
 	}
 
-	// Class for NPC markers
-	public class NpcMarker
+	// Class for map markers
+	public class MapMarker
 	{
-		public NPC Npc { get; set; }
+		public string Name { get; set; }
 		public Texture2D Marker { get; set; }
-		public Rectangle Location { get; set; }
+    public NPC Npc { get; set; }
+    public Vector2 Location { get; set; }
+		public Vector2 PrevLocation { get; set; }
+		public string PrevLocationName { get; set; }
 		public bool IsBirthday { get; set; }
 		public bool HasQuest { get; set; }
 		public bool IsOutdoors { get; set; } 
 		public bool IsHidden { get; set; } 
-		public int Layer { get; set; } 
-	}
-
-	// Class for Active Farmers
-	public class FarmerMarker
-	{
-		public string Name { get; set; }
-		public Vector2 Location { get; set; } 
-		public Vector2 PrevLocation { get; set; } 
-		public string PrevLocationName { get; set; }
-		public bool IsOutdoors { get; set; } 
+		public int Layer { get; set; }
 		public int DrawDelay { get; set; }
-	}
+  }
 
 	// Class for Location Vectors
 	public class MapVector

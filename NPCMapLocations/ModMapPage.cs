@@ -23,8 +23,8 @@ namespace NPCMapLocations
 		private readonly ModConfig Config;
 		private readonly Dictionary<string, string> NpcNames;
 		private Dictionary<string, bool> SecondaryNpcs { get; }
-		private HashSet<NpcMarker> NpcMarkers;
-		private Dictionary<long, FarmerMarker> FarmerMarkers;
+		private HashSet<MapMarker> NpcMarkers;
+		private Dictionary<long, MapMarker> FarmerMarkers;
 		private Dictionary<string, int> MarkerCropOffsets { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 		private readonly Texture2D BuildingMarkers;
@@ -39,10 +39,10 @@ namespace NPCMapLocations
 
 		// Map menu that uses modified map page and modified component locations for hover
 		public ModMapPage(
-			HashSet<NpcMarker> npcMarkers,
+			HashSet<MapMarker> npcMarkers,
 			Dictionary<string, string> npcNames,
 			Dictionary<string, bool> secondaryNpcs,
-			Dictionary<long, FarmerMarker> farmerMarkers,
+			Dictionary<long, MapMarker> farmerMarkers,
 			Dictionary<string, int> MarkerCropOffsets,
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
@@ -108,9 +108,9 @@ namespace NPCMapLocations
 
 			if (Context.IsMainPlayer)
 			{
-				foreach (NpcMarker npcMarker in this.NpcMarkers)
+				foreach (MapMarker npcMarker in this.NpcMarkers)
 				{
-					Rectangle npcLocation = npcMarker.Location;
+					Vector2 npcLocation = npcMarker.Location;
 					if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
 					    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 					{
@@ -125,7 +125,7 @@ namespace NPCMapLocations
 
 			if (Context.IsMultiplayer)
 			{
-				foreach (FarmerMarker farMarker in FarmerMarkers.Values)
+				foreach (MapMarker farMarker in FarmerMarkers.Values)
 				{
 					if (Game1.getMouseX() >= farMarker.Location.X - markerWidth / 2
 					    && Game1.getMouseX() <= farMarker.Location.X + markerWidth / 2
@@ -417,7 +417,7 @@ namespace NPCMapLocations
 				foreach (Farmer farmer in Game1.getOnlineFarmers())
 				{
 					// Temporary solution to handle desync of farmhand location/tile position when changing location
-					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
+					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
 						if (farMarker.DrawDelay == 0)
 							farmer.FarmerRenderer.drawMiniPortrat(b,
 								new Vector2(mapPagePos.X + farMarker.Location.X - 16, mapPagePos.Y + farMarker.Location.Y - 15),
@@ -438,10 +438,10 @@ namespace NPCMapLocations
 			var sortedMarkers = NpcMarkers.ToList();
 			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-			foreach (NpcMarker npcMarker in sortedMarkers)
+			foreach (MapMarker npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
-				if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
+				if (npcMarker.Location == Vector2.Zero || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
 				{
 					continue;
@@ -451,8 +451,8 @@ namespace NPCMapLocations
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) mapPagePos.X + npcMarker.Location.X, (int) mapPagePos.Y + npcMarker.Location.Y,
-							npcMarker.Location.Width, npcMarker.Location.Height),
+						new Rectangle((int) (mapPagePos.X + npcMarker.Location.X), (int) (mapPagePos.Y + npcMarker.Location.Y),
+							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
 					{
@@ -475,8 +475,8 @@ namespace NPCMapLocations
 				else
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) mapPagePos.X + npcMarker.Location.X, (int) mapPagePos.Y + npcMarker.Location.Y,
-							npcMarker.Location.Width, npcMarker.Location.Height),
+						new Rectangle((int) (mapPagePos.X + npcMarker.Location.X), (int) (mapPagePos.Y + npcMarker.Location.Y),
+							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
 					if (npcMarker.IsBirthday)
 					{

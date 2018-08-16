@@ -14,21 +14,21 @@ namespace NPCMapLocations
         private readonly ModConfig Config;
         private bool drawPamHouseUpgrade;
         private Dictionary<string, bool> SecondaryNpcs { get; }
-        private HashSet<NpcMarker> NpcMarkers;
-        private Dictionary<long, FarmerMarker> FarmerMarkers;
+        private HashSet<MapMarker> NpcMarkers;
+        private Dictionary<long, MapMarker> FarmerMarkers;
         private Dictionary<string, int> MarkerCropOffsets { get; }
         private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
         private readonly Texture2D BuildingMarkers;
 
-        private const int mmX = 12;
-        private const int mmY = 12;
-        private const int mmWidth = 450;
-        private const int mmHeight = 270;
+        private int mmX = 12;
+        private int mmY = 12;
+        private int mmWidth = 450;
+        private int mmHeight = 270;
 
         public ModMinimap(
-            HashSet<NpcMarker> npcMarkers,
+            HashSet<MapMarker> npcMarkers,
             Dictionary<string, bool> secondaryNpcs,
-            Dictionary<long, FarmerMarker> farmerMarkers,
+            Dictionary<long, MapMarker> farmerMarkers,
             Dictionary<string, int> MarkerCropOffsets,
             Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
             Texture2D buildingMarkers,
@@ -47,20 +47,22 @@ namespace NPCMapLocations
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
         }
 
-        // Center or the player's position is used as reference; not always perfectly center when reaching edge of map
+        // Center or the player's position is used as reference; player is not center when reaching edge of map
         public void DrawMiniMap(SpriteBatch b, Vector2 center)
         {
+            // Top-left offset for markers, relative to the minimap
             Vector2 mmPos =
                 new Vector2((int)mmX - center.X + mmWidth / 2,
-                    (int)mmY - center.Y + mmHeight / 2); // Offsets for map markers
-            Vector2 playerLoc = center;
+                    (int)mmY - center.Y + mmHeight / 2); 
+            Vector2 playerLoc = center; 
 
             // Top-left corner of minimap cropped from the whole map
-            // Centered around the player's location on the maap
+            // Centered around the player's location on the map
             var cropX = center.X - mmWidth / 2;
             var cropY = center.Y - mmHeight / 2;
 
             // Handle cases when reaching edge of map
+            // Change offsets accordingly when player is no longer centered
             if (cropX < 0)
             {
                 center.X = mmWidth / 2;
@@ -175,7 +177,7 @@ namespace NPCMapLocations
                 foreach (Farmer farmer in Game1.getOnlineFarmers())
                 {
                     // Temporary solution to handle desync of farmhand location/tile position when changing location
-                    if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
+                    if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
                         if (farMarker.DrawDelay == 0 &&
                             IsWithinMapArea(farMarker.Location.X - 16, farMarker.Location.Y - 15, center))
                             farmer.FarmerRenderer.drawMiniPortrat(b,
@@ -195,10 +197,10 @@ namespace NPCMapLocations
             var sortedMarkers = NpcMarkers.ToList();
             sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-            foreach (NpcMarker npcMarker in sortedMarkers)
+            foreach (MapMarker npcMarker in sortedMarkers)
             {
                 // Skip if no specified location
-                if (npcMarker.Location == Rectangle.Empty || npcMarker.Marker == null ||
+                if (npcMarker.Location == Vector2.Zero || npcMarker.Marker == null ||
                     !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name) ||
                     !IsWithinMapArea(npcMarker.Location.X, npcMarker.Location.Y, center))
                 {
@@ -209,8 +211,8 @@ namespace NPCMapLocations
                 if (npcMarker.IsHidden)
                 {
                     b.Draw(npcMarker.Marker,
-                        new Rectangle((int)mmPos.X + npcMarker.Location.X, (int)mmPos.Y + npcMarker.Location.Y,
-                            npcMarker.Location.Width, npcMarker.Location.Height),
+                        new Rectangle((int) (mmPos.X + npcMarker.Location.X), (int)(mmPos.Y + npcMarker.Location.Y),
+                            32, 30),
                         new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
                     if (npcMarker.IsBirthday)
                     {
@@ -234,8 +236,8 @@ namespace NPCMapLocations
                 {
 
                     b.Draw(npcMarker.Marker,
-                        new Rectangle((int)mmPos.X + npcMarker.Location.X, (int)mmPos.Y + npcMarker.Location.Y,
-                            npcMarker.Location.Width, npcMarker.Location.Height),
+                        new Rectangle((int)(mmPos.X + npcMarker.Location.X), (int)(mmPos.Y + npcMarker.Location.Y),
+                            30, 32),
                         new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
                     if (npcMarker.IsBirthday)
                     {
@@ -285,6 +287,7 @@ namespace NPCMapLocations
                 new Rectangle?(new Rectangle(0, 304, borderWidth, borderWidth)), Color.White);
         }
 
+        // Check if within map
         private bool IsWithinMapArea(float x, float y, Vector2 center)
         {
             return (
