@@ -27,7 +27,7 @@ namespace NPCMapLocations
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, int> MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private Dictionary<string, bool> SecondaryNpcs;
-		private Dictionary<string, string> NpcNames;
+		private Dictionary<string, string> CustomNames;
 		private HashSet<MapMarker> NpcMarkers;
 		public static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private bool hasOpenedMap = false;
@@ -175,7 +175,7 @@ namespace NPCMapLocations
 				{"Wizard", false}
 			};
       CustomHandler.UpdateCustomNpcs();
-			NpcNames = CustomHandler.GetNpcNames();
+			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
 		}
@@ -198,7 +198,7 @@ namespace NPCMapLocations
 				{
 					Game1.activeClickableMenu = new ModMenu(
 						SecondaryNpcs,
-						NpcNames,
+						CustomNames,
 						MarkerCropOffsets,
 						this.Helper,
 						this.Config
@@ -334,7 +334,7 @@ namespace NPCMapLocations
       // allows for better compatibility with other mods that use MapPage
 			pages[GameMenu.mapTab] = new ModMapPage(
 				NpcMarkers,
-				NpcNames,
+				CustomNames,
 				SecondaryNpcs,
 				FarmerMarkers,
 				MarkerCropOffsets,

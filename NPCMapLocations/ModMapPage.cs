@@ -21,7 +21,7 @@ namespace NPCMapLocations
 	{
 		private readonly IModHelper Helper;
 		private readonly ModConfig Config;
-		private readonly Dictionary<string, string> NpcNames;
+		private readonly Dictionary<string, string> CustomNames;
 		private Dictionary<string, bool> SecondaryNpcs { get; }
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<long, MapMarker> FarmerMarkers;
@@ -53,7 +53,7 @@ namespace NPCMapLocations
 			600 + IClickableMenu.borderWidth * 2)
 		{
 			this.NpcMarkers = npcMarkers;
-			this.NpcNames = npcNames;
+			this.CustomNames = npcNames;
 			this.SecondaryNpcs = secondaryNpcs;
 			this.FarmerMarkers = farmerMarkers;
 			this.MarkerCropOffsets = MarkerCropOffsets;
@@ -114,8 +114,8 @@ namespace NPCMapLocations
 					if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
 					    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 					{
-						if (this.NpcNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
-							hoveredList.Add(this.NpcNames[npcMarker.Npc.Name]);
+						if (this.CustomNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
+							hoveredList.Add(this.CustomNames[npcMarker.Npc.Name]);
 
 						if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
 							hasIndoorCharacter = true;

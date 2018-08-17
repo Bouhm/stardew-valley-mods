@@ -511,7 +511,7 @@ namespace NPCMapLocations
 	internal class ModCheckbox : OptionsElement
 	{
 		private readonly IModHelper Helper;
-		private readonly Dictionary<string, string> NpcNames;
+		private readonly Dictionary<string, string> CustomNames;
 		private readonly Dictionary<string, int> MarkerCropOffsets;
 		private readonly Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private ModConfig Config;
@@ -532,7 +532,7 @@ namespace NPCMapLocations
 			this.Helper = helper;
 			this.Config = config;
 			this.MarkerCropOffsets = MarkerCropOffsets;
-			this.NpcNames = npcNames;
+			this.CustomNames = npcNames;
 			this.label = label;
 
 			if (whichOption < 49)
@@ -652,7 +652,7 @@ namespace NPCMapLocations
 					SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f,
 						0.1f, false, -1, "", -1);
 				else
-					Utility.drawTextWithShadow(b, NpcNames[label], Game1.dialogueFont,
+					Utility.drawTextWithShadow(b, CustomNames[label], Game1.dialogueFont,
 						new Vector2((float) (slotX + this.bounds.X + this.bounds.Width + 8), (float) (slotY + this.bounds.Y)),
 						this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
 			}

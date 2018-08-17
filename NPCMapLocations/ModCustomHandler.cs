@@ -13,7 +13,7 @@ namespace NPCMapLocations
 		private readonly IModHelper Helper;
 		private readonly IMonitor Monitor;
 		private ModConfig Config;
-		private Dictionary<string, string> NpcNames; // For handling custom names
+		private Dictionary<string, string> CustomNames; // For handling custom names
 		private Dictionary<string, int> MarkerCropOffsets;
 		private HashSet<string> NpcCustomizations;
 		private string CustomNpcNames;
@@ -24,7 +24,7 @@ namespace NPCMapLocations
 			this.Helper = helper;
 			this.Config = config;
 			this.Monitor = monitor;
-			this.NpcNames = new Dictionary<string, string>();
+			this.CustomNames = new Dictionary<string, string>();
 			this.NpcCustomizations = new HashSet<string>();
 		}
 
@@ -81,7 +81,7 @@ namespace NPCMapLocations
 
 		public Dictionary<string, string> GetNpcNames()
 		{
-			return this.NpcNames;
+			return this.CustomNames;
 		}
 
 		public Dictionary<string, int> GetMarkerCropOffsets()
@@ -93,13 +93,13 @@ namespace NPCMapLocations
 		// Specifically mods that change names in dialogue files (displayName)
 		private void LoadCustomNames(NPC npc)
 		{
-			if (!this.NpcNames.TryGetValue(npc.Name, out string customName))
+			if (!this.CustomNames.TryGetValue(npc.Name, out string customName))
 			{
 				if (npc.displayName == null)
-					this.NpcNames.Add(npc.Name, npc.Name);
+					this.CustomNames.Add(npc.Name, npc.Name);
 				else
 				{
-					this.NpcNames.Add(npc.Name, npc.displayName);
+					this.CustomNames.Add(npc.Name, npc.displayName);
 					if (!npc.Name.Equals(npc.displayName) || this.Config.CustomCropOffsets.ContainsKey(npc.Name))
 						this.NpcCustomizations.Add(npc.Name);
 				}
