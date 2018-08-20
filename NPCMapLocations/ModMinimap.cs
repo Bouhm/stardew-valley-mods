@@ -21,7 +21,7 @@ namespace NPCMapLocations
         private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
         private readonly Texture2D BuildingMarkers;
 
-        private bool isBeingDragged;
+        public bool isBeingDragged;
         private Vector2 mmPos;
         private int prevMmX;
         private int prevMmY;
@@ -60,18 +60,18 @@ namespace NPCMapLocations
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
 
-        mmX = this.Config.MinimapX;
-        mmY = this.Config.MinimapY;
+            mmX = this.Config.MinimapX;
+            mmY = this.Config.MinimapY;
             mmWidth = this.Config.MinimapWidth;
-        mmHeight = this.Config.MinimapHeight;
+            mmHeight = this.Config.MinimapHeight;
         }
 
         public void HandleMouseDown()
         {
-            isBeingDragged = true;
             if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
                 Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
             {
+                isBeingDragged = true;
                 prevMmX = mmX;
                 prevMmY = mmY;
                 prevMouseX = Game1.getMouseX();
@@ -139,20 +139,22 @@ namespace NPCMapLocations
         // Center or the player's position is used as reference; player is not center when reaching edge of map
         public void DrawMiniMap(SpriteBatch b)
         {
-            if (isBeingDragged && (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
-                Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth))
+            if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+                Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
             {
-                mmX = prevMmX + Game1.getMouseX() - prevMouseX;
-                mmY = prevMmY + Game1.getMouseY() - prevMouseY;
-                mmX = (int)MathHelper.Clamp(mmX, 0 + borderWidth, Game1.viewport.Width - mmWidth - borderWidth);
-                mmY = (int)MathHelper.Clamp(mmY, 0 + borderWidth, Game1.viewport.Height - mmHeight - borderWidth);
+                Game1.mouseCursor = 2;
+                if (isBeingDragged)
+                {
+                    mmX = (int)MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth, Game1.viewport.Width - mmWidth - borderWidth);
+                    mmY = (int)MathHelper.Clamp(prevMmY + Game1.getMouseY() - prevMouseY, 0 + borderWidth, Game1.viewport.Height - mmHeight - borderWidth);
+                }
             }
 
             // Crop and draw minimap
             b.Draw(map, new Vector2((float)mmX, (float)mmY),
                 new Rectangle((int)Math.Floor(cropX / Game1.pixelZoom),
                     (int)Math.Floor(cropY / Game1.pixelZoom), mmWidth / Game1.pixelZoom + 2,
-                    mmHeight / Game1.pixelZoom + 2), Color.White, 0f, Vector2.Zero,
+                    mmHeight / Game1.pixelZoom + 2), Color.White * (isBeingDragged? 0.5f : 1f), 0f, Vector2.Zero,
                 4f, SpriteEffects.None, 0.86f);
 
             if (!isBeingDragged)

@@ -183,9 +183,15 @@ namespace NPCMapLocations
 		private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
 		{
 			if (!Context.IsWorldReady) return;
-			
-			Minimap?.HandleMouseDown();
-			if (Game1.activeClickableMenu is GameMenu)
+
+			if (Minimap != null && (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && (Game1.activeClickableMenu == null || Game1.paused))
+			{
+				Minimap.HandleMouseDown();
+				if (Minimap.isBeingDragged)
+					e.SuppressButton();
+			}
+
+			if (Game1.activeClickableMenu is GameMenu) 
 				HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
 		}
 
