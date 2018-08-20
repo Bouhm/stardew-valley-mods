@@ -59,8 +59,8 @@ namespace NPCMapLocations
             playerLoc = center;
             // Top-left offset for markers, relative to the minimap
             mmPos =
-                new Vector2((int)mmX - center.X + mmWidth / 2,
-                    (int)mmY - center.Y + mmHeight / 2);
+                new Vector2(mmX - center.X + mmWidth / 2,
+                    mmY - center.Y + mmHeight / 2);
 
             // Top-left corner of minimap cropped from the whole map
             // Centered around the player's location on the map

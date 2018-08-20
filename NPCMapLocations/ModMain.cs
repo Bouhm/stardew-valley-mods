@@ -324,7 +324,7 @@ namespace NPCMapLocations
 		private void OpenModMap(GameMenu gameMenu)
 		{
 			isModMapOpen = true;
-			UpdateNPCMarkers(true);
+			UpdateNpcs(true);
 			List<IClickableMenu> pages = this.Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
@@ -347,14 +347,14 @@ namespace NPCMapLocations
 		{
 			if (isModMapOpen || forceUpdate || true)
 			{
-        UpdateNPCMarkers(forceUpdate);
+        UpdateNpcs(forceUpdate);
 				if (Context.IsMultiplayer)
-					UpdateMapMarkers();
+					UpdateFarmers();
 			}
 		}
 
 		// Update NPC marker data and names on hover
-		private void UpdateNPCMarkers(bool forceUpdate = false)
+		private void UpdateNpcs(bool forceUpdate = false)
 		{
 			if (NpcMarkers == null) return;
 			foreach (MapMarker npcMarker in NpcMarkers)
@@ -500,28 +500,7 @@ namespace NPCMapLocations
 			}
 		}
 
-		// Only works for Farm atm which isn't very useful
-		// Get synced NPCs in active locations 
-		//private void UpdateSyncedNpcs()
-		//{
-		//	foreach (GameLocation location in this.Helper.Multiplayer.GetActiveLocations())
-		//	{
-		//		MapMarkers = new HashSet<NPCMarker>();
-		//		var syncedNpcs =
-		//			location.characters.Where(npc => !ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager());
-		//		foreach (NPC npc in syncedNpcs)
-		//		{
-		//			NPCMarker npcMarker = new NPCMarker()
-		//			{
-		//				Npc = npc,
-		//				IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
-		//			};
-		//			MapMarkers.Add(npcMarker);
-		//		}
-		//	}
-		//}
-
-		private void UpdateMapMarkers()
+		private void UpdateFarmers()
 		{
 			foreach (Farmer farmer in Game1.getOnlineFarmers())
 			{
