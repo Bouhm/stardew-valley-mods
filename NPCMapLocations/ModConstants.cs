@@ -134,13 +134,19 @@ public static class ModConstants
 			}
 		},
 		{
+			"Merchant", new MapVector[]
+			{
+				new MapVector(320, 410),
+			}
+		},
+		{
 			"Forest", new MapVector[]
 			{
 				new MapVector(0, 0, 250, 383),
 				new MapVector(120, 120, 554, 687)
 			}
 		},
-		{
+        {
 			"Woods", new MapVector[]
 			{
 				new MapVector(0, 0, 136, 346),

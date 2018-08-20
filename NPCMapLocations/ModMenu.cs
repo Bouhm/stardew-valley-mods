@@ -646,7 +646,7 @@ namespace NPCMapLocations
 						(float) Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				}
 
-				// Draw names
+				// Draw xnames
 				slotX += 75;
 				if (this.whichOption == -1)
 					SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f,

@@ -37,9 +37,6 @@ namespace NPCMapLocations
 		// Multiplayer
 		private Dictionary<long, MapMarker> FarmerMarkers;
 
-		// Minimap
-		private Vector2 center;
-
 		// For debug info
 		private const bool DEBUG_MODE = false;
 		private static Vector2 _tileLower;
@@ -320,6 +317,7 @@ namespace NPCMapLocations
 		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
+			Minimap?.Update();
 			UpdateMarkers();
 		}
 
@@ -349,10 +347,7 @@ namespace NPCMapLocations
 		{
 			if (isModMapOpen || forceUpdate || true)
 			{
-				center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
-					Game1.player.getTileY());
-
-                UpdateNPCMarkers(forceUpdate);
+        UpdateNPCMarkers(forceUpdate);
 				if (Context.IsMultiplayer)
 					UpdateMapMarkers();
 			}
@@ -713,10 +708,8 @@ namespace NPCMapLocations
 		// DEBUG 
 		private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
 		{
-			if (Minimap != null)
-			{
-				Minimap.DrawMiniMap(Game1.spriteBatch, center);
-			}
+				Minimap?.DrawMiniMap(Game1.spriteBatch);
+
 
 			if (!Context.IsWorldReady || Game1.player == null)
 			{

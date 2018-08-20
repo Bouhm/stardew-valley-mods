@@ -19,13 +19,16 @@ namespace NPCMapLocations
         private Dictionary<string, int> MarkerCropOffsets { get; }
         private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
         private readonly Texture2D BuildingMarkers;
-        private Dictionary<Texture2D, Vector2>
 
+        private Vector2 mmPos;
         private int mmX = 12;
         private int mmY = 12;
         private int mmWidth = 450;
         private int mmHeight = 270;
+        private float cropX;
+        private float cropY;
         private Vector2 center;
+        private Vector2 playerLoc;
 
         public ModMinimap(
             HashSet<MapMarker> npcMarkers,
@@ -49,18 +52,20 @@ namespace NPCMapLocations
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
         }
 
-        // Have to sync updates and take any logic out of draw so they all render equally 
         public void Update()
         {
+            center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
+                Game1.player.getTileY());
+            playerLoc = center;
             // Top-left offset for markers, relative to the minimap
-            Vector2 mmPos =
+            mmPos =
                 new Vector2((int)mmX - center.X + mmWidth / 2,
                     (int)mmY - center.Y + mmHeight / 2);
 
             // Top-left corner of minimap cropped from the whole map
             // Centered around the player's location on the map
-            var cropX = center.X - mmWidth / 2;
-            var cropY = center.Y - mmHeight / 2;
+            cropX = center.X - mmWidth / 2;
+            cropY = center.Y - mmHeight / 2;
 
             // Handle cases when reaching edge of map
             // Change offsets accordingly when player is no longer centered
@@ -90,52 +95,11 @@ namespace NPCMapLocations
                 mmPos.Y = mmY - (720 - mmHeight);
                 cropY = 720 - mmHeight;
             }
-
         }
 
         // Center or the player's position is used as reference; player is not center when reaching edge of map
-        public void DrawMiniMap(SpriteBatch b, Vector2 center)
-        {
-            // Top-left offset for markers, relative to the minimap
-            Vector2 mmPos =
-                new Vector2((int)mmX - center.X + mmWidth / 2,
-                    (int)mmY - center.Y + mmHeight / 2); 
-            Vector2 playerLoc = center; 
-
-            // Top-left corner of minimap cropped from the whole map
-            // Centered around the player's location on the map
-            var cropX = center.X - mmWidth / 2;
-            var cropY = center.Y - mmHeight / 2;
-
-            // Handle cases when reaching edge of map
-            // Change offsets accordingly when player is no longer centered
-            if (cropX < 0)
-            {
-                center.X = mmWidth / 2;
-                mmPos.X = mmX;
-                cropX = 0;
-            }
-            else if (cropX + mmWidth > map.Width * Game1.pixelZoom)
-            {
-                center.X = map.Width * Game1.pixelZoom - mmWidth / 2;
-                mmPos.X = mmX - (map.Width * Game1.pixelZoom - mmWidth);
-                cropX = map.Width - mmWidth;
-            }
-
-            if (cropY < 0)
-            {
-                center.Y = mmHeight / 2;
-                mmPos.Y = mmY;
-                cropY = 0;
-            }
-            // Actual map is 1200x720 but map.Height includes the farms
-            else if (cropY + mmHeight > 720)
-            {
-                center.Y = 720 - mmHeight / 2;
-                mmPos.Y = mmY - (720 - mmHeight);
-                cropY = 720 - mmHeight;
-            }
-
+        public void DrawMiniMap(SpriteBatch b)
+        {       
             // Crop and draw minimap
             b.Draw(map, new Vector2((float)mmX, (float)mmY),
                 new Rectangle((int)cropX / Game1.pixelZoom,

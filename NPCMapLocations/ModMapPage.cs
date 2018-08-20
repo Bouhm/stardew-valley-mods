@@ -405,8 +405,8 @@ namespace NPCMapLocations
 			// Traveling Merchant
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
-				Vector2 merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
-				b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + merchantLoc.X - 16, mapPagePos.Y + merchantLoc.Y - 15),
+				Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"].FirstOrDefault().X, ModConstants.MapVectors["Merchant"].FirstOrDefault().Y);
+        b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + merchantLoc.X - 16, mapPagePos.Y + merchantLoc.Y - 15),
 					new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 					1f);
 			}
