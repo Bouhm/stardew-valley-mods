@@ -11,6 +11,7 @@ namespace NPCMapLocations
     class ModMinimap
     {
         private Texture2D map;
+        private IModHelper Helper;
         private readonly ModConfig Config;
         private bool drawPamHouseUpgrade;
         private Dictionary<string, bool> SecondaryNpcs { get; }
@@ -20,11 +21,17 @@ namespace NPCMapLocations
         private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
         private readonly Texture2D BuildingMarkers;
 
+        private bool isBeingDragged;
         private Vector2 mmPos;
-        private int mmX = 12;
-        private int mmY = 12;
-        private int mmWidth = 450;
-        private int mmHeight = 270;
+        private int prevMmX;
+        private int prevMmY;
+        private int prevMouseX;
+        private int prevMouseY;
+        private int mmX;
+        private int mmY;
+        private int mmWidth;
+        private int mmHeight;
+        private int borderWidth = 12;
         private float cropX;
         private float cropY;
         private Vector2 center;
@@ -37,6 +44,7 @@ namespace NPCMapLocations
             Dictionary<string, int> MarkerCropOffsets,
             Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
             Texture2D buildingMarkers,
+            IModHelper helper,
             ModConfig config
         )
         {
@@ -46,10 +54,37 @@ namespace NPCMapLocations
             this.MarkerCropOffsets = MarkerCropOffsets;
             this.FarmBuildings = farmBuildings;
             this.BuildingMarkers = buildingMarkers;
+            this.Helper = helper;
             this.Config = config;
 
             map = Game1.content.Load<Texture2D>("LooseSprites\\map");
             drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
+
+        mmX = this.Config.MinimapX;
+        mmY = this.Config.MinimapY;
+            mmWidth = this.Config.MinimapWidth;
+        mmHeight = this.Config.MinimapHeight;
+        }
+
+        public void HandleMouseDown()
+        {
+            isBeingDragged = true;
+            if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+                Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
+            {
+                prevMmX = mmX;
+                prevMmY = mmY;
+                prevMouseX = Game1.getMouseX();
+                prevMouseY = Game1.getMouseY();
+            }
+        }
+
+        public void HandleMouseRelease()
+        {
+            isBeingDragged = false;
+            this.Config.MinimapX = mmX;
+            this.Config.MinimapY = mmY;
+            this.Helper.WriteConfig(this.Config);
         }
 
         public void Update()
@@ -104,6 +139,15 @@ namespace NPCMapLocations
         // Center or the player's position is used as reference; player is not center when reaching edge of map
         public void DrawMiniMap(SpriteBatch b)
         {
+            if (isBeingDragged && (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+                Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth))
+            {
+                mmX = prevMmX + Game1.getMouseX() - prevMouseX;
+                mmY = prevMmY + Game1.getMouseY() - prevMouseY;
+                mmX = (int)MathHelper.Clamp(mmX, 0 + borderWidth, Game1.viewport.Width - mmWidth - borderWidth);
+                mmY = (int)MathHelper.Clamp(mmY, 0 + borderWidth, Game1.viewport.Height - mmHeight - borderWidth);
+            }
+
             // Crop and draw minimap
             b.Draw(map, new Vector2((float)mmX, (float)mmY),
                 new Rectangle((int)Math.Floor(cropX / Game1.pixelZoom),
@@ -111,28 +155,58 @@ namespace NPCMapLocations
                     mmHeight / Game1.pixelZoom + 2), Color.White, 0f, Vector2.Zero,
                 4f, SpriteEffects.None, 0.86f);
 
+            if (!isBeingDragged)
+                DrawMarkers(b);
+           
+            // Border around minimap that will also help mask markers outside of the minimap
+            // Which gives more padding for when they are considered within the minimap area
+            // Draw border
+            DrawLine(b, new Vector2(mmX, mmY - borderWidth), new Vector2(mmX + mmWidth - 2, mmY - borderWidth), borderWidth,
+                Game1.menuTexture, new Rectangle(8, 256, 3, borderWidth));
+            DrawLine(b, new Vector2(mmX + mmWidth + borderWidth, mmY),
+                new Vector2(mmX + mmWidth + borderWidth, mmY + mmHeight - 2), borderWidth, Game1.menuTexture,
+                new Rectangle(8, 256, 3, borderWidth));
+            DrawLine(b, new Vector2(mmX + mmWidth, mmY + mmHeight + borderWidth),
+                new Vector2(mmX + 2, mmY + mmHeight + borderWidth), borderWidth, Game1.menuTexture,
+                new Rectangle(8, 256, 3, borderWidth));
+            DrawLine(b, new Vector2(mmX - borderWidth, mmHeight + mmY), new Vector2(mmX - borderWidth, mmY + 2), borderWidth,
+                Game1.menuTexture, new Rectangle(8, 256, 3, borderWidth));
+
+            // Draw the border corners
+            b.Draw(Game1.menuTexture, new Rectangle(mmX - borderWidth, mmY - borderWidth, borderWidth, borderWidth),
+                new Rectangle?(new Rectangle(0, 256, borderWidth, borderWidth)), Color.White);
+            b.Draw(Game1.menuTexture, new Rectangle(mmX + mmWidth, mmY - borderWidth, borderWidth, borderWidth),
+                new Rectangle?(new Rectangle(48, 256, borderWidth, borderWidth)), Color.White);
+            b.Draw(Game1.menuTexture, new Rectangle(mmX + mmWidth, mmY + mmHeight, borderWidth, borderWidth),
+                new Rectangle?(new Rectangle(48, 304, borderWidth, borderWidth)), Color.White);
+            b.Draw(Game1.menuTexture, new Rectangle(mmX - borderWidth, mmY + mmHeight, borderWidth, borderWidth),
+                new Rectangle?(new Rectangle(0, 304, borderWidth, borderWidth)), Color.White);
+        }
+
+        private void DrawMarkers(SpriteBatch b)
+        {
             // Farm overlay
             int farmCropWidth = (int)MathHelper.Min(131, (mmWidth - mmPos.X + Game1.tileSize / 4) / Game1.pixelZoom);
             int farmCropHeight = (int)MathHelper.Min(61, (mmHeight - mmPos.Y - 172 + Game1.tileSize / 4) / Game1.pixelZoom);
             switch (Game1.whichFarm)
             {
                 case 1:
-                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 172)), new Rectangle(0, 180, farmCropWidth, farmCropHeight), Color.White,
+                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)), new Rectangle(0, 180, farmCropWidth, farmCropHeight), Color.White,
                         0f,
                         Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 2:
-                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 172)), new Rectangle(131, 180, farmCropWidth, farmCropHeight), Color.White,
+                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)), new Rectangle(131, 180, farmCropWidth, farmCropHeight), Color.White,
                         0f,
                         Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 3:
-                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 172)), new Rectangle(0, 241, farmCropWidth, farmCropHeight), Color.White,
+                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)), new Rectangle(0, 241, farmCropWidth, farmCropHeight), Color.White,
                         0f,
                         Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 4:
-                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 172)), new Rectangle(131, 241, farmCropWidth, farmCropHeight), Color.White,
+                    b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)), new Rectangle(131, 241, farmCropWidth, farmCropHeight), Color.White,
                         0f,
                         Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
@@ -152,7 +226,7 @@ namespace NPCMapLocations
 
             if (Config.ShowFarmBuildings && FarmBuildings != null)
             {
-                var sortedBuildings = ModMain.FarmBuildings.ToList();
+                var sortedBuildings = FarmBuildings.ToList();
                 sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
 
                 foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
@@ -273,31 +347,6 @@ namespace NPCMapLocations
                 }
             }
 
-            // Border around minimap that will also help mask markers outside of the minimap
-            // Which gives more padding for when they are considered within the minimap area
-            int borderWidth = 12;
-
-            // Draw border
-            DrawLine(b, new Vector2(mmX, mmY - borderWidth), new Vector2(mmX + mmWidth - 2, mmY - borderWidth), borderWidth,
-                Game1.menuTexture, new Rectangle(8, 256, 3, borderWidth));
-            DrawLine(b, new Vector2(mmX + mmWidth + borderWidth, mmY),
-                new Vector2(mmX + mmWidth + borderWidth, mmY + mmHeight - 2), borderWidth, Game1.menuTexture,
-                new Rectangle(8, 256, 3, borderWidth));
-            DrawLine(b, new Vector2(mmX + mmWidth, mmY + mmHeight + borderWidth),
-                new Vector2(mmX + 2, mmY + mmHeight + borderWidth), borderWidth, Game1.menuTexture,
-                new Rectangle(8, 256, 3, borderWidth));
-            DrawLine(b, new Vector2(mmX - borderWidth, mmHeight + mmY), new Vector2(mmX - borderWidth, mmY + 2), borderWidth,
-                Game1.menuTexture, new Rectangle(8, 256, 3, borderWidth));
-
-            // Draw the border corners
-            b.Draw(Game1.menuTexture, new Rectangle(mmX - borderWidth, mmY - borderWidth, borderWidth, borderWidth),
-                new Rectangle?(new Rectangle(0, 256, borderWidth, borderWidth)), Color.White);
-            b.Draw(Game1.menuTexture, new Rectangle(mmX + mmWidth, mmY - borderWidth, borderWidth, borderWidth),
-                new Rectangle?(new Rectangle(48, 256, borderWidth, borderWidth)), Color.White);
-            b.Draw(Game1.menuTexture, new Rectangle(mmX + mmWidth, mmY + mmHeight, borderWidth, borderWidth),
-                new Rectangle?(new Rectangle(48, 304, borderWidth, borderWidth)), Color.White);
-            b.Draw(Game1.menuTexture, new Rectangle(mmX - borderWidth, mmY + mmHeight, borderWidth, borderWidth),
-                new Rectangle?(new Rectangle(0, 304, borderWidth, borderWidth)), Color.White);
         }
 
         // Normalize offset differences caused by map being 4x less precise than map markers 

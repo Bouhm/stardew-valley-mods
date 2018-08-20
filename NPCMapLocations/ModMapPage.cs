@@ -385,7 +385,7 @@ namespace NPCMapLocations
 
 			if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
-				var sortedBuildings = ModMain.FarmBuildings.ToList();
+				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
 
 				foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)

@@ -29,7 +29,7 @@ namespace NPCMapLocations
 		private Dictionary<string, bool> SecondaryNpcs;
 		private Dictionary<string, string> CustomNames;
 		private HashSet<MapMarker> NpcMarkers;
-		public static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private bool hasOpenedMap = false;
 		private bool isModMapOpen = false;
 		private const int DRAW_DELAY = 3;
@@ -51,14 +51,16 @@ namespace NPCMapLocations
 			BuildingMarkers =
 				this.Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
 
-			SaveEvents.AfterLoad += this.SaveEvents_AfterLoad;
-			TimeEvents.AfterDayStarted += this.TimeEvents_AfterDayStarted;
-			LocationEvents.BuildingsChanged += this.LocationEvents_BuildingsChanged;
-			InputEvents.ButtonPressed += this.InputEvents_ButtonPressed;
+			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
+			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+      InputEvents.ButtonReleased += InputEvents_ButtonReleased;
       GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
-			GameEvents.UpdateTick += this.GameEvents_UpdateTick;
-			GraphicsEvents.OnPostRenderEvent += this.GraphicsEvents_OnPostRenderEvent;
-			GraphicsEvents.Resize += this.GraphicsEvents_Resize;
+			GameEvents.UpdateTick += GameEvents_UpdateTick;
+      GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
+			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+			GraphicsEvents.Resize += GraphicsEvents_Resize;
 		}
 
     // Replace game map with modified map
@@ -76,18 +78,18 @@ namespace NPCMapLocations
 				if (!mapName.Equals("default_map"))
 					this.Monitor.Log($"Detected recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
 
-				map = (T) (object) this.Helper.Content.Load<T>($@"assets\{mapName}.png"); // Replace map page
+				map = (T)(object)this.Helper.Content.Load<T>($@"assets\{mapName}.png"); // Replace map page
 			}
 			catch
 			{
 				this.Monitor.Log($"Unable to find {mapName}; loaded default map instead.", LogLevel.Info);
-				map = (T) (object) this.Helper.Content.Load<T>($@"assets\default_map.png");
+				map = (T)(object)this.Helper.Content.Load<T>($@"assets\default_map.png");
 			}
 
 			return map;
 		}
 
-		private NetCollection<NPC> GetVillagers()
+    private NetCollection<NPC> GetVillagers()
 		{
 			var allNpcs = new NetCollection<NPC>();
 			var locationList = Context.IsMainPlayer
@@ -180,12 +182,21 @@ namespace NPCMapLocations
 		// Handle opening mod menu and changing tooltip options
 		private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
 		{
-			if (Context.IsWorldReady && Game1.activeClickableMenu is GameMenu)
+			if (!Context.IsWorldReady) return;
+			
+			Minimap?.HandleMouseDown();
+			if (Game1.activeClickableMenu is GameMenu)
 				HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
 		}
 
-		// Handle keyboard/controller inputs
-		private void HandleInput(GameMenu menu, SButton input)
+		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
+		{
+			if (Context.IsWorldReady)
+				Minimap?.HandleMouseRelease();
+    }
+
+    // Handle keyboard/controller inputs
+    private void HandleInput(GameMenu menu, SButton input)
 		{
 			if (menu.currentTab != GameMenu.mapTab) return;
 
@@ -271,6 +282,7 @@ namespace NPCMapLocations
 				MarkerCropOffsets,
 				FarmBuildings,
 				BuildingMarkers,
+				Helper,
 				Config
 			);
     }
@@ -331,6 +343,7 @@ namespace NPCMapLocations
       // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
       // allows for better compatibility with other mods that use MapPage
 			pages[GameMenu.mapTab] = new ModMapPage(
+
 				NpcMarkers,
 				CustomNames,
 				SecondaryNpcs,
@@ -684,12 +697,15 @@ namespace NPCMapLocations
 			UpdateFarmBuildingLocs();
 		}
 
-		// DEBUG 
-		private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
+		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
+			if (Context.IsWorldReady)
 				Minimap?.DrawMiniMap(Game1.spriteBatch);
+		}
 
-
+    // DEBUG 
+    private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
+		{
 			if (!Context.IsWorldReady || Game1.player == null)
 			{
 				return;
