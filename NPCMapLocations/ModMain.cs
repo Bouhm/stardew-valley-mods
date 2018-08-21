@@ -184,7 +184,7 @@ namespace NPCMapLocations
 		{
 			if (!Context.IsWorldReady) return;
 
-			if (Minimap != null && (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && (Game1.activeClickableMenu == null || Game1.paused))
+			if (Minimap != null && (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) && Game1.activeClickableMenu == null)
 			{
 				Minimap.HandleMouseDown();
 				if (Minimap.isBeingDragged)
@@ -281,16 +281,19 @@ namespace NPCMapLocations
 			}
 
 			ResetMarkers();
-			Minimap = new ModMinimap(
-				NpcMarkers,
-				SecondaryNpcs,
-				FarmerMarkers,
-				MarkerCropOffsets,
-				FarmBuildings,
-				BuildingMarkers,
-				Helper,
-				Config
-			);
+			if (Config.ShowMinimap)
+			{
+				Minimap = new ModMinimap(
+					NpcMarkers,
+					SecondaryNpcs,
+					FarmerMarkers,
+					MarkerCropOffsets,
+					FarmBuildings,
+					BuildingMarkers,
+					Helper,
+					Config
+				);
+			}
     }
 
 		private void ResetMarkers()
@@ -608,7 +611,7 @@ namespace NPCMapLocations
 				return Vector2.Zero;
 			}
             
-			int x = 0;
+			int x;
 			int y;
 
 			// Precise (static) regions and indoor locations

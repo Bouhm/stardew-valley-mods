@@ -107,7 +107,8 @@ namespace NPCMapLocations
 			this.options.Add(new MapModSlider("immersion.slider1", 0, -1, -1, helper, config));
 			this.options.Add(new MapModSlider("immersion.slider2", 1, -1, -1, helper, config));
 			this.options.Add(new OptionsElement(extraLabel));
-			this.options.Add(new ModCheckbox("extra.option1", 51, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+			this.options.Add(new ModCheckbox("minimap.option1", 54, -1, -1, npcNames, MarkerCropOffsets, helper, config));
+      this.options.Add(new ModCheckbox("extra.option1", 51, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			this.options.Add(new ModCheckbox("extra.option2", 52, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			this.options.Add(new ModCheckbox("extra.option3", 53, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			this.options.Add(new OptionsElement(villagersLabel));
@@ -568,7 +569,10 @@ namespace NPCMapLocations
 				case 53:
 					this.isChecked = this.Config.ShowTravelingMerchant;
 					return;
-				default:
+				case 54:
+					this.isChecked = this.Config.ShowMinimap;
+					return;
+        default:
 					return;
 			}
 		}
@@ -611,7 +615,10 @@ namespace NPCMapLocations
 					case 53:
 						this.Config.ShowTravelingMerchant = this.isChecked;
 						break;
-					default:
+					case 54:
+						this.Config.ShowMinimap = this.isChecked;
+						break;
+                    default:
 						break;
 				}
 			}

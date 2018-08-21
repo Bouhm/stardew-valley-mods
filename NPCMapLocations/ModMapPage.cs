@@ -74,8 +74,8 @@ namespace NPCMapLocations
 				var rect = regionRects.ElementAt(i);
 				this.points[i].bounds = new Rectangle(
 					// Snaps the cursor to the center instead of bottom right (default)
-					(int) ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2,
-					(int) ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2,
+					(int) (mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
+					(int) (mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
 					rect.Value.Width,
 					rect.Value.Height
 				);
@@ -110,7 +110,7 @@ namespace NPCMapLocations
 			{
 				foreach (MapMarker npcMarker in this.NpcMarkers)
 				{
-					Vector2 npcLocation = npcMarker.Location;
+					Vector2 npcLocation = new Vector2(mapX + npcMarker.Location.X, mapY + npcMarker.Location.Y);
 					if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
 					    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 					{
@@ -127,10 +127,11 @@ namespace NPCMapLocations
 			{
 				foreach (MapMarker farMarker in FarmerMarkers.Values)
 				{
-					if (Game1.getMouseX() >= farMarker.Location.X - markerWidth / 2
-					    && Game1.getMouseX() <= farMarker.Location.X + markerWidth / 2
-					    && Game1.getMouseY() >= farMarker.Location.Y - markerHeight / 2
-					    && Game1.getMouseY() <= farMarker.Location.Y + markerHeight / 2)
+					Vector2 farmerLocation = new Vector2(mapX + farMarker.Location.X, mapY + farMarker.Location.Y);
+             if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
+					    && Game1.getMouseX() <= farmerLocation.X + markerWidth / 2
+					    && Game1.getMouseY() >= farmerLocation.Y - markerHeight / 2
+					    && Game1.getMouseY() <= farmerLocation.Y + markerHeight / 2)
 					{
 						hoveredList.Add(farMarker.Name);
 

@@ -23,6 +23,7 @@ namespace NPCMapLocations
 		public bool ShowTravelingMerchant { get; set; } = true;
 		public bool ShowFarmBuildings { get; set; } = true;
 
+		public bool ShowMinimap { get; set; } = true;
 		public int MinimapX { get; set; } = 12;
 		public int MinimapY { get; set; } = 12;
 		public int MinimapWidth { get; set; } = 450;

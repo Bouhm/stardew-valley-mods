@@ -142,7 +142,10 @@ namespace NPCMapLocations
             if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
                 Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
             {
-                Game1.mouseCursor = 2;
+                // Change cursor to hand 
+                if (Game1.activeClickableMenu == null)
+                    Game1.mouseCursor = 2;
+
                 if (isBeingDragged)
                 {
                     mmX = (int)MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth, Game1.viewport.Width - mmWidth - borderWidth);
