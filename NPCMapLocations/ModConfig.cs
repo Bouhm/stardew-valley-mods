@@ -26,7 +26,7 @@ namespace NPCMapLocations
 		public bool ShowMinimap { get; set; } = true;
 		public int MinimapX { get; set; } = 12;
 		public int MinimapY { get; set; } = 12;
-		public int MinimapWidth { get; set; } = 450;
-		public int MinimapHeight { get; set; } = 270;
-	}
+		public int MinimapWidth { get; set; } = 100;
+		public int MinimapHeight { get; set; } = 60;
+  }
 }

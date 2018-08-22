@@ -13,7 +13,6 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework.Content;
 
 namespace NPCMapLocations
 {
@@ -381,9 +380,6 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
-			Vector2 mapPagePos =
-				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-
 			if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
@@ -395,8 +391,8 @@ namespace NPCMapLocations
 						b.Draw(
 							BuildingMarkers,
 							new Vector2(
-								mapPagePos.X + building.Value.Value.X - buildingRect.Width / 2,
-								mapPagePos.Y + building.Value.Value.Y - buildingRect.Height / 2
+								mapX + building.Value.Value.X - buildingRect.Width / 2,
+								mapY + building.Value.Value.Y - buildingRect.Height / 2
 							),
 							new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
 						);
@@ -407,7 +403,7 @@ namespace NPCMapLocations
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
 				Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"].FirstOrDefault().X, ModConstants.MapVectors["Merchant"].FirstOrDefault().Y);
-        b.Draw(Game1.mouseCursors, new Vector2(mapPagePos.X + merchantLoc.X - 16, mapPagePos.Y + merchantLoc.Y - 15),
+        b.Draw(Game1.mouseCursors, new Vector2(mapX + merchantLoc.X - 16, mapY + merchantLoc.Y - 15),
 					new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 					1f);
 			}
@@ -421,7 +417,7 @@ namespace NPCMapLocations
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
 						if (farMarker.DrawDelay == 0)
 							farmer.FarmerRenderer.drawMiniPortrat(b,
-								new Vector2(mapPagePos.X + farMarker.Location.X - 16, mapPagePos.Y + farMarker.Location.Y - 15),
+								new Vector2(mapX + farMarker.Location.X - 16, mapY + farMarker.Location.Y - 15),
 								0.00011f, 2f, 1, farmer);
 				}
 			}
@@ -430,7 +426,7 @@ namespace NPCMapLocations
 				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
 					Game1.player.getTileY());
 				Game1.player.FarmerRenderer.drawMiniPortrat(b,
-					new Vector2(mapPagePos.X + playerLoc.X - 16, mapPagePos.Y + playerLoc.Y - 15), 0.00011f, 2f, 1,
+					new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
 					Game1.player);
 			}
 
@@ -452,14 +448,14 @@ namespace NPCMapLocations
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapPagePos.X + npcMarker.Location.X), (int) (mapPagePos.Y + npcMarker.Location.Y),
+						new Rectangle((int) (mapX + npcMarker.Location.X), (int) (mapY + npcMarker.Location.Y),
 							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapPagePos.X + npcMarker.Location.X + 20, mapPagePos.Y + npcMarker.Location.Y),
+							new Vector2(mapX + npcMarker.Location.X + 20, mapY + npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
@@ -468,7 +464,7 @@ namespace NPCMapLocations
 					{
 						// Quest icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapPagePos.X + npcMarker.Location.X + 22, mapPagePos.Y + npcMarker.Location.Y - 3),
+							new Vector2(mapX + npcMarker.Location.X + 22, mapY + npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
@@ -476,14 +472,14 @@ namespace NPCMapLocations
 				else
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapPagePos.X + npcMarker.Location.X), (int) (mapPagePos.Y + npcMarker.Location.Y),
+						new Rectangle((int) (mapX + npcMarker.Location.X), (int) (mapY + npcMarker.Location.Y),
 							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapPagePos.X + npcMarker.Location.X + 20, mapPagePos.Y + npcMarker.Location.Y),
+							new Vector2(mapX + npcMarker.Location.X + 20, mapY + npcMarker.Location.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
@@ -492,7 +488,7 @@ namespace NPCMapLocations
 					{
 						// Quest icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapPagePos.X + npcMarker.Location.X + 22, mapPagePos.Y + npcMarker.Location.Y - 3),
+							new Vector2(mapX + npcMarker.Location.X + 22, mapY + npcMarker.Location.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
