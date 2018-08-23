@@ -774,10 +774,12 @@ namespace NPCMapLocations
 					selected = (int)MathHelper.Clamp(((int)Math.Floor((Config.MinimapHeight - 45) / 15.0)), 0, options.Count - 1);
 					options[selected] = Config.MinimapHeight;
 					break;
+				/*
 				case 57:
 					selected = (int)MathHelper.Clamp(((int)Math.Floor((Config.MinimapOpacity - 50) / 5.0)), 0, options.Count - 1);
 					options[selected] = Config.MinimapOpacity;
 					break;
+				*/
 				default:
 					break;
 			}
@@ -814,55 +816,57 @@ namespace NPCMapLocations
 				case 56:
 					Config.MinimapHeight = options[selected];
 					break;
-				case 57:
-					Config.MinimapOpacity = options[selected];
-					break;
+/*
+case 57:
+Config.MinimapOpacity = options[selected];
+break;
+*/
 				default:
 					break;
-			}
+}
 
-			Helper.WriteConfig(Config);
-		}
+Helper.WriteConfig(Config);
+}
 
-		public override void receiveKeyPress(Keys key)
-		{
-			base.receiveKeyPress(key);
-			if (Game1.options.snappyMenus && Game1.options.gamepadControls)
-			{
-				if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
-					receiveLeftClick(plusButton.Center.X, plusButton.Center.Y);
-				else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
-					receiveLeftClick(minusButton.Center.X, minusButton.Center.Y);
-			}
-		}
+public override void receiveKeyPress(Keys key)
+{
+base.receiveKeyPress(key);
+if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+{
+if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+receiveLeftClick(plusButton.Center.X, plusButton.Center.Y);
+else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+receiveLeftClick(minusButton.Center.X, minusButton.Center.Y);
+}
+}
 
-		public override void draw(SpriteBatch b, int slotX, int slotY)
-		{
-			greyedOut = !Config.ShowMinimap;
-			b.Draw(Game1.mouseCursors, new Vector2(slotX + minusButton.X, slotY + minusButton.Y), minusButtonSource,
-				Color.White * (greyedOut ? 0.33f : 1f) * (selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
-				0.4f);
-			b.DrawString(Game1.dialogueFont,
-				selected < displayOptions.Count && selected != -1 ? displayOptions[selected] : "",
-				new Vector2((int)(txtSize/2) + slotX, slotY + minusButton.Y), Game1.textColor* (greyedOut ? 0.33f : 1f));
-			b.Draw(Game1.mouseCursors, new Vector2(slotX + plusButton.X, slotY + plusButton.Y), plusButtonSource,
-				Color.White * (greyedOut ? 0.33f : 1f) * (selected == displayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
-				4f, SpriteEffects.None, 0.4f);
-			if (!Game1.options.snappyMenus && Game1.options.gamepadControls)
-			{
-				if (snapZoomMinus)
-				{
-					Game1.setMousePosition(slotX + minusButton.Center.X, slotY + minusButton.Center.Y);
-					snapZoomMinus = false;
-				}
-				else if (snapZoomPlus)
-				{
-					Game1.setMousePosition(slotX + plusButton.Center.X, slotY + plusButton.Center.Y);
-					snapZoomPlus = false;
-				}
-			}
+public override void draw(SpriteBatch b, int slotX, int slotY)
+{
+greyedOut = !Config.ShowMinimap;
+b.Draw(Game1.mouseCursors, new Vector2(slotX + minusButton.X, slotY + minusButton.Y), minusButtonSource,
+Color.White * (greyedOut ? 0.33f : 1f) * (selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
+0.4f);
+b.DrawString(Game1.dialogueFont,
+selected < displayOptions.Count && selected != -1 ? displayOptions[selected] : "",
+new Vector2((int)(txtSize/2) + slotX, slotY + minusButton.Y), Game1.textColor* (greyedOut ? 0.33f : 1f));
+b.Draw(Game1.mouseCursors, new Vector2(slotX + plusButton.X, slotY + plusButton.Y), plusButtonSource,
+Color.White * (greyedOut ? 0.33f : 1f) * (selected == displayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
+4f, SpriteEffects.None, 0.4f);
+if (!Game1.options.snappyMenus && Game1.options.gamepadControls)
+{
+if (snapZoomMinus)
+{
+Game1.setMousePosition(slotX + minusButton.Center.X, slotY + minusButton.Center.Y);
+snapZoomMinus = false;
+}
+else if (snapZoomPlus)
+{
+Game1.setMousePosition(slotX + plusButton.Center.X, slotY + plusButton.Center.Y);
+snapZoomPlus = false;
+}
+}
 
-			base.draw(b, slotX, slotY);
-		}
-	}
+base.draw(b, slotX, slotY);
+}
+}
 }
