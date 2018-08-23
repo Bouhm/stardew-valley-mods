@@ -92,26 +92,22 @@ namespace NPCMapLocations
       MenuEvents.MenuClosed += MenuEvents_MenuClosed;
 		}
 
-    private NetCollection<NPC> GetVillagers()
+    private HashSet<NPC> GetVillagers()
 		{
-			var allNpcs = new NetCollection<NPC>();
-			var locationList = Context.IsMainPlayer
-				? Helper.Multiplayer.GetActiveLocations().Concat(Game1.locations)
-				: Helper.Multiplayer.GetActiveLocations();
+			var villagers = new HashSet<NPC>();
 
-			foreach (var location in locationList)
+			foreach (var location in Game1.locations)
 			{
 				foreach (var npc in location.characters)
 				{
 					if (npc == null) continue;
-					if (!allNpcs.Contains(npc)
-					    && !ModConstants.ExcludedVillagers.Contains(npc.Name)
+					if (!ModConstants.ExcludedVillagers.Contains(npc.Name)
 					    && npc.isVillager())
-						allNpcs.Add(npc);
+						villagers.Add(npc);
 				}
 			}
 
-			return allNpcs;
+			return villagers;
 		}
 
 		// For drawing farm buildings on the map 
