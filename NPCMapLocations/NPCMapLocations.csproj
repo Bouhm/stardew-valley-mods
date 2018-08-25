@@ -53,6 +53,7 @@
     <Compile Include="ModMain.cs" />
     <Compile Include="ModMapPage.cs" />
     <Compile Include="ModMenu.cs" />
+    <Compile Include="NpcSync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
