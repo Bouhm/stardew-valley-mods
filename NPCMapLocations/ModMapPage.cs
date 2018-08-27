@@ -105,23 +105,20 @@ namespace NPCMapLocations
 				? "，"
 				: ", ";
 
-			if (Context.IsMainPlayer)
+			foreach (MapMarker npcMarker in this.NpcMarkers)
 			{
-				foreach (MapMarker npcMarker in this.NpcMarkers)
+				Vector2 npcLocation = new Vector2(mapX + npcMarker.Location.X, mapY + npcMarker.Location.Y);
+				if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
+				    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 				{
-					Vector2 npcLocation = new Vector2(mapX + npcMarker.Location.X, mapY + npcMarker.Location.Y);
-					if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
-					    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
-					{
-						if (this.CustomNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
-							hoveredList.Add(this.CustomNames[npcMarker.Npc.Name]);
+					if (this.CustomNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
+						hoveredList.Add(this.CustomNames[npcMarker.Npc.Name]);
 
-						if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
-							hasIndoorCharacter = true;
-					}
+					if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
+						hasIndoorCharacter = true;
 				}
 			}
-
+			
 			if (Context.IsMultiplayer)
 			{
 				foreach (MapMarker farMarker in FarmerMarkers.Values)
