@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NPCMapLocations.util;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -47,7 +46,7 @@ namespace NPCMapLocations
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
-		private static string alertFlag;
+		private static List<string> alertFlags; 
 
 
 		// Replace game map with modified map
@@ -97,6 +96,7 @@ namespace NPCMapLocations
       MenuEvents.MenuClosed += MenuEvents_MenuClosed;
 		}
 
+		// Get only relevant villagers for map
     private List<NPC> GetVillagers()
 		{
 			var villagers = new List<NPC>();
@@ -180,15 +180,26 @@ namespace NPCMapLocations
 			// Multiplayer NPC Sync for farmhands
 			//if (Context.IsMultiplayer)
 			//{
-				var SyncedNpcs = new List<NPC>();
-				NpcSyncer = new PyResponder<List<NPC>, HashSet<MapMarker>>("MapMod.NpcSync",
+					var xmlSer = new XmlSerializer(typeof(SerializableDictionary<string, NpcSync>));
+					NpcSyncer = new PyResponder<bool, SerializableDictionary<string, NpcSync>>("MapMod.NpcSync",
 					(s) =>
 					{
 						foreach (var marker in NpcMarkers)
-							SyncedNpcs.Add(marker.Npc);
+						{
+							if (s.TryGetValue(marker.Npc.Name, out var npcSync))
+							{
+								var syncedMarker = new MapMarker() {
+									IsOutdoors = s[marker.Npc.Name].IsOutdoors,
+									MapLocation = new Vector2(s[marker.Npc.Name].LocX, s[marker.Npc.Name].LocY) 
+								};
+								NpcMarkers.Remove(marker);
+								NpcMarkers.Add(syncedMarker);
+							}
+						}
 
-						return SyncedNpcs;
-					}, 30);
+						return true;
+					}, 30, SerializationType.XML, SerializationType.XML, xmlSer);
+					
 				NpcSyncer.start();
 			//}
 		}
@@ -399,10 +410,10 @@ namespace NPCMapLocations
 
 				if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
 				{
-					if (alertFlag != "UnknownLocation:" + locationName)
+					if (!alertFlags.Contains("UnknownLocation:" + locationName))
 					{
 						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Warn);
-						alertFlag = "UnknownLocation:" + locationName;
+						alertFlags.Add("UnknownLocation:" + locationName);
 					}
 					continue;
 				}
@@ -501,12 +512,12 @@ namespace NPCMapLocations
 					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - 16;
 					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - 15;
 
-					npcMarker.Location = new Vector2(x, y);
+					npcMarker.MapLocation = new Vector2(x, y);
 				}
 				else
 				{
 					// Set no location so they don't get drawn
-					npcMarker.Location = Vector2.Zero;
+					npcMarker.MapLocation = Vector2.Zero;
 				}
 			}
 		}
@@ -518,10 +529,10 @@ namespace NPCMapLocations
 				if (farmer?.currentLocation == null) continue;
 				if (!ModConstants.MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
 				{
-					if (alertFlag != "UnknownLocation:" + farmer.currentLocation.Name)
+					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
 					{
 						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Warn);
-						alertFlag = "UnknownLocation:" + farmer.currentLocation.Name;
+						alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
 					}
 				}
 
@@ -530,8 +541,8 @@ namespace NPCMapLocations
 
 				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 				{
-					var deltaX = farmerLoc.X - farMarker.PrevLocation.X;
-					var deltaY = farmerLoc.Y - farMarker.PrevLocation.Y;
+					var deltaX = farmerLoc.X - farMarker.PrevMapLocation.X;
+					var deltaY = farmerLoc.Y - farMarker.PrevMapLocation.Y;
 
 					// Location changes before tile position, causing farmhands to blink
 					// to the wrong position upon entering new location. Handle this in draw.
@@ -551,8 +562,8 @@ namespace NPCMapLocations
 					FarmerMarkers.Add(farmerId, newMarker);
 				}
 
-				FarmerMarkers[farmerId].Location = farmerLoc;
-				FarmerMarkers[farmerId].PrevLocation = farmerLoc;
+				FarmerMarkers[farmerId].MapLocation = farmerLoc;
+				FarmerMarkers[farmerId].PrevMapLocation = farmerLoc;
 				FarmerMarkers[farmerId].PrevLocationName = farmer.currentLocation.Name;
 				FarmerMarkers[farmerId].IsOutdoors = farmer.currentLocation.IsOutdoors;
 			}
@@ -562,11 +573,11 @@ namespace NPCMapLocations
 		{
 			foreach (Farmer farmer in Game1.otherFarmers.Values)
 			{
-				Task<List<NPC>> syncNpc = PyNet.sendRequestToFarmer<List<NPC>>("MapMod.NpcSync", NpcMarkers, farmer);
+				// Check first if farmer has mod installed?
+
+				Task<SerializableDictionary<string, NpcSync>> syncNpc = PyNet.sendRequestToFarmer<SerializableDictionary<string, NpcSync>>("MapMod.NpcSync", NpcMarkers, farmer);
 				syncNpc.Wait();
 				if (syncNpc.Result == null)
-					ResetMarkers(syncNpc.Result);
-				else
 					Monitor.Log($"Failed to sync NPCs for {farmer.Name}", LogLevel.Error);
 			}
 		}
@@ -739,11 +750,11 @@ namespace NPCMapLocations
 	// Class for map markers
 	public class MapMarker
 	{
-		public string Name { get; set; }
+		public string Name { get; set; } // For any customized names; Npc.Name would be vanilla names
 		public Texture2D Marker { get; set; }
 		public NPC Npc { get; set; }
-		public Vector2 Location { get; set; }
-		public Vector2 PrevLocation { get; set; }
+		public Vector2 MapLocation { get; set; }
+		public Vector2 PrevMapLocation { get; set; }
 		public string PrevLocationName { get; set; }
 		public bool IsBirthday { get; set; }
 		public bool HasQuest { get; set; }

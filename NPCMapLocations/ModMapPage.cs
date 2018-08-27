@@ -107,7 +107,7 @@ namespace NPCMapLocations
 
 			foreach (MapMarker npcMarker in this.NpcMarkers)
 			{
-				Vector2 npcLocation = new Vector2(mapX + npcMarker.Location.X, mapY + npcMarker.Location.Y);
+				Vector2 npcLocation = new Vector2(mapX + npcMarker.MapLocation.X, mapY + npcMarker.MapLocation.Y);
 				if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
 				    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 				{
@@ -123,7 +123,7 @@ namespace NPCMapLocations
 			{
 				foreach (MapMarker farMarker in FarmerMarkers.Values)
 				{
-					Vector2 farmerLocation = new Vector2(mapX + farMarker.Location.X, mapY + farMarker.Location.Y);
+					Vector2 farmerLocation = new Vector2(mapX + farMarker.MapLocation.X, mapY + farMarker.MapLocation.Y);
              if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
 					    && Game1.getMouseX() <= farmerLocation.X + markerWidth / 2
 					    && Game1.getMouseY() >= farmerLocation.Y - markerHeight / 2
@@ -414,7 +414,7 @@ namespace NPCMapLocations
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
 						if (farMarker.DrawDelay == 0)
 							farmer.FarmerRenderer.drawMiniPortrat(b,
-								new Vector2(mapX + farMarker.Location.X - 16, mapY + farMarker.Location.Y - 15),
+								new Vector2(mapX + farMarker.MapLocation.X - 16, mapY + farMarker.MapLocation.Y - 15),
 								0.00011f, 2f, 1, farmer);
 				}
 			}
@@ -435,7 +435,7 @@ namespace NPCMapLocations
 			foreach (MapMarker npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
-				if (npcMarker.Location == Vector2.Zero || npcMarker.Marker == null ||
+				if (npcMarker.MapLocation == Vector2.Zero || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
 				{
 					continue;
@@ -445,14 +445,14 @@ namespace NPCMapLocations
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapX + npcMarker.Location.X), (int) (mapY + npcMarker.Location.Y),
+						new Rectangle((int) (mapX + npcMarker.MapLocation.X), (int) (mapY + npcMarker.MapLocation.Y),
 							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.Location.X + 20, mapY + npcMarker.Location.Y),
+							new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
@@ -461,7 +461,7 @@ namespace NPCMapLocations
 					{
 						// Quest icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.Location.X + 22, mapY + npcMarker.Location.Y - 3),
+							new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 					}
@@ -469,14 +469,14 @@ namespace NPCMapLocations
 				else
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapX + npcMarker.Location.X), (int) (mapY + npcMarker.Location.Y),
+						new Rectangle((int) (mapX + npcMarker.MapLocation.X), (int) (mapY + npcMarker.MapLocation.Y),
 							32, 30),
 						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
 					if (npcMarker.IsBirthday)
 					{
 						// Gift icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.Location.X + 20, mapY + npcMarker.Location.Y),
+							new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
 							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}
@@ -485,7 +485,7 @@ namespace NPCMapLocations
 					{
 						// Quest icon
 						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.Location.X + 22, mapY + npcMarker.Location.Y - 3),
+							new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
 							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 					}

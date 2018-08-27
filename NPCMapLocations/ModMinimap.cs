@@ -284,11 +284,11 @@ namespace NPCMapLocations
 						if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 						{
 							if (farMarker.DrawDelay == 0 &&
-							    IsWithinMapArea(farMarker.Location.X - 16, farMarker.Location.Y - 15))
+							    IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
 							{
 								farmer.FarmerRenderer.drawMiniPortrat(b,
-									new Vector2(NormalizeToMap(mmPos.X + farMarker.Location.X - 16),
-										NormalizeToMap(mmPos.Y + farMarker.Location.Y - 15)),
+									new Vector2(NormalizeToMap(mmPos.X + farMarker.MapLocation.X - 16),
+										NormalizeToMap(mmPos.Y + farMarker.MapLocation.Y - 15)),
 									0.00011f, 2f, 1, farmer);
 							}
 						}
@@ -311,52 +311,52 @@ namespace NPCMapLocations
 			foreach (var npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
-				if (npcMarker.Location == Vector2.Zero || npcMarker.Marker == null ||
+				if (npcMarker.MapLocation == Vector2.Zero || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name) ||
-				    !IsWithinMapArea(npcMarker.Location.X, npcMarker.Location.Y))
+				    !IsWithinMapArea(npcMarker.MapLocation.X, npcMarker.MapLocation.Y))
 					continue;
 
 				// Tint/dim hidden markers
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.Location.X),
-							NormalizeToMap(mmPos.Y + npcMarker.Location.Y),
+						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X),
+							NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y),
 							32, 30),
 						new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.Location.X + 20),
-								NormalizeToMap(mmPos.Y + npcMarker.Location.Y)),
+							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 20),
+								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y)),
 							new Rectangle(147, 412, 10, 11), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 
 					if (npcMarker.HasQuest)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.Location.X + 22),
-								NormalizeToMap(mmPos.Y + npcMarker.Location.Y - 3)),
+							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 22),
+								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y - 3)),
 							new Rectangle(403, 496, 5, 14), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 				}
 				else
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.Location.X),
-							NormalizeToMap(mmPos.Y + npcMarker.Location.Y),
+						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X),
+							NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y),
 							30, 32),
 						new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White);
 					if (npcMarker.IsBirthday)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.Location.X + 20),
-								NormalizeToMap(mmPos.Y + npcMarker.Location.Y)),
+							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 20),
+								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y)),
 							new Rectangle(147, 412, 10, 11), Color.White, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None,
 							0f);
 
 					if (npcMarker.HasQuest)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.Location.X + 22),
-								NormalizeToMap(mmPos.Y + npcMarker.Location.Y - 3)),
+							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 22),
+								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y - 3)),
 							new Rectangle(403, 496, 5, 14), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 				}
