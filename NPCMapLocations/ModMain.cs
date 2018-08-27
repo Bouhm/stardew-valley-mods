@@ -177,9 +177,10 @@ namespace NPCMapLocations
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
 
+      /*
 			// Multiplayer NPC Sync for farmhands
-			//if (Context.IsMultiplayer)
-			//{
+			if (Context.IsMultiplayer)
+			{
 					var xmlSer = new XmlSerializer(typeof(SerializableDictionary<string, NpcSync>));
 					NpcSyncer = new PyResponder<bool, SerializableDictionary<string, NpcSync>>("MapMod.NpcSync",
 					(s) =>
@@ -201,7 +202,8 @@ namespace NPCMapLocations
 					}, 30, SerializationType.XML, SerializationType.XML, xmlSer);
 					
 				NpcSyncer.start();
-			//}
+			}
+      */
 		}
 
 		// Handle opening mod menu and changing tooltip options
@@ -346,7 +348,7 @@ namespace NPCMapLocations
 			if (Config.ShowMinimap)
 				Minimap?.Update();
 			//if (Context.IsMultiplayer)
-				NpcSyncRequest();
+			//	NpcSyncRequest();
 
 			UpdateMarkers();
 		}
@@ -765,12 +767,13 @@ namespace NPCMapLocations
 	}
 
 	// Class for Location Vectors
+  // Maps the tileX and tileY in a game location to the location on the map
 	public class MapVector
 	{
-		public int TileX;
-		public int TileY;
-		public int X;
-		public int Y;
+		public int TileX; // tileX in a game location
+		public int TileY; // tileY in a game location
+		public int X; // Absolute position relative to viewport (on map page)
+		public int Y; // Absolute position relative to viewport (on map page)
 
 		public MapVector()
 		{

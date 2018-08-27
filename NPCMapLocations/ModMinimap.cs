@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -33,6 +33,7 @@ namespace NPCMapLocations
 		private int prevMmY;
 		private int prevMouseX;
 		private int prevMouseY;
+	  private int drawDelay;
 
 		public ModMinimap(
 			HashSet<MapMarker> npcMarkers,
@@ -87,6 +88,7 @@ namespace NPCMapLocations
 			Config.MinimapX = mmX;
 			Config.MinimapY = mmY;
 			Helper.WriteConfig(Config);
+		  drawDelay = 15;
 		}
 
 		public void Resize()
@@ -95,7 +97,7 @@ namespace NPCMapLocations
 			mmHeight = Config.MinimapHeight * Game1.pixelZoom;
 		}
 
-        public void Update()
+    public void Update()
 		{
       center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY());
@@ -175,10 +177,19 @@ namespace NPCMapLocations
 					mmHeight / Game1.pixelZoom + 2), color, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
-			if (!isBeingDragged)
-				DrawMarkers(b);
+		  if (!isBeingDragged)
+		  {
+		    // When minimap is moved, redraw markers after recalculating & repositioning
+				if (drawDelay == 0)
+		      DrawMarkers(b);
+		    else
+		    {
+		      drawDelay--;
+		      drawDelay = (int)MathHelper.Max(drawDelay, 0);
+		    }
+		  }
 
-			// Border around minimap that will also help mask markers outside of the minimap
+		  // Border around minimap that will also help mask markers outside of the minimap
 			// Which gives more padding for when they are considered within the minimap area
 			// Draw border
 			DrawLine(b, new Vector2(mmX, mmY - borderWidth), new Vector2(mmX + mmWidth - 2, mmY - borderWidth), borderWidth,
