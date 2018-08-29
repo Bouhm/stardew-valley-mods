@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Menus;
 
 namespace NPCMapLocations
 {
@@ -70,25 +71,28 @@ namespace NPCMapLocations
 
 		public void HandleMouseDown()
 		{
-
-      if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
-			    Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
-			{
-				isBeingDragged = true;
-        prevMmX = mmX;
-				prevMmY = mmY;
-				prevMouseX = Game1.getMouseX();
-				prevMouseY = Game1.getMouseY();
-			}
+		  if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+		      Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
+		  {
+		    isBeingDragged = true;
+		    prevMmX = mmX;
+		    prevMmY = mmY;
+		    prevMouseX = Game1.getMouseX();
+		    prevMouseY = Game1.getMouseY();
+		  }
 		}
 
 		public void HandleMouseRelease()
 		{
-			isBeingDragged = false;
-			Config.MinimapX = mmX;
-			Config.MinimapY = mmY;
-			Helper.WriteConfig(Config);
-		  drawDelay = 15;
+		  if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+		      Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
+		  {
+		    isBeingDragged = false;
+		    Config.MinimapX = mmX;
+		    Config.MinimapY = mmY;
+		    Helper.WriteConfig(Config);
+		    drawDelay = 15;
+		  }
 		}
 
 		public void Resize()
@@ -152,11 +156,9 @@ namespace NPCMapLocations
 			if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
 			    Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
 			{
-				// Change cursor to hand 
-				if (Game1.activeClickableMenu == null)
-					Game1.mouseCursor = 2;
-
-				if (isBeingDragged)
+			  if (ModMain.HeldKey.ToString().Equals(Config.MinimapDragKey))
+			    Game1.mouseCursor = 2;
+        if (isBeingDragged)
 				{
 					mmX = (int) MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth,
 						Game1.viewport.Width - mmWidth - borderWidth);

@@ -24,7 +24,8 @@ namespace NPCMapLocations
 {
 	public class ModMain : Mod, IAssetLoader
 	{
-		private Texture2D BuildingMarkers;
+	  public static SButton HeldKey;
+    private Texture2D BuildingMarkers;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
@@ -208,26 +209,38 @@ namespace NPCMapLocations
 		}
 
 		// Handle opening mod menu and changing tooltip options
-		private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
-		{
-			if (!Context.IsWorldReady) return;
+	  private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+	  {
+	    if (!Context.IsWorldReady) return;
 
-			if (Config.ShowMinimap && Minimap != null && (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
-			    Game1.activeClickableMenu == null)
-			{
-				Minimap.HandleMouseDown();
-				if (Minimap.isBeingDragged)
-					e.SuppressButton();
-			}
+	    if (Config.ShowMinimap && Minimap != null)
+	    {
+	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
+	        HeldKey = e.Button;
+	      else if (HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+	               (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
+	               Game1.activeClickableMenu == null)
+	      {
+          Minimap.HandleMouseDown();
+	        if (Minimap.isBeingDragged)
+	          e.SuppressButton();
+	      }
+	    }
 
-			if (Game1.activeClickableMenu is GameMenu)
-				HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
+	    if (Game1.activeClickableMenu is GameMenu)
+				  HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
 		}
 
 		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
 		{
-			if (Context.IsWorldReady && e.Button == SButton.MouseLeft)
-				Minimap?.HandleMouseRelease();
+		  HeldKey = SButton.None;
+		  if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
+		  {
+		    if (Game1.activeClickableMenu == null)
+		      Minimap.HandleMouseRelease();
+		    else if (Game1.activeClickableMenu is ModMenu)
+		      Minimap.Resize();
+		  }
 		}
 
 		// Handle keyboard/controller inputs
