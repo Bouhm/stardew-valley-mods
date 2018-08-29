@@ -5,10 +5,8 @@ Shows NPC locations on a modified map.
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -43,7 +41,7 @@ namespace NPCMapLocations
 		private static IPyResponder NpcSyncer;
 
 		// For debug info
-		private const bool DEBUG_MODE = false;
+	  private const bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
@@ -213,6 +211,7 @@ namespace NPCMapLocations
 	  {
 	    if (!Context.IsWorldReady) return;
 
+      // Minimap dragging
 	    if (Config.ShowMinimap && Minimap != null)
 	    {
 	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
@@ -227,6 +226,14 @@ namespace NPCMapLocations
 	      }
 	    }
 
+      // Minimap toggle
+	    if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
+	    {
+	      Config.ShowMinimap = !Config.ShowMinimap;
+	      Helper.WriteConfig(Config);
+	    }
+
+	    // ModMenu
 	    if (Game1.activeClickableMenu is GameMenu)
 				  HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
 		}
@@ -704,7 +711,7 @@ namespace NPCMapLocations
 
 		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-			if (Context.IsWorldReady)
+      if (Context.IsWorldReady)
 			{
 				Minimap?.DrawMiniMap();
 			}

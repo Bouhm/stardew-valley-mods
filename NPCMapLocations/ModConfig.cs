@@ -11,6 +11,7 @@ namespace NPCMapLocations
 		public string MenuKey { get; set; } = "Tab";
 		public string TooltipKey { get; set; } = "Space";
 	  public string MinimapDragKey { get; set; } = "LeftAlt";
+	  public string MinimapToggleKey { get; set; } = "Tab";
 		public int NameTooltipMode { get; set; } = 1;
 		public int ImmersionOption { get; set; } = 1;
 		public bool ByHeartLevel { get; set; } = false;

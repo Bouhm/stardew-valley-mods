@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
 
 namespace NPCMapLocations
 {
@@ -23,18 +22,18 @@ namespace NPCMapLocations
 
 		public bool isBeingDragged;
 		private readonly Texture2D map;
-		private int mmHeight;
-		private Vector2 mmPos;
-		private int mmWidth;
-		private int mmX;
-		private int mmY;
+	  private int mmWidth; // minimap width
+    private int mmHeight; // minimap height
+	  private Vector2 mmPos; // top-left position of minimap relative to viewport
+    private int mmX; // top-left crop of minimap relative to map
+		private int mmY; // top-left crop of minimap relative to map
 		private readonly HashSet<MapMarker> NpcMarkers;
 		private Vector2 playerLoc;
 		private int prevMmX;
 		private int prevMmY;
 		private int prevMouseX;
 		private int prevMouseY;
-	  private int drawDelay;
+	  private int drawDelay = 0;
 
 		public ModMinimap(
 			HashSet<MapMarker> npcMarkers,
@@ -91,7 +90,7 @@ namespace NPCMapLocations
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
 		    Helper.WriteConfig(Config);
-		    drawDelay = 15;
+		    drawDelay = 20;
 		  }
 		}
 
@@ -153,11 +152,16 @@ namespace NPCMapLocations
 		// Center or the player's position is used as reference; player is not center when reaching edge of map
 		public void DrawMiniMap()
 		{
-			if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
+		  var IsHoveringMinimap = false;
+
+      if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
 			    Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
 			{
-			  if (ModMain.HeldKey.ToString().Equals(Config.MinimapDragKey))
+        IsHoveringMinimap = true;
+
+        if (ModMain.HeldKey.ToString().Equals(Config.MinimapDragKey))
 			    Game1.mouseCursor = 2;
+
         if (isBeingDragged)
 				{
 					mmX = (int) MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth,
@@ -167,9 +171,9 @@ namespace NPCMapLocations
 				}
 			}
 
+		  // When cursor is hovering over a clickable component behind the minimap, make transparent
 			var b = Game1.spriteBatch;
-
-			var color = isBeingDragged
+			var color = IsHoveringMinimap
 				? Color.White * 0.5f
 				: Color.White;
 
@@ -182,8 +186,11 @@ namespace NPCMapLocations
 		  if (!isBeingDragged)
 		  {
 		    // When minimap is moved, redraw markers after recalculating & repositioning
-				if (drawDelay == 0)
-		      DrawMarkers(b);
+		    if (drawDelay == 0)
+		    {
+		      if (!IsHoveringMinimap)
+		        DrawMarkers(b);
+		    }
 		    else
 		      drawDelay--;
 		  }
