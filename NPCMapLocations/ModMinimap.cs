@@ -183,10 +183,7 @@ namespace NPCMapLocations
 				if (drawDelay == 0)
 		      DrawMarkers(b);
 		    else
-		    {
 		      drawDelay--;
-		      drawDelay = (int)MathHelper.Max(drawDelay, 0);
-		    }
 		  }
 
 		  // Border around minimap that will also help mask markers outside of the minimap

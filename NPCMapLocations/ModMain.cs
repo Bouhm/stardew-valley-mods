@@ -46,7 +46,7 @@ namespace NPCMapLocations
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
-		private static List<string> alertFlags; 
+	  private static List<string> alertFlags;
 
 
 		// Replace game map with modified map
@@ -93,10 +93,10 @@ namespace NPCMapLocations
 			GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
 			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += GraphicsEvents_Resize;
-      MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+      MenuEvents.MenuChanged += MenuEvents_MenuChanged;
 		}
 
-		// Get only relevant villagers for map
+    // Get only relevant villagers for map
     private List<NPC> GetVillagers()
 		{
 			var villagers = new List<NPC>();
@@ -176,6 +176,7 @@ namespace NPCMapLocations
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
+      alertFlags = new List<string>();
 
       /*
 			// Multiplayer NPC Sync for farmhands
@@ -681,7 +682,7 @@ namespace NPCMapLocations
 			UpdateFarmBuildingLocs();
 		}
 
-		private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+		private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
 		{
 			if (!Context.IsWorldReady) return;
 			if (e.PriorMenu is ModMenu)
