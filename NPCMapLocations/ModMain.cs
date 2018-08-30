@@ -240,7 +240,9 @@ namespace NPCMapLocations
 
 		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
 		{
-		  HeldKey = SButton.None;
+      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey))
+		    HeldKey = SButton.None;
+
 		  if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
 		  {
 		    if (Game1.activeClickableMenu == null)
