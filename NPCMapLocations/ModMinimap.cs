@@ -119,7 +119,7 @@ namespace NPCMapLocations
 			cropX = center.X - (float) Math.Floor(mmWidth / 2.0);
 			cropY = center.Y - (float) Math.Floor(mmHeight / 2.0);
 
-			// Handle cases when reaching edge of map
+			// Handle cases when reaching edge of map 
 			// Change offsets accordingly when player is no longer centered
 			if (cropX < 0)
 			{
@@ -131,6 +131,7 @@ namespace NPCMapLocations
 			{
 				center.X = map.Width * Game1.pixelZoom - mmWidth / 2;
 				mmPos.X = mmX - (map.Width * Game1.pixelZoom - mmWidth);
+
 				cropX = map.Width - mmWidth;
 			}
 
