@@ -13,20 +13,20 @@ namespace NPCMapLocations
 		private readonly Texture2D BuildingMarkers;
 		private readonly ModConfig Config;
 		private readonly int borderWidth = 12;
-		private Vector2 center;
-		private float cropX;
-		private float cropY;
 		private readonly bool drawPamHouseUpgrade;
 		private readonly Dictionary<long, MapMarker> FarmerMarkers;
 		private readonly IModHelper Helper;
 
 		public bool isBeingDragged;
 		private readonly Texture2D map;
-	  private int mmWidth; // minimap width
+	  private Vector2 center; // Center position of minimap
+	  private float cropX; // Top-left position of crop on map
+	  private float cropY; // Top-left position of crop on map
+    private int mmWidth; // minimap width
     private int mmHeight; // minimap height
-	  private Vector2 mmPos; // top-left position of minimap relative to viewport
-    private int mmX; // top-left crop of minimap relative to map
-		private int mmY; // top-left crop of minimap relative to map
+	  private Vector2 mmLoc; // minimap location relative to map location
+    private int mmX; // top-left position of minimap relative to viewport
+		private int mmY; // top-left position of minimap relative to viewport
 		private readonly HashSet<MapMarker> NpcMarkers;
 		private Vector2 playerLoc;
 		private int prevMmX;
@@ -110,7 +110,7 @@ namespace NPCMapLocations
 			center.Y = NormalizeToMap(center.Y);
 
 			// Top-left offset for markers, relative to the minimap
-			mmPos =
+			mmLoc =
 				new Vector2(mmX - center.X + (float) Math.Floor(mmWidth / 2.0),
 					mmY - center.Y + (float) Math.Floor(mmHeight / 2.0));
 
@@ -124,13 +124,13 @@ namespace NPCMapLocations
 			if (cropX < 0)
 			{
 				center.X = mmWidth / 2;
-				mmPos.X = mmX;
+				mmLoc.X = mmX;
 				cropX = 0;
 			}
 			else if (cropX + mmWidth > map.Width * Game1.pixelZoom)
 			{
 				center.X = map.Width * Game1.pixelZoom - mmWidth / 2;
-				mmPos.X = mmX - (map.Width * Game1.pixelZoom - mmWidth);
+				mmLoc.X = mmX - (map.Width * Game1.pixelZoom - mmWidth);
 
 				cropX = map.Width - mmWidth;
 			}
@@ -138,14 +138,14 @@ namespace NPCMapLocations
 			if (cropY < 0)
 			{
 				center.Y = mmHeight / 2;
-				mmPos.Y = mmY;
+				mmLoc.Y = mmY;
 				cropY = 0;
 			}
 			// Actual map is 1200x720 but map.Height includes the farms
 			else if (cropY + mmHeight > 720)
 			{
 				center.Y = 720 - mmHeight / 2;
-				mmPos.Y = mmY - (720 - mmHeight);
+				mmLoc.Y = mmY - (720 - mmHeight);
 				cropY = 720 - mmHeight;
 			}
 		}
@@ -226,42 +226,53 @@ namespace NPCMapLocations
 			var color = Color.White;
 
 			// Farm overlay
-			var farmCropWidth = (int) MathHelper.Min(131, (mmWidth - mmPos.X + Game1.tileSize / 4) / Game1.pixelZoom);
-			var farmCropHeight = (int) MathHelper.Min(61, (mmHeight - mmPos.Y - 172 + Game1.tileSize / 4) / Game1.pixelZoom);
-			switch (Game1.whichFarm)
-			{
-				case 1:
-					b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)),
-						new Rectangle(0, 180, farmCropWidth, farmCropHeight), color,
-						0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 2:
-					b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)),
-						new Rectangle(131, 180, farmCropWidth, farmCropHeight), color,
-						0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 3:
-					b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)),
-						new Rectangle(0, 241, farmCropWidth, farmCropHeight), color,
-						0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 4:
-					b.Draw(map, new Vector2(NormalizeToMap(mmPos.X), NormalizeToMap(mmPos.Y + 174)),
-						new Rectangle(131, 241, farmCropWidth, farmCropHeight), color,
-						0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-			}
+		  var farmWidth = 131;
+      var farmHeight = 61;
+		  var farmCropX = Math.Floor(cropX / Game1.pixelZoom);
+		  var farmCropY = Math.Floor(cropY / Game1.pixelZoom);
+
+      if (farmCropX < farmWidth && farmCropX + mmWidth > farmWidth && farmCropY < farmHeight + 172 && farmCropY + mmHeight > farmHeight + 172)
+		  {
+		    var farmCropWidth = (int)(farmWidth - farmCropX);
+		    var farmCropHeight = (int)(farmHeight - farmCropY);
+		    var farmX = NormalizeToMap((float)(mmX));
+		    var farmY = NormalizeToMap((float)(mmY+172));//(int)Math.Floor(cropY / Game1.pixelZoom) - 12);
+		    switch (Game1.whichFarm)
+		    {
+		      case 1:
+		        b.Draw(map, new Vector2(farmX, farmY),
+		          new Rectangle(0 + (int)Math.Floor(cropX / Game1.pixelZoom), 180 + (int)Math.Floor(cropY / Game1.pixelZoom), farmWidth, farmHeight), color,
+		          0f,
+		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+		        break;
+		      case 2:
+		        b.Draw(map, new Vector2(farmX, farmY),
+		          new Rectangle(131 + (int)Math.Floor(cropX / Game1.pixelZoom), 180 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          0f,
+		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+		        break;
+		      case 3:
+		        b.Draw(map, new Vector2(farmX, farmY),
+		          new Rectangle(0 + (int)Math.Floor(cropX / Game1.pixelZoom), 241 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          0f,
+		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+		        break;
+		      case 4:
+		        b.Draw(map, new Vector2(farmX, farmY),
+		          new Rectangle(131 + (int)Math.Floor(cropX / Game1.pixelZoom),
+		            241 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          0f,
+		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+		        break;
+		    }
+      }
 
 			if (drawPamHouseUpgrade)
 			{
 				var pamHouseX = ModConstants.MapVectors["Trailer"][0].X;
 				var pamHouseY = ModConstants.MapVectors["Trailer"][0].Y;
 				if (IsWithinMapArea(pamHouseX, pamHouseY))
-					b.Draw(map, new Vector2(NormalizeToMap(mmPos.X + pamHouseX), NormalizeToMap(mmPos.Y + pamHouseY)),
+					b.Draw(map, new Vector2(NormalizeToMap(mmLoc.X + pamHouseX), NormalizeToMap(mmLoc.Y + pamHouseY)),
 						new Rectangle(263, 181, 8, 8), color,
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
@@ -278,8 +289,8 @@ namespace NPCMapLocations
 							b.Draw(
 								BuildingMarkers,
 								new Vector2(
-									NormalizeToMap(mmPos.X + building.Value.Value.X - (float) Math.Floor(buildingRect.Width / 2.0)),
-									NormalizeToMap(mmPos.Y + building.Value.Value.Y - (float) Math.Floor(buildingRect.Height / 2.0))
+									NormalizeToMap(mmLoc.X + building.Value.Value.X - (float) Math.Floor(buildingRect.Width / 2.0)),
+									NormalizeToMap(mmLoc.Y + building.Value.Value.Y - (float) Math.Floor(buildingRect.Height / 2.0))
 								),
 								buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
 							);
@@ -290,7 +301,7 @@ namespace NPCMapLocations
 			{
 				var merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
 				if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
-					b.Draw(Game1.mouseCursors, new Vector2(NormalizeToMap(mmPos.X + merchantLoc.X - 16), NormalizeToMap(mmPos.Y + merchantLoc.Y - 15)), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
+					b.Draw(Game1.mouseCursors, new Vector2(NormalizeToMap(mmLoc.X + merchantLoc.X - 16), NormalizeToMap(mmLoc.Y + merchantLoc.Y - 15)), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 						1f);
 			}
 
@@ -305,8 +316,8 @@ namespace NPCMapLocations
 							    IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
 							{
 								farmer.FarmerRenderer.drawMiniPortrat(b,
-									new Vector2(NormalizeToMap(mmPos.X + farMarker.MapLocation.X - 16),
-										NormalizeToMap(mmPos.Y + farMarker.MapLocation.Y - 15)),
+									new Vector2(NormalizeToMap(mmLoc.X + farMarker.MapLocation.X - 16),
+										NormalizeToMap(mmLoc.Y + farMarker.MapLocation.Y - 15)),
 									0.00011f, 2f, 1, farmer);
 							}
 						}
@@ -315,7 +326,7 @@ namespace NPCMapLocations
 				else
 				{
 					Game1.player.FarmerRenderer.drawMiniPortrat(b,
-						new Vector2(NormalizeToMap(mmPos.X + playerLoc.X - 16), NormalizeToMap(mmPos.Y + playerLoc.Y - 15)), 0.00011f,
+						new Vector2(NormalizeToMap(mmLoc.X + playerLoc.X - 16), NormalizeToMap(mmLoc.Y + playerLoc.Y - 15)), 0.00011f,
 						2f, 1,
 						Game1.player);
 				}
@@ -338,43 +349,43 @@ namespace NPCMapLocations
 				if (npcMarker.IsHidden)
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X),
-							NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y),
+						new Rectangle(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X),
+							NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y),
 							32, 30),
 						new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.DimGray * 0.7f);
 					if (npcMarker.IsBirthday)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 20),
-								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y)),
+							new Vector2(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X + 20),
+								NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y)),
 							new Rectangle(147, 412, 10, 11), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 
 					if (npcMarker.HasQuest)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 22),
-								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y - 3)),
+							new Vector2(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X + 22),
+								NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y - 3)),
 							new Rectangle(403, 496, 5, 14), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None, 0f);
 				}
 				else
 				{
 					b.Draw(npcMarker.Marker,
-						new Rectangle(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X),
-							NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y),
+						new Rectangle(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X),
+							NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y),
 							30, 32),
 						new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White);
 					if (npcMarker.IsBirthday)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 20),
-								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y)),
+							new Vector2(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X + 20),
+								NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y)),
 							new Rectangle(147, 412, 10, 11), Color.White, 0f, Vector2.Zero, 1.8f,
 							SpriteEffects.None,
 							0f);
 
 					if (npcMarker.HasQuest)
 						b.Draw(Game1.mouseCursors,
-							new Vector2(NormalizeToMap(mmPos.X + npcMarker.MapLocation.X + 22),
-								NormalizeToMap(mmPos.Y + npcMarker.MapLocation.Y - 3)),
+							new Vector2(NormalizeToMap(mmLoc.X + npcMarker.MapLocation.X + 22),
+								NormalizeToMap(mmLoc.Y + npcMarker.MapLocation.Y - 3)),
 							new Rectangle(403, 496, 5, 14), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
 							0f);
 				}
