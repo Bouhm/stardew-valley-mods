@@ -228,39 +228,41 @@ namespace NPCMapLocations
 			// Farm overlay
 		  var farmWidth = 131;
       var farmHeight = 61;
-		  var farmCropX = Math.Floor(cropX / Game1.pixelZoom);
-		  var farmCropY = Math.Floor(cropY / Game1.pixelZoom);
+		  var farmCropX = (int)Math.Floor(cropX / Game1.pixelZoom);
+		  var farmCropY = (int)Math.Floor(cropY / Game1.pixelZoom);
+		  var m = mmLoc;
 
-      if (farmCropX < farmWidth && farmCropX + mmWidth > farmWidth && farmCropY < farmHeight + 172 && farmCropY + mmHeight > farmHeight + 172)
+      // Farm types are cropped from (0, 43), 131x61
+      if (farmCropX < farmWidth && farmCropX + mmWidth > farmWidth && farmCropY < farmHeight + 43 && farmCropY + mmHeight > farmHeight + 43)
 		  {
 		    var farmCropWidth = (int)(farmWidth - farmCropX);
-		    var farmCropHeight = (int)(farmHeight - farmCropY);
-		    var farmX = NormalizeToMap((float)(mmX));
-		    var farmY = NormalizeToMap((float)(mmY+172));//(int)Math.Floor(cropY / Game1.pixelZoom) - 12);
+		    var farmCropHeight = (int) (farmHeight - farmCropY);
+		    var farmX = NormalizeToMap((float) (mmX + farmCropX));
+		    var farmY = NormalizeToMap((float) (mmY + farmCropY));
 		    switch (Game1.whichFarm)
 		    {
 		      case 1:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(0 + (int)Math.Floor(cropX / Game1.pixelZoom), 180 + (int)Math.Floor(cropY / Game1.pixelZoom), farmWidth, farmHeight), color,
+		          new Rectangle(0 + farmCropY, 180 + farmCropY, farmWidth, farmHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		      case 2:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(131 + (int)Math.Floor(cropX / Game1.pixelZoom), 180 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          new Rectangle(131 + farmCropY, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		      case 3:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(0 + (int)Math.Floor(cropX / Game1.pixelZoom), 241 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          new Rectangle(0 + farmCropY, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		      case 4:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(131 + (int)Math.Floor(cropX / Game1.pixelZoom),
-		            241 + (int)Math.Floor(cropY / Game1.pixelZoom), farmCropWidth, farmCropHeight), color,
+		          new Rectangle(131 + farmCropX,
+		            241 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
