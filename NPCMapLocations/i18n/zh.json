@@ -1,4 +1,8 @@
 {
+	"minimap.label": "Minimap",
+	"minimap.option1": "Enabled",
+	"minimap.plusMinus1": "Minimap width",
+	"minimap.plusMinus2": "Minimap height",
 	"immersion.label": "设置:",
 	"immersion.option1": "展示所有村民",
 	"immersion.option2": "显示所有说话的村民",

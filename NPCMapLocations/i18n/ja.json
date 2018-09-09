@@ -1,4 +1,8 @@
 {
+	"minimap.label": "Minimap",
+	"minimap.option1": "Enabled",
+	"minimap.plusMinus1": "Minimap width",
+	"minimap.plusMinus2": "Minimap height",
 	"immersion.label": "設定:",
 	"immersion.option1": "住人を常に表示する",
 	"immersion.option2": "プレイヤーと話した住人を表示する",
