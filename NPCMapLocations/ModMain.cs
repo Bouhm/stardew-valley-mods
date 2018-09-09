@@ -365,10 +365,8 @@ namespace NPCMapLocations
 		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
-			if (Config.ShowMinimap)
-				Minimap?.Update();
-			//if (Context.IsMultiplayer)
-			//	NpcSyncRequest();
+		  if (Config.ShowMinimap)
+		    Minimap?.Update();
 
 			UpdateMarkers();
 		}
@@ -697,7 +695,7 @@ namespace NPCMapLocations
 
 		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-      if (Context.IsWorldReady)
+      if (Context.IsWorldReady && Config.ShowMinimap)
 			{
 				Minimap?.DrawMiniMap();
 			}

@@ -234,8 +234,8 @@ namespace NPCMapLocations
       // When any part of the cropped farm is outside of the minimap
 		  var farmWidth = 131;
 		  var farmHeight = 61;
-      var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth)) + 2;
-		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight)) + 2;
+      var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth));
+		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight));
 		  var farmCropX = (int)MathHelper.Clamp((mmX - mmLoc.X)/Game1.pixelZoom, 0, farmWidth);
 		  var farmCropY = (int)MathHelper.Clamp((mmY - mmLoc.Y - 172)/Game1.pixelZoom, 0, farmHeight);
 		  var farmCropWidth = farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
