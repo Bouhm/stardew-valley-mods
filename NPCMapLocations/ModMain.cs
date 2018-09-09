@@ -6,44 +6,47 @@ Shows NPC locations on a modified map.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Netcode;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using PyTK;
+using PyTK.Types;
 
 namespace NPCMapLocations
 {
 	public class ModMain : Mod, IAssetLoader
 	{
-		private const int DRAW_DELAY = 3;
-
-		// For debug info
-		private const bool DEBUG_MODE = false;
-		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
-		private static Vector2 _tileLower;
-		private static Vector2 _tileUpper;
-		private static string alertFlag;
-		private Texture2D BuildingMarkers;
+	  public static SButton HeldKey;
+    private Texture2D BuildingMarkers;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
+		private Dictionary<string, int>
+			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
+		private ModMinimap Minimap;
+		private HashSet<MapMarker> NpcMarkers;
+		private Dictionary<string, bool> SecondaryNpcs;
+		private const int DRAW_DELAY = 3;
 
 		// Multiplayer
 		private Dictionary<long, MapMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
+		private static IPyResponder NpcSyncer;
 
-		private Dictionary<string, int>
-			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
+		// For debug info
+	  private const bool DEBUG_MODE = false;
+		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+		private static Vector2 _tileLower;
+		private static Vector2 _tileUpper;
+	  private static List<string> alertFlags;
 
-		private ModMinimap Minimap;
-		private HashSet<MapMarker> NpcMarkers;
-		private Dictionary<string, bool> SecondaryNpcs;
 
 		// Replace game map with modified map
 		public bool CanLoad<T>(IAssetInfo asset)
@@ -58,7 +61,7 @@ namespace NPCMapLocations
 			try
 			{
 				if (!mapName.Equals("default_map"))
-					Monitor.Log($"Detected recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
+					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
 
 				map = Helper.Content.Load<T>($@"assets\{mapName}.png"); // Replace map page
 			}
@@ -89,20 +92,20 @@ namespace NPCMapLocations
 			GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
 			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
 			GraphicsEvents.Resize += GraphicsEvents_Resize;
-      MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+      MenuEvents.MenuChanged += MenuEvents_MenuChanged;
 		}
 
-    private HashSet<NPC> GetVillagers()
+    // Get only relevant villagers for map
+    private List<NPC> GetVillagers()
 		{
-			var villagers = new HashSet<NPC>();
+			var villagers = new List<NPC>();
 
 			foreach (var location in Game1.locations)
 			{
 				foreach (var npc in location.characters)
 				{
 					if (npc == null) continue;
-					if (!ModConstants.ExcludedVillagers.Contains(npc.Name)
-					    && npc.isVillager())
+					if (!villagers.Contains(npc) && !ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
 						villagers.Add(npc);
 				}
 			}
@@ -172,45 +175,95 @@ namespace NPCMapLocations
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
+      alertFlags = new List<string>();
+
+      /*
+			// Multiplayer NPC Sync for farmhands
+			if (Context.IsMultiplayer)
+			{
+					var xmlSer = new XmlSerializer(typeof(SerializableDictionary<string, NpcSync>));
+					NpcSyncer = new PyResponder<bool, SerializableDictionary<string, NpcSync>>("MapMod.NpcSync",
+					(s) =>
+					{
+						foreach (var marker in NpcMarkers)
+						{
+							if (s.TryGetValue(marker.Npc.Name, out var npcSync))
+							{
+								var syncedMarker = new MapMarker() {
+									IsOutdoors = s[marker.Npc.Name].IsOutdoors,
+									MapLocation = new Vector2(s[marker.Npc.Name].LocX, s[marker.Npc.Name].LocY) 
+								};
+								NpcMarkers.Remove(marker);
+								NpcMarkers.Add(syncedMarker);
+							}
+						}
+
+						return true;
+					}, 30, SerializationType.XML, SerializationType.XML, xmlSer);
+					
+				NpcSyncer.start();
+			}
+      */
 		}
 
 		// Handle opening mod menu and changing tooltip options
-		private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
-		{
-			if (!Context.IsWorldReady) return;
+	  private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+	  {
+	    if (!Context.IsWorldReady) return;
 
-			if (Config.ShowMinimap && Minimap != null && (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
-			    Game1.activeClickableMenu == null)
-			{
-				Minimap.HandleMouseDown();
-				if (Minimap.isBeingDragged)
-					e.SuppressButton();
-			}
+      // Minimap dragging
+	    if (Config.ShowMinimap && Minimap != null)
+	    {
+	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
+	        HeldKey = e.Button;
+	      else if (//HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+	               (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
+	               Game1.activeClickableMenu == null)
+	      {
+          Minimap.HandleMouseDown();
+	        if (Minimap.isBeingDragged)
+	          e.SuppressButton();
+	      }
+	    }
 
-			if (Game1.activeClickableMenu is GameMenu)
-				HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
+      // Minimap toggle
+	    if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
+	    {
+	      Config.ShowMinimap = !Config.ShowMinimap;
+	      Helper.WriteConfig(Config);
+	    }
+
+	    // ModMenu
+	    if (Game1.activeClickableMenu is GameMenu)
+				  HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
 		}
 
 		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
 		{
-			if (Context.IsWorldReady && e.Button == SButton.MouseLeft)
-				Minimap?.HandleMouseRelease();
+      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey))
+		    HeldKey = SButton.None;
+
+		  if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
+		  {
+		    if (Game1.activeClickableMenu == null)
+		      Minimap.HandleMouseRelease();
+		    else if (Game1.activeClickableMenu is ModMenu)
+		      Minimap.Resize();
+		  }
 		}
 
 		// Handle keyboard/controller inputs
 		private void HandleInput(GameMenu menu, SButton input)
 		{
 			if (menu.currentTab != GameMenu.mapTab) return;
-
-			if (Context.IsMainPlayer)
-				if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
-					Game1.activeClickableMenu = new ModMenu(
-						SecondaryNpcs,
-						CustomNames,
-						MarkerCropOffsets,
-						Helper,
-						Config
-					);
+			if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
+				Game1.activeClickableMenu = new ModMenu(
+					SecondaryNpcs,
+					CustomNames,
+					MarkerCropOffsets,
+					Helper,
+					Config
+				);
 
 			if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
 				ChangeTooltipConfig();
@@ -261,7 +314,7 @@ namespace NPCMapLocations
 				}
 			}
 
-			ResetMarkers();
+			ResetMarkers(GetVillagers());
 			if (Config.ShowMinimap)
 				Minimap = new ModMinimap(
 					NpcMarkers,
@@ -275,10 +328,10 @@ namespace NPCMapLocations
 				);
 		}
 
-		private void ResetMarkers()
+		private void ResetMarkers(List<NPC> villagers)
 		{
 			NpcMarkers = new HashSet<MapMarker>();
-			foreach (var npc in GetVillagers())
+			foreach (var npc in villagers)
 			{
 				// Handle case where Kent appears even though he shouldn't
 				if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
@@ -317,6 +370,9 @@ namespace NPCMapLocations
 			if (!Context.IsWorldReady) return;
 			if (Config.ShowMinimap)
 				Minimap?.Update();
+			//if (Context.IsMultiplayer)
+			//	NpcSyncRequest();
+
 			UpdateMarkers();
 		}
 
@@ -342,20 +398,24 @@ namespace NPCMapLocations
 			);
 		}
 
-		private void UpdateMarkers(bool forceUpdate = false)
+		private void UpdateMarkers(bool forceUpdateAll = false)
 		{
-			if (isModMapOpen || forceUpdate || true)
+			if (isModMapOpen || forceUpdateAll)
 			{
-				UpdateNpcs(forceUpdate);
+				UpdateNpcs(forceUpdateAll);
 				if (Context.IsMultiplayer)
+				{
 					UpdateFarmers();
+
+				}
 			}
 		}
 
 		// Update NPC marker data and names on hover
-		private void UpdateNpcs(bool forceUpdate = false)
+		private void UpdateNpcs(bool forceUpdateAll = false)
 		{
 			if (NpcMarkers == null) return;
+
 			foreach (var npcMarker in NpcMarkers)
 			{
 				var npc = npcMarker.Npc;
@@ -373,10 +433,15 @@ namespace NPCMapLocations
 					locationName = npc.currentLocation.Name;
 				}
 
-				if (locationName == null // Couldn't resolve location name
-				    || !ModConstants.MapVectors.TryGetValue(locationName, out var npcPos) // Location not mapped
-				)
+				if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
+				{
+					if (!alertFlags.Contains("UnknownLocation:" + locationName))
+					{
+						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Warn);
+						alertFlags.Add("UnknownLocation:" + locationName);
+					}
 					continue;
+				}
 
 				// For layering indoor/outdoor NPCs and indoor indicator
 				npcMarker.IsOutdoors = npcLocation.IsOutdoors;
@@ -459,7 +524,7 @@ namespace NPCMapLocations
 
 					/*
 					// Only do calculations if NPCs are moving
-					if (!forceUpdate 
+					if (!forceUpdateAll 
 					    && (npcMarker.Location != Rectangle.Empty
 					    && (!npcLocation.IsOutdoors // Indoors
 					    || !npcMarker.Npc.isMoving()))) // Not moving
@@ -472,12 +537,12 @@ namespace NPCMapLocations
 					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - 16;
 					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - 15;
 
-					npcMarker.Location = new Vector2(x, y);
+					npcMarker.MapLocation = new Vector2(x, y);
 				}
 				else
 				{
 					// Set no location so they don't get drawn
-					npcMarker.Location = Vector2.Zero;
+					npcMarker.MapLocation = Vector2.Zero;
 				}
 			}
 		}
@@ -487,14 +552,22 @@ namespace NPCMapLocations
 			foreach (var farmer in Game1.getOnlineFarmers())
 			{
 				if (farmer?.currentLocation == null) continue;
+				if (!ModConstants.MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+				{
+					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
+					{
+						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Warn);
+						alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
+					}
+				}
 
 				var farmerId = farmer.UniqueMultiplayerID;
 				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
 
 				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 				{
-					var deltaX = farmerLoc.X - farMarker.PrevLocation.X;
-					var deltaY = farmerLoc.Y - farMarker.PrevLocation.Y;
+					var deltaX = farmerLoc.X - farMarker.PrevMapLocation.X;
+					var deltaY = farmerLoc.Y - farMarker.PrevMapLocation.Y;
 
 					// Location changes before tile position, causing farmhands to blink
 					// to the wrong position upon entering new location. Handle this in draw.
@@ -514,10 +587,23 @@ namespace NPCMapLocations
 					FarmerMarkers.Add(farmerId, newMarker);
 				}
 
-				FarmerMarkers[farmerId].Location = farmerLoc;
-				FarmerMarkers[farmerId].PrevLocation = farmerLoc;
+				FarmerMarkers[farmerId].MapLocation = farmerLoc;
+				FarmerMarkers[farmerId].PrevMapLocation = farmerLoc;
 				FarmerMarkers[farmerId].PrevLocationName = farmer.currentLocation.Name;
 				FarmerMarkers[farmerId].IsOutdoors = farmer.currentLocation.IsOutdoors;
+			}
+		}
+
+		private void NpcSyncRequest()
+		{
+			foreach (Farmer farmer in Game1.otherFarmers.Values)
+			{
+				// Check first if farmer has mod installed?
+
+				Task<SerializableDictionary<string, NpcSync>> syncNpc = PyNet.sendRequestToFarmer<SerializableDictionary<string, NpcSync>>("MapMod.NpcSync", NpcMarkers, farmer);
+				syncNpc.Wait();
+				if (syncNpc.Result == null)
+					Monitor.Log($"Failed to sync NPCs for {farmer.Name}", LogLevel.Error);
 			}
 		}
 
@@ -541,20 +627,13 @@ namespace NPCMapLocations
 		// MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
 		// Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
 		// Requires MapModConstants and modified map page in ./assets
-		public static Vector2 LocationToMap(string location, int tileX = -1, int tileY = -1, IMonitor monitor = null)
+		public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1)
 		{
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-			if (!ModConstants.MapVectors.TryGetValue(location, out var locVectors))
-			{
-				if (monitor != null && alertFlag != "UnknownLocation:" + location)
-				{
-					monitor.Log("Unknown location: " + location + ".", LogLevel.Trace);
-					alertFlag = "UnknownLocation:" + location;
-				}
 
+			if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
 				return Vector2.Zero;
-			}
 
 			int x;
 			int y;
@@ -599,26 +678,10 @@ namespace NPCMapLocations
 				// Uses fallback strategy - get closest points such that lower != upper
 				var tilePos = "(" + tileX + ", " + tileY + ")";
 				if (lower == null)
-				{
-					if (monitor != null && alertFlag != "NullBound:" + tilePos)
-					{
-						monitor.Log("Null lower bound: No vector less than " + tilePos + " in " + location, LogLevel.Trace);
-						alertFlag = "NullBound:" + tilePos;
-					}
-
 					lower = upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-				}
 
 				if (upper == null)
-				{
-					if (monitor != null && alertFlag != "NullBound:" + tilePos)
-					{
-						monitor.Log("Null upper bound: No vector greater than " + tilePos + " in " + location, LogLevel.Trace);
-						alertFlag = "NullBound:" + tilePos;
-					}
-
 					upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-				}
 
 				x = (int) (lower.X + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.X - lower.X));
 				y = (int) (lower.Y + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.Y - lower.Y));
@@ -641,7 +704,7 @@ namespace NPCMapLocations
 			UpdateFarmBuildingLocs();
 		}
 
-		private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+		private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
 		{
 			if (!Context.IsWorldReady) return;
 			if (e.PriorMenu is ModMenu)
@@ -650,7 +713,7 @@ namespace NPCMapLocations
 
 		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-			if (Context.IsWorldReady)
+      if (Context.IsWorldReady)
 			{
 				Minimap?.DrawMiniMap();
 			}
@@ -676,8 +739,8 @@ namespace NPCMapLocations
 
 			// Show map location and tile positions
 			DrawText(
-				Game1.player.currentLocation.Name + " (" + Game1.player.Position.X / Game1.tileSize + ", " +
-				Game1.player.Position.Y / Game1.tileSize + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
+				Game1.player.currentLocation.Name + " (" + Math.Floor(Game1.player.Position.X / Game1.tileSize) + ", " +
+				Math.Floor(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
 
 			var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu) Game1.activeClickableMenu : null;
 
@@ -712,11 +775,11 @@ namespace NPCMapLocations
 	// Class for map markers
 	public class MapMarker
 	{
-		public string Name { get; set; }
+		public string Name { get; set; } // For any customized names; Npc.Name would be vanilla names
 		public Texture2D Marker { get; set; }
 		public NPC Npc { get; set; }
-		public Vector2 Location { get; set; }
-		public Vector2 PrevLocation { get; set; }
+		public Vector2 MapLocation { get; set; }
+		public Vector2 PrevMapLocation { get; set; }
 		public string PrevLocationName { get; set; }
 		public bool IsBirthday { get; set; }
 		public bool HasQuest { get; set; }
@@ -727,12 +790,13 @@ namespace NPCMapLocations
 	}
 
 	// Class for Location Vectors
+  // Maps the tileX and tileY in a game location to the location on the map
 	public class MapVector
 	{
-		public int TileX;
-		public int TileY;
-		public int X;
-		public int Y;
+		public int TileX; // tileX in a game location
+		public int TileY; // tileY in a game location
+		public int X; // Absolute position relative to viewport (on map page)
+		public int Y; // Absolute position relative to viewport (on map page)
 
 		public MapVector()
 		{
