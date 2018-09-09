@@ -90,7 +90,7 @@ namespace NPCMapLocations
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
 		    Helper.WriteConfig(Config);
-		    drawDelay = 20;
+		    drawDelay = 30;
 		  }
 		}
 
@@ -228,14 +228,13 @@ namespace NPCMapLocations
 		{
 			var color = Color.White;
 
-			// Farm overlay
-		  var farmWidth = 131;
-      var farmHeight = 61;
-
+      // Farm types overlay
       // The farms are always overlayed at (0, 43) on the map
       // The crop position, dimensions, and overlay position must all be adjusted accordingly
-      // When any part of the cropped farm is outside of the minimap 
-		  var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth)) + 2;
+      // When any part of the cropped farm is outside of the minimap
+		  var farmWidth = 131;
+		  var farmHeight = 61;
+      var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth)) + 2;
 		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight)) + 2;
 		  var farmCropX = (int)MathHelper.Clamp((mmX - mmLoc.X)/Game1.pixelZoom, 0, farmWidth);
 		  var farmCropY = (int)MathHelper.Clamp((mmY - mmLoc.Y - 172)/Game1.pixelZoom, 0, farmHeight);
@@ -270,7 +269,7 @@ namespace NPCMapLocations
 		        break;
 		    }
       
-
+      // Pam house upgrade
 			if (drawPamHouseUpgrade)
 			{
 				var pamHouseX = ModConstants.MapVectors["Trailer"][0].X;
@@ -281,6 +280,7 @@ namespace NPCMapLocations
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
+      // Farm buildings
 			if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();

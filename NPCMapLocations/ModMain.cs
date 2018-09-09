@@ -15,8 +15,6 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
-using PyTK;
-using PyTK.Types;
 
 namespace NPCMapLocations
 {
@@ -38,7 +36,6 @@ namespace NPCMapLocations
 		private Dictionary<long, MapMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
-		private static IPyResponder NpcSyncer;
 
 		// For debug info
 	  private const bool DEBUG_MODE = false;
@@ -591,19 +588,6 @@ namespace NPCMapLocations
 				FarmerMarkers[farmerId].PrevMapLocation = farmerLoc;
 				FarmerMarkers[farmerId].PrevLocationName = farmer.currentLocation.Name;
 				FarmerMarkers[farmerId].IsOutdoors = farmer.currentLocation.IsOutdoors;
-			}
-		}
-
-		private void NpcSyncRequest()
-		{
-			foreach (Farmer farmer in Game1.otherFarmers.Values)
-			{
-				// Check first if farmer has mod installed?
-
-				Task<SerializableDictionary<string, NpcSync>> syncNpc = PyNet.sendRequestToFarmer<SerializableDictionary<string, NpcSync>>("MapMod.NpcSync", NpcMarkers, farmer);
-				syncNpc.Wait();
-				if (syncNpc.Result == null)
-					Monitor.Log($"Failed to sync NPCs for {farmer.Name}", LogLevel.Error);
 			}
 		}
 
