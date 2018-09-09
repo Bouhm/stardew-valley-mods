@@ -102,6 +102,9 @@ namespace NPCMapLocations
 
     public void Update()
 		{
+		  // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
+		  // Positions relative to the map (the map image) are not.
+
       center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY());
 			playerLoc = center;
@@ -228,34 +231,33 @@ namespace NPCMapLocations
 			// Farm overlay
 		  var farmWidth = 131;
       var farmHeight = 61;
-		  var farmCropX = (int)Math.Floor(cropX / Game1.pixelZoom);
-		  var farmCropY = (int)Math.Floor(cropY / Game1.pixelZoom);
-		  var m = mmLoc;
 
-      // Farm types are cropped from (0, 43), 131x61
-      if (farmCropX < farmWidth && farmCropX + mmWidth > farmWidth && farmCropY < farmHeight + 43 && farmCropY + mmHeight > farmHeight + 43)
-		  {
-		    var farmCropWidth = (int)(farmWidth - farmCropX);
-		    var farmCropHeight = (int) (farmHeight - farmCropY);
-		    var farmX = NormalizeToMap((float) (mmX + farmCropX));
-		    var farmY = NormalizeToMap((float) (mmY + farmCropY));
-		    switch (Game1.whichFarm)
+      // The farms are always overlayed at (0, 43) on the map
+      // The crop position, dimensions, and overlay position must all be adjusted accordingly
+      // When any part of the cropped farm is outside of the minimap 
+		  var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth)) + 2;
+		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight)) + 2;
+		  var farmCropX = (int)MathHelper.Clamp((mmX - mmLoc.X)/Game1.pixelZoom, 0, farmWidth);
+		  var farmCropY = (int)MathHelper.Clamp((mmY - mmLoc.Y - 172)/Game1.pixelZoom, 0, farmHeight);
+		  var farmCropWidth = farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
+		  var farmCropHeight = farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+      switch (Game1.whichFarm)
 		    {
 		      case 1:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(0 + farmCropY, 180 + farmCropY, farmWidth, farmHeight), color,
+		          new Rectangle(0 + farmCropX, 180 + farmCropY, farmWidth, farmHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		      case 2:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(131 + farmCropY, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
+		          new Rectangle(131 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		      case 3:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(0 + farmCropY, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
+		          new Rectangle(0 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
@@ -267,7 +269,7 @@ namespace NPCMapLocations
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		    }
-      }
+      
 
 			if (drawPamHouseUpgrade)
 			{
@@ -301,8 +303,8 @@ namespace NPCMapLocations
 			// Traveling Merchant
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
-				var merchantLoc = ModMain.LocationToMap("Forest", 28, 11);
-				if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
+			  Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"].FirstOrDefault().X, ModConstants.MapVectors["Merchant"].FirstOrDefault().Y);
+        if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
 					b.Draw(Game1.mouseCursors, new Vector2(NormalizeToMap(mmLoc.X + merchantLoc.X - 16), NormalizeToMap(mmLoc.Y + merchantLoc.Y - 15)), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 						1f);
 			}
