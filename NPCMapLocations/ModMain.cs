@@ -6,7 +6,6 @@ Shows NPC locations on a modified map.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -87,11 +86,12 @@ namespace NPCMapLocations
 			InputEvents.ButtonReleased += InputEvents_ButtonReleased;
 			GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
 			GameEvents.UpdateTick += GameEvents_UpdateTick;
-			GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
-			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-			GraphicsEvents.Resize += GraphicsEvents_Resize;
       MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-		}
+		  PlayerEvents.Warped += PlayerEvents_Warped;
+		  GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
+		  GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+		  GraphicsEvents.Resize += GraphicsEvents_Resize;
+    }
 
     // Get only relevant villagers for map
     private List<NPC> GetVillagers()
@@ -158,8 +158,8 @@ namespace NPCMapLocations
 				UpdateFarmBuildingLocs();
 		}
 
-		// Load config and other one-off data
-		private void SaveEvents_AfterLoad(object sender, EventArgs e)
+    // Load config and other one-off data
+    private void SaveEvents_AfterLoad(object sender, EventArgs e)
 		{
 			SecondaryNpcs = new Dictionary<string, bool>
 			{
@@ -665,7 +665,12 @@ namespace NPCMapLocations
 				Minimap?.Resize();
 		}
 
-		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
+	  private void PlayerEvents_Warped(object sender, EventArgsPlayerWarped e)
+	  {
+	    Minimap?.CheckOffsetForMap();
+	  }
+
+    private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
       if (Context.IsWorldReady && Config.ShowMinimap)
 			{
