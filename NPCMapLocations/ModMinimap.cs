@@ -90,7 +90,7 @@ namespace NPCMapLocations
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
 		    Helper.WriteConfig(Config);
-		    drawDelay = 20;
+		    drawDelay = 30;
 		  }
 		}
 
@@ -168,10 +168,10 @@ namespace NPCMapLocations
 
         if (isBeingDragged)
 				{
-					mmX = (int) MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth,
-						Game1.viewport.Width - mmWidth - borderWidth);
-					mmY = (int) MathHelper.Clamp(prevMmY + Game1.getMouseY() - prevMouseY, 0 + borderWidth,
-						Game1.viewport.Height - mmHeight - borderWidth);
+					mmX = NormalizeToMap(MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, borderWidth,
+						Game1.viewport.Width - mmWidth - borderWidth));
+					mmY = NormalizeToMap(MathHelper.Clamp(prevMmY + Game1.getMouseY() - prevMouseY, borderWidth,
+						Game1.viewport.Height - mmHeight - borderWidth));
 				}
 			}
 
@@ -228,19 +228,28 @@ namespace NPCMapLocations
 		{
 			var color = Color.White;
 
-			// Farm overlay
-		  var farmWidth = 131;
-      var farmHeight = 61;
-
+      // Farm types overlay
       // The farms are always overlayed at (0, 43) on the map
       // The crop position, dimensions, and overlay position must all be adjusted accordingly
-      // When any part of the cropped farm is outside of the minimap 
-		  var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth)) + 2;
-		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight)) + 2;
+      // When any part of the cropped farm is outside of the minimap
+		  var farmWidth = 131;
+		  var farmHeight = 61;
+      var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth));
+		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight) + 2);
 		  var farmCropX = (int)MathHelper.Clamp((mmX - mmLoc.X)/Game1.pixelZoom, 0, farmWidth);
 		  var farmCropY = (int)MathHelper.Clamp((mmY - mmLoc.Y - 172)/Game1.pixelZoom, 0, farmHeight);
-		  var farmCropWidth = farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
-		  var farmCropHeight = farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+
+      // Check if farm crop extends outside of minimap
+		  var farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom) ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
+		  var farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+
+      // Check if farm crop extends beyond farm size
+		  if (farmCropX + farmCropWidth > farmWidth)
+		    farmCropWidth = farmWidth - farmCropX;
+
+		  if (farmCropY + farmCropHeight > farmHeight)
+		    farmCropHeight = farmHeight - farmCropY;
+
       switch (Game1.whichFarm)
 		    {
 		      case 1:
@@ -270,17 +279,18 @@ namespace NPCMapLocations
 		        break;
 		    }
       
-
+      // Pam house upgrade
 			if (drawPamHouseUpgrade)
 			{
-				var pamHouseX = ModConstants.MapVectors["Trailer"][0].X;
-				var pamHouseY = ModConstants.MapVectors["Trailer"][0].Y;
+				var pamHouseX = ModConstants.MapVectors["Trailer_Big"][0].X;
+				var pamHouseY = ModConstants.MapVectors["Trailer_Big"][0].Y;
 				if (IsWithinMapArea(pamHouseX, pamHouseY))
 					b.Draw(map, new Vector2(NormalizeToMap(mmLoc.X + pamHouseX), NormalizeToMap(mmLoc.Y + pamHouseY)),
 						new Rectangle(263, 181, 8, 8), color,
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
+      // Farm buildings
 			if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();

@@ -15,8 +15,6 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
-using PyTK;
-using PyTK.Types;
 
 namespace NPCMapLocations
 {
@@ -38,7 +36,6 @@ namespace NPCMapLocations
 		private Dictionary<long, MapMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
-		private static IPyResponder NpcSyncer;
 
 		// For debug info
 	  private const bool DEBUG_MODE = false;
@@ -176,34 +173,6 @@ namespace NPCMapLocations
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
-
-      /*
-			// Multiplayer NPC Sync for farmhands
-			if (Context.IsMultiplayer)
-			{
-					var xmlSer = new XmlSerializer(typeof(SerializableDictionary<string, NpcSync>));
-					NpcSyncer = new PyResponder<bool, SerializableDictionary<string, NpcSync>>("MapMod.NpcSync",
-					(s) =>
-					{
-						foreach (var marker in NpcMarkers)
-						{
-							if (s.TryGetValue(marker.Npc.Name, out var npcSync))
-							{
-								var syncedMarker = new MapMarker() {
-									IsOutdoors = s[marker.Npc.Name].IsOutdoors,
-									MapLocation = new Vector2(s[marker.Npc.Name].LocX, s[marker.Npc.Name].LocY) 
-								};
-								NpcMarkers.Remove(marker);
-								NpcMarkers.Add(syncedMarker);
-							}
-						}
-
-						return true;
-					}, 30, SerializationType.XML, SerializationType.XML, xmlSer);
-					
-				NpcSyncer.start();
-			}
-      */
 		}
 
 		// Handle opening mod menu and changing tooltip options
@@ -216,7 +185,7 @@ namespace NPCMapLocations
 	    {
 	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
 	        HeldKey = e.Button;
-	      else if (//HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+	      else if (HeldKey.ToString().Equals(Config.MinimapDragKey) &&
 	               (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
 	               Game1.activeClickableMenu == null)
 	      {
@@ -368,10 +337,8 @@ namespace NPCMapLocations
 		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
-			if (Config.ShowMinimap)
-				Minimap?.Update();
-			//if (Context.IsMultiplayer)
-			//	NpcSyncRequest();
+		  if (Config.ShowMinimap)
+		    Minimap?.Update();
 
 			UpdateMarkers();
 		}
@@ -404,10 +371,7 @@ namespace NPCMapLocations
 			{
 				UpdateNpcs(forceUpdateAll);
 				if (Context.IsMultiplayer)
-				{
 					UpdateFarmers();
-
-				}
 			}
 		}
 
@@ -594,19 +558,6 @@ namespace NPCMapLocations
 			}
 		}
 
-		private void NpcSyncRequest()
-		{
-			foreach (Farmer farmer in Game1.otherFarmers.Values)
-			{
-				// Check first if farmer has mod installed?
-
-				Task<SerializableDictionary<string, NpcSync>> syncNpc = PyNet.sendRequestToFarmer<SerializableDictionary<string, NpcSync>>("MapMod.NpcSync", NpcMarkers, farmer);
-				syncNpc.Wait();
-				if (syncNpc.Result == null)
-					Monitor.Log($"Failed to sync NPCs for {farmer.Name}", LogLevel.Error);
-			}
-		}
-
 		// Helper method for LocationToMap
 		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
 		{
@@ -713,7 +664,7 @@ namespace NPCMapLocations
 
 		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-      if (Context.IsWorldReady)
+      if (Context.IsWorldReady && Config.ShowMinimap)
 			{
 				Minimap?.DrawMiniMap();
 			}

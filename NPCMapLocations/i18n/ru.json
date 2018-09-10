@@ -1,4 +1,8 @@
 {
+	"minimap.label": "Minimap",
+	"minimap.option1": "Enabled",
+	"minimap.plusMinus1": "Minimap width",
+	"minimap.plusMinus2": "Minimap height",
 	"immersion.label": "настройки:",
 	"immersion.option1": "Всегда показывать жителей",
 	"immersion.option2": "Показывать жителей, с которыми общался игрок",

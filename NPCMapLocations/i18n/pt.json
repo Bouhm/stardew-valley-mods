@@ -1,4 +1,8 @@
 {
+	"minimap.label": "Minimap",
+	"minimap.option1": "Enabled",
+	"minimap.plusMinus1": "Minimap width",
+	"minimap.plusMinus2": "Minimap height",
 	"immersion.label": "Configurações:",
 	"immersion.option1": "Sempre Mostrar Moradores",
 	"immersion.option2": "Mostrar Moradores que o Jogador Já Falou",

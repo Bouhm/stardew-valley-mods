@@ -1,4 +1,4 @@
-﻿/*
+/*
 Menu settings for the mod. 
 Menu code regurgitated from the game code
 Settings loaded from this.Config file and changes saved onto this.Config file.
@@ -86,7 +86,6 @@ namespace NPCMapLocations
 			// Translate labels and initialize buttons to handle button press
 			string minimapLabel = helper.Translation.Get("minimap.label");
 			string immersionLabel = helper.Translation.Get("immersion.label");
-			string extraLabel = helper.Translation.Get("extra.label");
 			string villagersLabel = helper.Translation.Get("villagers.label");
 			immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1, helper, config);
 			immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1, helper, config);
@@ -125,7 +124,6 @@ namespace NPCMapLocations
 			options.Add(new MapModSlider("immersion.slider1", 0, -1, -1, 0, 12, helper, config));
 			options.Add(new MapModSlider("immersion.slider2", 1, -1, -1, 0, 12, helper, config));
 
-			options.Add(new OptionsElement(extraLabel));
 			options.Add(new ModCheckbox("extra.option1", 51, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			options.Add(new ModCheckbox("extra.option2", 52, -1, -1, npcNames, MarkerCropOffsets, helper, config));
 			options.Add(new ModCheckbox("extra.option3", 53, -1, -1, npcNames, MarkerCropOffsets, helper, config));
@@ -759,7 +757,7 @@ namespace NPCMapLocations
 			}
 
 			bounds = new Rectangle(x, y, (int) (1.5 * txtSize), 32);
-			this.label = label;
+			this.label = helper.Translation.Get(label);
 			this.whichOption = whichOption;
 			minusButton = new Rectangle(x, 16, 28, 32);
 			plusButton = new Rectangle(bounds.Right - 96, 16, 28, 32);
@@ -818,11 +816,11 @@ namespace NPCMapLocations
 				case 56:
 					Config.MinimapHeight = options[selected];
 					break;
-/*
-case 57:
-Config.MinimapOpacity = options[selected];
-break;
-*/
+      /*
+      case 57:
+      Config.MinimapOpacity = options[selected];
+      break;
+      */
 				default:
 					break;
 			}
