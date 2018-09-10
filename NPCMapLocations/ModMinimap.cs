@@ -282,8 +282,8 @@ namespace NPCMapLocations
       // Pam house upgrade
 			if (drawPamHouseUpgrade)
 			{
-				var pamHouseX = ModConstants.MapVectors["Trailer"][0].X;
-				var pamHouseY = ModConstants.MapVectors["Trailer"][0].Y;
+				var pamHouseX = ModConstants.MapVectors["Trailer_Big"][0].X;
+				var pamHouseY = ModConstants.MapVectors["Trailer_Big"][0].Y;
 				if (IsWithinMapArea(pamHouseX, pamHouseY))
 					b.Draw(map, new Vector2(NormalizeToMap(mmLoc.X + pamHouseX), NormalizeToMap(mmLoc.Y + pamHouseY)),
 						new Rectangle(263, 181, 8, 8), color,

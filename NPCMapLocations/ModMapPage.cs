@@ -1,4 +1,4 @@
-﻿/*
+/*
 MapPage for the mod that handles logic for tooltips
 and drawing everything.
 Based on regurgitated game code.
@@ -282,8 +282,8 @@ namespace NPCMapLocations
 			if (drawPamHouseUpgrade)
 			{
 				b.Draw(map,
-					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer"][0].X),
-						(float) (mapY + ModConstants.MapVectors["Trailer"][0].Y)), new Rectangle(263, 181, 8, 8), Color.White,
+					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].X),
+						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].Y)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 

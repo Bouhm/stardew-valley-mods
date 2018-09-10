@@ -1,4 +1,4 @@
-﻿/*
+/*
 Static class that stores constants for map mod.
 Do NOT modify anything here other than MapVectors
 */
@@ -286,7 +286,13 @@ public static class ModConstants
 				new MapVector(813, 365)
 			}
 		},
-		{
+	  {
+	    "Trailer_Big", new MapVector[]
+	    {
+	      new MapVector(800, 349)
+	    }
+	  },
+    {
 			"ManorHouse", new MapVector[]
 			{
 				new MapVector(780, 417)

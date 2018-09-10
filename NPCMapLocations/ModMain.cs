@@ -38,7 +38,7 @@ namespace NPCMapLocations
 		private bool isModMapOpen;
 
 		// For debug info
-	  private const bool DEBUG_MODE = false;
+	  private const bool DEBUG_MODE = true;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
@@ -173,34 +173,6 @@ namespace NPCMapLocations
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
-
-      /*
-			// Multiplayer NPC Sync for farmhands
-			if (Context.IsMultiplayer)
-			{
-					var xmlSer = new XmlSerializer(typeof(SerializableDictionary<string, NpcSync>));
-					NpcSyncer = new PyResponder<bool, SerializableDictionary<string, NpcSync>>("MapMod.NpcSync",
-					(s) =>
-					{
-						foreach (var marker in NpcMarkers)
-						{
-							if (s.TryGetValue(marker.Npc.Name, out var npcSync))
-							{
-								var syncedMarker = new MapMarker() {
-									IsOutdoors = s[marker.Npc.Name].IsOutdoors,
-									MapLocation = new Vector2(s[marker.Npc.Name].LocX, s[marker.Npc.Name].LocY) 
-								};
-								NpcMarkers.Remove(marker);
-								NpcMarkers.Add(syncedMarker);
-							}
-						}
-
-						return true;
-					}, 30, SerializationType.XML, SerializationType.XML, xmlSer);
-					
-				NpcSyncer.start();
-			}
-      */
 		}
 
 		// Handle opening mod menu and changing tooltip options
