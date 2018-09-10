@@ -22,6 +22,7 @@ namespace NPCMapLocations
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
+	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
@@ -54,17 +55,17 @@ namespace NPCMapLocations
 		public T Load<T>(IAssetInfo asset)
 		{
 			T map;
-			var mapName = CustomHandler.LoadMap();
+			MapName = CustomHandler.LoadMap();
 			try
 			{
-				if (!mapName.Equals("default_map"))
+				if (!MapName.Equals("default_map"))
 					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
 
-				map = Helper.Content.Load<T>($@"assets\{mapName}.png"); // Replace map page
+				map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
 			}
 			catch
 			{
-				Monitor.Log($"Unable to find {mapName}; loaded default map instead.", LogLevel.Info);
+				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Info);
 				map = Helper.Content.Load<T>($@"assets\default_map.png");
 			}
 
@@ -293,7 +294,8 @@ namespace NPCMapLocations
 					FarmBuildings,
 					BuildingMarkers,
 					Helper,
-					Config
+					Config,
+          MapName
 				);
 		}
 
@@ -361,7 +363,8 @@ namespace NPCMapLocations
 				FarmBuildings,
 				BuildingMarkers,
 				Helper,
-				Config
+				Config,
+        MapName
 			);
 		}
 

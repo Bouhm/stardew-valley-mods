@@ -14,6 +14,7 @@ namespace NPCMapLocations
 		private readonly ModConfig Config;
 		private readonly int borderWidth = 12;
 		private readonly bool drawPamHouseUpgrade;
+	  private readonly string MapName;
 		private readonly Dictionary<long, MapMarker> FarmerMarkers;
 		private readonly IModHelper Helper;
 
@@ -43,7 +44,8 @@ namespace NPCMapLocations
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
 			IModHelper helper,
-			ModConfig config
+			ModConfig config,
+      string mapName = null
 		)
 		{
 			NpcMarkers = npcMarkers;
@@ -52,6 +54,7 @@ namespace NPCMapLocations
 			this.MarkerCropOffsets = MarkerCropOffsets;
 			FarmBuildings = farmBuildings;
 			BuildingMarkers = buildingMarkers;
+		  MapName = mapName;
 			Helper = helper;
 			Config = config;
 
@@ -284,7 +287,7 @@ namespace NPCMapLocations
 				var pamHouseX = ModConstants.MapVectors["Trailer_Big"][0].X;
 				var pamHouseY = ModConstants.MapVectors["Trailer_Big"][0].Y;
 				if (IsWithinMapArea(pamHouseX, pamHouseY))
-					b.Draw(map, new Vector2(NormalizeToMap(mmLoc.X + pamHouseX), NormalizeToMap(mmLoc.Y + pamHouseY)),
+					b.Draw(map, new Vector2(NormalizeToMap(mmLoc.X + pamHouseX - 13), NormalizeToMap(mmLoc.Y + pamHouseY - 16)),
 						new Rectangle(263, 181, 8, 8), color,
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
@@ -296,17 +299,26 @@ namespace NPCMapLocations
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
 
 				foreach (var building in sortedBuildings)
-					if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out var buildingRect))
-						if (IsWithinMapArea(building.Value.Value.X - buildingRect.Width / 2,
-							building.Value.Value.Y - buildingRect.Height / 2))
-							b.Draw(
-								BuildingMarkers,
-								new Vector2(
-									NormalizeToMap(mmLoc.X + building.Value.Value.X - (float) Math.Floor(buildingRect.Width / 2.0)),
-									NormalizeToMap(mmLoc.Y + building.Value.Value.Y - (float) Math.Floor(buildingRect.Height / 2.0))
-								),
-								buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
-							);
+			    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out var buildingRect))
+			    {
+			      if (IsWithinMapArea(building.Value.Value.X - buildingRect.Width / 2,
+			        building.Value.Value.Y - buildingRect.Height / 2))
+			      {
+			        if (MapName == "starblue_map")
+			          buildingRect.Y = 7;
+			        else if (MapName == "eemie_recolour_map")
+			          buildingRect.Y = 14;
+
+              b.Draw(
+			          BuildingMarkers,
+			          new Vector2(
+			            NormalizeToMap(mmLoc.X + building.Value.Value.X - (float) Math.Floor(buildingRect.Width / 2.0)),
+			            NormalizeToMap(mmLoc.Y + building.Value.Value.Y - (float) Math.Floor(buildingRect.Height / 2.0))
+			          ),
+			          buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+			        );
+			      }
+			    }
 			}
 
 			// Traveling Merchant

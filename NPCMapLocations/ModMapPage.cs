@@ -27,6 +27,7 @@ namespace NPCMapLocations
 		private Dictionary<string, int> MarkerCropOffsets { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 		private readonly Texture2D BuildingMarkers;
+	  private readonly string MapName;
 		private string hoveredNames = "";
 		private string hoveredLocationText = "";
 		private Texture2D map;
@@ -46,7 +47,8 @@ namespace NPCMapLocations
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
 			IModHelper helper,
-			ModConfig config
+			ModConfig config,
+      string mapName = null
 		) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
 			Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
 			600 + IClickableMenu.borderWidth * 2)
@@ -60,8 +62,9 @@ namespace NPCMapLocations
 			this.BuildingMarkers = buildingMarkers;
 			this.Helper = helper;
 			this.Config = config;
+		  this.MapName = mapName;
 
-			map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+      map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
 			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(map.Bounds.Width * 4, 720, 0, 0);
 			mapX = (int) center.X;
@@ -282,8 +285,8 @@ namespace NPCMapLocations
 			if (drawPamHouseUpgrade)
 			{
 				b.Draw(map,
-					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].X),
-						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].Y)), new Rectangle(263, 181, 8, 8), Color.White,
+					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].X - 13),
+						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
@@ -385,7 +388,12 @@ namespace NPCMapLocations
 				foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
 				{
 					if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
-						b.Draw(
+					  if (MapName == "starblue_map")
+					    buildingRect.Y = 7;
+					  else if (MapName == "eemie_recolour_map")
+					    buildingRect.Y = 14;
+
+          b.Draw(
 							BuildingMarkers,
 							new Vector2(
 								mapX + building.Value.Value.X - buildingRect.Width / 2,
