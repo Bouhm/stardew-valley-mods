@@ -38,7 +38,7 @@ namespace NPCMapLocations
 		private bool isModMapOpen;
 
 		// For debug info
-	  private const bool DEBUG_MODE = true;
+	  private const bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
