@@ -213,7 +213,7 @@ namespace NPCMapLocations
 	    {
 	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
 	        HeldKey = e.Button;
-	      else if (//HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+	      else if (HeldKey.ToString().Equals(Config.MinimapDragKey) &&
 	               (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
 	               Game1.activeClickableMenu == null)
 	      {
@@ -399,10 +399,7 @@ namespace NPCMapLocations
 			{
 				UpdateNpcs(forceUpdateAll);
 				if (Context.IsMultiplayer)
-				{
 					UpdateFarmers();
-
-				}
 			}
 		}
 
