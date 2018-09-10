@@ -130,12 +130,11 @@ namespace NPCMapLocations
 				mmLoc.X = mmX;
 				cropX = 0;
 			}
-			else if (cropX + mmWidth > map.Width * Game1.pixelZoom)
+			else if (cropX + mmWidth > 1200)
 			{
-				center.X = map.Width * Game1.pixelZoom - mmWidth / 2;
-				mmLoc.X = mmX - (map.Width * Game1.pixelZoom - mmWidth);
-
-				cropX = map.Width - mmWidth;
+				center.X = 1200 - mmWidth / 2;
+				mmLoc.X = mmX - (1200 - mmWidth);
+				cropX = 1200 - mmWidth;
 			}
 
 			if (cropY < 0)
@@ -254,7 +253,7 @@ namespace NPCMapLocations
 		    {
 		      case 1:
 		        b.Draw(map, new Vector2(farmX, farmY),
-		          new Rectangle(0 + farmCropX, 180 + farmCropY, farmWidth, farmHeight), color,
+		          new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
