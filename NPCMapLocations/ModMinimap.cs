@@ -168,10 +168,10 @@ namespace NPCMapLocations
 
         if (isBeingDragged)
 				{
-					mmX = (int) MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, 0 + borderWidth,
-						Game1.viewport.Width - mmWidth - borderWidth);
-					mmY = (int) MathHelper.Clamp(prevMmY + Game1.getMouseY() - prevMouseY, 0 + borderWidth,
-						Game1.viewport.Height - mmHeight - borderWidth);
+					mmX = NormalizeToMap(MathHelper.Clamp(prevMmX + Game1.getMouseX() - prevMouseX, borderWidth,
+						Game1.viewport.Width - mmWidth - borderWidth));
+					mmY = NormalizeToMap(MathHelper.Clamp(prevMmY + Game1.getMouseY() - prevMouseY, borderWidth,
+						Game1.viewport.Height - mmHeight - borderWidth));
 				}
 			}
 
@@ -235,11 +235,21 @@ namespace NPCMapLocations
 		  var farmWidth = 131;
 		  var farmHeight = 61;
       var farmX = NormalizeToMap(MathHelper.Clamp(mmLoc.X, mmX, mmX + mmWidth));
-		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight));
+		  var farmY = NormalizeToMap(MathHelper.Clamp(mmLoc.Y + 172, mmY, mmY + mmHeight) + 2);
 		  var farmCropX = (int)MathHelper.Clamp((mmX - mmLoc.X)/Game1.pixelZoom, 0, farmWidth);
 		  var farmCropY = (int)MathHelper.Clamp((mmY - mmLoc.Y - 172)/Game1.pixelZoom, 0, farmHeight);
-		  var farmCropWidth = farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
-		  var farmCropHeight = farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+
+      // Check if farm crop extends outside of minimap
+		  var farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (mmX + mmWidth) / Game1.pixelZoom) ? (int)((mmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
+		  var farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+
+      // Check if farm crop extends beyond farm size
+		  if (farmCropX + farmCropWidth > farmWidth)
+		    farmCropWidth = farmWidth - farmCropX;
+
+		  if (farmCropY + farmCropHeight > farmHeight)
+		    farmCropHeight = farmHeight - farmCropY;
+
       switch (Game1.whichFarm)
 		    {
 		      case 1:
