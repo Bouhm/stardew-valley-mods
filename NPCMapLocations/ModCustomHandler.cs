@@ -1,9 +1,11 @@
-﻿using StardewModdingAPI;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using Microsoft.Xna.Framework;
 
 namespace NPCMapLocations
 {
@@ -89,9 +91,45 @@ namespace NPCMapLocations
 			return this.MarkerCropOffsets;
 		}
 
-		// Handle any modified NPC names 
-		// Specifically mods that change names in dialogue files (displayName)
-		private void LoadCustomNames(NPC npc)
+	  // Any custom locations with given location on the map
+	  public void LoadCustomLocations()
+	  {
+	    foreach (KeyValuePair<string, int[]> location in Config.CustomLocations)
+	    {
+	      if (location.Value.Length < 2) continue;
+	      if (ModConstants.MapVectors.ContainsKey(location.Key))
+	      {
+	        ModConstants.MapVectors[location.Key] = new MapVector[] { new MapVector(location.Value[0], location.Value[1]) };
+	      }
+	      else
+	      {
+	        ModConstants.MapVectors.Add(location.Key, new MapVector[] { new MapVector(location.Value[0], location.Value[1]) });
+	      }
+	    }
+	  }
+
+	  // Custom markers to draw on the map with given location
+	  public Dictionary<string, Rectangle> GetCustomMarkerRects()
+	  {
+	    var customLocationMarkerRects = new Dictionary<string, Rectangle>();
+	    foreach (KeyValuePair<string, int[]> location in Config.CustomLocationMarkers)
+	    {
+	      if (location.Value.Length < 4 || ModConstants.MapVectors.ContainsKey(location.Key)) continue;
+	      customLocationMarkerRects.Add(location.Key,
+	        new Rectangle()
+	        {
+	          X = location.Value[0],
+	          Y = location.Value[1],
+	          Width = location.Value[2],
+	          Height = location.Value[3]
+	        });
+	    }
+	    return customLocationMarkerRects;
+	  }
+
+    // Handle any modified NPC names 
+    // Specifically mods that change names in dialogue files (displayName)
+    private void LoadCustomNames(NPC npc)
 		{
 			if (!this.CustomNames.TryGetValue(npc.Name, out string customName))
 			{

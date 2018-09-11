@@ -1,7 +1,6 @@
 /*
  * Config file for mod settings.
  */
-
 using System.Collections.Generic;
 
 namespace NPCMapLocations
@@ -24,7 +23,8 @@ namespace NPCMapLocations
 		public Dictionary<string, int> CustomCropOffsets { get; set; } = new Dictionary<string, int>();
 		public bool ShowTravelingMerchant { get; set; } = true;
 		public bool ShowFarmBuildings { get; set; } = true;
-
+    public Dictionary<string, int[]> CustomLocations { get; set; } = new Dictionary<string, int[]>();
+    public Dictionary<string, int[]> CustomLocationMarkers { get; set; } = new Dictionary<string, int[]>();
 		public bool ShowMinimap { get; set; } = true;
 		public int MinimapX { get; set; } = 12;
 		public int MinimapY { get; set; } = 12;

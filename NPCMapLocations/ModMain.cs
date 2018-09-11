@@ -4,6 +4,7 @@ Shows NPC locations on a modified map.
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -21,10 +22,12 @@ namespace NPCMapLocations
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
+	  private Texture2D CustomMarkers;
 	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
+	  private Dictionary<string, Rectangle> CustomMarkerRects;
 		private Dictionary<string, int>
 			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private ModMinimap Minimap;
@@ -59,7 +62,7 @@ namespace NPCMapLocations
 			{
 				if (!MapName.Equals("default_map"))
 					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Debug);
-
+       
 				map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
 			}
 			catch
@@ -78,6 +81,8 @@ namespace NPCMapLocations
 			CustomHandler = new ModCustomHandler(helper, Config, Monitor);
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
+		  CustomMarkers =
+		    Helper.Content.Load<Texture2D>(@"assets/customMarkers.png"); // Load custom markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
@@ -172,6 +177,8 @@ namespace NPCMapLocations
 			CustomHandler.UpdateCustomNpcs();
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
+		  CustomHandler.LoadCustomLocations();
+		  CustomMarkerRects = CustomHandler.GetCustomMarkerRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
 		}
