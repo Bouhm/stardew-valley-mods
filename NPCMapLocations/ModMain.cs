@@ -598,20 +598,15 @@ namespace NPCMapLocations
 
 		  if (locationName.StartsWith("UndergroundMine"))
 		  {
-		    var mine = locationName;
-		    mine.Replace("\\D+", ""); // Extract mine level from name string
+		    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
 		    if (Int32.TryParse(mine, out var mineLevel))
 		    {
 		      // Skull cave
 		      if (mineLevel > 120)
-		      {
 		        locationName = "SkullCave";
-		      }
 		      // Mines
 		      else
-		      {
-		        locationName = "Mines";
-		      }
+		        locationName = "Mine";
 		    }
       }
 		   
@@ -680,22 +675,17 @@ namespace NPCMapLocations
 			return new Vector2(x, y);
 		}
 
-	  private string getMinesLocationName(string location)
+	  private string getMinesLocationName(string locationName)
 	  {
-	    var mine = location;
-	    mine.Replace("\\D+", ""); // Extract mine level from name string
-	    if (Int32.TryParse(mine, out var mineLevel))
+	    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+      if (Int32.TryParse(mine, out var mineLevel))
 	    {
 	      // Skull cave
 	      if (mineLevel > 120)
-	      {
 	        return "SkullCave";
-	      }
 	      // Mines
 	      else
-	      {
-	        return "Mines";
-	      }
+	        return "Mine";
 	    }
 	    return null;
 	  }

@@ -21,6 +21,7 @@ namespace NPCMapLocations
 
 		public bool isBeingDragged;
 		private readonly Texture2D map;
+	  private Vector2 prevCenter;
 	  private Vector2 center; // Center position of minimap
 	  private float cropX; // Top-left position of crop on map
 	  private float cropY; // Top-left position of crop on map
@@ -121,7 +122,13 @@ namespace NPCMapLocations
 
 		  center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY());
-			playerLoc = center;
+
+      // Player in unknown location, use previous location as center
+		  if (center == Vector2.Zero && prevCenter != null)
+		    center = prevCenter;
+		  else
+		    prevCenter = center;
+			playerLoc = prevCenter;
 
 			center.X = NormalizeToMap(center.X);
 			center.Y = NormalizeToMap(center.Y);
