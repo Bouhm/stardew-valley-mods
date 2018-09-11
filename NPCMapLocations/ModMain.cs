@@ -38,13 +38,13 @@ namespace NPCMapLocations
 		private bool isModMapOpen;
 
 		// For debug info
-	  private const bool DEBUG_MODE = false;
+	  private const bool DEBUG_MODE = true;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
 	  private static List<string> alertFlags;
 
-
+  
 		// Replace game map with modified map
 		public bool CanLoad<T>(IAssetInfo asset)
 		{
@@ -401,7 +401,11 @@ namespace NPCMapLocations
 					locationName = npc.currentLocation.Name;
 				}
 
-				if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
+        // Special case for Mines
+			  if (locationName.StartsWith("UndergroundMine"))
+			    locationName = getMinesLocationName(locationName);
+
+        if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + locationName))
 					{
@@ -520,6 +524,11 @@ namespace NPCMapLocations
 			foreach (var farmer in Game1.getOnlineFarmers())
 			{
 				if (farmer?.currentLocation == null) continue;
+			  var locationName = farmer.currentLocation.Name;
+
+			  if (locationName.StartsWith("UndergroundMine"))
+          locationName = getMinesLocationName(locationName);
+
 				if (!ModConstants.MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
@@ -587,7 +596,27 @@ namespace NPCMapLocations
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
 
-			if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
+		  if (locationName.StartsWith("UndergroundMine"))
+		  {
+		    var mine = locationName;
+		    mine.Replace("\\D+", ""); // Extract mine level from name string
+		    if (Int32.TryParse(mine, out var mineLevel))
+		    {
+		      // Skull cave
+		      if (mineLevel > 120)
+		      {
+		        locationName = "SkullCave";
+		      }
+		      // Mines
+		      else
+		      {
+		        locationName = "Mines";
+		      }
+		    }
+      }
+		   
+
+      if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
 				return Vector2.Zero;
 
 			int x;
@@ -651,12 +680,33 @@ namespace NPCMapLocations
 			return new Vector2(x, y);
 		}
 
+	  private string getMinesLocationName(string location)
+	  {
+	    var mine = location;
+	    mine.Replace("\\D+", ""); // Extract mine level from name string
+	    if (Int32.TryParse(mine, out var mineLevel))
+	    {
+	      // Skull cave
+	      if (mineLevel > 120)
+	      {
+	        return "SkullCave";
+	      }
+	      // Mines
+	      else
+	      {
+	        return "Mines";
+	      }
+	    }
+	    return null;
+	  }
+
 		private void GraphicsEvents_Resize(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
 
 			UpdateMarkers(true);
 			UpdateFarmBuildingLocs();
+      Minimap?.CheckOffsetForMap();
 		}
 
 		private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)

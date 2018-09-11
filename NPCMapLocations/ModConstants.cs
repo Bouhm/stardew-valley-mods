@@ -458,12 +458,6 @@ public static class ModConstants
 			}
 		},
 		{
-			"UndergroundMine", new MapVector[]
-			{
-				new MapVector(861, 83)
-			}
-		},
-		{
 			"Quarry", new MapVector[]
 			{
 				new MapVector(1032, 139)
