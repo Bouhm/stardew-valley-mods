@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -267,6 +267,9 @@ namespace NPCCompass
                         locator.Proximity = 0;
                     }
 
+                    if (!constants.MarkerCrop.TryGetValue(locator.Name, out var cropY))
+                      cropY = 0;
+
                     // Pointer texture
                     Game1.spriteBatch.Draw(
                         pointer,
@@ -284,7 +287,7 @@ namespace NPCCompass
                     Game1.spriteBatch.Draw(
                         locator.Marker,
                         new Vector2(locator.X + 24, locator.Y + 20),
-                        new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
+                        new Rectangle?(new Rectangle(0, cropY, 16, 15)),
                         Color.White * (float)alphaLevel,
                         0f,
                         new Vector2(16, 16),

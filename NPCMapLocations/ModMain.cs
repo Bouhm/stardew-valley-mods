@@ -6,7 +6,6 @@ Shows NPC locations on a modified map.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -22,6 +21,7 @@ namespace NPCMapLocations
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
+	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
@@ -54,17 +54,17 @@ namespace NPCMapLocations
 		public T Load<T>(IAssetInfo asset)
 		{
 			T map;
-			var mapName = CustomHandler.LoadMap();
+			MapName = CustomHandler.LoadMap();
 			try
 			{
-				if (!mapName.Equals("default_map"))
+				if (!MapName.Equals("default_map"))
 					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
 
-				map = Helper.Content.Load<T>($@"assets\{mapName}.png"); // Replace map page
+				map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
 			}
 			catch
 			{
-				Monitor.Log($"Unable to find {mapName}; loaded default map instead.", LogLevel.Info);
+				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Info);
 				map = Helper.Content.Load<T>($@"assets\default_map.png");
 			}
 
@@ -86,11 +86,12 @@ namespace NPCMapLocations
 			InputEvents.ButtonReleased += InputEvents_ButtonReleased;
 			GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
 			GameEvents.UpdateTick += GameEvents_UpdateTick;
-			GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
-			GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-			GraphicsEvents.Resize += GraphicsEvents_Resize;
       MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-		}
+		  PlayerEvents.Warped += PlayerEvents_Warped;
+		  GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
+		  GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
+		  GraphicsEvents.Resize += GraphicsEvents_Resize;
+    }
 
     // Get only relevant villagers for map
     private List<NPC> GetVillagers()
@@ -157,8 +158,8 @@ namespace NPCMapLocations
 				UpdateFarmBuildingLocs();
 		}
 
-		// Load config and other one-off data
-		private void SaveEvents_AfterLoad(object sender, EventArgs e)
+    // Load config and other one-off data
+    private void SaveEvents_AfterLoad(object sender, EventArgs e)
 		{
 			SecondaryNpcs = new Dictionary<string, bool>
 			{
@@ -284,6 +285,7 @@ namespace NPCMapLocations
 			}
 
 			ResetMarkers(GetVillagers());
+      UpdateMarkers(true);
 			if (Config.ShowMinimap)
 				Minimap = new ModMinimap(
 					NpcMarkers,
@@ -293,7 +295,8 @@ namespace NPCMapLocations
 					FarmBuildings,
 					BuildingMarkers,
 					Helper,
-					Config
+					Config,
+          MapName
 				);
 		}
 
@@ -361,7 +364,8 @@ namespace NPCMapLocations
 				FarmBuildings,
 				BuildingMarkers,
 				Helper,
-				Config
+				Config,
+        MapName
 			);
 		}
 
@@ -662,7 +666,12 @@ namespace NPCMapLocations
 				Minimap?.Resize();
 		}
 
-		private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
+	  private void PlayerEvents_Warped(object sender, EventArgsPlayerWarped e)
+	  {
+	    Minimap?.CheckOffsetForMap();
+	  }
+
+    private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
       if (Context.IsWorldReady && Config.ShowMinimap)
 			{
