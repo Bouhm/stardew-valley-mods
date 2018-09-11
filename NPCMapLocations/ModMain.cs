@@ -38,7 +38,7 @@ namespace NPCMapLocations
 		private bool isModMapOpen;
 
 		// For debug info
-	  private const bool DEBUG_MODE = true;
+	  private const bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
@@ -58,13 +58,13 @@ namespace NPCMapLocations
 			try
 			{
 				if (!MapName.Equals("default_map"))
-					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
+					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Debug);
 
 				map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
 			}
 			catch
 			{
-				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Info);
+				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Debug);
 				map = Helper.Content.Load<T>($@"assets\default_map.png");
 			}
 
@@ -409,7 +409,7 @@ namespace NPCMapLocations
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + locationName))
 					{
-						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Warn);
+						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
 						alertFlags.Add("UnknownLocation:" + locationName);
 					}
 					continue;
@@ -533,7 +533,7 @@ namespace NPCMapLocations
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
 					{
-						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Warn);
+						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
 						alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
 					}
 				}
