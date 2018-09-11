@@ -354,6 +354,7 @@ namespace NPCMapLocations
 						// Temporary solution to handle desync of farmhand location/tile position when changing location
 						if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 						{
+						  if (farMarker.MapLocation == Vector2.Zero) continue;
 							if (farMarker.DrawDelay == 0 &&
 							    IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
 							{
@@ -367,10 +368,11 @@ namespace NPCMapLocations
 				}
 				else
 				{
-					Game1.player.FarmerRenderer.drawMiniPortrat(b,
-						new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
-						2f, 1,
-						Game1.player);
+          if (playerLoc != Vector2.Zero)
+					  Game1.player.FarmerRenderer.drawMiniPortrat(b,
+						  new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
+						  2f, 1,
+						  Game1.player);
 				}
 			
 
