@@ -172,6 +172,7 @@ namespace NPCMapLocations
 		  var IsHoveringMinimap = false;
 		  var offsetMmX = mmX + offset;
 
+      // Move minimap along with mouse when held down
       if (Game1.getMouseX() > offsetMmX - borderWidth && Game1.getMouseX() < offsetMmX + mmWidth + borderWidth &&
 			    Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
 			{
@@ -189,18 +190,20 @@ namespace NPCMapLocations
 				}
 			}
 
-		  // When cursor is hovering over a clickable component behind the minimap, make transparent
+      // Make transparent on hover
 			var b = Game1.spriteBatch;
 			var color = IsHoveringMinimap
 				? Color.White * 0.5f
 				: Color.White;
 
+      // Draw map
 			b.Draw(map, new Vector2(offsetMmX, mmY),
 				new Rectangle((int) Math.Floor(cropX / Game1.pixelZoom),
 					(int) Math.Floor(cropY / Game1.pixelZoom), mmWidth / Game1.pixelZoom + 2,
 					mmHeight / Game1.pixelZoom + 2), color, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
+      // Don't draw markers while being dragged
 		  if (!isBeingDragged)
 		  {
 		    // When minimap is moved, redraw markers after recalculating & repositioning

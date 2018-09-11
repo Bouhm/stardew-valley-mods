@@ -285,6 +285,7 @@ namespace NPCMapLocations
 			}
 
 			ResetMarkers(GetVillagers());
+      UpdateMarkers(true);
 			if (Config.ShowMinimap)
 				Minimap = new ModMinimap(
 					NpcMarkers,
