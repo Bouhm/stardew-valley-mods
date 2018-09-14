@@ -94,17 +94,21 @@ namespace NPCMapLocations
 	  // Any custom locations with given location on the map
 	  public void LoadCustomLocations()
 	  {
-	    foreach (KeyValuePair<string, int[]> location in Config.CustomLocations)
+      // int[] where ([0], [1]) is the location on the map
+	    foreach (KeyValuePair<string, int[][]> mapVectors in Config.CustomLocations)
 	    {
-	      if (location.Value.Length < 2) continue;
-	      if (ModConstants.MapVectors.ContainsKey(location.Key))
+	      foreach (var mapVector in mapVectors.Value)
 	      {
-	        ModConstants.MapVectors[location.Key] = new MapVector[] { new MapVector(location.Value[0], location.Value[1]) };
-	      }
-	      else
-	      {
-	        ModConstants.MapVectors.Add(location.Key, new MapVector[] { new MapVector(location.Value[0], location.Value[1]) });
-	      }
+	        if (mapVector.Length < 2) continue;
+	        if (ModConstants.MapVectors.ContainsKey(mapVectors.Key))
+	        {
+	          ModConstants.MapVectors[mapVectors.Key] = new MapVector[] { new MapVector(mapVector[0], mapVector[1]) };
+	        }
+	        else
+	        {
+	          ModConstants.MapVectors.Add(mapVectors.Key, new MapVector[] { new MapVector(mapVector[0], mapVector[1]) });
+	        }
+        }
 	    }
 	  }
 
