@@ -79,7 +79,7 @@ public static class ModConstants
 		{
 			"Farm", new MapVector[]
 			{
-				new MapVector(30, 237, 0, 0),
+				new MapVector(330, 237, 0, 0),
 				new MapVector(514, 386, 80, 65)
 			}
 		},

@@ -12,14 +12,16 @@ namespace NPCMapLocations
 	internal class ModMinimap
 	{
 		private readonly Texture2D BuildingMarkers;
-	  private readonly Texture2D CustomLocationMarkers;
     private readonly ModConfig Config;
 		private readonly int borderWidth = 12;
 		private readonly bool drawPamHouseUpgrade;
 		private readonly Dictionary<long, MapMarker> FarmerMarkers;
-	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
 		private readonly IModHelper Helper;
 	  private readonly string MapName;
+
+	  private readonly Dictionary<string, MapVector[]> CustomLocations;
+	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
+	  private readonly Texture2D CustomLocationMarkers;
 
     public bool isBeingDragged;
 		private readonly Texture2D map;
@@ -51,9 +53,11 @@ namespace NPCMapLocations
 			IModHelper helper,
 			ModConfig config,
       string mapName = null,
-      Texture2D customLocationMarkers = null,
-      Dictionary<string, Rectangle> customLocationRects = null
-		)
+      Dictionary<string, MapVector[]> customLocations = null,
+			Dictionary<string, Rectangle> customLocationRects = null,
+			Texture2D customLocationMarkers = null
+
+    )
 		{
 			this.NpcMarkers = npcMarkers;
 		  this.SecondaryNpcs = secondaryNpcs;
@@ -64,8 +68,9 @@ namespace NPCMapLocations
 		  this.Helper = helper;
 		  this.Config = config;
 		  this.MapName = mapName;
-      this.CustomLocationMarkers = customLocationMarkers;
+		  this.CustomLocations = customLocations;
 		  this.CustomLocationRects = customLocationRects;
+		  this.CustomLocationMarkers = customLocationMarkers;
 
       map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
@@ -366,7 +371,7 @@ namespace NPCMapLocations
 		  {
 		    foreach (var location in CustomLocationRects)
 		    {
-		      if (ModConstants.MapVectors.TryGetValue(location.Key, out var locationVector) && CustomLocationRects.TryGetValue(location.Key, out var locationRect))
+		      if (CustomLocations.TryGetValue(location.Key, out var locationVector) && CustomLocationRects.TryGetValue(location.Key, out var locationRect))
 		      {
             // If only one Vector specified, treat it as a marker
             // Markers are centered based on width/height
@@ -379,21 +384,21 @@ namespace NPCMapLocations
 		            markerY - locationRect.Height / 2))
 		          {
 		            b.Draw(
-		              BuildingMarkers,
+		              CustomLocationMarkers,
 		              new Vector2(
 		                NormalizeToMap(
 		                  offsetMmLoc.X + markerX - (float) Math.Floor(locationRect.Width / 2.0)),
 		                NormalizeToMap(offsetMmLoc.Y + markerY -
 		                               (float) Math.Floor(locationRect.Height / 2.0))
 		              ),
-		              locationRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+		              locationRect, color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
 		            );
 		          }
 		        }
 
 		        // If more than one Vector, treat it as a region with lower & upper bound
             // Regions are draw by the top-left corner
-		        else if (locationVector.Length < 1)
+		        else if (locationVector.Length > 1)
 		        {
 		          var regionLocX = locationVector[0].MapX;
 		          var regionLocY = locationVector[0].MapY;
@@ -415,7 +420,7 @@ namespace NPCMapLocations
 		          if (regionCropY + regionCropHeight > regionHeight)
 		            regionCropHeight = regionHeight - regionCropY;
 
-		          b.Draw(map, new Vector2(regionX, regionY),
+		          b.Draw(CustomLocationMarkers, new Vector2(regionX, regionY),
 		            new Rectangle(locationRect.X + regionCropX, locationRect.Y + regionCropY, regionCropWidth, regionCropHeight), color,
 		            0f,
 		            Vector2.Zero, 4f, SpriteEffects.None, 0.861f);

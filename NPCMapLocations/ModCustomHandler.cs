@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
@@ -95,27 +96,26 @@ namespace NPCMapLocations
 	  // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
     // { "customRegion": [{x1, y1}, {x2, y2}] where x, y are relative to map (for a custom region ex. a new farm)
 	  // Any custom locations with given location on the map
-	  public void LoadCustomLocations()
+	  public Dictionary<string, MapVector[]> GetCustomLocations()
 	  {
-      foreach (KeyValuePair<string, object[]> mapVectors in Config.CustomLocations)
+      var customMapVectors = new Dictionary<string, MapVector[]>();
+      foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomLocations)
 	    {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
 	      for (int i = 0; i < mapVectors.Value.Length; i++)
 	      {
           var mapVector = mapVectors.Value[i];
           mapVectorArr[i] = new MapVector(
-	          (int) mapVector.GetType().GetProperty("MapX").GetValue(mapVector, null),
-	          (int) mapVector.GetType().GetProperty("MapY").GetValue(mapVector, null),
-	          (int) mapVector.GetType().GetProperty("TileX")?.GetValue(mapVector, null),
-	          (int) mapVector.GetType().GetProperty("TileY")?.GetValue(mapVector, null)
+	          (int) mapVector.GetValue("MapX"),
+	          (int) mapVector.GetValue("MapY"),
+	          (int) mapVector.GetValue("TileX"),
+	          (int) mapVector.GetValue("TileY")
 	        );
 	      }
-
-	      if (ModConstants.MapVectors.ContainsKey(mapVectors.Key))
-	        ModConstants.MapVectors[mapVectors.Key] = mapVectorArr;
-	      else
-	        ModConstants.MapVectors.Add(mapVectors.Key, mapVectorArr);        
+	      customMapVectors.Add(mapVectors.Key, mapVectorArr);        
 	    }
+
+	    return customMapVectors;
 	  }
 
 
@@ -124,16 +124,16 @@ namespace NPCMapLocations
 	  public Dictionary<string, Rectangle> GetCustomLocationRects()
 	  {
 	    var customLocationRects = new Dictionary<string, Rectangle>();
-	    foreach (KeyValuePair<string, object> locationRect in Config.CustomLocationRects)
+	    foreach (KeyValuePair<string, JObject> locationRect in Config.CustomLocationRects)
 	    {
 	      var customRect = locationRect.Value;
         customLocationRects.Add(
 	        locationRect.Key,
 	        new Rectangle(
-	          (int)customRect.GetType().GetProperty("CropX").GetValue(customRect, null),
-	          (int)customRect.GetType().GetProperty("CropY").GetValue(customRect, null),
-	          (int)customRect.GetType().GetProperty("CropWidth").GetValue(customRect, null),
-	          (int)customRect.GetType().GetProperty("CropHeight").GetValue(customRect, null)
+	          (int)customRect.GetValue("X"),
+	          (int)customRect.GetValue("Y"),
+	          (int)customRect.GetValue("Width"),
+	          (int)customRect.GetValue("Height")
           )
 	      );
 	    }

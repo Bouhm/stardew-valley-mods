@@ -4,7 +4,6 @@ Shows NPC locations on a modified map.
 */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -22,25 +21,27 @@ namespace NPCMapLocations
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
-	  private Texture2D CustomLocationMarkers;
-	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
-		private Dictionary<string, string> CustomNames;
-	  private Dictionary<string, Rectangle> CustomLocationRects;
-		private Dictionary<string, int>
-			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private ModMinimap Minimap;
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
-		private const int DRAW_DELAY = 3;
+	  private const int DRAW_DELAY = 3;
 
-		// Multiplayer
-		private Dictionary<long, MapMarker> FarmerMarkers;
+    // Customizations/Custom mods
+	  private string MapName;
+    private Texture2D CustomLocationMarkers;
+	  private Dictionary<string, MapVector[]> CustomLocations;
+    private Dictionary<string, Rectangle> CustomLocationRects;
+	  private Dictionary<string, string> CustomNames;
+	  private Dictionary<string, int> MarkerCropOffsets;
+
+    // Multiplayer
+    private Dictionary<long, MapMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
 
-		// For debug info
+		// Debugging
 	  private const bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
@@ -82,7 +83,7 @@ namespace NPCMapLocations
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
 		  CustomLocationMarkers =
-		    Helper.Content.Load<Texture2D>(@"assets/customMarkers.png"); // Load custom location markers
+		    Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
@@ -177,8 +178,8 @@ namespace NPCMapLocations
 			CustomHandler.UpdateCustomNpcs();
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
-		  CustomHandler.LoadCustomLocations();
-		  CustomLocationRects = CustomHandler.GetCustomLocationRects();
+		  CustomLocations = CustomHandler.GetCustomLocations();
+      CustomLocationRects = CustomHandler.GetCustomLocationRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
 		}
@@ -304,8 +305,9 @@ namespace NPCMapLocations
 					Helper,
 					Config,
           MapName,
-          CustomLocationMarkers,
-          CustomLocationRects
+          CustomLocations,
+					CustomLocationRects,
+          CustomLocationMarkers
 				);
 		}
 
@@ -375,8 +377,9 @@ namespace NPCMapLocations
 				Helper,
 				Config,
 				MapName,
-				CustomLocationMarkers,
-				CustomLocationRects
+				CustomLocations,
+				CustomLocationRects,
+        CustomLocationMarkers
       );
 		}
 
@@ -811,18 +814,16 @@ namespace NPCMapLocations
 
 		public MapVector(int x, int y)
 		{
-			TileX = 0;
-			TileY = 0;
 			MapX = x;
 			MapY = y;
-		}
+    }
 
 		public MapVector(int x, int y, int tileX, int tileY)
 		{
-			TileX = tileX;
-			TileY = tileY;
 			MapX = x;
 			MapY = y;
-		}
+		  TileX = tileX;
+		  TileY = tileY;
+    }
 	}
 }

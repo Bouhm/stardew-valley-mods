@@ -3,6 +3,7 @@
  */
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
@@ -24,8 +25,8 @@ namespace NPCMapLocations
 		public Dictionary<string, int> CustomCropOffsets { get; set; } = new Dictionary<string, int>();
 		public bool ShowTravelingMerchant { get; set; } = true;
 		public bool ShowFarmBuildings { get; set; } = true;
-    public Dictionary<string, object[]> CustomLocations { get; set; } = new Dictionary<string, object[]>();
-    public Dictionary<string, object> CustomLocationRects { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, JObject[]> CustomLocations { get; set; } = new Dictionary<string, JObject[]>();
+    public Dictionary<string, JObject> CustomLocationRects { get; set; } = new Dictionary<string, JObject>();
 		public bool ShowMinimap { get; set; } = true;
 		public int MinimapX { get; set; } = 12;
 		public int MinimapY { get; set; } = 12;
