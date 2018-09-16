@@ -105,12 +105,26 @@ namespace NPCMapLocations
 	      for (int i = 0; i < mapVectors.Value.Length; i++)
 	      {
           var mapVector = mapVectors.Value[i];
-          mapVectorArr[i] = new MapVector(
-	          (int) mapVector.GetValue("MapX"),
-	          (int) mapVector.GetValue("MapY"),
-	          (int) mapVector.GetValue("TileX"),
-	          (int) mapVector.GetValue("TileY")
-	        );
+
+          // Marker doesn't need to specify corresponding Tile position
+	        if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
+	        {
+	          mapVectorArr[i] = new MapVector(
+	            (int) mapVector.GetValue("MapX"),
+	            (int) mapVector.GetValue("MapY")
+	          );
+	        }
+          // Region must specify corresponding Tile positions for
+          // Calculations on movement within location
+	        else
+          {
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY"),
+              (int)mapVector.GetValue("TileX"),
+              (int)mapVector.GetValue("TileY")
+            );
+          }
 	      }
 	      customMapVectors.Add(mapVectors.Key, mapVectorArr);        
 	    }
