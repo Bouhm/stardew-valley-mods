@@ -26,7 +26,9 @@ namespace NPCMapLocations
 		private Dictionary<long, MapMarker> FarmerMarkers;
 		private Dictionary<string, int> MarkerCropOffsets { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
-		private readonly Texture2D BuildingMarkers;
+	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
+    private readonly Texture2D BuildingMarkers;
+	  private readonly Texture2D CustomLocationMarkers;
 	  private readonly string MapName;
 		private string hoveredNames = "";
 		private string hoveredLocationText = "";
@@ -48,8 +50,10 @@ namespace NPCMapLocations
 			Texture2D buildingMarkers,
 			IModHelper helper,
 			ModConfig config,
-      string mapName = null
-		) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
+      string mapName = null,
+			Texture2D customLocationMarkers = null,
+			Dictionary<string, Rectangle> customLocationRects = null
+    ) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
 			Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
 			600 + IClickableMenu.borderWidth * 2)
 		{
@@ -63,6 +67,8 @@ namespace NPCMapLocations
 			this.Helper = helper;
 			this.Config = config;
 		  this.MapName = mapName;
+		  this.CustomLocationMarkers = customLocationMarkers;
+		  this.CustomLocationRects = customLocationRects;
 
       map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
@@ -285,8 +291,8 @@ namespace NPCMapLocations
 			if (drawPamHouseUpgrade)
 			{
 				b.Draw(map,
-					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].X - 13),
-						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
+					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].MapX - 13),
+						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].MapY - 16)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
@@ -407,7 +413,7 @@ namespace NPCMapLocations
 			// Traveling Merchant
 			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
-				Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"].FirstOrDefault().X, ModConstants.MapVectors["Merchant"].FirstOrDefault().Y);
+				Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         b.Draw(Game1.mouseCursors, new Vector2(mapX + merchantLoc.X - 16, mapY + merchantLoc.Y - 15),
 					new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 					1f);

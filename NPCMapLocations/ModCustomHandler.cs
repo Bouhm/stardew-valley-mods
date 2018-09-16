@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace NPCMapLocations
 {
@@ -91,44 +92,52 @@ namespace NPCMapLocations
 			return this.MarkerCropOffsets;
 		}
 
+	  // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
+    // { "customRegion": [{x1, y1}, {x2, y2}] where x, y are relative to map (for a custom region ex. a new farm)
 	  // Any custom locations with given location on the map
 	  public void LoadCustomLocations()
 	  {
-      // int[] where ([0], [1]) is the location on the map
-	    foreach (KeyValuePair<string, int[][]> mapVectors in Config.CustomLocations)
+      foreach (KeyValuePair<string, object[]> mapVectors in Config.CustomLocations)
 	    {
-	      foreach (var mapVector in mapVectors.Value)
+        var mapVectorArr = new MapVector[mapVectors.Value.Length];
+	      for (int i = 0; i < mapVectors.Value.Length; i++)
 	      {
-	        if (mapVector.Length < 2) continue;
-	        if (ModConstants.MapVectors.ContainsKey(mapVectors.Key))
-	        {
-	          ModConstants.MapVectors[mapVectors.Key] = new MapVector[] { new MapVector(mapVector[0], mapVector[1]) };
-	        }
-	        else
-	        {
-	          ModConstants.MapVectors.Add(mapVectors.Key, new MapVector[] { new MapVector(mapVector[0], mapVector[1]) });
-	        }
-        }
+          var mapVector = mapVectors.Value[i];
+          mapVectorArr[i] = new MapVector(
+	          (int) mapVector.GetType().GetProperty("MapX").GetValue(mapVector, null),
+	          (int) mapVector.GetType().GetProperty("MapY").GetValue(mapVector, null),
+	          (int) mapVector.GetType().GetProperty("TileX")?.GetValue(mapVector, null),
+	          (int) mapVector.GetType().GetProperty("TileY")?.GetValue(mapVector, null)
+	        );
+	      }
+
+	      if (ModConstants.MapVectors.ContainsKey(mapVectors.Key))
+	        ModConstants.MapVectors[mapVectors.Key] = mapVectorArr;
+	      else
+	        ModConstants.MapVectors.Add(mapVectors.Key, mapVectorArr);        
 	    }
 	  }
 
+
+    // { "customLocation": [{x, y, width, height}] } for cropping from x, y with given crop width/height
 	  // Custom markers to draw on the map with given location
-	  public Dictionary<string, Rectangle> GetCustomMarkerRects()
+	  public Dictionary<string, Rectangle> GetCustomLocationRects()
 	  {
-	    var customLocationMarkerRects = new Dictionary<string, Rectangle>();
-	    foreach (KeyValuePair<string, int[]> location in Config.CustomLocationMarkers)
+	    var customLocationRects = new Dictionary<string, Rectangle>();
+	    foreach (KeyValuePair<string, object> locationRect in Config.CustomLocationRects)
 	    {
-	      if (location.Value.Length < 4 || ModConstants.MapVectors.ContainsKey(location.Key)) continue;
-	      customLocationMarkerRects.Add(location.Key,
-	        new Rectangle()
-	        {
-	          X = location.Value[0],
-	          Y = location.Value[1],
-	          Width = location.Value[2],
-	          Height = location.Value[3]
-	        });
+	      var customRect = locationRect.Value;
+        customLocationRects.Add(
+	        locationRect.Key,
+	        new Rectangle(
+	          (int)customRect.GetType().GetProperty("CropX").GetValue(customRect, null),
+	          (int)customRect.GetType().GetProperty("CropY").GetValue(customRect, null),
+	          (int)customRect.GetType().GetProperty("CropWidth").GetValue(customRect, null),
+	          (int)customRect.GetType().GetProperty("CropHeight").GetValue(customRect, null)
+          )
+	      );
 	    }
-	    return customLocationMarkerRects;
+	    return customLocationRects;
 	  }
 
     // Handle any modified NPC names 

@@ -12,14 +12,16 @@ namespace NPCMapLocations
 	internal class ModMinimap
 	{
 		private readonly Texture2D BuildingMarkers;
-		private readonly ModConfig Config;
+	  private readonly Texture2D CustomLocationMarkers;
+    private readonly ModConfig Config;
 		private readonly int borderWidth = 12;
 		private readonly bool drawPamHouseUpgrade;
-	  private readonly string MapName;
 		private readonly Dictionary<long, MapMarker> FarmerMarkers;
+	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
 		private readonly IModHelper Helper;
+	  private readonly string MapName;
 
-		public bool isBeingDragged;
+    public bool isBeingDragged;
 		private readonly Texture2D map;
 	  private Vector2 prevCenter;
 	  private Vector2 center; // Center position of minimap
@@ -48,20 +50,24 @@ namespace NPCMapLocations
 			Texture2D buildingMarkers,
 			IModHelper helper,
 			ModConfig config,
-      string mapName = null
+      string mapName = null,
+      Texture2D customLocationMarkers = null,
+      Dictionary<string, Rectangle> customLocationRects = null
 		)
 		{
-			NpcMarkers = npcMarkers;
-			SecondaryNpcs = secondaryNpcs;
-			FarmerMarkers = farmerMarkers;
+			this.NpcMarkers = npcMarkers;
+		  this.SecondaryNpcs = secondaryNpcs;
+		  this.FarmerMarkers = farmerMarkers;
 			this.MarkerCropOffsets = MarkerCropOffsets;
-			FarmBuildings = farmBuildings;
-			BuildingMarkers = buildingMarkers;
-		  MapName = mapName;
-			Helper = helper;
-			Config = config;
+		  this.FarmBuildings = farmBuildings;
+		  this.BuildingMarkers = buildingMarkers;
+		  this.Helper = helper;
+		  this.Config = config;
+		  this.MapName = mapName;
+      this.CustomLocationMarkers = customLocationMarkers;
+		  this.CustomLocationRects = customLocationRects;
 
-			map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+      map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
 
 			mmX = Config.MinimapX;
@@ -254,10 +260,12 @@ namespace NPCMapLocations
 		  var offsetMmX = mmX + offset;
       var offsetMmLoc = new Vector2(mmLoc.X + offset, mmLoc.Y);
 
-      // Farm types overlay
+      //
+      // ===== Farm types =====
+      //
       // The farms are always overlayed at (0, 43) on the map
       // The crop position, dimensions, and overlay position must all be adjusted accordingly
-      // When any part of the cropped farm is outside of the minimap
+      // When any part of the cropped farm is outside of the minimap as player moves
       var farmWidth = 131;
 		  var farmHeight = 61;
       var farmX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, offsetMmX, offsetMmX + mmWidth));
@@ -277,7 +285,7 @@ namespace NPCMapLocations
 		    farmCropHeight = farmHeight - farmCropY;
 
       switch (Game1.whichFarm)
-		    {
+		  {
 		      case 1:
 		        b.Draw(map, new Vector2(farmX, farmY),
 		          new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
@@ -304,25 +312,30 @@ namespace NPCMapLocations
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
 		    }
-      
-      // Pam house upgrade
-			if (drawPamHouseUpgrade)
+
+      //
+      // ===== Pam house upgrade =====
+      //
+      if (drawPamHouseUpgrade)
 			{
-				var pamHouseX = ModConstants.MapVectors["Trailer_Big"][0].X;
-				var pamHouseY = ModConstants.MapVectors["Trailer_Big"][0].Y;
+				var pamHouseX = ModConstants.MapVectors["Trailer_Big"][0].MapX;
+				var pamHouseY = ModConstants.MapVectors["Trailer_Big"][0].MapY;
 				if (IsWithinMapArea(pamHouseX, pamHouseY))
 					b.Draw(map, new Vector2(NormalizeToMap(offsetMmLoc.X + pamHouseX - 13), NormalizeToMap(offsetMmLoc.Y + pamHouseY - 16)),
 						new Rectangle(263, 181, 8, 8), color,
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
 
-      // Farm buildings
-			if (Config.ShowFarmBuildings && FarmBuildings != null)
+      //
+      // ===== Farm buildings =====
+      //
+      if (Config.ShowFarmBuildings && FarmBuildings != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
 
-				foreach (var building in sortedBuildings)
+			  foreach (var building in sortedBuildings)
+			  {
 			    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out var buildingRect))
 			    {
 			      if (IsWithinMapArea(building.Value.Value.X - buildingRect.Width / 2,
@@ -333,7 +346,7 @@ namespace NPCMapLocations
 			        else if (MapName == "eemie_recolour_map")
 			          buildingRect.Y = 14;
 
-              b.Draw(
+			        b.Draw(
 			          BuildingMarkers,
 			          new Vector2(
 			            NormalizeToMap(offsetMmLoc.X + building.Value.Value.X - (float) Math.Floor(buildingRect.Width / 2.0)),
@@ -343,12 +356,80 @@ namespace NPCMapLocations
 			        );
 			      }
 			    }
+			  }
 			}
 
-			// Traveling Merchant
-			if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
+      //
+      // ===== Custom locations =====
+      //
+      if (Config.CustomLocationRects != null)
+		  {
+		    foreach (var location in CustomLocationRects)
+		    {
+		      if (ModConstants.MapVectors.TryGetValue(location.Key, out var locationVector) && CustomLocationRects.TryGetValue(location.Key, out var locationRect))
+		      {
+            // If only one Vector specified, treat it as a marker
+            // Markers are centered based on width/height
+		        if (locationVector.Length == 1)
+		        {
+		          var markerX = locationVector[0].MapX;
+		          var markerY = locationVector[0].MapY;
+
+		          if (IsWithinMapArea(markerX - locationRect.Width / 2,
+		            markerY - locationRect.Height / 2))
+		          {
+		            b.Draw(
+		              BuildingMarkers,
+		              new Vector2(
+		                NormalizeToMap(
+		                  offsetMmLoc.X + markerX - (float) Math.Floor(locationRect.Width / 2.0)),
+		                NormalizeToMap(offsetMmLoc.Y + markerY -
+		                               (float) Math.Floor(locationRect.Height / 2.0))
+		              ),
+		              locationRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+		            );
+		          }
+		        }
+
+		        // If more than one Vector, treat it as a region with lower & upper bound
+            // Regions are draw by the top-left corner
+		        else if (locationVector.Length < 1)
+		        {
+		          var regionLocX = locationVector[0].MapX;
+		          var regionLocY = locationVector[0].MapY;
+              var regionWidth = locationRect.Width;
+		          var regionHeight = locationRect.Height;
+		          var regionX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + regionLocX, offsetMmX, offsetMmX + mmWidth));
+		          var regionY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + regionLocY, mmY, mmY + mmHeight) + 2);
+		          var regionCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - regionLocX) / Game1.pixelZoom, 0, farmWidth);
+		          var regionCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - regionLocY) / Game1.pixelZoom, 0, farmHeight);
+
+		          // Check if region crop extends outside of minimap
+		          var regionCropWidth = (regionX / Game1.pixelZoom + regionWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - regionX) / Game1.pixelZoom) : regionWidth - regionCropX;
+		          var regionCropHeight = (regionY / Game1.pixelZoom + regionHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - regionY) / Game1.pixelZoom) : regionHeight - regionCropY;
+
+		          // Check if region crop extends beyond region size
+		          if (regionCropX + regionCropWidth > regionWidth)
+		            regionCropWidth = regionWidth - regionCropX;
+
+		          if (regionCropY + regionCropHeight > regionHeight)
+		            regionCropHeight = regionHeight - regionCropY;
+
+		          b.Draw(map, new Vector2(regionX, regionY),
+		            new Rectangle(locationRect.X + regionCropX, locationRect.Y + regionCropY, regionCropWidth, regionCropHeight), color,
+		            0f,
+		            Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+            }
+          }
+		    }
+		  }
+
+      //
+      // ===== Traveling Merchant =====
+      //
+      if (Config.ShowTravelingMerchant && SecondaryNpcs["Merchant"])
 			{
-			  Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"].FirstOrDefault().X, ModConstants.MapVectors["Merchant"].FirstOrDefault().Y);
+			  Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
 					b.Draw(Game1.mouseCursors, new Vector2(NormalizeToMap(offsetMmLoc.X + merchantLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + merchantLoc.Y - 15)), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
 						1f);
@@ -382,8 +463,9 @@ namespace NPCMapLocations
 						  Game1.player);
 				}
 			
-
-			// NPCs
+      //
+			// ===== NPCs =====
+      //
 			// Sort by drawing order
 			var sortedMarkers = NpcMarkers.ToList();
 			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));

@@ -22,12 +22,12 @@ namespace NPCMapLocations
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
-	  private Texture2D CustomMarkers;
+	  private Texture2D CustomLocationMarkers;
 	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private Dictionary<string, string> CustomNames;
-	  private Dictionary<string, Rectangle> CustomMarkerRects;
+	  private Dictionary<string, Rectangle> CustomLocationRects;
 		private Dictionary<string, int>
 			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private ModMinimap Minimap;
@@ -81,8 +81,8 @@ namespace NPCMapLocations
 			CustomHandler = new ModCustomHandler(helper, Config, Monitor);
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
-		  CustomMarkers =
-		    Helper.Content.Load<Texture2D>(@"assets/customMarkers.png"); // Load custom markers
+		  CustomLocationMarkers =
+		    Helper.Content.Load<Texture2D>(@"assets/customMarkers.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
@@ -178,7 +178,7 @@ namespace NPCMapLocations
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 		  CustomHandler.LoadCustomLocations();
-		  CustomMarkerRects = CustomHandler.GetCustomMarkerRects();
+		  CustomLocationRects = CustomHandler.GetCustomLocationRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
 		}
@@ -303,7 +303,9 @@ namespace NPCMapLocations
 					BuildingMarkers,
 					Helper,
 					Config,
-          MapName
+          MapName,
+          CustomLocationMarkers,
+          CustomLocationRects
 				);
 		}
 
@@ -372,8 +374,10 @@ namespace NPCMapLocations
 				BuildingMarkers,
 				Helper,
 				Config,
-        MapName
-			);
+				MapName,
+				CustomLocationMarkers,
+				CustomLocationRects
+      );
 		}
 
 		private void UpdateMarkers(bool forceUpdateAll = false)
@@ -627,8 +631,8 @@ namespace NPCMapLocations
 			// Precise (static) regions and indoor locations
 			if (locVectors.Count() == 1 || tileX == -1 || tileY == -1)
 			{
-				x = locVectors.FirstOrDefault().X;
-				y = locVectors.FirstOrDefault().Y;
+				x = locVectors.FirstOrDefault().MapX;
+				y = locVectors.FirstOrDefault().MapY;
 			}
 			else
 			{
@@ -669,8 +673,8 @@ namespace NPCMapLocations
 				if (upper == null)
 					upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-				x = (int) (lower.X + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.X - lower.X));
-				y = (int) (lower.Y + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.Y - lower.Y));
+				x = (int) (lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX));
+				y = (int) (lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY));
 
 				if (DEBUG_MODE)
 				{
@@ -800,38 +804,25 @@ namespace NPCMapLocations
   // Maps the tileX and tileY in a game location to the location on the map
 	public class MapVector
 	{
-		public int TileX; // tileX in a game location
-		public int TileY; // tileY in a game location
-		public int X; // Absolute position relative to viewport (on map page)
-		public int Y; // Absolute position relative to viewport (on map page)
-
-		public MapVector()
-		{
-			TileX = 0;
-			TileY = 0;
-			X = 0;
-			Y = 0;
-		}
+		public int TileX { get; set; } // tileX in a game location
+    public int TileY { get; set; } // tileY in a game location
+    public int MapX { get; set; } // Absolute position relative to map
+    public int MapY { get; set; } // Absolute position relative to map
 
 		public MapVector(int x, int y)
 		{
 			TileX = 0;
 			TileY = 0;
-			X = x;
-			Y = y;
+			MapX = x;
+			MapY = y;
 		}
 
-		public MapVector(int tileX, int tileY, int x, int y)
+		public MapVector(int x, int y, int tileX, int tileY)
 		{
 			TileX = tileX;
 			TileY = tileY;
-			X = x;
-			Y = y;
-		}
-
-		public int[] GetValues()
-		{
-			return new[] {TileX, TileY, X, Y};
+			MapX = x;
+			MapY = y;
 		}
 	}
 }
