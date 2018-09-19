@@ -32,7 +32,7 @@ namespace NPCCompass
             config = helper.ReadConfig<ModConfig>();
             ModEntry.pointer = helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
             constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
-            GameEvents.UpdateTick += GameEvents_UpdateTick;
+            GameEvents.EighthUpdateTick += GameEvents_UpdateTick;
             GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
             GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
@@ -286,7 +286,7 @@ namespace NPCCompass
                     // NPC head
                     Game1.spriteBatch.Draw(
                         locator.Marker,
-                        new Vector2(locator.X + 24, locator.Y + 20),
+                        new Vector2(locator.X + 24, locator.Y + 16),
                         new Rectangle?(new Rectangle(0, cropY, 16, 15)),
                         Color.White * (float)alphaLevel,
                         0f,
@@ -306,9 +306,12 @@ namespace NPCCompass
                 // To offset the offsets used to keep all of the locators inside the viewport screen
                 if (locator.Quadrant == 2 || locator.Quadrant == 4)
                     offsetX = -16;
-                
-                // Pointer texture
-                Game1.spriteBatch.Draw(
+
+              if (!constants.MarkerCrop.TryGetValue(locator.Name, out var cropY))
+                cropY = 0;
+
+              // Pointer texture
+              Game1.spriteBatch.Draw(
                     pointer,
                     new Vector2(locator.X + offsetX, locator.Y),
                     new Rectangle?(new Rectangle(0, 0, 64, 64)),
@@ -323,8 +326,8 @@ namespace NPCCompass
                 // NPC head
                 Game1.spriteBatch.Draw(
                     locator.Marker,
-                    new Vector2(locator.X + 24 + offsetX, locator.Y + 20),
-                    new Rectangle?(new Rectangle(0, constants.MarkerCrop[locator.Name], 16, 15)),
+                    new Vector2(locator.X + 24 + offsetX, locator.Y + 16),
+                    new Rectangle?(new Rectangle(0, cropY, 16, 15)),
                     Color.White * (float)alphaLevel,
                     0f,
                     new Vector2(16, 16),
@@ -336,7 +339,7 @@ namespace NPCCompass
                 if (locator.Proximity > 0)
                 {
                     string distanceString = Math.Round(locator.Proximity / Game1.tileSize, 0).ToString();
-                    DrawText(distanceString, new Vector2(locator.X + offsetX, locator.Y + 16), Color.White * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 0.37f);
+                    DrawText(distanceString, new Vector2(locator.X + offsetX + 12, locator.Y + 12), Color.Black * (float)alphaLevel, new Vector2((int)Game1.dialogueFont.MeasureString(distanceString).X / 2, (float)((Game1.tileSize / 4) * 0.5)), 1f);
                 }
             }
                 
@@ -356,11 +359,11 @@ namespace NPCCompass
         // Draw outlined text
         private static void DrawText(string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
         {
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(-1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
