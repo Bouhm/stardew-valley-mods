@@ -1,9 +1,13 @@
-﻿using StardewModdingAPI;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
@@ -89,9 +93,70 @@ namespace NPCMapLocations
 			return this.MarkerCropOffsets;
 		}
 
-		// Handle any modified NPC names 
-		// Specifically mods that change names in dialogue files (displayName)
-		private void LoadCustomNames(NPC npc)
+	  // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
+    // { "customRegion": [{x1, y1}, {x2, y2}] where x, y are relative to map (for a custom region ex. a new farm)
+	  // Any custom locations with given location on the map
+	  public Dictionary<string, MapVector[]> GetCustomLocations()
+	  {
+      var customMapVectors = new Dictionary<string, MapVector[]>();
+      foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomLocations)
+	    {
+        var mapVectorArr = new MapVector[mapVectors.Value.Length];
+	      for (int i = 0; i < mapVectors.Value.Length; i++)
+	      {
+          var mapVector = mapVectors.Value[i];
+
+          // Marker doesn't need to specify corresponding Tile position
+	        if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
+	        {
+	          mapVectorArr[i] = new MapVector(
+	            (int) mapVector.GetValue("MapX"),
+	            (int) mapVector.GetValue("MapY")
+	          );
+	        }
+          // Region must specify corresponding Tile positions for
+          // Calculations on movement within location
+	        else
+          {
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY"),
+              (int)mapVector.GetValue("TileX"),
+              (int)mapVector.GetValue("TileY")
+            );
+          }
+	      }
+	      customMapVectors.Add(mapVectors.Key, mapVectorArr);        
+	    }
+
+	    return customMapVectors;
+	  }
+
+
+    // { "customLocation": [{x, y, width, height}] } for cropping from x, y with given crop width/height
+	  // Custom markers to draw on the map with given location
+	  public Dictionary<string, Rectangle> GetCustomLocationRects()
+	  {
+	    var customLocationRects = new Dictionary<string, Rectangle>();
+	    foreach (KeyValuePair<string, JObject> locationRect in Config.CustomLocationRects)
+	    {
+	      var customRect = locationRect.Value;
+        customLocationRects.Add(
+	        locationRect.Key,
+	        new Rectangle(
+	          (int)customRect.GetValue("X"),
+	          (int)customRect.GetValue("Y"),
+	          (int)customRect.GetValue("Width"),
+	          (int)customRect.GetValue("Height")
+          )
+	      );
+	    }
+	    return customLocationRects;
+	  }
+
+    // Handle any modified NPC names 
+    // Specifically mods that change names in dialogue files (displayName)
+    private void LoadCustomNames(NPC npc)
 		{
 			if (!this.CustomNames.TryGetValue(npc.Name, out string customName))
 			{
