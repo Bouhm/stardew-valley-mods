@@ -278,13 +278,25 @@ namespace NPCCompass
 
     private void DrawLocators()
     {
+      int count = 1;
+      string currLocation = "";
+      int offsetX = 0;
+      int offsetY = -64;
+
       foreach (KeyValuePair<string, HashSet<Locator>> doorLocators in doorLocatorMaps)
       {
-        int count = 0;
-        string currLocation = "";
+        if (currLocation != doorLocators.Key)
+        {
+          currLocation = doorLocators.Key;
+          count = 1;
+        }
+        else
+          count++;
 
         foreach (Locator locator in doorLocators.Value)
         {
+          if (count > 1) continue;
+
           double alphaLevel = locator.Proximity > MAX_PROXIMITY
             ? 0.25
             : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
@@ -301,11 +313,11 @@ namespace NPCCompass
           // Pointer texture
           Game1.spriteBatch.Draw(
             pointer,
-            new Vector2(locator.X, locator.Y - 64),
+            new Vector2(locator.X, locator.Y + offsetY),
             new Rectangle?(new Rectangle(0, 0, 64, 64)),
             Color.White * (float) alphaLevel,
             (float) (locator.Angle - 3 * MathHelper.PiOver4),
-            new Vector2(pointer.Width / 2, pointer.Height),
+            new Vector2(pointer.Width / 2, pointer.Height / 2),
             1f,
             SpriteEffects.None,
             0.0f
@@ -314,7 +326,7 @@ namespace NPCCompass
           // NPC head
           Game1.spriteBatch.Draw(
             locator.Marker,
-            new Vector2(locator.X + 24, locator.Y - 48),
+            new Vector2(locator.X + 24, locator.Y + offsetY + 16),
             new Rectangle?(new Rectangle(0, cropY, 16, 15)),
             Color.White * (float) alphaLevel,
             0f,
@@ -323,6 +335,21 @@ namespace NPCCompass
             SpriteEffects.None,
             1f
           );
+
+          if (doorLocators.Value.Count > 1)
+          {
+            string countString = $"{doorLocators.Value.Count-1}";
+
+            // tinyFont doesn't scale the + symbol the same way...
+            DrawText(Game1.tinyFont, "+", new Vector2(locator.X, locator.Y + offsetY + 12),
+              Color.Black * (float)alphaLevel,
+              new Vector2(12, -4), 0.5f);
+
+            DrawText(Game1.tinyFont, countString, new Vector2(locator.X, locator.Y + offsetY + 12),
+              Color.Black * (float)alphaLevel,
+              new Vector2((int)(Game1.tinyFont.MeasureString(countString).X-12) / 2,
+                (float)((Game1.tileSize / 4) * 0.5)), 1f);
+          }
         }
       }
 
@@ -331,7 +358,6 @@ namespace NPCCompass
         double alphaLevel = locator.Proximity > MAX_PROXIMITY
           ? 0.25
           : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
-        int offsetX = 0;
 
         // To offset the offsets used to keep all of the locators inside the viewport screen
         if (locator.Quadrant == 2 || locator.Quadrant == 4)
@@ -368,10 +394,10 @@ namespace NPCCompass
 
         if (locator.Proximity > 0)
         {
-          string distanceString = Math.Round(locator.Proximity / Game1.tileSize, 0).ToString();
-          DrawText(distanceString, new Vector2(locator.X + offsetX + 14, locator.Y + 12),
+          string distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
+          DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX, locator.Y + 12),
             Color.Black * (float) alphaLevel,
-            new Vector2((int) Game1.dialogueFont.MeasureString(distanceString).X / 2,
+            new Vector2((int) Game1.tinyFont.MeasureString(distanceString).X / 2,
               (float) ((Game1.tileSize / 4) * 0.5)), 1f);
         }
       }
@@ -388,14 +414,14 @@ namespace NPCCompass
     }
 
     // Draw outlined text
-    private static void DrawText(string text, Vector2 pos, Color? color = null, Vector2? origin = null,
+    private static void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null,
       float scale = 1f)
     {
-      //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-      //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-      //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-      //Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos + new Vector2(-1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
-      Game1.spriteBatch.DrawString(Game1.tinyFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero, scale,
+      //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+      //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+      //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+      //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(-1, -1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
+      Game1.spriteBatch.DrawString(font ?? Game1.tinyFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero, scale,
         SpriteEffects.None, 0f);
     }
 
