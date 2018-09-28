@@ -14,10 +14,13 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using Netcode;
+using StardewValley.Network;
 
 namespace NPCMapLocations
 {
-	public class ModMain : Mod, IAssetLoader
+
+  public class ModMain : Mod, IAssetLoader
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
@@ -26,6 +29,7 @@ namespace NPCMapLocations
 		private ModMinimap Minimap;
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
+	  private Dictionary<string, LocationContext> locationContexts;
 	  private const int DRAW_DELAY = 3;
 
     // Customizations/Custom mods
@@ -166,7 +170,9 @@ namespace NPCMapLocations
 
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
-		{
+    {
+     
+
 			SecondaryNpcs = new Dictionary<string, bool>
 			{
 				{"Kent", false},
@@ -359,7 +365,22 @@ namespace NPCMapLocations
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
-			isModMapOpen = true;
+		  locationContexts = new Dictionary<string, LocationContext>();
+		  foreach (var location in Game1.locations)
+		  {
+		    if (!locationContexts.ContainsKey(location.Name) && location.isOutdoors)
+		      MapDoorToLocation(location, null, location.Name);
+		  }
+
+		  var a = locationContexts;
+		  foreach (var ctx in locationContexts)
+		  {
+		    var children = ctx.Value.Children != null ? string.Join(", ", ctx.Value.Children) : null;
+		    Monitor.Log($"{ctx.Key} - {ctx.Value.Type}, {ctx.Value.Root}, {ctx.Value.Parent ?? null}, {children}");
+		  }
+
+
+      isModMapOpen = true;
 			UpdateNpcs(true);
 			var pages = Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -383,7 +404,75 @@ namespace NPCMapLocations
       );
 		}
 
-		private void UpdateMarkers(bool forceUpdateAll = false)
+    // Rooms inside buildings are not included in doors for the building. Why?!
+	  private void MapDoorToLocation(GameLocation location, GameLocation prevLocation, string root)
+	  {
+	    if (prevLocation == null || location.doors.Any())
+	    {
+	      if (location.Name == "Mountain")
+	      {
+	        var a = 1;
+	      }
+        foreach (var door in location.doors.Pairs)
+	      {
+	        MapDoorToLocation(Game1.getLocationFromName(door.Value), location, root);
+	      }
+	    }
+	    else
+	    {
+	      if (location.isOutdoors)
+	      {
+	        if (!locationContexts.ContainsKey(location.Name))
+	        {
+	          locationContexts.Add(location.Name, new LocationContext() {Type = "outdoors", Root = root});
+	        }
+	      }
+	      else
+	      {
+	        if (prevLocation.isOutdoors)
+	        {
+	          if (!locationContexts.ContainsKey(location.Name))
+	          {
+	            locationContexts.Add(location.Name,
+	              new LocationContext() {Type = "building", Parent = prevLocation.Name, Root = root});
+              if (locationContexts.TryGetValue(prevLocation.Name, out var locationCtx) && !locationCtx.Children.Contains(location.Name))
+	              locationCtx.Children.Add(location.Name);
+	          }
+
+	          if (!locationContexts.ContainsKey(prevLocation.Name))
+	          {
+	            locationContexts.Add(prevLocation.Name,
+	              new LocationContext() {Type = "outdoors", Children = new List<string>(){location.Name}, Root = root});
+	            if (locationContexts.TryGetValue(prevLocation.Name, out var locationCtx))
+	              locationCtx.Parent = prevLocation.Name;
+	          }
+	          else if (!locationContexts[prevLocation.Name].Children.Contains(location.Name))
+            {
+	            locationContexts[prevLocation.Name].Children.Add(location.Name);
+	          }
+	        }
+	        else
+	        {
+	          if (!locationContexts.ContainsKey(location.Name))
+	          {
+	            locationContexts.Add(location.Name, new LocationContext() { Type = "room", Parent = prevLocation.Name, Root = root });
+	          }
+
+	          if (!locationContexts.ContainsKey(prevLocation.Name))
+	          {
+	            locationContexts.Add(prevLocation.Name, new LocationContext() { Type = "building", Children = new List<string>() {location.Name},Root = root });
+	          }
+	          else if (!locationContexts[prevLocation.Name].Children.Contains(location.Name))
+	          {
+              locationContexts[prevLocation.Name].Children.Add(location.Name);
+	          }
+	        }
+          
+	      }
+	    }
+	  }
+
+	  private void UpdateMarkers(bool forceUpdateAll = false)
 		{
 			if (isModMapOpen || forceUpdateAll)
 			{
@@ -826,4 +915,12 @@ namespace NPCMapLocations
 		  TileY = tileY;
     }
 	}
+
+  internal class LocationContext
+  {
+    public string Root { get; set; } // Top-most level
+    public string Parent { get; set; } // Level above 
+    public List<string> Children { get; set; } // Level below
+    public string Type { get; set; } // Outdoor, building, or room
+  }
 }
