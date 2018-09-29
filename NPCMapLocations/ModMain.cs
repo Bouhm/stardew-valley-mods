@@ -367,19 +367,8 @@ namespace NPCMapLocations
 		{
 		  locationContexts = new Dictionary<string, LocationContext>();
 		  foreach (var location in Game1.locations)
-		  {
-		    if (!locationContexts.ContainsKey(location.Name) && location.isOutdoors)
-		      MapDoorToLocation(location, null, location.Name);
-		  }
-
-		  var a = locationContexts;
-		  foreach (var ctx in locationContexts)
-		  {
-		    var children = ctx.Value.Children != null ? string.Join(", ", ctx.Value.Children) : null;
-		    Monitor.Log($"{ctx.Key} - {ctx.Value.Type}, {ctx.Value.Root}, {ctx.Value.Parent ?? null}, {children}");
-		  }
-
-
+		    MapRootLocations(location, null, false);
+      
       isModMapOpen = true;
 			UpdateNpcs(true);
 			var pages = Helper.Reflection
@@ -404,72 +393,42 @@ namespace NPCMapLocations
       );
 		}
 
-    // Rooms inside buildings are not included in doors for the building. Why?!
-	  private void MapDoorToLocation(GameLocation location, GameLocation prevLocation, string root)
+    // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
+	  private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp)
 	  {
-	    if (prevLocation == null || location.doors.Any())
-	    {
-	      if (location.Name == "Mountain")
-	      {
-	        var a = 1;
-	      }
-        foreach (var door in location.doors.Pairs)
-	      {
-	        MapDoorToLocation(Game1.getLocationFromName(door.Value), location, root);
-	      }
-	    }
-	    else
-	    {
-	      if (location.isOutdoors)
-	      {
-	        if (!locationContexts.ContainsKey(location.Name))
-	        {
-	          locationContexts.Add(location.Name, new LocationContext() {Type = "outdoors", Root = root});
-	        }
-	      }
-	      else
-	      {
-	        if (prevLocation.isOutdoors)
-	        {
-	          if (!locationContexts.ContainsKey(location.Name))
-	          {
-	            locationContexts.Add(location.Name,
-	              new LocationContext() {Type = "building", Parent = prevLocation.Name, Root = root});
-              if (locationContexts.TryGetValue(prevLocation.Name, out var locationCtx) && !locationCtx.Children.Contains(location.Name))
-	              locationCtx.Children.Add(location.Name);
-	          }
+	    if (!locationContexts.ContainsKey(location.Name))
+	      locationContexts.Add(location.Name, new LocationContext());
 
-	          if (!locationContexts.ContainsKey(prevLocation.Name))
-	          {
-	            locationContexts.Add(prevLocation.Name,
-	              new LocationContext() {Type = "outdoors", Children = new List<string>(){location.Name}, Root = root});
-	            if (locationContexts.TryGetValue(prevLocation.Name, out var locationCtx))
-	              locationCtx.Parent = prevLocation.Name;
-	          }
-	          else if (!locationContexts[prevLocation.Name].Children.Contains(location.Name))
-            {
-	            locationContexts[prevLocation.Name].Children.Add(location.Name);
-	          }
-	        }
-	        else
-	        {
-	          if (!locationContexts.ContainsKey(location.Name))
-	          {
-	            locationContexts.Add(location.Name, new LocationContext() { Type = "room", Parent = prevLocation.Name, Root = root });
-	          }
+      // Pass root location back recursively
+	    if (root != null)
+	    {
+	      locationContexts[location.Name].Root = root;
+        return root;
+      }
 
-	          if (!locationContexts.ContainsKey(prevLocation.Name))
-	          {
-	            locationContexts.Add(prevLocation.Name, new LocationContext() { Type = "building", Children = new List<string>() {location.Name},Root = root });
-	          }
-	          else if (!locationContexts[prevLocation.Name].Children.Contains(location.Name))
-	          {
-              locationContexts[prevLocation.Name].Children.Add(location.Name);
-	          }
-	        }
-          
-	      }
+      // Root location found, set as root and return
+	    if (location.isOutdoors)
+	    {
+	      locationContexts[location.Name].Type = "outdoors";
+        locationContexts[location.Name].Root = location.Name;
+        return location.Name;
 	    }
+
+      // Iterate warps of current location and traverse recursively
+	    foreach (var warp in location.warps)
+	    {
+        // If one of the warps is a root location, current location is an indoor building 
+	      if (Game1.getLocationFromName(warp.TargetName).isOutdoors)
+	        hasOutdoorWarp = true;
+
+        // If all warps are indoors, then the current location is a room
+	      locationContexts[location.Name].Type = hasOutdoorWarp ? "indoors" : "room";
+        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp);
+	      locationContexts[location.Name].Root = root;
+        return root;
+	    }
+
+	    return root;
 	  }
 
 	  private void UpdateMarkers(bool forceUpdateAll = false)
@@ -918,9 +877,13 @@ namespace NPCMapLocations
 
   internal class LocationContext
   {
-    public string Root { get; set; } // Top-most level
-    public string Parent { get; set; } // Level above 
-    public List<string> Children { get; set; } // Level below
-    public string Type { get; set; } // Outdoor, building, or room
+    public string Type { get; set; } // outdoors, indoors, or room
+    public string Root { get; set; } // Top-most location
+
+    public LocationContext()
+    {
+      Type = null;
+      Root = null;
+    }
   }
 }
