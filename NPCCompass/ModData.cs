@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NPCCompass
+namespace LocationCompass
 {
     public class ModData
     {

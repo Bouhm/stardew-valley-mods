@@ -14,10 +14,13 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using Netcode;
+using StardewValley.Network;
 
 namespace NPCMapLocations
 {
-	public class ModMain : Mod, IAssetLoader
+
+  public class ModMain : Mod, IAssetLoader
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
@@ -26,6 +29,7 @@ namespace NPCMapLocations
 		private ModMinimap Minimap;
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
+	  private Dictionary<string, LocationContext> locationContexts;
 	  private const int DRAW_DELAY = 3;
 
     // Customizations/Custom mods
@@ -166,7 +170,9 @@ namespace NPCMapLocations
 
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
-		{
+    {
+     
+
 			SecondaryNpcs = new Dictionary<string, bool>
 			{
 				{"Kent", false},
@@ -359,7 +365,11 @@ namespace NPCMapLocations
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
-			isModMapOpen = true;
+		  locationContexts = new Dictionary<string, LocationContext>();
+		  foreach (var location in Game1.locations)
+		    MapRootLocations(location, null, false);
+      
+      isModMapOpen = true;
 			UpdateNpcs(true);
 			var pages = Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -383,7 +393,45 @@ namespace NPCMapLocations
       );
 		}
 
-		private void UpdateMarkers(bool forceUpdateAll = false)
+    // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
+	  private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp)
+	  {
+	    if (!locationContexts.ContainsKey(location.Name))
+	      locationContexts.Add(location.Name, new LocationContext());
+
+      // Pass root location back recursively
+	    if (root != null)
+	    {
+	      locationContexts[location.Name].Root = root;
+        return root;
+      }
+
+      // Root location found, set as root and return
+	    if (location.isOutdoors)
+	    {
+	      locationContexts[location.Name].Type = "outdoors";
+        locationContexts[location.Name].Root = location.Name;
+        return location.Name;
+	    }
+
+      // Iterate warps of current location and traverse recursively
+	    foreach (var warp in location.warps)
+	    {
+        // If one of the warps is a root location, current location is an indoor building 
+	      if (Game1.getLocationFromName(warp.TargetName).isOutdoors)
+	        hasOutdoorWarp = true;
+
+        // If all warps are indoors, then the current location is a room
+	      locationContexts[location.Name].Type = hasOutdoorWarp ? "indoors" : "room";
+        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp);
+	      locationContexts[location.Name].Root = root;
+        return root;
+	    }
+
+	    return root;
+	  }
+
+	  private void UpdateMarkers(bool forceUpdateAll = false)
 		{
 			if (isModMapOpen || forceUpdateAll)
 			{
@@ -826,4 +874,16 @@ namespace NPCMapLocations
 		  TileY = tileY;
     }
 	}
+
+  internal class LocationContext
+  {
+    public string Type { get; set; } // outdoors, indoors, or room
+    public string Root { get; set; } // Top-most location
+
+    public LocationContext()
+    {
+      Type = null;
+      Root = null;
+    }
+  }
 }
