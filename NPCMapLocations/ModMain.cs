@@ -14,8 +14,6 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
-using Netcode;
-using StardewValley.Network;
 
 namespace NPCMapLocations
 {
@@ -91,6 +89,7 @@ namespace NPCMapLocations
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+      LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
 			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
 			InputEvents.ButtonReleased += InputEvents_ButtonReleased;
@@ -168,12 +167,21 @@ namespace NPCMapLocations
 				UpdateFarmBuildingLocs();
 		}
 
+	  private void LocationEvents_LocationsChanged(object sender, EventArgsLocationsChanged e)
+	  {
+	    locationContexts = new Dictionary<string, LocationContext>();
+	    foreach (var location in Game1.locations)
+	      MapRootLocations(location, null, false);
+	  }
+
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
-     
+      locationContexts = new Dictionary<string, LocationContext>();
+      foreach (var location in Game1.locations)
+        MapRootLocations(location, null, false);
 
-			SecondaryNpcs = new Dictionary<string, bool>
+      SecondaryNpcs = new Dictionary<string, bool>
 			{
 				{"Kent", false},
 				{"Marlon", false},
@@ -365,10 +373,6 @@ namespace NPCMapLocations
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
-		  locationContexts = new Dictionary<string, LocationContext>();
-		  foreach (var location in Game1.locations)
-		    MapRootLocations(location, null, false);
-      
       isModMapOpen = true;
 			UpdateNpcs(true);
 			var pages = Helper.Reflection
@@ -480,34 +484,19 @@ namespace NPCMapLocations
 				// For layering indoor/outdoor NPCs and indoor indicator
 				npcMarker.IsOutdoors = npcLocation.IsOutdoors;
 
-				// For show Npcs in player's location option
-				var isSameLocation = false;
+        // For show Npcs in player's location option
+			  var isSameLocation = false;
+			  if (Config.OnlySameLocation)
+			  {
+			    if (locationName == Game1.player.currentLocation.Name)
+			      isSameLocation = true;
+          else if (locationContexts.TryGetValue(locationName, out var npcLocCtx) &&
+                   locationContexts.TryGetValue(Game1.player.currentLocation.Name, out var playerLocCtx))
+			      isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
+        }
 
-				if (Config.OnlySameLocation)
-				{
-					isSameLocation = locationName.Equals(Game1.player.currentLocation.Name);
-					// Check inside buildings and rooms
-					foreach (var door in Game1.player.currentLocation.doors.Pairs)
-						// Check buildings
-						if (door.Value.Equals(locationName))
-						{
-							isSameLocation = true;
-							break;
-						}
-						// Check rooms
-						else
-						{
-							foreach (var roomDoor in npcLocation.doors.Pairs)
-								if (door.Value.Equals(roomDoor.Value))
-								{
-									isSameLocation = true;
-									break;
-								}
-						}
-				}
-
-				// NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-				npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
+        // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
+        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
 				                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
 				                     || Config.OnlySameLocation && !isSameLocation
 				                     || Config.ByHeartLevel
