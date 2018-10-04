@@ -131,11 +131,11 @@ namespace NPCMapLocations
       // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
       // Positions relative to the map (the map image) are not.
 
-		  center = ModMain.LocationToMap(Game1.player.currentLocation.Name, Game1.player.getTileX(),
+		  center = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
 				Game1.player.getTileY());
 
       // Player in unknown location, use previous location as center
-		  if (center == Vector2.Zero && prevCenter != null)
+		  if (center.X < 0 && prevCenter != null)
 		    center = prevCenter;
 		  else
 		    prevCenter = center;
@@ -447,7 +447,7 @@ namespace NPCMapLocations
 						// Temporary solution to handle desync of farmhand location/tile position when changing location
 						if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 						{
-						  if (farMarker.MapLocation == Vector2.Zero) continue;
+						  if (farMarker.MapLocation.X < 0) continue;
 							if (farMarker.DrawDelay == 0 &&
 							    IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
 							{
@@ -461,24 +461,26 @@ namespace NPCMapLocations
 				}
 				else
 				{
-          if (playerLoc != Vector2.Zero)
+          if (playerLoc.X >= 0)
 					  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 						  new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
 						  2f, 1,
 						  Game1.player);
 				}
-			
+
+		  if (!Context.IsMainPlayer) return;
+
       //
-			// ===== NPCs =====
+      // ===== NPCs =====
       //
-			// Sort by drawing order
-			var sortedMarkers = NpcMarkers.ToList();
+      // Sort by drawing order
+      var sortedMarkers = NpcMarkers.ToList();
 			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
 			foreach (var npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
-				if (npcMarker.MapLocation == Vector2.Zero || npcMarker.Marker == null ||
+				if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name) ||
 				    !IsWithinMapArea(npcMarker.MapLocation.X, npcMarker.MapLocation.Y))
 					continue;
