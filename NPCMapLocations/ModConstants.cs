@@ -466,8 +466,8 @@ public static class ModConstants
 		{
 			"Desert", new MapVector[]
 			{
-				new MapVector(53, 6, 0, 0),
-				new MapVector(201, 178, 50, 60),
+				new MapVector(64, 0, 0, 0),
+				new MapVector(216, 176, 50, 60),
 			}
 		},
 		{
@@ -479,19 +479,20 @@ public static class ModConstants
 		{
 			"SandyHouse", new MapVector[]
 			{
-				new MapVector(76, 140)
+				new MapVector(86, 146)
 			}
 		},
-		{
+	  {
+	    "Club", new MapVector[]
+	    {
+	      new MapVector(86, 146)
+	    }
+	  },
+ 
+    {
 			"SkullCave", new MapVector[]
 			{
-				new MapVector(82, 12)
-			}
-		},
-		{
-			"Club", new MapVector[]
-			{
-				new MapVector(79, 140)
+				new MapVector(88, 8)
 			}
 		}
 	};
