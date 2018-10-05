@@ -6,6 +6,7 @@ Shows NPC locations on a modified map.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -17,34 +18,40 @@ using StardewValley.Quests;
 
 namespace NPCMapLocations
 {
-	public class ModMain : Mod, IAssetLoader
+
+  public class ModMain : Mod, IAssetLoader
 	{
 	  public static SButton HeldKey;
     private Texture2D BuildingMarkers;
-	  private string MapName;
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
-		private Dictionary<string, string> CustomNames;
-		private Dictionary<string, int>
-			MarkerCropOffsets; // NPC head crops, top left corner (0, Y), width = 16, height = 15 
 		private ModMinimap Minimap;
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
-		private const int DRAW_DELAY = 3;
+	  private Dictionary<string, LocationContext> locationContexts;
+	  private const int DRAW_DELAY = 3;
 
-		// Multiplayer
-		private Dictionary<long, MapMarker> FarmerMarkers;
+    // Customizations/Custom mods
+	  private string MapName;
+    private Texture2D CustomLocationMarkers;
+	  private Dictionary<string, MapVector[]> CustomLocations;
+    private Dictionary<string, Rectangle> CustomLocationRects;
+	  private Dictionary<string, string> CustomNames;
+	  private Dictionary<string, int> MarkerCropOffsets;
+
+    // Multiplayer
+    private Dictionary<long, MapMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
 
-		// For debug info
+		// Debugging
 	  private const bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
 	  private static List<string> alertFlags;
 
-
+  
 		// Replace game map with modified map
 		public bool CanLoad<T>(IAssetInfo asset)
 		{
@@ -58,13 +65,13 @@ namespace NPCMapLocations
 			try
 			{
 				if (!MapName.Equals("default_map"))
-					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Info);
-
+					Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Debug);
+       
 				map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
 			}
 			catch
 			{
-				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Info);
+				Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Debug);
 				map = Helper.Content.Load<T>($@"assets\default_map.png");
 			}
 
@@ -78,9 +85,12 @@ namespace NPCMapLocations
 			CustomHandler = new ModCustomHandler(helper, Config, Monitor);
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
+		  CustomLocationMarkers =
+		    Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
 			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+      LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
 			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
 			InputEvents.ButtonReleased += InputEvents_ButtonReleased;
@@ -158,10 +168,21 @@ namespace NPCMapLocations
 				UpdateFarmBuildingLocs();
 		}
 
+	  private void LocationEvents_LocationsChanged(object sender, EventArgsLocationsChanged e)
+	  {
+	    locationContexts = new Dictionary<string, LocationContext>();
+	    foreach (var location in Game1.locations)
+	      MapRootLocations(location, null, false);
+	  }
+
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
-		{
-			SecondaryNpcs = new Dictionary<string, bool>
+    {
+      locationContexts = new Dictionary<string, LocationContext>();
+      foreach (var location in Game1.locations)
+        MapRootLocations(location, null, false);
+
+      SecondaryNpcs = new Dictionary<string, bool>
 			{
 				{"Kent", false},
 				{"Marlon", false},
@@ -172,6 +193,8 @@ namespace NPCMapLocations
 			CustomHandler.UpdateCustomNpcs();
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
+		  CustomLocations = CustomHandler.GetCustomLocations();
+      CustomLocationRects = CustomHandler.GetCustomLocationRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
 		}
@@ -296,7 +319,10 @@ namespace NPCMapLocations
 					BuildingMarkers,
 					Helper,
 					Config,
-          MapName
+          MapName,
+          CustomLocations,
+					CustomLocationRects,
+          CustomLocationMarkers
 				);
 		}
 
@@ -340,15 +366,23 @@ namespace NPCMapLocations
 		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
-		  if (Config.ShowMinimap)
-		    Minimap?.Update();
+		  var updateForMinimap = false;
 
-			UpdateMarkers();
+		  if (Config.ShowMinimap)
+		  {
+		    if (Minimap != null)
+		    {
+		      Minimap.Update();
+		      updateForMinimap = true;
+		    }
+		  }
+
+      UpdateMarkers(updateForMinimap);
 		}
 
 		private void OpenModMap(GameMenu gameMenu)
 		{
-			isModMapOpen = true;
+      isModMapOpen = true;
 			UpdateNpcs(true);
 			var pages = Helper.Reflection
 				.GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -365,15 +399,58 @@ namespace NPCMapLocations
 				BuildingMarkers,
 				Helper,
 				Config,
-        MapName
-			);
+				MapName,
+				CustomLocations,
+				CustomLocationRects,
+        CustomLocationMarkers
+      );
 		}
 
-		private void UpdateMarkers(bool forceUpdateAll = false)
+    // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
+	  private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp)
+	  {
+	    if (!locationContexts.ContainsKey(location.Name))
+	      locationContexts.Add(location.Name, new LocationContext());
+
+      // Pass root location back recursively
+	    if (root != null)
+	    {
+	      locationContexts[location.Name].Root = root;
+        return root;
+      }
+
+      // Root location found, set as root and return
+	    if (location.isOutdoors)
+	    {
+	      locationContexts[location.Name].Type = "outdoors";
+        locationContexts[location.Name].Root = location.Name;
+        return location.Name;
+	    }
+
+      // Iterate warps of current location and traverse recursively
+	    foreach (var warp in location.warps)
+	    {
+        // If one of the warps is a root location, current location is an indoor building 
+	      if (Game1.getLocationFromName(warp.TargetName).isOutdoors)
+	        hasOutdoorWarp = true;
+
+        // If all warps are indoors, then the current location is a room
+	      locationContexts[location.Name].Type = hasOutdoorWarp ? "indoors" : "room";
+        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp);
+	      locationContexts[location.Name].Root = root;
+        return root;
+	    }
+
+	    return root;
+	  }
+
+	  private void UpdateMarkers(bool forceUpdateAll = false)
 		{
 			if (isModMapOpen || forceUpdateAll)
 			{
-				UpdateNpcs(forceUpdateAll);
+			  if (Context.IsMainPlayer)
+          UpdateNpcs(forceUpdateAll);
+
 				if (Context.IsMultiplayer)
 					UpdateFarmers();
 			}
@@ -401,11 +478,15 @@ namespace NPCMapLocations
 					locationName = npc.currentLocation.Name;
 				}
 
-				if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
+        // Special case for Mines
+			  if (locationName.StartsWith("UndergroundMine"))
+			    locationName = getMinesLocationName(locationName);
+
+        if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + locationName))
 					{
-						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Warn);
+						Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
 						alertFlags.Add("UnknownLocation:" + locationName);
 					}
 					continue;
@@ -414,34 +495,19 @@ namespace NPCMapLocations
 				// For layering indoor/outdoor NPCs and indoor indicator
 				npcMarker.IsOutdoors = npcLocation.IsOutdoors;
 
-				// For show Npcs in player's location option
-				var isSameLocation = false;
+        // For show Npcs in player's location option
+			  var isSameLocation = false;
+			  if (Config.OnlySameLocation)
+			  {
+			    if (locationName == Game1.player.currentLocation.Name)
+			      isSameLocation = true;
+          else if (locationContexts.TryGetValue(locationName, out var npcLocCtx) &&
+                   locationContexts.TryGetValue(Game1.player.currentLocation.Name, out var playerLocCtx))
+			      isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
+        }
 
-				if (Config.OnlySameLocation)
-				{
-					isSameLocation = locationName.Equals(Game1.player.currentLocation.Name);
-					// Check inside buildings and rooms
-					foreach (var door in Game1.player.currentLocation.doors.Pairs)
-						// Check buildings
-						if (door.Value.Equals(locationName))
-						{
-							isSameLocation = true;
-							break;
-						}
-						// Check rooms
-						else
-						{
-							foreach (var roomDoor in npcLocation.doors.Pairs)
-								if (door.Value.Equals(roomDoor.Value))
-								{
-									isSameLocation = true;
-									break;
-								}
-						}
-				}
-
-				// NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-				npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
+        // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
+        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
 				                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
 				                     || Config.OnlySameLocation && !isSameLocation
 				                     || Config.ByHeartLevel
@@ -510,7 +576,7 @@ namespace NPCMapLocations
 				else
 				{
 					// Set no location so they don't get drawn
-					npcMarker.MapLocation = Vector2.Zero;
+					npcMarker.MapLocation = new Vector2(-1000, -1000);
 				}
 			}
 		}
@@ -520,11 +586,16 @@ namespace NPCMapLocations
 			foreach (var farmer in Game1.getOnlineFarmers())
 			{
 				if (farmer?.currentLocation == null) continue;
+			  var locationName = farmer.currentLocation.Name;
+
+			  if (locationName.StartsWith("UndergroundMine"))
+          locationName = getMinesLocationName(locationName);
+
 				if (!ModConstants.MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
 					{
-						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Warn);
+						Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
 						alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
 					}
 				}
@@ -565,7 +636,7 @@ namespace NPCMapLocations
 		// Helper method for LocationToMap
 		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
 		{
-			if (location == null || tileX < 0 || tileY < 0) return Vector2.Zero;
+			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
 
 			// Handle farm buildings
 			// Match currentLocation.Name with buildingType 
@@ -587,8 +658,23 @@ namespace NPCMapLocations
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
 
-			if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
-				return Vector2.Zero;
+		  if (locationName.StartsWith("UndergroundMine"))
+		  {
+		    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+		    if (Int32.TryParse(mine, out var mineLevel))
+		    {
+		      // Skull cave
+		      if (mineLevel > 120)
+		        locationName = "SkullCave";
+		      // Mines
+		      else
+		        locationName = "Mine";
+		    }
+      }
+		   
+
+      if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
+				return new Vector2(-1000, -1000);
 
 			int x;
 			int y;
@@ -596,8 +682,8 @@ namespace NPCMapLocations
 			// Precise (static) regions and indoor locations
 			if (locVectors.Count() == 1 || tileX == -1 || tileY == -1)
 			{
-				x = locVectors.FirstOrDefault().X;
-				y = locVectors.FirstOrDefault().Y;
+				x = locVectors.FirstOrDefault().MapX;
+				y = locVectors.FirstOrDefault().MapY;
 			}
 			else
 			{
@@ -638,8 +724,8 @@ namespace NPCMapLocations
 				if (upper == null)
 					upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-				x = (int) (lower.X + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.X - lower.X));
-				y = (int) (lower.Y + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.Y - lower.Y));
+				x = (int) (lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX));
+				y = (int) (lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY));
 
 				if (DEBUG_MODE)
 				{
@@ -651,12 +737,28 @@ namespace NPCMapLocations
 			return new Vector2(x, y);
 		}
 
+	  private string getMinesLocationName(string locationName)
+	  {
+	    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+      if (Int32.TryParse(mine, out var mineLevel))
+	    {
+	      // Skull cave
+	      if (mineLevel > 120)
+	        return "SkullCave";
+	      // Mines
+	      else
+	        return "Mine";
+	    }
+	    return null;
+	  }
+
 		private void GraphicsEvents_Resize(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
 
 			UpdateMarkers(true);
 			UpdateFarmBuildingLocs();
+      Minimap?.CheckOffsetForMap();
 		}
 
 		private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
@@ -673,7 +775,7 @@ namespace NPCMapLocations
 
     private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-      if (Context.IsWorldReady && Config.ShowMinimap)
+      if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD)
 			{
 				Minimap?.DrawMiniMap();
 			}
@@ -692,8 +794,8 @@ namespace NPCMapLocations
 		private static void ShowDebugInfo()
 		{
 			if (Game1.player.currentLocation == null) return;
-
-			// Black backgronud for legible text
+    
+			// Black background for legible text
 			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(50, 50, 425, 160), new Rectangle(1, 80, 1, 1),
 				Color.Black);
 
@@ -746,45 +848,42 @@ namespace NPCMapLocations
 		public bool IsOutdoors { get; set; }
 		public bool IsHidden { get; set; }
 		public int Layer { get; set; }
-		public int DrawDelay { get; set; }
+	  public int DrawDelay { get; set; } = 0;
 	}
 
 	// Class for Location Vectors
   // Maps the tileX and tileY in a game location to the location on the map
 	public class MapVector
 	{
-		public int TileX; // tileX in a game location
-		public int TileY; // tileY in a game location
-		public int X; // Absolute position relative to viewport (on map page)
-		public int Y; // Absolute position relative to viewport (on map page)
-
-		public MapVector()
-		{
-			TileX = 0;
-			TileY = 0;
-			X = 0;
-			Y = 0;
-		}
+		public int TileX { get; set; } // tileX in a game location
+    public int TileY { get; set; } // tileY in a game location
+    public int MapX { get; set; } // Absolute position relative to map
+    public int MapY { get; set; } // Absolute position relative to map
 
 		public MapVector(int x, int y)
 		{
-			TileX = 0;
-			TileY = 0;
-			X = x;
-			Y = y;
-		}
+			MapX = x;
+			MapY = y;
+    }
 
-		public MapVector(int tileX, int tileY, int x, int y)
+		public MapVector(int x, int y, int tileX, int tileY)
 		{
-			TileX = tileX;
-			TileY = tileY;
-			X = x;
-			Y = y;
-		}
-
-		public int[] GetValues()
-		{
-			return new[] {TileX, TileY, X, Y};
-		}
+			MapX = x;
+			MapY = y;
+		  TileX = tileX;
+		  TileY = tileY;
+    }
 	}
+
+  internal class LocationContext
+  {
+    public string Type { get; set; } // outdoors, indoors, or room
+    public string Root { get; set; } // Top-most location
+
+    public LocationContext()
+    {
+      Type = null;
+      Root = null;
+    }
+  }
 }

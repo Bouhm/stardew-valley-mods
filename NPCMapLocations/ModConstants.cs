@@ -66,8 +66,8 @@ public static class ModConstants
 		{
 			"Backwoods", new MapVector[]
 			{
-				new MapVector(0, 0, 385, 122),
-				new MapVector(50, 40, 529, 238),
+				new MapVector(385, 122, 0, 0),
+				new MapVector(529, 238, 50, 40),
 			}
 		},
 		{
@@ -79,8 +79,8 @@ public static class ModConstants
 		{
 			"Farm", new MapVector[]
 			{
-				new MapVector(0, 0, 330, 237),
-				new MapVector(80, 65, 514, 386)
+				new MapVector(330, 237, 0, 0),
+				new MapVector(514, 386, 80, 65)
 			}
 		},
 		{
@@ -117,8 +117,8 @@ public static class ModConstants
 		{
 			"BusStop", new MapVector[]
 			{
-				new MapVector(0, 0, 517, 182),
-				new MapVector(35, 30, 594, 300)
+				new MapVector(517, 182, 0, 0),
+				new MapVector(594, 300, 35, 30)
 			}
 		},
 		{
@@ -142,15 +142,15 @@ public static class ModConstants
 		{
 			"Forest", new MapVector[]
 			{
-				new MapVector(0, 0, 250, 383),
-				new MapVector(120, 120, 554, 687)
+				new MapVector(250, 383, 0, 0),
+				new MapVector(554, 687, 120, 120)
 			}
 		},
         {
 			"Woods", new MapVector[]
 			{
-				new MapVector(0, 0, 136, 346),
-				new MapVector(60, 32, 230, 395)
+				new MapVector(136, 346, 0, 0),
+				new MapVector(230, 395, 60, 32)
 			}
 		},
 		{
@@ -193,12 +193,12 @@ public static class ModConstants
 			"Town", new MapVector[]
 			{
 				// Top half of town
-				new MapVector(0, 0, 593, 173),
-				new MapVector(120, 40, 921, 275),
+				new MapVector(593, 173, 0, 0),
+				new MapVector(921, 275, 120, 40),
 
 				// Bottom half of town
-				new MapVector(0, 41, 602, 268),
-				new MapVector(120, 110, 958, 513)
+				new MapVector(602, 268, 0, 41),
+				new MapVector(958, 513, 120, 110)
 			}
 		},
 		{
@@ -319,8 +319,8 @@ public static class ModConstants
 		{
 			"Beach", new MapVector[]
 			{
-				new MapVector(0, 0, 726, 541),
-				new MapVector(104, 50, 997, 688)
+				new MapVector(726, 541, 0, 0),
+				new MapVector(997, 688, 104, 50)
 			}
 		},
 		{
@@ -356,8 +356,8 @@ public static class ModConstants
 		{
 			"Railroad", new MapVector[]
 			{
-				new MapVector(0, 34, 589, 0),
-				new MapVector(70, 62, 794, 81)
+				new MapVector(589, 0, 0, 34),
+				new MapVector(794, 81, 70, 62)
 			}
 		},
 		{
@@ -423,8 +423,8 @@ public static class ModConstants
 		{
 			"Mountain", new MapVector[]
 			{
-				new MapVector(0, 0, 718, 81),
-				new MapVector(135, 41, 1074, 186),
+				new MapVector(718, 81, 0, 0),
+				new MapVector(1074, 186, 135, 41),
 			}
 		},
 		{
@@ -458,12 +458,6 @@ public static class ModConstants
 			}
 		},
 		{
-			"UndergroundMine", new MapVector[]
-			{
-				new MapVector(861, 83)
-			}
-		},
-		{
 			"Quarry", new MapVector[]
 			{
 				new MapVector(1032, 139)
@@ -472,8 +466,8 @@ public static class ModConstants
 		{
 			"Desert", new MapVector[]
 			{
-				new MapVector(0, 0, 53, 6),
-				new MapVector(50, 60, 201, 178),
+				new MapVector(64, 0, 0, 0),
+				new MapVector(216, 176, 50, 60),
 			}
 		},
 		{
@@ -485,19 +479,20 @@ public static class ModConstants
 		{
 			"SandyHouse", new MapVector[]
 			{
-				new MapVector(76, 140)
+				new MapVector(86, 146)
 			}
 		},
-		{
+	  {
+	    "Club", new MapVector[]
+	    {
+	      new MapVector(86, 146)
+	    }
+	  },
+ 
+    {
 			"SkullCave", new MapVector[]
 			{
-				new MapVector(82, 12)
-			}
-		},
-		{
-			"Club", new MapVector[]
-			{
-				new MapVector(79, 140)
+				new MapVector(88, 8)
 			}
 		}
 	};

@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPCCompass", "NPCCompass\NPCCompass.csproj", "{DE3B91FA-F6D6-456D-874C-74B9250DC298}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationCompass", "LocationCompass\LocationCompass.csproj", "{DE3B91FA-F6D6-456D-874C-74B9250DC298}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
