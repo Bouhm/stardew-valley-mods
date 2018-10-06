@@ -228,9 +228,9 @@ namespace LocationCompass
 
       if (isDoor)
       {
-        if (Utility.isOnScreen(npcPos, Game1.tileSize / 4))
+        if (Utility.isOnScreen(new Vector2(npcPos.X, npcPos.Y - Game1.tileSize * 3 / 2), Game1.tileSize / 4))
           return new Vector2(npcPos.X - Game1.viewport.X + Game1.tileSize / 2,
-            npcPos.Y - Game1.viewport.Y - Game1.tileSize / 2);
+            npcPos.Y - Game1.viewport.Y - Game1.tileSize*3/2);
         else
           x += 3 * Game1.tileSize / 4;
       }
@@ -248,6 +248,8 @@ namespace LocationCompass
           // Top half
           else
             y += (playerPos.X - Game1.viewport.X) * (float) Math.Tan(MathHelper.TwoPi - angle);
+
+          y = MathHelper.Clamp(y, pointer.Height / 2, Game1.viewport.Height - pointer.Height / 2);
           return new Vector2(0 + (Game1.tileSize / 2 + 8), y);
         case 2:
           // Left half
@@ -256,6 +258,8 @@ namespace LocationCompass
           // Right half
           else
             x -= (playerPos.Y - Game1.viewport.Y) * (float) Math.Tan(MathHelper.PiOver2 - angle);
+
+          x = MathHelper.Clamp(x, pointer.Width / 2, Game1.viewport.Width - pointer.Width / 2);
           return new Vector2(x, 0 + (Game1.tileSize / 2 + 8));
         case 3:
           // Top half
@@ -264,6 +268,8 @@ namespace LocationCompass
           // Bottom half
           else
             y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float) Math.Tan(MathHelper.Pi - angle);
+
+          y = MathHelper.Clamp(y, pointer.Height / 2, Game1.viewport.Height - pointer.Height / 2);
           return new Vector2(Game1.viewport.Width - (Game1.tileSize / 2 + 8), y);
         case 4:
           // Right half
@@ -274,16 +280,21 @@ namespace LocationCompass
           else
             x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) *
                  (float) Math.Tan(3 * MathHelper.PiOver2 - angle);
+
+          x = MathHelper.Clamp(x, pointer.Width / 2, Game1.viewport.Width - pointer.Width / 2);
           return new Vector2(x, Game1.viewport.Height - (Game1.tileSize / 2 + 8));
         default:
-          return new Vector2(-5000, -5000);
+          return new Vector2(-1000, -1000);
       }
     }
 
     private void UpdateLocators()
     {
       locators = new Dictionary<GameLocation, List<Locator>>();
-      activeDoorLocators = new Dictionary<string, LocatorScroller>();
+      if (activeDoorLocators == null)
+      {
+        activeDoorLocators = new Dictionary<string, LocatorScroller>();
+      }
 
       foreach (NPC npc in GetVillagers())
       {
@@ -328,10 +339,12 @@ namespace LocationCompass
                 );
                 isDoor = true;
                 isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
+
                 if (!activeDoorLocators.ContainsKey(npc.currentLocation.Name))
-                  activeDoorLocators.Add(npc.currentLocation.Name, new LocatorScroller() { Location = npc.currentLocation.Name });
+                  activeDoorLocators.Add(npc.currentLocation.Name,
+                    new LocatorScroller() {Location = npc.currentLocation.Name, Characters = new HashSet<string>(){ npc.Name }});
                 else
-                  activeDoorLocators[npc.currentLocation.Name].Count++;
+                  activeDoorLocators[npc.currentLocation.Name].Characters.Add(npc.Name);
 
                 break;
               }
@@ -384,22 +397,37 @@ namespace LocationCompass
     {
       string currLocation = "";
       int offsetX = 0;
-      int offsetY = -64;
+      int offsetY = 0;
 
+      // Individual locators, onscreen or offscreen
       foreach (var locPair in locators)
       {
         if (locPair.Key.isOutdoors)
         {
           foreach (var locator in locPair.Value)
           {
-
             double alphaLevel = locator.Proximity > MAX_PROXIMITY
               ? 0.25
               : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
 
-            // To offset the offsets used to keep all of the locators inside the viewport screen
-            //if (locator.Quadrant == 2 || locator.Quadrant == 4)
-            //  offsetX = -16;
+            if (!locator.IsOnScreen)
+            {
+              switch (locator.Quadrant)
+              {
+                case 1:
+                  offsetX = 16;
+                  break;
+                case 2:
+                  offsetY = 16;
+                  break;
+                case 3:
+                  offsetX = -16;
+                  break;
+                case 4:
+                  offsetY = -16;
+                  break;
+              }
+            }
 
             if (!constants.MarkerCrop.TryGetValue(locator.Name, out var cropY))
               cropY = 0;
@@ -407,7 +435,7 @@ namespace LocationCompass
             // Pointer texture
             Game1.spriteBatch.Draw(
               pointer,
-              new Vector2(locator.X + offsetX, locator.Y),
+              new Vector2(locator.X + offsetX, locator.Y + offsetY),
               new Rectangle?(new Rectangle(0, 0, 64, 64)),
               Color.White * (float)alphaLevel,
               (float)(locator.Angle - 3 * MathHelper.PiOver4),
@@ -420,7 +448,7 @@ namespace LocationCompass
             // NPC head
             Game1.spriteBatch.Draw(
               locator.Marker,
-              new Vector2(locator.X + 24 + offsetX, locator.Y + 16),
+              new Vector2(locator.X + offsetX + 24, locator.Y + offsetY + 16),
               new Rectangle?(new Rectangle(0, cropY, 16, 15)),
               Color.White * (float)alphaLevel,
               0f,
@@ -440,18 +468,16 @@ namespace LocationCompass
             }
           }
         }
+        // Multiple locators in a location, pointing to its door
         else
         {
-          Locator locator;
-          LocatorScroller activeLocator;
-
+          Locator locator = null;
+          LocatorScroller activeLocator = null;
+         
           if (activeDoorLocators != null && activeDoorLocators.TryGetValue(locPair.Key.Name, out activeLocator))
           {
             locator = locPair.Value.ElementAt(activeLocator.Index);
-            // Arrow buttons for scroller
             activeLocator.UpdatePosition(locator.X, locator.Y);
-            activeLocator.Draw();
-            
           }
           else
             locator = locPair.Value.FirstOrDefault();
@@ -459,8 +485,6 @@ namespace LocationCompass
             double alphaLevel = locator.Proximity > MAX_PROXIMITY
             ? 0.25
             : 0.25 + ((MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY) * 0.75;
-
-          
 
           if (locator.IsOnScreen)
           {
@@ -474,7 +498,7 @@ namespace LocationCompass
           // Pointer texture
           Game1.spriteBatch.Draw(
             pointer,
-            new Vector2(locator.X, locator.Y + offsetY),
+            new Vector2(locator.X + offsetX, locator.Y + offsetY),
             new Rectangle?(new Rectangle(0, 0, 64, 64)),
             Color.White * (float)alphaLevel,
             (float)(locator.Angle - 3 * MathHelper.PiOver4),
@@ -487,7 +511,7 @@ namespace LocationCompass
           // NPC head
           Game1.spriteBatch.Draw(
             locator.Marker,
-            new Vector2(locator.X + 24, locator.Y + offsetY + 16),
+            new Vector2(locator.X + offsetX + 24, locator.Y + offsetY + 16),
             new Rectangle?(new Rectangle(0, cropY, 16, 15)),
             Color.White * (float)alphaLevel,
             0f,
@@ -510,6 +534,9 @@ namespace LocationCompass
               Color.Black * (float) alphaLevel,
               new Vector2((int) (Game1.tinyFont.MeasureString(countString).X - 12) / 2,
                 (float) ((Game1.tileSize / 4) * 0.5)), 1f);
+
+            if (activeLocator != null)
+              activeLocator.Draw((float)alphaLevel);
           }
         }
       }
@@ -575,21 +602,20 @@ namespace LocationCompass
     public float Y { get; set; } = 0;
     public double Angle { get; set; } = 0.0;
     public bool IsDoor { get; set; } = true;
-    public bool IsOnScreen { get; set; } = true;
-   
+    public bool IsOnScreen { get; set; } = true;   
   }
 
   internal class LocatorScroller
   {
     public string Location { get; set; }
-    public int Count { get; set; } = 0;
+    public HashSet<string> Characters { get; set; }
     public int Index { get; set; } = 0;
     public float X { get; set; }
     public float Y { get; set; }
 
     private Rectangle leftArrowRect;
     private Rectangle rightArrowRect;
-    private const int margin = 48;
+    private const int margin = 40;
 
     public LocatorScroller()
     {
@@ -605,35 +631,36 @@ namespace LocationCompass
         Game1.playSound("drumkit6");
 
         if (Index < 0)
-          Index = Count - 1;
+          Index = Characters.Count - 1;
       }
       else if (rightArrowRect.Contains(x, y))
       {
         Index++;
         Game1.playSound("drumkit6");
 
-        if (Index > Count)
+        if (Index > Characters.Count - 1)
           Index = 0;
       }
+      
     }
 
     public void UpdatePosition(float x, float y)
     {
-      X = x - 8;
-      Y = y - 72;
+      X = x - 6;
+      Y = y - 16;
       leftArrowRect.X = (int) X - margin;
       leftArrowRect.Y = (int) Y;
       rightArrowRect.X = (int) X + margin;
       rightArrowRect.Y = (int) Y;
     }
 
-    public void Draw()
+    public void Draw(float opacity)
     {
       var b = Game1.spriteBatch;
       b.Draw(Game1.mouseCursors, new Vector2((float) (leftArrowRect.X), (float) (leftArrowRect.Y)),
-        new Rectangle(480, 96, 24, 32), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1f);
+        new Rectangle(480, 96, 24, 32), Color.White * opacity, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
       b.Draw(Game1.mouseCursors, new Vector2((float) (rightArrowRect.X), (float) (rightArrowRect.Y)),
-        new Rectangle(448, 96, 24, 32), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 1f);
+        new Rectangle(448, 96, 24, 32), Color.White * opacity, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
     }
   }
 

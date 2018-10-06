@@ -6,6 +6,7 @@ Shows NPC locations on a modified map.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -365,10 +366,18 @@ namespace NPCMapLocations
 		private void GameEvents_HalfSecondTick(object sender, EventArgs e)
 		{
 			if (!Context.IsWorldReady) return;
-		  if (Config.ShowMinimap)
-		    Minimap?.Update();
+		  var updateForMinimap = false;
 
-			UpdateMarkers();
+		  if (Config.ShowMinimap)
+		  {
+		    if (Minimap != null)
+		    {
+		      Minimap.Update();
+		      updateForMinimap = true;
+		    }
+		  }
+
+      UpdateMarkers(updateForMinimap);
 		}
 
 		private void OpenModMap(GameMenu gameMenu)
@@ -439,7 +448,9 @@ namespace NPCMapLocations
 		{
 			if (isModMapOpen || forceUpdateAll)
 			{
-				UpdateNpcs(forceUpdateAll);
+			  if (Context.IsMainPlayer)
+          UpdateNpcs(forceUpdateAll);
+
 				if (Context.IsMultiplayer)
 					UpdateFarmers();
 			}
@@ -565,7 +576,7 @@ namespace NPCMapLocations
 				else
 				{
 					// Set no location so they don't get drawn
-					npcMarker.MapLocation = Vector2.Zero;
+					npcMarker.MapLocation = new Vector2(-1000, -1000);
 				}
 			}
 		}
@@ -625,7 +636,7 @@ namespace NPCMapLocations
 		// Helper method for LocationToMap
 		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
 		{
-			if (location == null || tileX < 0 || tileY < 0) return Vector2.Zero;
+			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
 
 			// Handle farm buildings
 			// Match currentLocation.Name with buildingType 
@@ -663,7 +674,7 @@ namespace NPCMapLocations
 		   
 
       if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
-				return Vector2.Zero;
+				return new Vector2(-1000, -1000);
 
 			int x;
 			int y;
@@ -764,7 +775,7 @@ namespace NPCMapLocations
 
     private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
 		{
-      if (Context.IsWorldReady && Config.ShowMinimap)
+      if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD)
 			{
 				Minimap?.DrawMiniMap();
 			}
@@ -783,8 +794,8 @@ namespace NPCMapLocations
 		private static void ShowDebugInfo()
 		{
 			if (Game1.player.currentLocation == null) return;
-
-			// Black backgronud for legible text
+    
+			// Black background for legible text
 			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(50, 50, 425, 160), new Rectangle(1, 80, 1, 1),
 				Color.Black);
 
@@ -837,7 +848,7 @@ namespace NPCMapLocations
 		public bool IsOutdoors { get; set; }
 		public bool IsHidden { get; set; }
 		public int Layer { get; set; }
-		public int DrawDelay { get; set; }
+	  public int DrawDelay { get; set; } = 0;
 	}
 
 	// Class for Location Vectors

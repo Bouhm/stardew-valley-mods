@@ -466,7 +466,7 @@ namespace NPCMapLocations
 				{
 					// Temporary solution to handle desync of farmhand location/tile position when changing location
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
-					  if (farMarker.MapLocation == Vector2.Zero)
+            if (farMarker == null || farMarker.MapLocation.X < 0)
 					    continue;
 				    if (farMarker.DrawDelay == 0)
 				    {
@@ -480,11 +480,13 @@ namespace NPCMapLocations
 			{
 				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
 					Game1.player.getTileY());
-        if (playerLoc != Vector2.Zero)
+        if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 					  new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
 					  Game1.player);
 			}
+
+		  if (!Context.IsMainPlayer) return;
 
 			// NPCs
 			// Sort by drawing order
@@ -494,7 +496,7 @@ namespace NPCMapLocations
 			foreach (MapMarker npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
-				if (npcMarker.MapLocation == Vector2.Zero || npcMarker.Marker == null ||
+				if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
 				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
 				{
 					continue;
@@ -557,7 +559,7 @@ namespace NPCMapLocations
 		{
 			if (hoveredNames.Equals("")) return;
 
-			indoorIconVector = Vector2.Zero;
+			indoorIconVector = new Vector2(-1000, -1000);
 			var lines = names.Split('\n');
 			int height = (int) Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
 			int width = (int) Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
