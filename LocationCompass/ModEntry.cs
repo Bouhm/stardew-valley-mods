@@ -247,8 +247,8 @@ namespace LocationCompass
           else
             y += (playerPos.X - Game1.viewport.X) * (float) Math.Tan(MathHelper.TwoPi - angle);
 
-          y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4, Game1.viewport.Height - Game1.tileSize * 3 / 4);
-          return new Vector2(0 + Game1.tileSize * 3 / 4, y);
+          y = MathHelper.Clamp(y, (Game1.tileSize*3/4 + 2), Game1.viewport.Height - (Game1.tileSize*3/4 + 2));
+          return new Vector2(0 + (Game1.tileSize*3/4 + 2), y);
         case 2:
           // Left half
           if (angle < MathHelper.PiOver2)
@@ -257,8 +257,8 @@ namespace LocationCompass
           else
             x -= (playerPos.Y - Game1.viewport.Y) * (float) Math.Tan(MathHelper.PiOver2 - angle);
 
-          x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4, Game1.viewport.Width - Game1.tileSize * 3 / 4);
-          return new Vector2(x, 0 + Game1.tileSize * 3 / 4);
+          x = MathHelper.Clamp(x, (Game1.tileSize*3/4 + 2), Game1.viewport.Width - (Game1.tileSize*3/4 + 2));
+          return new Vector2(x, 0 + (Game1.tileSize*3/4 + 2));
         case 3:
           // Top half
           if (angle < MathHelper.Pi)
@@ -267,8 +267,8 @@ namespace LocationCompass
           else
             y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float) Math.Tan(MathHelper.Pi - angle);
 
-          y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4, Game1.viewport.Height - Game1.tileSize * 3 / 4);
-          return new Vector2(Game1.viewport.Width - Game1.tileSize * 3 / 4, y);
+          y = MathHelper.Clamp(y, (Game1.tileSize*3/4 + 2), Game1.viewport.Height - (Game1.tileSize*3/4 + 2));
+          return new Vector2(Game1.viewport.Width - (Game1.tileSize*3/4 + 2), y);
         case 4:
           // Right half
           if (angle < 3 * MathHelper.PiOver2)
@@ -279,8 +279,8 @@ namespace LocationCompass
             x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) *
                  (float) Math.Tan(3 * MathHelper.PiOver2 - angle);
 
-          x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4, Game1.viewport.Width - Game1.tileSize * 3 / 4);
-          return new Vector2(x, Game1.viewport.Height - Game1.tileSize*3/4);
+          x = MathHelper.Clamp(x, (Game1.tileSize*3/4 + 2), Game1.viewport.Width - (Game1.tileSize*3/4 + 2));
+          return new Vector2(x, Game1.viewport.Height - (Game1.tileSize*3/4 + 2));
         default:
           return new Vector2(-1000, -1000);
       }
