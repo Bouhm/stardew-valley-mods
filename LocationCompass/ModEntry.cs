@@ -228,11 +228,9 @@ namespace LocationCompass
 
       if (isDoor)
       {
-        if (Utility.isOnScreen(new Vector2(npcPos.X, npcPos.Y - Game1.tileSize * 3 / 2), Game1.tileSize / 4))
-          return new Vector2(npcPos.X - Game1.viewport.X + Game1.tileSize / 2,
-            npcPos.Y - Game1.viewport.Y - Game1.tileSize*3/2);
-        else
-          x += 3 * Game1.tileSize / 4;
+        if (Utility.isOnScreen(new Vector2(npcPos.X, npcPos.Y), Game1.tileSize / 4))
+          return new Vector2(npcPos.X - Game1.viewport.X,
+            npcPos.Y - Game1.viewport.Y);
       }
 
       // Draw triangle such that the hypotenuse is
@@ -334,8 +332,8 @@ namespace LocationCompass
               if (door.Value.Equals(npc.currentLocation.Name) || door.Value.Equals(npcLocCtx.Parent))
               {
                 npcPos = new Vector2(
-                  door.Key.X * Game1.tileSize,
-                  door.Key.Y * Game1.tileSize
+                  door.Key.X * Game1.tileSize + Game1.tileSize/2,
+                  door.Key.Y * Game1.tileSize - Game1.tileSize*3/2
                 );
                 isDoor = true;
                 isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
