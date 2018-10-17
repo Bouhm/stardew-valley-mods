@@ -46,6 +46,7 @@ namespace LocationCompass
     private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
     {
       if (!Context.IsWorldReady || activeWarpLocators == null) return;
+
       if (e.Button.Equals(SButton.MouseLeft) || e.Button.Equals(SButton.ControllerA))
         foreach (var doorLocator in activeWarpLocators)
           doorLocator.Value.ReceiveLeftClick(Game1.getMouseX(), Game1.getMouseY());
@@ -145,14 +146,13 @@ namespace LocationCompass
       return root;
     }
 
-    public string GetBuilding(string target, string location)
+    public string GetTargetIndoor(string playerLoc, string npcLoc)
     {
-      var building = locationContexts[location].Parent;
-      if (building == null) return null;
-      if (target == building) return building;
-      GetBuilding(target, building);
-
-      return null;
+      var target = locationContexts[npcLoc].Parent;
+      if (target == null) return null;
+      if (locationContexts[npcLoc].Root == target) return npcLoc;
+      if (playerLoc == target) return target;
+      return GetTargetIndoor(playerLoc, target);
     }
 
     // Get only relevant villagers for map
@@ -201,6 +201,104 @@ namespace LocationCompass
 
       if (!Game1.paused)
         UpdateLocators();
+    }
+
+    private void UpdateLocators()
+    {
+      locators = new Dictionary<string, List<Locator>>();
+      activeWarpLocators = new Dictionary<string, LocatorScroller>();
+
+      foreach (var npc in GetVillagers())
+      {
+        if (npc.Schedule == null
+            && !npc.isMarried()
+            || npc.currentLocation == null
+            || config.NPCBlacklist.Contains(npc.Name)
+        )
+          continue;
+
+        locationContexts.TryGetValue(Game1.player.currentLocation.Name, out var playerLocCtx);
+        locationContexts.TryGetValue(npc.currentLocation.Name, out var npcLocCtx);
+
+        if (npcLocCtx.Root != playerLocCtx.Root)
+          continue;
+
+        var playerLoc = Game1.player.currentLocation;
+        var npcLoc = npc.currentLocation;
+        var npcPos = new Vector2(-1000, 1000);
+        var playerPos =
+          new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom,
+            Game1.player.position.Y);
+        var IsWarp = false;
+        var isOnScreen = false;
+        var location = npcLoc.Name;
+
+        if (playerLoc == npcLoc)
+        {
+          // Don't include locator if NPC is visible on screen
+          if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize / 4))
+            continue;
+
+          npcPos = new Vector2(npc.position.X + npc.Sprite.SpriteHeight / 2 * Game1.pixelZoom, npc.position.Y);
+        }
+        // Indoor locations
+        else
+        {
+          var indoor = GetTargetIndoor(playerLoc.Name, npcLoc.Name);
+          if (indoor == null) continue;
+          if (playerLoc.Name != npcLocCtx.Root && playerLoc.Name != indoor) continue;
+
+          if (!playerLoc.IsOutdoors)
+          {
+            npcPos = new Vector2(
+              npcLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
+              npcLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+            );
+          }
+          else
+          {
+            npcPos = new Vector2(
+              locationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
+              locationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+            );
+          }
+
+          IsWarp = true;
+          location = indoor;
+        }
+
+        isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
+
+        var locator = new Locator
+        {
+          Name = npc.Name,
+          Marker = npc.Sprite.Texture,
+          Proximity = GetDistance(playerPos, npcPos),
+          IsWarp = IsWarp,
+          IsOnScreen = isOnScreen
+        };
+
+        var angle = GetPlayerToNPCAngle(playerPos, npcPos);
+        var quadrant = GetViewportQuadrant(angle, playerPos);
+        var locatorPos = GetLocatorPosition(angle, quadrant, playerPos, npcPos, isOnScreen, IsWarp);
+
+        locator.X = locatorPos.X;
+        locator.Y = locatorPos.Y;
+        locator.Angle = angle;
+        locator.Quadrant = quadrant;
+
+        if (locators.TryGetValue(location, out var doorLocators))
+        {
+          if (!doorLocators.Contains(locator))
+            doorLocators.Add(locator);
+        }
+        else
+        {
+          doorLocators = new List<Locator> {locator};
+        }
+
+        locators[location] = doorLocators;
+      }
     }
 
     // Get angle (in radians) to determine which quadrant the NPC is in
@@ -273,30 +371,30 @@ namespace LocationCompass
         case 1:
           // Bottom half
           if (angle > MathHelper.TwoPi - angle)
-            y += (playerPos.X - Game1.viewport.X) * (float) Math.Tan(MathHelper.TwoPi - angle);
+            y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
           // Top half
           else
-            y += (playerPos.X - Game1.viewport.X) * (float) Math.Tan(MathHelper.TwoPi - angle);
+            y += (playerPos.X - Game1.viewport.X) * (float)Math.Tan(MathHelper.TwoPi - angle);
 
           y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
           return new Vector2(0 + Game1.tileSize * 3 / 4 + 2, y);
         case 2:
           // Left half
           if (angle < MathHelper.PiOver2)
-            x -= (playerPos.Y - Game1.viewport.Y) * (float) Math.Tan(MathHelper.PiOver2 - angle);
+            x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
           // Right half
           else
-            x -= (playerPos.Y - Game1.viewport.Y) * (float) Math.Tan(MathHelper.PiOver2 - angle);
+            x -= (playerPos.Y - Game1.viewport.Y) * (float)Math.Tan(MathHelper.PiOver2 - angle);
 
           x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2));
           return new Vector2(x, 0 + Game1.tileSize * 3 / 4 + 2);
         case 3:
           // Top half
           if (angle < MathHelper.Pi)
-            y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float) Math.Tan(MathHelper.Pi - angle);
+            y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
           // Bottom half
           else
-            y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float) Math.Tan(MathHelper.Pi - angle);
+            y -= (Game1.viewport.X + Game1.viewport.Width - playerPos.X) * (float)Math.Tan(MathHelper.Pi - angle);
 
           y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
           return new Vector2(Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2), y);
@@ -304,110 +402,17 @@ namespace LocationCompass
           // Right half
           if (angle < 3 * MathHelper.PiOver2)
             x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) *
-                 (float) Math.Tan(3 * MathHelper.PiOver2 - angle);
+                 (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
           // Left half
           else
             x += (Game1.viewport.Y + Game1.viewport.Height - playerPos.Y) *
-                 (float) Math.Tan(3 * MathHelper.PiOver2 - angle);
+                 (float)Math.Tan(3 * MathHelper.PiOver2 - angle);
 
           x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2));
           return new Vector2(x, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
         default:
           return new Vector2(-1000, -1000);
       }
-    }
-
-    private void UpdateLocators()
-    {
-      locators = new Dictionary<string, List<Locator>>();
-      activeWarpLocators = new Dictionary<string, LocatorScroller>();
-
-      foreach (var npc in GetVillagers())
-      {
-        if (npc.Schedule == null
-            && !npc.isMarried()
-            || npc.currentLocation == null
-            || config.NPCBlacklist.Contains(npc.Name)
-        )
-          continue;
-
-        locationContexts.TryGetValue(Game1.player.currentLocation.Name, out var playerLocCtx);
-        locationContexts.TryGetValue(npc.currentLocation.Name, out var npcLocCtx);
-
-        if (npcLocCtx.Root != playerLocCtx.Root)
-          continue;
-
-        var playerLoc = Game1.player.currentLocation;
-        var npcLoc = npc.currentLocation;
-        var npcPos = new Vector2(-1000, 1000);
-        var playerPos =
-          new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom,
-            Game1.player.position.Y);
-        var IsWarp = false;
-        var isOnScreen = false;
-
-        if (playerLoc == npcLoc)
-        {
-          // Don't include locator if NPC is visible on screen
-          if (Utility.isOnScreen(new Vector2(npc.position.X, npc.position.Y), Game1.tileSize / 4))
-            continue;
-
-          npcPos = new Vector2(npc.position.X + npc.Sprite.SpriteHeight / 2 * Game1.pixelZoom, npc.position.Y);
-        }
-        // Indoor locations
-        else
-        {
-          var location = npcLoc.Name;
-          var building = GetBuilding(playerLoc.Name, npcLoc.Name);
-
-          if (playerLoc.Name == npcLocCtx.Root)
-          {
-            if (building == null) continue;
-            location = building;
-          }
-          else if (playerLoc.Name != building) continue;
-
-          npcPos = new Vector2(
-            npcLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-            npcLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-          );
-          IsWarp = true;
-        }
-
-        isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
-
-        var locator = new Locator
-        {
-          Name = npc.Name,
-          Marker = npc.Sprite.Texture,
-          Proximity = GetDistance(playerPos, npcPos),
-          IsWarp = IsWarp,
-          IsOnScreen = isOnScreen
-        };
-
-        var angle = GetPlayerToNPCAngle(playerPos, npcPos);
-        var quadrant = GetViewportQuadrant(angle, playerPos);
-        var locatorPos = GetLocatorPosition(angle, quadrant, playerPos, npcPos, isOnScreen, IsWarp);
-
-        locator.X = locatorPos.X;
-        locator.Y = locatorPos.Y;
-        locator.Angle = angle;
-        locator.Quadrant = quadrant;
-
-        if (locators.TryGetValue(npc.currentLocation.Name, out var doorLocators))
-        {
-          if (!doorLocators.Contains(locator))
-            doorLocators.Add(locator);
-        }
-        else
-        {
-          doorLocators = new List<Locator> {locator};
-        }
-
-        locators[npc.currentLocation.Name] = doorLocators;
-      }
-
-      var a = locators;
     }
 
     private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
