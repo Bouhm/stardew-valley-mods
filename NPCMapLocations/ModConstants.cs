@@ -289,7 +289,7 @@ public static class ModConstants
 	  {
 	    "Trailer_Big", new MapVector[]
 	    {
-	      new MapVector(813, 365)
+	      new MapVector(815, 365)
       }
 	  },
     {
@@ -323,7 +323,14 @@ public static class ModConstants
 				new MapVector(997, 688, 104, 50)
 			}
 		},
-		{
+	  {
+	    "BeachNightMarket", new MapVector[]
+	    {
+	      new MapVector(726, 541, 0, 0),
+	      new MapVector(997, 688, 104, 50)
+	    }
+	  },
+    {
 			"ElliottHouse", new MapVector[]
 			{
 				new MapVector(852, 564)
@@ -344,13 +351,13 @@ public static class ModConstants
 		{
 			"MermaidHouse", new MapVector[]
 			{
-				new MapVector(867, 640)
+				new MapVector(875, 638)
 			}
 		},
 		{
 			"Submarine", new MapVector[]
 			{
-				new MapVector(742, 651)
+				new MapVector(738, 644)
 			}
 		},
 		{
@@ -466,8 +473,8 @@ public static class ModConstants
 		{
 			"Desert", new MapVector[]
 			{
-				new MapVector(64, 0, 0, 0),
-				new MapVector(216, 176, 50, 60),
+				new MapVector(64, 2, 0, 0),
+				new MapVector(216, 166, 50, 60),
 			}
 		},
 		{
