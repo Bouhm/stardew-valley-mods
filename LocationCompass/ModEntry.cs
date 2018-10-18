@@ -46,10 +46,14 @@ namespace LocationCompass
     private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
     {
       if (!Context.IsWorldReady || activeWarpLocators == null) return;
-
+      var a = locators;
+      var b = activeWarpLocators;
       if (e.Button.Equals(SButton.MouseLeft) || e.Button.Equals(SButton.ControllerA))
         foreach (var doorLocator in activeWarpLocators)
-          doorLocator.Value.ReceiveLeftClick(Game1.getMouseX(), Game1.getMouseY());
+        {
+          if (doorLocator.Value.Characters.Count > 1)
+            doorLocator.Value.ReceiveLeftClick();
+        }
     }
 
     private void LocationEvents_LocationsChanged(object sender, EventArgsLocationsChanged e)
@@ -199,14 +203,13 @@ namespace LocationCompass
       if (!Context.IsWorldReady)
         return;
 
-      if (!Game1.paused)
+      if (!Game1.paused && showLocators)
         UpdateLocators();
     }
 
     private void UpdateLocators()
     {
       locators = new Dictionary<string, List<Locator>>();
-      activeWarpLocators = new Dictionary<string, LocatorScroller>();
 
       foreach (var npc in GetVillagers())
       {
@@ -247,6 +250,8 @@ namespace LocationCompass
           var indoor = GetTargetIndoor(playerLoc.Name, npcLoc.Name);
           if (indoor == null) continue;
           if (playerLoc.Name != npcLocCtx.Root && playerLoc.Name != indoor) continue;
+          IsWarp = true;
+          location = (playerLoc.IsOutdoors || npcLocCtx.Type != "room") ? indoor : location;
 
           if (!playerLoc.IsOutdoors)
           {
@@ -263,8 +268,18 @@ namespace LocationCompass
             );
           }
 
-          IsWarp = true;
-          location = indoor;
+          if (!activeWarpLocators.ContainsKey(location))
+          {
+            activeWarpLocators.Add(location, new LocatorScroller()
+            {
+              Location = location,
+              Characters = new HashSet<string>() {npc.Name},
+              LocatorRect = new Rectangle((int) (npcPos.X - 32), (int) (npcPos.Y - 32),
+                64, 64)
+            });
+          }
+          else
+            activeWarpLocators[location].Characters.Add(npc.Name);
         }
 
         isOnScreen = Utility.isOnScreen(npcPos, Game1.tileSize / 4);
@@ -286,6 +301,13 @@ namespace LocationCompass
         locator.Y = locatorPos.Y;
         locator.Angle = angle;
         locator.Quadrant = quadrant;
+
+        if (new Rectangle((int) (locator.X - 32), (int) (locator.Y - 32), 64, 64).Contains(Game1.getMouseX(),
+          Game1.getMouseY()))
+        {
+          Game1.mouseCursor = 0;
+          Game1.mouseCursorTransparency = 1f;
+        }
 
         if (locators.TryGetValue(location, out var doorLocators))
         {
@@ -437,23 +459,8 @@ namespace LocationCompass
         {
           foreach (var locator in locPair.Value)
           {
-            offsetX = 26;
+            offsetX = 24;
             offsetY = 15;
-
-
-            // Adjust for offsets used to create padding around edges of screen
-            switch (locator.Quadrant)
-            {
-              case 2:
-                offsetX -= 3;
-                break;
-              case 3:
-                offsetX -= 2;
-                break;
-              case 4:
-                offsetY -= 4;
-                break;
-            }
 
             var alphaLevel = locator.Proximity > MAX_PROXIMITY
               ? 0.25
@@ -469,7 +476,7 @@ namespace LocationCompass
               new Rectangle(0, 0, 64, 64),
               Color.White * (float) alphaLevel,
               (float) (locator.Angle - 3 * MathHelper.PiOver4),
-              new Vector2(pointer.Width / 2, pointer.Height / 2),
+              new Vector2(32, 32),
               1f,
               SpriteEffects.None,
               0.0f
@@ -488,6 +495,7 @@ namespace LocationCompass
               1f
             );
 
+            
             if (locator.Proximity > 0)
             {
               var distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
@@ -507,14 +515,12 @@ namespace LocationCompass
           if (activeWarpLocators != null && activeWarpLocators.TryGetValue(locPair.Key, out activeLocator))
           {
             locator = locPair.Value.ElementAt(activeLocator.Index);
-            activeLocator.UpdatePosition(locator.X, locator.Y);
+            activeLocator.LocatorRect = new Rectangle((int)(locator.X- 32), (int)(locator.Y - 32), 64, 64);
           }
           else
-          {
             locator = locPair.Value.FirstOrDefault();
-          }
 
-          offsetX = 26;
+          offsetX = 24;
           offsetY = 12;
 
           // Adjust for offsets used to create padding around edges of screen
@@ -525,15 +531,13 @@ namespace LocationCompass
                 offsetY += 2;
                 break;
               case 2:
-                offsetX -= 4;
+                offsetX -= 0;
                 offsetY += 2;
                 break;
               case 3:
-                offsetX -= 4;
                 offsetY -= 1;
                 break;
               case 4:
-
                 break;
             }
 
@@ -558,7 +562,7 @@ namespace LocationCompass
             new Rectangle(0, 0, 64, 64),
             Color.White * (float) alphaLevel,
             (float) (locator.Angle - 3 * MathHelper.PiOver4),
-            new Vector2(pointer.Width / 2, pointer.Height / 2),
+            new Vector2(32, 32),
             1f,
             SpriteEffects.None,
             0.0f
@@ -577,7 +581,8 @@ namespace LocationCompass
             1f
           );
 
-          if (locator.IsOnScreen)
+          if (locator.IsOnScreen || new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(Game1.getMouseX(),
+                Game1.getMouseY()))
           {
             var countString = $"{locPair.Value.Count}";
 
@@ -597,19 +602,16 @@ namespace LocationCompass
               new Vector2((int) (Game1.tinyFont.MeasureString(countString).X - 24) / 2,
                 (float) (Game1.tileSize / 8) + 3), 1f);
 
-            if (activeLocator != null && activeLocator.Characters.Count > 1)
-              activeLocator.Draw((float) alphaLevel);
           }
-          else
-          {
-            if (locator.Proximity > 0)
+
+            else if (locator.Proximity > 0)
             {
               var distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
               DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                 Color.Black * (float) alphaLevel,
                 new Vector2((int) Game1.tinyFont.MeasureString(distanceString).X / 2,
                   (float) (Game1.tileSize / 4 * 0.5)), 1f);
-            }
+            
           }
         }
       }
@@ -681,34 +683,14 @@ namespace LocationCompass
 
   internal class LocatorScroller
   {
-    private const int margin = 40;
-
-    private Rectangle leftArrowRect;
-    private Rectangle rightArrowRect;
-
-    public LocatorScroller()
-    {
-      leftArrowRect = new Rectangle((int) X - margin, (int) Y, 64, 64);
-      rightArrowRect = new Rectangle((int) X + margin, (int) Y, 64, 64);
-    }
-
     public string Location { get; set; }
     public HashSet<string> Characters { get; set; }
     public int Index { get; set; }
-    public float X { get; set; }
-    public float Y { get; set; }
+    public Rectangle LocatorRect { get; set; }
 
-    public void ReceiveLeftClick(int x, int y)
+    public void ReceiveLeftClick()
     {
-      if (leftArrowRect.Contains(x, y))
-      {
-        Index--;
-        Game1.playSound("drumkit6");
-
-        if (Index < 0)
-          Index = Characters.Count - 1;
-      }
-      else if (rightArrowRect.Contains(x, y))
+      if (LocatorRect.Contains(Game1.getMouseX(), Game1.getMouseY()))
       {
         Index++;
         Game1.playSound("drumkit6");
@@ -716,25 +698,6 @@ namespace LocationCompass
         if (Index > Characters.Count - 1)
           Index = 0;
       }
-    }
-
-    public void UpdatePosition(float x, float y)
-    {
-      X = x - 6;
-      Y = y - 6;
-      leftArrowRect.X = (int) X - margin;
-      leftArrowRect.Y = (int) Y;
-      rightArrowRect.X = (int) X + margin;
-      rightArrowRect.Y = (int) Y;
-    }
-
-    public void Draw(float opacity)
-    {
-      var b = Game1.spriteBatch;
-      b.Draw(Game1.mouseCursors, new Vector2(leftArrowRect.X, leftArrowRect.Y),
-        new Rectangle(480, 96, 24, 32), Color.White * opacity, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
-      b.Draw(Game1.mouseCursors, new Vector2(rightArrowRect.X, rightArrowRect.Y),
-        new Rectangle(448, 96, 24, 32), Color.White * opacity, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 1f);
     }
   }
 
