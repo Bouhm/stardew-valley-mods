@@ -32,5 +32,6 @@ namespace NPCMapLocations
 		public int MinimapY { get; set; } = 12;
 		public int MinimapWidth { get; set; } = 100;
 		public int MinimapHeight { get; set; } = 60;
-  }
+	  public bool DEBUG_MODE { get; set; } = false;
+	}
 }

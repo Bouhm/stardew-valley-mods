@@ -44,7 +44,7 @@ namespace NPCMapLocations
 		private bool isModMapOpen;
 
 		// Debugging
-	  private const bool DEBUG_MODE = false;
+	  private static bool DEBUG_MODE = false;
 		private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 		private static Vector2 _tileLower;
 		private static Vector2 _tileUpper;
@@ -177,6 +177,7 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
+      DEBUG_MODE = Config.DEBUG_MODE;
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
@@ -633,7 +634,7 @@ namespace NPCMapLocations
 		}
 
 		// Helper method for LocationToMap
-		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY)
+		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, bool isPlayer = false)
 		{
 			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
 
@@ -646,13 +647,13 @@ namespace NPCMapLocations
 				        || FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
 					return FarmBuildings[location.uniqueName.Value].Value;
 
-			return LocationToMap(location.Name, tileX, tileY);
+			return LocationToMap(location.Name, tileX, tileY, isPlayer);
 		}
 
 		// MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
 		// Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
 		// Requires MapModConstants and modified map page in ./assets
-		public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1)
+	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, bool isPlayer = false)
 		{
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -726,7 +727,7 @@ namespace NPCMapLocations
 				x = (int) (lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX));
 				y = (int) (lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY));
 
-				if (DEBUG_MODE)
+				if (DEBUG_MODE && isPlayer)
 				{
 					_tileUpper = new Vector2(upper.TileX, upper.TileY);
 					_tileLower = new Vector2(lower.TileX, lower.TileY);
@@ -790,7 +791,7 @@ namespace NPCMapLocations
 		}
 
 		// Show debug info in top left corner
-		private static void ShowDebugInfo()
+		private void ShowDebugInfo()
 		{
 			if (Game1.player.currentLocation == null) return;
     
@@ -801,25 +802,28 @@ namespace NPCMapLocations
 			// Show map location and tile positions
 			DrawText(
 				Game1.player.currentLocation.Name + " (" + Math.Floor(Game1.player.Position.X / Game1.tileSize) + ", " +
-				Math.Floor(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4));
+				Math.Floor(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), (_tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X || Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)) ? Color.Red : Color.White);
 
 			var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu) Game1.activeClickableMenu : null;
 
-			// Show lower & upper bound tiles used for calculations 
-			if (currMenu != null && currMenu.currentTab == GameMenu.mapTab)
-			{
-				DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-					new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8));
-				DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-					new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
-			}
-			else
-			{
-				DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-					new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.DimGray);
-				DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-					new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
-			}
+			// Show lower & upper bound tiles used for calculations
+		  if (!(_tileLower == Vector2.Zero && _tileUpper == Vector2.Zero))
+		  {
+		    if (isModMapOpen || Config.ShowMinimap)
+		    {
+		      DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8));
+		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
+		    }
+		    else
+		    {
+		      DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.DimGray);
+		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
+		    }
+      }
 		}
 
 		// Draw outlined text

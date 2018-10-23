@@ -132,7 +132,7 @@ namespace NPCMapLocations
       // Positions relative to the map (the map image) are not.
 
 		  center = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
-				Game1.player.getTileY());
+				Game1.player.getTileY(), true);
 
       // Player in unknown location, use previous location as center
 		  if (center.X < 0 && prevCenter != null)
