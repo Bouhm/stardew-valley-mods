@@ -106,7 +106,7 @@ namespace NPCMapLocations
 		    isBeingDragged = false;
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
-		    Helper.WriteConfig(Config);
+		    Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		    drawDelay = 30;
 		  }
 		}
@@ -132,7 +132,7 @@ namespace NPCMapLocations
       // Positions relative to the map (the map image) are not.
 
 		  center = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
-				Game1.player.getTileY(), true);
+				Game1.player.getTileY(), CustomLocations, true);
 
       // Player in unknown location, use previous location as center
 		  if (center.X < 0 && prevCenter != null)

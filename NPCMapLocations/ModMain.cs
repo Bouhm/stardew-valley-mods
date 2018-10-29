@@ -25,6 +25,7 @@ namespace NPCMapLocations
 		private ModConfig Config;
 		private ModCustomHandler CustomHandler;
 		private ModMinimap Minimap;
+	  private Dictionary<string, MapVector[]> MapVectors;
 		private HashSet<MapMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
 	  private Dictionary<string, LocationContext> locationContexts;
@@ -79,16 +80,14 @@ namespace NPCMapLocations
 
 		public override void Entry(IModHelper helper)
 		{
-			Config = Helper.ReadConfig<ModConfig>();
-			MarkerCropOffsets = ModConstants.MarkerCropOffsets;
-			CustomHandler = new ModCustomHandler(helper, Config, Monitor);
+      MarkerCropOffsets = ModConstants.MarkerCropOffsets;
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
 		  CustomLocationMarkers =
 		    Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-			TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+      TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
 			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
@@ -122,7 +121,7 @@ namespace NPCMapLocations
 
 		// For drawing farm buildings on the map 
 		// and getting positions relative to the farm 
-		private static void UpdateFarmBuildingLocs()
+		private void UpdateFarmBuildingLocs()
 		{
 			FarmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
 
@@ -137,7 +136,8 @@ namespace NPCMapLocations
 				var locVector = LocationToMap(
 					"Farm", // Get building position in farm
 					building.tileX.Value,
-					building.tileY.Value
+					building.tileY.Value,
+          CustomLocations
 				);
 				// Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
 				// since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
@@ -177,6 +177,9 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
+      Config = Helper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+      CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
+      CustomLocations = CustomHandler.GetCustomLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
@@ -194,6 +197,16 @@ namespace NPCMapLocations
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
 		  CustomLocations = CustomHandler.GetCustomLocations();
+      MapVectors = ModConstants.MapVectors;
+
+      foreach (var locVectors in CustomLocations)
+      {
+        if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
+          MapVectors[locVectors.Key] = locVectors.Value;
+        else
+          MapVectors.Add(locVectors.Key, locVectors.Value);
+      }
+
       CustomLocationRects = CustomHandler.GetCustomLocationRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
@@ -223,7 +236,7 @@ namespace NPCMapLocations
 	    if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
 	    {
 	      Config.ShowMinimap = !Config.ShowMinimap;
-	      Helper.WriteConfig(Config);
+	      Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 	    }
 
 	    // ModMenu
@@ -233,6 +246,7 @@ namespace NPCMapLocations
 
 		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
 		{
+		  if (!Context.IsWorldReady) return;
       if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey))
 		    HeldKey = SButton.None;
 
@@ -269,13 +283,13 @@ namespace NPCMapLocations
 			{
 				if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
 
-				Helper.WriteConfig(Config);
+				Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 			}
 			else
 			{
 				if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
 
-				Helper.WriteConfig(Config);
+				Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 			}
 		}
 
@@ -309,21 +323,20 @@ namespace NPCMapLocations
 
 			ResetMarkers(GetVillagers());
       UpdateMarkers(true);
-			if (Config.ShowMinimap)
-				Minimap = new ModMinimap(
-					NpcMarkers,
-					SecondaryNpcs,
-					FarmerMarkers,
-					MarkerCropOffsets,
-					FarmBuildings,
-					BuildingMarkers,
-					Helper,
-					Config,
-          MapName,
-          CustomLocations,
-					CustomLocationRects,
-          CustomLocationMarkers
-				);
+			Minimap = new ModMinimap(
+				NpcMarkers,
+				SecondaryNpcs,
+				FarmerMarkers,
+				MarkerCropOffsets,
+				FarmBuildings,
+				BuildingMarkers,
+				Helper,
+				Config,
+        MapName,
+        CustomLocations,
+				CustomLocationRects,
+        CustomLocationMarkers
+			);
 		}
 
 		private void ResetMarkers(List<NPC> villagers)
@@ -482,7 +495,7 @@ namespace NPCMapLocations
 			  if (locationName.StartsWith("UndergroundMine"))
 			    locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || !ModConstants.MapVectors.TryGetValue(locationName, out var loc))
+        if (locationName == null || !MapVectors.TryGetValue(locationName, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + locationName))
 					{
@@ -568,8 +581,8 @@ namespace NPCMapLocations
 					*/
 
 					// Get center of NPC marker 
-					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).X - 16;
-					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY()).Y - 15;
+					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomLocations).X - 16;
+					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomLocations).Y - 15;
 
 					npcMarker.MapLocation = new Vector2(x, y);
 				}
@@ -591,7 +604,7 @@ namespace NPCMapLocations
 			  if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-				if (!ModConstants.MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+				if (!MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
 				{
 					if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
 					{
@@ -601,7 +614,7 @@ namespace NPCMapLocations
 				}
 
 				var farmerId = farmer.UniqueMultiplayerID;
-				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY());
+				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY(), CustomLocations);
 
 				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 				{
@@ -634,7 +647,7 @@ namespace NPCMapLocations
 		}
 
 		// Helper method for LocationToMap
-		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, bool isPlayer = false)
+		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, Dictionary<string, MapVector[]> CustomLocations = null, bool isPlayer = false)
 		{
 			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
 
@@ -647,13 +660,13 @@ namespace NPCMapLocations
 				        || FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
 					return FarmBuildings[location.uniqueName.Value].Value;
 
-			return LocationToMap(location.Name, tileX, tileY, isPlayer);
+			return LocationToMap(location.Name, tileX, tileY, CustomLocations, isPlayer);
 		}
 
 		// MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
 		// Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
 		// Requires MapModConstants and modified map page in ./assets
-	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, bool isPlayer = false)
+	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> CustomLocations = null, bool isPlayer = false)
 		{
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -671,10 +684,11 @@ namespace NPCMapLocations
 		        locationName = "Mine";
 		    }
       }
-		   
 
-      if (!ModConstants.MapVectors.TryGetValue(locationName, out var locVectors))
-				return new Vector2(-1000, -1000);
+		  MapVector[] locVectors = null;
+		  if ((CustomLocations != null && !CustomLocations.TryGetValue(locationName, out locVectors)) && !ModConstants.MapVectors.TryGetValue(locationName, out locVectors) || locVectors == null)
+        return new Vector2(-1000, -1000);
+
 
 			int x;
 			int y;
@@ -715,6 +729,8 @@ namespace NPCMapLocations
 					if ((upper == null || hasEqualTile) && tileX <= vector.TileX && tileY <= vector.TileY) upper = vector;
 				}
 
+			  var a = locVectors;
+          
 				// Handle null cases - not enough vectors to calculate using lower/upper bound strategy
 				// Uses fallback strategy - get closest points such that lower != upper
 				var tilePos = "(" + tileX + ", " + tileY + ")";
@@ -796,13 +812,13 @@ namespace NPCMapLocations
 			if (Game1.player.currentLocation == null) return;
     
 			// Black background for legible text
-			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(50, 50, 425, 160), new Rectangle(1, 80, 1, 1),
+			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 200), new Rectangle(3, 0, 1, 1),
 				Color.Black);
 
 			// Show map location and tile positions
+      DrawText($"{Game1.player.currentLocation.Name} ({Game1.currentLocation.Map.DisplayWidth/Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 			DrawText(
-				Game1.player.currentLocation.Name + " (" + Math.Floor(Game1.player.Position.X / Game1.tileSize) + ", " +
-				Math.Floor(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), (_tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X || Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)) ? Color.Red : Color.White);
+				"Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " + Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), (_tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X || Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)) ? Color.Red : Color.White);
 
 			var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu) Game1.activeClickableMenu : null;
 
@@ -812,16 +828,16 @@ namespace NPCMapLocations
 		    if (isModMapOpen || Config.ShowMinimap)
 		    {
 		      DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8));
-		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
 		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
+		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3));
 		    }
 		    else
 		    {
 		      DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.DimGray);
-		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
 		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
+		      DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+		        new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), Color.DimGray);
 		    }
       }
 		}

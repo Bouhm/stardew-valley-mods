@@ -289,7 +289,7 @@ public static class ModConstants
 	  {
 	    "Trailer_Big", new MapVector[]
 	    {
-	      new MapVector(815, 365)
+	      new MapVector(810, 365)
       }
 	  },
     {

@@ -60,7 +60,7 @@ namespace NPCMapLocations
 
 				this.Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Info);
 			}
-			this.Helper.WriteConfig(Config);
+			this.Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		// Load recolored map if user has recolor mods

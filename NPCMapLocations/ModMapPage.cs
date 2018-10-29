@@ -479,7 +479,7 @@ namespace NPCMapLocations
 			else
 			{
 				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
-					Game1.player.getTileY(), true);
+					Game1.player.getTileY(), CustomLocations, true);
         if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 					  new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
