@@ -33,9 +33,8 @@ namespace NPCMapLocations
 
     // Customizations/Custom mods
 	  private string MapName;
-    private Texture2D CustomLocationMarkers;
-	  private Dictionary<string, MapVector[]> CustomLocations;
-    private Dictionary<string, Rectangle> CustomLocationRects;
+    private Texture2D CustomMarkerTex;
+	  private Dictionary<string, MapVector[]> CustomMapLocations;
 	  private Dictionary<string, string> CustomNames;
 	  private Dictionary<string, int> MarkerCropOffsets;
 
@@ -83,7 +82,7 @@ namespace NPCMapLocations
       MarkerCropOffsets = ModConstants.MarkerCropOffsets;
 			BuildingMarkers =
 				Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
-		  CustomLocationMarkers =
+		  CustomMarkerTex =
 		    Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
@@ -137,7 +136,7 @@ namespace NPCMapLocations
 					"Farm", // Get building position in farm
 					building.tileX.Value,
 					building.tileY.Value,
-          CustomLocations
+          CustomMapLocations
 				);
 				// Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
 				// since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
@@ -179,7 +178,7 @@ namespace NPCMapLocations
     {
       Config = Helper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
       CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
-      CustomLocations = CustomHandler.GetCustomLocations();
+      CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
@@ -196,10 +195,10 @@ namespace NPCMapLocations
 			CustomHandler.UpdateCustomNpcs();
 			CustomNames = CustomHandler.GetNpcNames();
 			MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
-		  CustomLocations = CustomHandler.GetCustomLocations();
+		  CustomMapLocations = CustomHandler.GetCustomMapLocations();
       MapVectors = ModConstants.MapVectors;
 
-      foreach (var locVectors in CustomLocations)
+      foreach (var locVectors in CustomMapLocations)
       {
         if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
           MapVectors[locVectors.Key] = locVectors.Value;
@@ -207,7 +206,6 @@ namespace NPCMapLocations
           MapVectors.Add(locVectors.Key, locVectors.Value);
       }
 
-      CustomLocationRects = CustomHandler.GetCustomLocationRects();
 			UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
 		}
@@ -217,8 +215,8 @@ namespace NPCMapLocations
 	  {
 	    if (!Context.IsWorldReady) return;
 
-      // Minimap dragging
-	    if (Config.ShowMinimap && Minimap != null)
+	    // Minimap dragging
+      if (Config.ShowMinimap && Minimap != null)
 	    {
 	      if (e.Button.ToString().Equals(Config.MinimapDragKey))
 	        HeldKey = e.Button;
@@ -233,7 +231,7 @@ namespace NPCMapLocations
 	    }
 
       // Minimap toggle
-	    if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
+      if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
 	    {
 	      Config.ShowMinimap = !Config.ShowMinimap;
 	      Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
@@ -242,12 +240,20 @@ namespace NPCMapLocations
 	    // ModMenu
 	    if (Game1.activeClickableMenu is GameMenu)
 				  HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
+
+	    if (DEBUG_MODE && e.Button == SButton.LeftAlt)
+	    {
+	      HeldKey = e.Button;
+	    }
+
+      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftAlt && e.Button.Equals(SButton.MouseRight))
+        Game1.player.setTileLocation(Game1.currentCursorTile);
 		}
 
 		private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
 		{
 		  if (!Context.IsWorldReady) return;
-      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey))
+      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey) || (HeldKey == SButton.LeftAlt && e.Button != SButton.MouseRight))
 		    HeldKey = SButton.None;
 
 		  if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
@@ -333,9 +339,8 @@ namespace NPCMapLocations
 				Helper,
 				Config,
         MapName,
-        CustomLocations,
-				CustomLocationRects,
-        CustomLocationMarkers
+        CustomMapLocations,
+        CustomMarkerTex
 			);
 		}
 
@@ -413,9 +418,8 @@ namespace NPCMapLocations
 				Helper,
 				Config,
 				MapName,
-				CustomLocations,
-				CustomLocationRects,
-        CustomLocationMarkers
+        CustomMapLocations,
+        CustomMarkerTex
       );
 		}
 
@@ -581,8 +585,8 @@ namespace NPCMapLocations
 					*/
 
 					// Get center of NPC marker 
-					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomLocations).X - 16;
-					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomLocations).Y - 15;
+					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomMapLocations).X - 16;
+					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomMapLocations).Y - 15;
 
 					npcMarker.MapLocation = new Vector2(x, y);
 				}
@@ -614,7 +618,7 @@ namespace NPCMapLocations
 				}
 
 				var farmerId = farmer.UniqueMultiplayerID;
-				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY(), CustomLocations);
+				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY(), CustomMapLocations);
 
 				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 				{
@@ -647,7 +651,7 @@ namespace NPCMapLocations
 		}
 
 		// Helper method for LocationToMap
-		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, Dictionary<string, MapVector[]> CustomLocations = null, bool isPlayer = false)
+		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
 		{
 			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
 
@@ -660,13 +664,13 @@ namespace NPCMapLocations
 				        || FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
 					return FarmBuildings[location.uniqueName.Value].Value;
 
-			return LocationToMap(location.Name, tileX, tileY, CustomLocations, isPlayer);
+			return LocationToMap(location.Name, tileX, tileY, CustomMapLocations, isPlayer);
 		}
 
 		// MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
 		// Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
 		// Requires MapModConstants and modified map page in ./assets
-	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> CustomLocations = null, bool isPlayer = false)
+	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
 		{
 			var mapPagePos =
 				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
@@ -686,7 +690,7 @@ namespace NPCMapLocations
       }
 
 		  MapVector[] locVectors = null;
-		  if ((CustomLocations != null && !CustomLocations.TryGetValue(locationName, out locVectors)) && !ModConstants.MapVectors.TryGetValue(locationName, out locVectors) || locVectors == null)
+		  if ((CustomMapLocations != null && !CustomMapLocations.TryGetValue(locationName, out locVectors)) && !ModConstants.MapVectors.TryGetValue(locationName, out locVectors) || locVectors == null)
         return new Vector2(-1000, -1000);
 
 
@@ -795,6 +799,15 @@ namespace NPCMapLocations
 			{
 				Minimap?.DrawMiniMap();
 			}
+
+      // Highlight tile for debug mode
+		  if (HeldKey == SButton.LeftAlt) {
+        Game1.spriteBatch.Draw(Game1.mouseCursors,
+		      new Vector2(
+		        Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
+		        Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
+		      new Rectangle ?(new Rectangle(448, 128, 64, 64)), Color.White);
+		  }
 		}
 
 		// DEBUG 
@@ -815,8 +828,12 @@ namespace NPCMapLocations
 			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 200), new Rectangle(3, 0, 1, 1),
 				Color.Black);
 
-			// Show map location and tile positions
-      DrawText($"{Game1.player.currentLocation.Name} ({Game1.currentLocation.Map.DisplayWidth/Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+		  var locationName = Game1.player.currentLocation.Name == "Cabin"
+		    ? Game1.player.currentLocation.uniqueName.Value
+		    : Game1.player.currentLocation.Name;
+
+      // Show map location and tile positions
+      DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth/Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 			DrawText(
 				"Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " + Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), (_tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X || Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)) ? Color.Red : Color.White);
 

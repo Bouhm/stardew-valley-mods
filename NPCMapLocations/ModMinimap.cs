@@ -19,9 +19,9 @@ namespace NPCMapLocations
 		private readonly IModHelper Helper;
 	  private readonly string MapName;
 
-	  private readonly Dictionary<string, MapVector[]> CustomLocations;
-	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
-	  private readonly Texture2D CustomLocationMarkers;
+	  private readonly Dictionary<string, MapVector[]> CustomMapLocations;
+	  private readonly Dictionary<string, Rectangle> CustomMapMarkers;
+	  private readonly Texture2D CustomMarkerTex;
 
     public bool isBeingDragged;
 		private readonly Texture2D map;
@@ -53,10 +53,8 @@ namespace NPCMapLocations
 			IModHelper helper,
 			ModConfig config,
       string mapName = null,
-      Dictionary<string, MapVector[]> customLocations = null,
-			Dictionary<string, Rectangle> customLocationRects = null,
-			Texture2D customLocationMarkers = null
-
+      Dictionary<string, MapVector[]> customMapLocations = null,
+			Texture2D CustomMarkerTex = null
     )
 		{
 			this.NpcMarkers = npcMarkers;
@@ -68,9 +66,8 @@ namespace NPCMapLocations
 		  this.Helper = helper;
 		  this.Config = config;
 		  this.MapName = mapName;
-		  this.CustomLocations = customLocations;
-		  this.CustomLocationRects = customLocationRects;
-		  this.CustomLocationMarkers = customLocationMarkers;
+		  this.CustomMapLocations = customMapLocations;
+		  this.CustomMarkerTex = CustomMarkerTex;
 
       map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
@@ -132,7 +129,7 @@ namespace NPCMapLocations
       // Positions relative to the map (the map image) are not.
 
 		  center = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
-				Game1.player.getTileY(), CustomLocations, true);
+				Game1.player.getTileY(), CustomMapLocations, true);
 
       // Player in unknown location, use previous location as center
 		  if (center.X < 0 && prevCenter != null)
@@ -367,47 +364,41 @@ namespace NPCMapLocations
       //
       // ===== Custom locations =====
       //
-      if (Config.CustomLocationRects != null)
+      if (Config.CustomMapMarkers != null)
 		  {
-		    foreach (var location in CustomLocationRects)
+		    foreach (var location in Config.CustomMapMarkers)
 		    {
-		      if (CustomLocations.TryGetValue(location.Key, out var locationVector) && CustomLocationRects.TryGetValue(location.Key, out var locationRect))
+		      if (CustomMapLocations.TryGetValue(location.Key, out var locationVector) && Config.CustomMapMarkers.TryGetValue(location.Key, out var locationRects))
 		      {
+		        var fromAreaRect = locationRects.GetValue("FromArea");
+		        var toAreaRect = locationRects.GetValue("ToArea");
+            var srcRect = new Rectangle(fromAreaRect.Value<int>("X"), fromAreaRect.Value<int>("Y"),
+		          fromAreaRect.Value<int>("Width"), fromAreaRect.Value<int>("Height"));
+		        var locationX = toAreaRect.Value<int>("X");
+		        var locationY = toAreaRect.Value<int>("Y");
+
             // If only one Vector specified, treat it as a marker
             // Markers are centered based on width/height
-		        if (locationVector.Length == 1)
+            if (locationVector.Length == 1)
 		        {
-		          var markerX = locationVector[0].MapX;
-		          var markerY = locationVector[0].MapY;
+		          b.Draw(
+		            CustomMarkerTex,
+		            new Vector2(offsetMmLoc.X + locationX - fromAreaRect.Value<int>("Width") / 2, offsetMmLoc.Y + locationY - fromAreaRect.Value<int>("Height") / 2
+		            ),
+		            srcRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+		          );
 
-		          if (IsWithinMapArea(markerX - locationRect.Width / 2,
-		            markerY - locationRect.Height / 2))
-		          {
-		            b.Draw(
-		              CustomLocationMarkers,
-		              new Vector2(
-		                NormalizeToMap(
-		                  offsetMmLoc.X + markerX - (float) Math.Floor(locationRect.Width / 2.0)),
-		                NormalizeToMap(offsetMmLoc.Y + markerY -
-		                               (float) Math.Floor(locationRect.Height / 2.0))
-		              ),
-		              locationRect, color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-		            );
-		          }
 		        }
-
 		        // If more than one Vector, treat it as a region with lower & upper bound
-            // Regions are draw by the top-left corner
+		        // Regions are draw by the top-left corner
 		        else if (locationVector.Length > 1)
-		        {
-		          var regionLocX = locationVector[0].MapX;
-		          var regionLocY = locationVector[0].MapY;
-              var regionWidth = locationRect.Width;
-		          var regionHeight = locationRect.Height;
-		          var regionX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + regionLocX, offsetMmX, offsetMmX + mmWidth));
-		          var regionY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + regionLocY, mmY, mmY + mmHeight) + 2);
-		          var regionCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - regionLocX) / Game1.pixelZoom, 0, farmWidth);
-		          var regionCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - regionLocY) / Game1.pixelZoom, 0, farmHeight);
+            {
+		          var regionWidth = srcRect.Width;
+		          var regionHeight = srcRect.Height;
+		          var regionX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + locationX, offsetMmX, offsetMmX + mmWidth));
+		          var regionY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + locationY, mmY, mmY + mmHeight) + 2);
+		          var regionCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - locationX) / Game1.pixelZoom, 0, farmWidth);
+		          var regionCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - locationY) / Game1.pixelZoom, 0, farmHeight);
 
 		          // Check if region crop extends outside of minimap
 		          var regionCropWidth = (regionX / Game1.pixelZoom + regionWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - regionX) / Game1.pixelZoom) : regionWidth - regionCropX;
@@ -420,13 +411,13 @@ namespace NPCMapLocations
 		          if (regionCropY + regionCropHeight > regionHeight)
 		            regionCropHeight = regionHeight - regionCropY;
 
-		          b.Draw(CustomLocationMarkers, new Vector2(regionX, regionY),
-		            new Rectangle(locationRect.X + regionCropX, locationRect.Y + regionCropY, regionCropWidth, regionCropHeight), color,
+		          b.Draw(CustomMarkerTex, new Vector2(regionX, regionY),
+		            new Rectangle(srcRect.X + regionCropX, srcRect.Y + regionCropY, regionCropWidth, regionCropHeight), color,
 		            0f,
 		            Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-            }
-          }
-		    }
+		        }
+		      }
+        }
 		  }
 
       //

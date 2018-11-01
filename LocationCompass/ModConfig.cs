@@ -10,7 +10,7 @@ namespace LocationCompass
     {
         public bool Toggle { get; set; } = false;
         public string HoldKeyCode { get; set; } = "LeftAlt";
-      public bool ShowFarmersOnly { get; set; } = true;
+        public bool ShowFarmersOnly { get; set; } = true;
         public List<string> NPCBlacklist { get; set; } = new List<string>();
     }
 }

@@ -96,10 +96,10 @@ namespace NPCMapLocations
 	  // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
     // { "customRegion": [{x1, y1}, {x2, y2}] where x, y are relative to map (for a custom region ex. a new farm)
 	  // Any custom locations with given location on the map
-	  public Dictionary<string, MapVector[]> GetCustomLocations()
+	  public Dictionary<string, MapVector[]> GetCustomMapLocations()
 	  {
       var customMapVectors = new Dictionary<string, MapVector[]>();
-      foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomLocations)
+      foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomMapLocations)
 	    {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
 	      for (int i = 0; i < mapVectors.Value.Length; i++)
@@ -130,28 +130,6 @@ namespace NPCMapLocations
 	    }
 
 	    return customMapVectors;
-	  }
-
-
-    // { "customLocation": [{x, y, width, height}] } for cropping from x, y with given crop width/height
-	  // Custom markers to draw on the map with given location
-	  public Dictionary<string, Rectangle> GetCustomLocationRects()
-	  {
-	    var customLocationRects = new Dictionary<string, Rectangle>();
-	    foreach (KeyValuePair<string, JObject> locationRect in Config.CustomLocationRects)
-	    {
-	      var customRect = locationRect.Value;
-        customLocationRects.Add(
-	        locationRect.Key,
-	        new Rectangle(
-	          (int)customRect.GetValue("X"),
-	          (int)customRect.GetValue("Y"),
-	          (int)customRect.GetValue("Width"),
-	          (int)customRect.GetValue("Height")
-          )
-	      );
-	    }
-	    return customLocationRects;
 	  }
 
     // Handle any modified NPC names 

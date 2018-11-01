@@ -37,9 +37,8 @@ namespace NPCMapLocations
 		private Vector2 indoorIconVector;
 		private bool drawPamHouseUpgrade;
 
-	  private readonly Dictionary<string, MapVector[]> CustomLocations;
-	  private readonly Dictionary<string, Rectangle> CustomLocationRects;
-	  private readonly Texture2D CustomLocationMarkers;
+	  private readonly Dictionary<string, MapVector[]> CustomMapLocations;
+	  private readonly Texture2D CustomMarkerTex;
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
@@ -53,9 +52,8 @@ namespace NPCMapLocations
 			IModHelper helper,
 			ModConfig config,
       string mapName = null,
-      Dictionary<string, MapVector[]> customLocations = null,
-			Dictionary<string, Rectangle> customLocationRects = null,
-			Texture2D customLocationMarkers = null
+      Dictionary<string, MapVector[]> customMapLocations = null,
+      Texture2D CustomMarkerTex = null
     ) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
 			Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
 			600 + IClickableMenu.borderWidth * 2)
@@ -70,9 +68,8 @@ namespace NPCMapLocations
 			this.Helper = helper;
 			this.Config = config;
 		  this.MapName = mapName;
-		  this.CustomLocations = customLocations;
-		  this.CustomLocationRects = customLocationRects;
-		  this.CustomLocationMarkers = customLocationMarkers;
+		  this.CustomMapLocations = customMapLocations;
+		  this.CustomMarkerTex = CustomMarkerTex;
 
       map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
@@ -415,37 +412,21 @@ namespace NPCMapLocations
 			}
 
       // ===== Custom locations =====
-      if (Config.CustomLocationRects != null)
+      if (Config.CustomMapMarkers != null)
       {
-        foreach (var location in CustomLocationRects)
+        foreach (var location in Config.CustomMapMarkers)
         {
-          if (CustomLocations.TryGetValue(location.Key, out var locationVector) && CustomLocationRects.TryGetValue(location.Key, out var locationRect))
+          if (CustomMapLocations.TryGetValue(location.Key, out var locationVector) && Config.CustomMapMarkers.TryGetValue(location.Key, out var locationRects))
           {
-            // If only one Vector specified, treat it as a marker
-            // Markers are centered based on width/height
-            if (locationVector.Length == 1)
-            {
-              var markerX = locationVector[0].MapX;
-              var markerY = locationVector[0].MapY;
+            var fromAreaRect = locationRects.GetValue("FromArea");
+            var toAreaRect = locationRects.GetValue("ToArea");
+            var srcRect = new Rectangle(fromAreaRect.Value<int>("X"), fromAreaRect.Value<int>("Y"),
+              fromAreaRect.Value<int>("Width"), fromAreaRect.Value<int>("Height"));
 
-                b.Draw(
-                  CustomLocationMarkers,
-                  new Vector2(mapX + markerX - locationRect.Width / 2, mapY + markerY - locationRect.Height / 2
-                  ),
-                  locationRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-                );
-              
-            }
-
-            // If more than one Vector, treat it as a region with lower & upper bound
-            // Regions are draw by the top-left corner
-            else if (locationVector.Length > 1)
-            {
-              b.Draw(CustomLocationMarkers, new Vector2(mapX + locationVector[0].MapX, mapY + locationVector[0].MapY),
-                locationRect, Color.White,
-                0f,
-                Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-            }
+            b.Draw(CustomMarkerTex, new Vector2(mapX + toAreaRect.Value<int>("X"), mapY + toAreaRect.Value<int>("Y")),
+              srcRect, Color.White,
+              0f,
+              Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           }
         }
       }
@@ -479,7 +460,7 @@ namespace NPCMapLocations
 			else
 			{
 				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
-					Game1.player.getTileY(), CustomLocations, true);
+					Game1.player.getTileY(), CustomMapLocations, true);
         if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 					  new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
