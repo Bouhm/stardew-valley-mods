@@ -9,14 +9,14 @@ namespace NPCMapLocations
 {
   class SyncedLocationData
   {
-    public Dictionary<string, Vector2> SyncedLocations { get; set; }
+    public Dictionary<string, MapLocationData> SyncedLocations { get; set; }
 
     public SyncedLocationData()
     {
-      SyncedLocations = new Dictionary<string, Vector2>();
+      SyncedLocations = new Dictionary<string, MapLocationData>();
     }
 
-    public void AddNpcLocation(string name, Vector2 mapLocation) 
+    public void AddNpcLocation(string name, MapLocationData mapLocation) 
     {
       if (!SyncedLocations.ContainsKey(name))
       {
@@ -26,6 +26,21 @@ namespace NPCMapLocations
       {
         SyncedLocations[name] = mapLocation;
       }
+    }
+  }
+
+  // Used for syncing only the necessary data
+  internal class MapLocationData
+  {
+    public string LocationName { get; set; }
+    public int TileX { get; set; }
+    public int TileY { get; set; }
+
+    public MapLocationData(string locationName, int tileX, int tileY)
+    {
+      this.LocationName = locationName;
+      this.TileX = tileX;
+      this.TileY = tileY;
     }
   }
 }

@@ -15,7 +15,7 @@ namespace NPCMapLocations
     private readonly ModConfig Config;
 		private readonly int borderWidth = 12;
 		private readonly bool drawPamHouseUpgrade;
-		private readonly Dictionary<long, MapMarker> FarmerMarkers;
+		private readonly Dictionary<long, CharacterMarker> FarmerMarkers;
 		private readonly IModHelper Helper;
 	  private readonly string MapName;
 
@@ -35,7 +35,7 @@ namespace NPCMapLocations
     private int mmX; // top-left position of minimap relative to viewport
 		private int mmY; // top-left position of minimap relative to viewport
 	  private int offset = 0; // offset for minimap if viewport changed
-		private readonly HashSet<MapMarker> NpcMarkers;
+		private readonly HashSet<CharacterMarker> NpcMarkers;
 		private Vector2 playerLoc;
 		private int prevMmX;
 		private int prevMmY;
@@ -44,9 +44,9 @@ namespace NPCMapLocations
 	  private int drawDelay = 0;
 
 		public ModMinimap(
-			HashSet<MapMarker> npcMarkers,
+			HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, bool> secondaryNpcs,
-			Dictionary<long, MapMarker> farmerMarkers,
+			Dictionary<long, CharacterMarker> farmerMarkers,
 			Dictionary<string, int> MarkerCropOffsets,
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
@@ -128,7 +128,7 @@ namespace NPCMapLocations
       // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
       // Positions relative to the map (the map image) are not.
 
-		  center = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
+		  center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY(), CustomMapLocations, true);
 
       // Player in unknown location, use previous location as center
@@ -457,9 +457,7 @@ namespace NPCMapLocations
 						  2f, 1,
 						  Game1.player);
 				}
-
-		  if (!Context.IsMainPlayer) return;
-
+        
       //
       // ===== NPCs =====
       //

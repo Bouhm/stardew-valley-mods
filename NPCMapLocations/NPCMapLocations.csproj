@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SyncedLocationData.cs" />
     <Compile Include="ModMinimap.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModConstants.cs" />

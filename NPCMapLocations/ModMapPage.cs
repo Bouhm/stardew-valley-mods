@@ -22,8 +22,8 @@ namespace NPCMapLocations
 		private readonly ModConfig Config;
 		private readonly Dictionary<string, string> CustomNames;
 		private Dictionary<string, bool> SecondaryNpcs { get; }
-		private HashSet<MapMarker> NpcMarkers;
-		private Dictionary<long, MapMarker> FarmerMarkers;
+		private HashSet<CharacterMarker> NpcMarkers;
+		private Dictionary<long, CharacterMarker> FarmerMarkers;
 		private Dictionary<string, int> MarkerCropOffsets { get; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
     private readonly Texture2D BuildingMarkers;
@@ -42,10 +42,10 @@ namespace NPCMapLocations
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
-			HashSet<MapMarker> npcMarkers,
+			HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, string> npcNames,
 			Dictionary<string, bool> secondaryNpcs,
-			Dictionary<long, MapMarker> farmerMarkers,
+			Dictionary<long, CharacterMarker> farmerMarkers,
 			Dictionary<string, int> MarkerCropOffsets,
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
 			Texture2D buildingMarkers,
@@ -117,7 +117,7 @@ namespace NPCMapLocations
 				? "，"
 				: ", ";
 
-			foreach (MapMarker npcMarker in this.NpcMarkers)
+			foreach (CharacterMarker npcMarker in this.NpcMarkers)
 			{
 				Vector2 npcLocation = new Vector2(mapX + npcMarker.MapLocation.X, mapY + npcMarker.MapLocation.Y);
 				if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
@@ -133,7 +133,7 @@ namespace NPCMapLocations
 			
 			if (Context.IsMultiplayer)
 			{
-				foreach (MapMarker farMarker in FarmerMarkers.Values)
+				foreach (CharacterMarker farMarker in FarmerMarkers.Values)
 				{
 					Vector2 farmerLocation = new Vector2(mapX + farMarker.MapLocation.X, mapY + farMarker.MapLocation.Y);
              if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
@@ -448,7 +448,7 @@ namespace NPCMapLocations
 				foreach (Farmer farmer in Game1.getOnlineFarmers())
 				{
 					// Temporary solution to handle desync of farmhand location/tile position when changing location
-					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out MapMarker farMarker))
+					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out CharacterMarker farMarker))
             if (farMarker == null || farMarker.MapLocation.X < 0)
 					    continue;
 				    if (farMarker.DrawDelay == 0)
@@ -461,7 +461,7 @@ namespace NPCMapLocations
 			}
 			else
 			{
-				Vector2 playerLoc = ModMain.GetMapPosition(Game1.player.currentLocation, Game1.player.getTileX(),
+				Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
 					Game1.player.getTileY(), CustomMapLocations, true);
         if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
@@ -469,14 +469,12 @@ namespace NPCMapLocations
 					  Game1.player);
 			}
 
-		  if (!Context.IsMainPlayer) return;
-
 			// NPCs
 			// Sort by drawing order
 			var sortedMarkers = NpcMarkers.ToList();
 			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-			foreach (MapMarker npcMarker in sortedMarkers)
+			foreach (CharacterMarker npcMarker in sortedMarkers)
 			{
 				// Skip if no specified location
 				if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||

@@ -26,7 +26,7 @@ namespace NPCMapLocations
 		private ModCustomHandler CustomHandler;
 		private ModMinimap Minimap;
 	  private Dictionary<string, MapVector[]> MapVectors;
-		private HashSet<MapMarker> NpcMarkers;
+		private HashSet<CharacterMarker> NpcMarkers;
 		private Dictionary<string, bool> SecondaryNpcs;
 	  private Dictionary<string, LocationContext> locationContexts;
 	  private const int DRAW_DELAY = 3;
@@ -39,9 +39,10 @@ namespace NPCMapLocations
 	  private Dictionary<string, int> MarkerCropOffsets;
 
     // Multiplayer
-    private Dictionary<long, MapMarker> FarmerMarkers;
+    private Dictionary<long, CharacterMarker> FarmerMarkers;
 		private bool hasOpenedMap;
 		private bool isModMapOpen;
+	  private static bool LOCATION_SYNC = true; // Experimental features
 
 		// Debugging
 	  private static bool DEBUG_MODE = false;
@@ -86,11 +87,13 @@ namespace NPCMapLocations
 		    Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
 			SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+		  Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
 			LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
 			InputEvents.ButtonPressed += InputEvents_ButtonPressed;
 			InputEvents.ButtonReleased += InputEvents_ButtonReleased;
+      GameEvents.OneSecondTick += GameEvents_OneSecondTick;
 			GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
 			GameEvents.UpdateTick += GameEvents_UpdateTick;
       MenuEvents.MenuChanged += MenuEvents_MenuChanged;
@@ -98,6 +101,38 @@ namespace NPCMapLocations
 		  GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
 		  GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
 		  GraphicsEvents.Resize += GraphicsEvents_Resize;
+    }
+
+    private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+    {
+      if (NpcMarkers == null) return;
+      if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
+      {
+        SyncedLocationData message = e.ReadAs<SyncedLocationData>();
+        foreach (var marker in NpcMarkers)
+        {
+          if (message.SyncedLocations.TryGetValue(marker.Npc.Name, out var npcLoc))
+          {
+            marker.SyncedLocationName = npcLoc.LocationName;
+            var mapLocation = LocationToMap(npcLoc.LocationName, npcLoc.TileX, npcLoc.TileY);
+            marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
+          }
+        }
+      }
+    }
+
+    private void GameEvents_OneSecondTick(object sender, EventArgs e)
+    {
+      if (Context.IsMainPlayer && Context.IsWorldReady)
+      {
+        SyncedLocationData message = new SyncedLocationData();
+        foreach (NPC npc in GetVillagers())
+        {
+          if (npc == null || npc.currentLocation == null) continue;
+          message.AddNpcLocation(npc.Name, new MapLocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(), npc.getTileY()));
+        }
+        this.Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] { this.ModManifest.UniqueID });
+      }
     }
 
     // Get only relevant villagers for map
@@ -346,22 +381,23 @@ namespace NPCMapLocations
 
 		private void ResetMarkers(List<NPC> villagers)
 		{
-			NpcMarkers = new HashSet<MapMarker>();
+			NpcMarkers = new HashSet<CharacterMarker>();
 			foreach (var npc in villagers)
 			{
 				// Handle case where Kent appears even though he shouldn't
 				if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
 
-				var npcMarker = new MapMarker
+				var npcMarker = new CharacterMarker
 				{
-					Npc = npc,
+          Npc = npc,
+          Marker = npc.Sprite.Texture,
 					IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
 				};
 				NpcMarkers.Add(npcMarker);
 			}
 
 			if (Context.IsMultiplayer)
-				FarmerMarkers = new Dictionary<long, MapMarker>();
+				FarmerMarkers = new Dictionary<long, CharacterMarker>();
 		}
 
 		// To initialize ModMap quicker for smoother rendering when opening map
@@ -426,22 +462,23 @@ namespace NPCMapLocations
     // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
 	  private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp)
 	  {
-	    if (!locationContexts.ContainsKey(location.Name))
-	      locationContexts.Add(location.Name, new LocationContext());
+	    var locationName = location.uniqueName.Value ?? location.Name;
+	    if (!locationContexts.ContainsKey(locationName))
+	      locationContexts.Add(locationName, new LocationContext());
 
       // Pass root location back recursively
 	    if (root != null)
 	    {
-	      locationContexts[location.Name].Root = root;
+	      locationContexts[locationName].Root = root;
         return root;
       }
 
       // Root location found, set as root and return
 	    if (location.IsOutdoors)
 	    {
-	      locationContexts[location.Name].Type = "outdoors";
-        locationContexts[location.Name].Root = location.Name;
-        return location.Name;
+	      locationContexts[locationName].Type = "outdoors";
+        locationContexts[locationName].Root = locationName;
+        return locationName;
 	    }
 
       // Iterate warps of current location and traverse recursively
@@ -452,9 +489,9 @@ namespace NPCMapLocations
 	        hasOutdoorWarp = true;
 
         // If all warps are indoors, then the current location is a room
-	      locationContexts[location.Name].Type = hasOutdoorWarp ? "indoors" : "room";
+	      locationContexts[locationName].Type = hasOutdoorWarp ? "indoors" : "room";
         root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp);
-	      locationContexts[location.Name].Root = root;
+	      locationContexts[locationName].Root = root;
         return root;
 	    }
 
@@ -480,23 +517,28 @@ namespace NPCMapLocations
 
 			foreach (var npcMarker in NpcMarkers)
 			{
-				var npc = npcMarker.Npc;
-				string locationName;
-				var npcLocation = npc.currentLocation;
+			  string locationName;
+			  var npc = npcMarker.Npc;
 
-				// Handle null locations at beginning of new day
-				if (npcLocation == null)
-				{
-					locationName = npc.DefaultMap;
-					npcLocation = Game1.getLocationFromName(locationName);
-				}
-				else
-				{
-					locationName = npc.currentLocation.Name;
-				}
+        if (npcMarker.SyncedLocationName == null)
+			  {
+			    // Handle null locations at beginning of new day
+			    if (npc.currentLocation == null)
+			    {
+			      locationName = npc.DefaultMap;
+			    }
+			    else
+			    {
+			      locationName = npc.currentLocation.Name;
+			    }
+        }
+        else
+        {
+          locationName = npcMarker.SyncedLocationName;
+        }
 
         // Special case for Mines
-			  if (locationName.StartsWith("UndergroundMine"))
+        if (locationName.StartsWith("UndergroundMine"))
 			    locationName = getMinesLocationName(locationName);
 
         if (locationName == null || !MapVectors.TryGetValue(locationName, out var loc))
@@ -510,10 +552,13 @@ namespace NPCMapLocations
 				}
 
 				// For layering indoor/outdoor NPCs and indoor indicator
-				npcMarker.IsOutdoors = npcLocation.IsOutdoors;
+			  if (locationContexts.TryGetValue(locationName, out var locCtx))
+			    npcMarker.IsOutdoors = locCtx.Type == "outdoors";
+			  else
+			    npcMarker.IsOutdoors = false;
 
         // For show Npcs in player's location option
-			  var isSameLocation = false;
+        var isSameLocation = false;
 			  if (Config.OnlySameLocation)
 			  {
 			    if (locationName == Game1.player.currentLocation.Name)
@@ -524,21 +569,21 @@ namespace NPCMapLocations
         }
 
         // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
-				                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
+        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npcMarker.Name)
+				                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npcMarker.Name)
 				                     || Config.OnlySameLocation && !isSameLocation
 				                     || Config.ByHeartLevel
-				                     && !(Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
-				                          >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
+				                     && !(Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
+				                          >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
 				                          <= Config.HeartLevelMax);
 
 				// NPCs that will be drawn onto the map
-				if (!Config.NpcBlacklist.Contains(npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+				if (!Config.NpcBlacklist.Contains(npcMarker.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
 				{
 					// Check if gifted for birthday
 					if (npcMarker.IsBirthday)
-						npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) &&
-						                       Game1.player.friendshipData[npc.Name].GiftsToday == 0;
+						npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Name) &&
+						                       Game1.player.friendshipData[npcMarker.Name].GiftsToday == 0;
 
 					// Check for daily quests
 					foreach (var quest in Game1.player.questLog)
@@ -546,24 +591,22 @@ namespace NPCMapLocations
 							switch (quest.questType.Value)
 							{
 								case 3:
-									npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npc.Name;
+									npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npcMarker.Name;
 									break;
 								case 4:
-									npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npc.Name;
+									npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npcMarker.Name;
 									break;
 								case 7:
-									npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npc.Name;
+									npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npcMarker.Name;
 									break;
 								case 10:
-									npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npc.Name;
+									npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npcMarker.Name;
 									break;
 								default:
 									break;
 							}
 						else
 							npcMarker.HasQuest = false;
-
-					npcMarker.Marker = npc.Sprite.Texture;
 
 					// Establish draw order, higher number infront
 					// Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
@@ -584,11 +627,13 @@ namespace NPCMapLocations
 					}
 					*/
 
-					// Get center of NPC marker 
-					var x = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomMapLocations).X - 16;
-					var y = (int) GetMapPosition(npcLocation, npc.getTileX(), npc.getTileY(), CustomMapLocations).Y - 15;
-
-					npcMarker.MapLocation = new Vector2(x, y);
+				  if (npcMarker.SyncedLocationName == null)
+				  {
+				    // Get center of NPC marker 
+				    var x = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), CustomMapLocations).X - 16;
+				    var y = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), CustomMapLocations).Y - 15;
+				    npcMarker.MapLocation = new Vector2(x, y);
+				  }
 				}
 				else
 				{
@@ -618,7 +663,7 @@ namespace NPCMapLocations
 				}
 
 				var farmerId = farmer.UniqueMultiplayerID;
-				var farmerLoc = GetMapPosition(farmer.currentLocation, farmer.getTileX(), farmer.getTileY(), CustomMapLocations);
+				var farmerLoc = LocationToMap(farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name, farmer.getTileX(), farmer.getTileY(), CustomMapLocations);
 
 				if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 				{
@@ -634,7 +679,7 @@ namespace NPCMapLocations
 				}
 				else
 				{
-					var newMarker = new MapMarker
+					var newMarker = new CharacterMarker
 					{
 						Name = farmer.Name,
 						DrawDelay = 0
@@ -650,28 +695,13 @@ namespace NPCMapLocations
 			}
 		}
 
-		// Helper method for LocationToMap
-		public static Vector2 GetMapPosition(GameLocation location, int tileX, int tileY, Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
-		{
-			if (location == null || tileX < 0 || tileY < 0) return new Vector2(-1000, -1000); ;
-
-			// Handle farm buildings
-			// Match currentLocation.Name with buildingType 
-			// and use uniqueName to get location of buildings with the same currentLocation.Name
-			if (location.IsFarm && !location.Name.Equals("FarmHouse"))
-				if (location.uniqueName.Value != null
-				    && (FarmBuildings[location.uniqueName.Value].Key.Equals(location.Name)
-				        || FarmBuildings[location.uniqueName.Value].Key.Contains("Cabin")))
-					return FarmBuildings[location.uniqueName.Value].Value;
-
-			return LocationToMap(location.Name, tileX, tileY, CustomMapLocations, isPlayer);
-		}
-
 		// MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
 		// Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
 		// Requires MapModConstants and modified map page in ./assets
 	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
-		{
+	  {
+	    if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
+
 		  if (locationName.StartsWith("UndergroundMine"))
 		  {
 		    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
@@ -826,10 +856,7 @@ namespace NPCMapLocations
 			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 200), new Rectangle(3, 0, 1, 1),
 				Color.Black);
 
-		  var locationName = Game1.player.currentLocation.uniqueName.Value != null
-		    ? Game1.player.currentLocation.uniqueName.Value
-		    : Game1.player.currentLocation.Name;
-
+		  var locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
 
       // Show map location and tile positions
       DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth/Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
@@ -870,13 +897,14 @@ namespace NPCMapLocations
 	}
 
 	// Class for map markers
-	public class MapMarker
+	public class CharacterMarker
 	{
 		public string Name { get; set; } // For any customized names; Npc.Name would be vanilla names
+    public NPC Npc { get; set; }
 		public Texture2D Marker { get; set; }
-		public NPC Npc { get; set; }
 		public Vector2 MapLocation { get; set; }
 		public Vector2 PrevMapLocation { get; set; }
+    public string SyncedLocationName { get; set; }
 		public string PrevLocationName { get; set; }
 		public bool IsBirthday { get; set; }
 		public bool HasQuest { get; set; }
