@@ -383,8 +383,7 @@ namespace NPCMapLocations
 		        {
 		          b.Draw(
 		            CustomMarkerTex,
-		            new Vector2(offsetMmLoc.X + locationX - fromAreaRect.Value<int>("Width") / 2, offsetMmLoc.Y + locationY - fromAreaRect.Value<int>("Height") / 2
-		            ),
+		            new Vector2(offsetMmLoc.X + locationX, offsetMmLoc.Y + locationY),
 		            srcRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
 		          );
 

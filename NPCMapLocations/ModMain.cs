@@ -437,7 +437,7 @@ namespace NPCMapLocations
       }
 
       // Root location found, set as root and return
-	    if (location.isOutdoors)
+	    if (location.IsOutdoors)
 	    {
 	      locationContexts[location.Name].Type = "outdoors";
         locationContexts[location.Name].Root = location.Name;
@@ -448,7 +448,7 @@ namespace NPCMapLocations
 	    foreach (var warp in location.warps)
 	    {
         // If one of the warps is a root location, current location is an indoor building 
-	      if (Game1.getLocationFromName(warp.TargetName).isOutdoors)
+	      if (Game1.getLocationFromName(warp.TargetName).IsOutdoors)
 	        hasOutdoorWarp = true;
 
         // If all warps are indoors, then the current location is a room
@@ -672,9 +672,6 @@ namespace NPCMapLocations
 		// Requires MapModConstants and modified map page in ./assets
 	  public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
 		{
-			var mapPagePos =
-				Utility.getTopLeftPositionForCenteringOnScreen(300 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0);
-
 		  if (locationName.StartsWith("UndergroundMine"))
 		  {
 		    var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
@@ -689,12 +686,13 @@ namespace NPCMapLocations
 		    }
       }
 
-		  MapVector[] locVectors = null;
-		  if ((CustomMapLocations != null && !CustomMapLocations.TryGetValue(locationName, out locVectors)) && !ModConstants.MapVectors.TryGetValue(locationName, out locVectors) || locVectors == null)
+      MapVector[] locVectors = null;
+      if ((CustomMapLocations != null && !CustomMapLocations.TryGetValue(locationName, out locVectors)) && !ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
+		    return new Vector2(-1000, -1000);
+      else if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
         return new Vector2(-1000, -1000);
 
-
-			int x;
+      int x;
 			int y;
 
 			// Precise (static) regions and indoor locations
@@ -801,7 +799,7 @@ namespace NPCMapLocations
 			}
 
       // Highlight tile for debug mode
-		  if (HeldKey == SButton.LeftAlt) {
+		  if (DEBUG_MODE && HeldKey == SButton.LeftAlt) {
         Game1.spriteBatch.Draw(Game1.mouseCursors,
 		      new Vector2(
 		        Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
@@ -828,9 +826,10 @@ namespace NPCMapLocations
 			Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 425, 200), new Rectangle(3, 0, 1, 1),
 				Color.Black);
 
-		  var locationName = Game1.player.currentLocation.Name == "Cabin"
+		  var locationName = Game1.player.currentLocation.uniqueName.Value != null
 		    ? Game1.player.currentLocation.uniqueName.Value
 		    : Game1.player.currentLocation.Name;
+
 
       // Show map location and tile positions
       DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth/Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
