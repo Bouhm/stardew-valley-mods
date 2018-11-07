@@ -457,7 +457,7 @@ namespace NPCMapLocations
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out CharacterMarker farMarker))
             if (farMarker == null || farMarker.MapLocation.X < 0)
 					    continue;
-				    if (farMarker.DrawDelay == 0)
+				    if (farMarker != null && farMarker.DrawDelay == 0)
 				    {
 				      farmer.FarmerRenderer.drawMiniPortrat(b,
 				        new Vector2(mapX + farMarker.MapLocation.X - 16, mapY + farMarker.MapLocation.Y - 15),

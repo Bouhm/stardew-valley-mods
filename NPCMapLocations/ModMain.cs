@@ -21,7 +21,7 @@ namespace NPCMapLocations
   {
     private const int DRAW_DELAY = 3;
     public static SButton HeldKey;
-    public static bool LOCATION_SYNC = false; // Experimental features
+    public static bool LOCATION_SYNC = true; // Experimental features
 
     // Debugging
     private static bool DEBUG_MODE;
@@ -86,14 +86,11 @@ namespace NPCMapLocations
         Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-      /*
       if (LOCATION_SYNC)
       {
         GameEvents.OneSecondTick += GameEvents_OneSecondTick;
         Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       }
-      */
-
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
       LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
@@ -184,7 +181,7 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
-      Config = Helper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
       CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
@@ -242,7 +239,7 @@ namespace NPCMapLocations
       if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
       // ModMenu
@@ -295,13 +292,13 @@ namespace NPCMapLocations
       {
         if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
 
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
       else
       {
         if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
 
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
     }
 
@@ -407,7 +404,6 @@ namespace NPCMapLocations
       UpdateMarkers(updateForMinimap);
     }
 
-    /*
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
       if (Context.IsMainPlayer && Context.IsWorldReady)
@@ -444,7 +440,6 @@ namespace NPCMapLocations
           }
       }
     }
-    */
 
     private void OpenModMap(GameMenu gameMenu)
     {
