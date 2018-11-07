@@ -533,7 +533,7 @@ namespace NPCMapLocations
           if (npc.currentLocation == null)
             locationName = npc.DefaultMap;
           else
-            locationName = npc.currentLocation.Name;
+            locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
         }
         else
         {
@@ -544,7 +544,7 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || !MapVectors.TryGetValue(locationName, out var loc))
+        if (locationName == null || (!locationName.Contains("Cabin") && !MapVectors.TryGetValue(locationName, out var loc)))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
@@ -650,12 +650,12 @@ namespace NPCMapLocations
       foreach (var farmer in Game1.getOnlineFarmers())
       {
         if (farmer?.currentLocation == null) continue;
-        var locationName = farmer.currentLocation.Name;
+        var locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (!MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        if (!locationName.Contains("Cabin") && !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
           if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
           {
             Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
