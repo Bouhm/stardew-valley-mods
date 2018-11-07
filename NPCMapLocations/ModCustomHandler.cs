@@ -20,7 +20,6 @@ namespace NPCMapLocations
 		private Dictionary<string, string> CustomNames; // For handling custom names
 		private Dictionary<string, int> MarkerCropOffsets;
 		private HashSet<string> NpcCustomizations;
-		private string CustomNpcNames;
 
 		public ModCustomHandler(IModHelper helper, ModConfig config, IMonitor monitor)
 		{
@@ -60,7 +59,7 @@ namespace NPCMapLocations
 
 				this.Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Info);
 			}
-			this.Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+			this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		// Load recolored map if user has recolor mods

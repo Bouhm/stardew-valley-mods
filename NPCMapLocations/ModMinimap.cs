@@ -20,7 +20,6 @@ namespace NPCMapLocations
 	  private readonly string MapName;
 
 	  private readonly Dictionary<string, MapVector[]> CustomMapLocations;
-	  private readonly Dictionary<string, Rectangle> CustomMapMarkers;
 	  private readonly Texture2D CustomMarkerTex;
 
     public bool isBeingDragged;
@@ -103,7 +102,7 @@ namespace NPCMapLocations
 		    isBeingDragged = false;
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
-		    Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+		    Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		    drawDelay = 30;
 		  }
 		}

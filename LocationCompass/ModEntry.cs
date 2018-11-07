@@ -36,7 +36,7 @@ namespace LocationCompass
       config = helper.ReadConfig<ModConfig>();
       pointer =
         helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
-      constants = this.helper.ReadJsonFile<ModData>("constants.json") ?? new ModData();
+      constants = this.helper.Data.ReadJsonFile<ModData>("constants.json") ?? new ModData();
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
@@ -67,7 +67,7 @@ namespace LocationCompass
           MapRootLocations(location, null, null, false, new Vector2(-1000, -1000));
 
       foreach (var location in Game1.getFarm().buildings)
-        MapRootLocations(location.indoors, null, null, false, new Vector2(-1000, -1000));
+        MapRootLocations(location.indoors.Value, null, null, false, new Vector2(-1000, -1000));
     }
 
     private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
@@ -564,8 +564,6 @@ namespace LocationCompass
 
     private void DrawLocators()
     {
-      var currLocation = "";
-
       // Individual locators, onscreen or offscreen
       foreach (var locPair in locators)
       {
