@@ -9,7 +9,8 @@ namespace LocationCompass
     class ModConfig
     {
         public bool Toggle { get; set; } = false;
-        public string ShowKeyCode { get; set; } = "LeftAlt";
+        public string HoldKeyCode { get; set; } = "Tab";
+        public bool ShowFarmersOnly { get; set; } = true;
         public List<string> NPCBlacklist { get; set; } = new List<string>();
     }
 }

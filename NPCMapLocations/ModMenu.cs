@@ -473,7 +473,6 @@ namespace NPCMapLocations
 	{
 		private readonly ModConfig Config;
 		private readonly Dictionary<string, string> CustomNames;
-		private readonly Dictionary<string, Dictionary<string, int>> CustomNpcs;
 		private readonly IModHelper Helper;
 		private readonly Dictionary<string, int> MarkerCropOffsets;
 		private readonly List<string> orderedNames;
@@ -580,7 +579,7 @@ namespace NPCMapLocations
 				}
 			}
 
-			Helper.WriteConfig(Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -685,7 +684,7 @@ namespace NPCMapLocations
 					break;
 			}
 
-			Helper.WriteConfig(Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void receiveLeftClick(int x, int y)
@@ -825,7 +824,7 @@ namespace NPCMapLocations
 					break;
 			}
 
-			Helper.WriteConfig(Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void receiveKeyPress(Keys key)
