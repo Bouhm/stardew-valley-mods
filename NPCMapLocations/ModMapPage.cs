@@ -112,26 +112,30 @@ namespace NPCMapLocations
 
 			const int markerWidth = 32;
 			const int markerHeight = 30;
+
 			// Have to use special character to separate strings for Chinese
 			string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh)
 				? "，"
 				: ", ";
 
-			foreach (CharacterMarker npcMarker in this.NpcMarkers)
-			{
-				Vector2 npcLocation = new Vector2(mapX + npcMarker.MapLocation.X, mapY + npcMarker.MapLocation.Y);
-				if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
-				    Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
-				{
-					if (this.CustomNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
-						hoveredList.Add(this.CustomNames[npcMarker.Npc.Name]);
+		  if (NpcMarkers != null)
+		  {
+		    foreach (CharacterMarker npcMarker in this.NpcMarkers)
+		    {
+		      Vector2 npcLocation = new Vector2(mapX + npcMarker.MapLocation.X, mapY + npcMarker.MapLocation.Y);
+		      if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
+		          Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
+		      {
+		        if (this.CustomNames.ContainsKey(npcMarker.Npc.Name) && !npcMarker.IsHidden)
+		          hoveredList.Add(this.CustomNames[npcMarker.Npc.Name]);
 
-					if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
-						hasIndoorCharacter = true;
-				}
-			}
-			
-			if (Context.IsMultiplayer)
+		        if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
+		          hasIndoorCharacter = true;
+		      }
+		    }
+		  }
+
+		  if (Context.IsMultiplayer)
 			{
 				foreach (CharacterMarker farMarker in FarmerMarkers.Values)
 				{
@@ -175,82 +179,84 @@ namespace NPCMapLocations
 			DrawMap(b);
 			DrawMarkers(b);
 
-			int x = Game1.getMouseX() + Game1.tileSize / 2;
-			int y = Game1.getMouseY() + Game1.tileSize / 2;
-			int width;
-			int height;
-			int offsetY = 0;
+      int x = Game1.getMouseX() + Game1.tileSize / 2;
+      int y = Game1.getMouseY() + Game1.tileSize / 2;
+      int width;
+      int height;
+      int offsetY = 0;
 
-			this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
+      this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
-			if (!hoveredLocationText.Equals(""))
-			{
-				IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1,
-					-1, -1, 1f, null);
-				int textLength = (int) Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2;
-				width = Math.Max((int) Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2, textLength);
-				height = (int) Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + Game1.tileSize / 2);
-				if (x + width > Game1.viewport.Width)
-				{
-					x = Game1.viewport.Width - width;
-					y += Game1.tileSize / 4;
-				}
+      if (!hoveredLocationText.Equals(""))
+      {
+        IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1,
+          -1, -1, 1f, null);
+        int textLength = (int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2;
+        width = Math.Max((int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2, textLength);
+        height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + Game1.tileSize / 2);
+        if (x + width > Game1.viewport.Width)
+        {
+          x = Game1.viewport.Width - width;
+          y += Game1.tileSize / 4;
+        }
 
-				if (this.Config.NameTooltipMode == 1)
-				{
-					if (y + height > Game1.viewport.Height)
-					{
-						x += Game1.tileSize / 4;
-						y = Game1.viewport.Height - height;
-					}
+        if (this.Config.NameTooltipMode == 1)
+        {
+          if (y + height > Game1.viewport.Height)
+          {
+            x += Game1.tileSize / 4;
+            y = Game1.viewport.Height - height;
+          }
 
-					offsetY = 2 - Game1.tileSize;
-				}
-				else if (this.Config.NameTooltipMode == 2)
-				{
-					if (y + height > Game1.viewport.Height)
-					{
-						x += Game1.tileSize / 4;
-						y = Game1.viewport.Height - height;
-					}
+          offsetY = 2 - Game1.tileSize;
+        }
+        else if (this.Config.NameTooltipMode == 2)
+        {
+          if (y + height > Game1.viewport.Height)
+          {
+            x += Game1.tileSize / 4;
+            y = Game1.viewport.Height - height;
+          }
 
-					offsetY = height - 4;
-				}
-				else
-				{
-					if (y + height > Game1.viewport.Height)
-					{
-						x += Game1.tileSize / 4;
-						y = Game1.viewport.Height - height;
-					}
-				}
+          offsetY = height - 4;
+        }
+        else
+        {
+          if (y + height > Game1.viewport.Height)
+          {
+            x += Game1.tileSize / 4;
+            y = Game1.viewport.Height - height;
+          }
+        }
 
-				// Draw name tooltip positioned around location tooltip
-				DrawNames(b, hoveredNames, x, y, offsetY, height, this.Config.NameTooltipMode);
+        // Draw name tooltip positioned around location tooltip
+        DrawNames(b, hoveredNames, x, y, offsetY, height, this.Config.NameTooltipMode);
 
-				// Draw location tooltip
-				IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height,
-					Color.White, 1f, false);
-				b.DrawString(Game1.smallFont, hoveredLocationText,
-					new Vector2((float) (x + Game1.tileSize / 4), (float) (y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f),
-					Game1.textShadowColor);
-				b.DrawString(Game1.smallFont, hoveredLocationText,
-					new Vector2((float) (x + Game1.tileSize / 4), (float) (y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f),
-					Game1.textShadowColor);
-				b.DrawString(Game1.smallFont, hoveredLocationText,
-					new Vector2((float) (x + Game1.tileSize / 4), (float) (y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f),
-					Game1.textShadowColor);
-				b.DrawString(Game1.smallFont, hoveredLocationText,
-					new Vector2((float) (x + Game1.tileSize / 4), (float) (y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
-			}
-			else
-			{
-				// Draw name tooltip only
-				DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, this.Config.NameTooltipMode);
-			}
+        // Draw location tooltip
+        IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height,
+          Color.White, 1f, false);
+        b.DrawString(Game1.smallFont, hoveredLocationText,
+          new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 2f),
+          Game1.textShadowColor);
+        b.DrawString(Game1.smallFont, hoveredLocationText,
+          new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(0f, 2f),
+          Game1.textShadowColor);
+        b.DrawString(Game1.smallFont, hoveredLocationText,
+          new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)) + new Vector2(2f, 0f),
+          Game1.textShadowColor);
+        b.DrawString(Game1.smallFont, hoveredLocationText,
+          new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
+      }
+      else
+      {
+        // Draw name tooltip only
+        DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, this.Config.NameTooltipMode);
+      }
 
-			// Draw indoor icon
-			if (hasIndoorCharacter && !String.IsNullOrEmpty(hoveredNames))
+      
+
+      // Draw indoor icon
+      if (hasIndoorCharacter && !String.IsNullOrEmpty(hoveredNames))
 				b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
 					Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
 
@@ -471,68 +477,71 @@ namespace NPCMapLocations
 
 			// NPCs
 			// Sort by drawing order
-			var sortedMarkers = NpcMarkers.ToList();
-			sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
+		  if (NpcMarkers != null)
+		  {
+        var sortedMarkers = NpcMarkers.ToList();
+        sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-			foreach (CharacterMarker npcMarker in sortedMarkers)
-			{
-				// Skip if no specified location
-				if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
-				    !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
-				{
-					continue;
-				}
+        foreach (CharacterMarker npcMarker in sortedMarkers)
+        {
+          // Skip if no specified location
+          if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
+              !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
+          {
+            continue;
+          }
 
-				// Tint/dim hidden markers
-				if (npcMarker.IsHidden)
-				{
-					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapX + npcMarker.MapLocation.X), (int) (mapY + npcMarker.MapLocation.Y),
-							32, 30),
-						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
-					if (npcMarker.IsBirthday)
-					{
-						// Gift icon
-						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
-							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
-							SpriteEffects.None, 0f);
-					}
+          // Tint/dim hidden markers
+          if (npcMarker.IsHidden)
+          {
+            b.Draw(npcMarker.Marker,
+              new Rectangle((int)(mapX + npcMarker.MapLocation.X), (int)(mapY + npcMarker.MapLocation.Y),
+                32, 30),
+              new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.DimGray * 0.7f);
+            if (npcMarker.IsBirthday)
+            {
+              // Gift icon
+              b.Draw(Game1.mouseCursors,
+                new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
+                new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
+                SpriteEffects.None, 0f);
+            }
 
-					if (npcMarker.HasQuest)
-					{
-						// Quest icon
-						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
-							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
-							SpriteEffects.None, 0f);
-					}
-				}
-				else
-				{
-					b.Draw(npcMarker.Marker,
-						new Rectangle((int) (mapX + npcMarker.MapLocation.X), (int) (mapY + npcMarker.MapLocation.Y),
-							32, 30),
-						new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
-					if (npcMarker.IsBirthday)
-					{
-						// Gift icon
-						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
-							new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
-							0f);
-					}
+            if (npcMarker.HasQuest)
+            {
+              // Quest icon
+              b.Draw(Game1.mouseCursors,
+                new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
+                new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.DimGray * 0.7f, 0f, Vector2.Zero, 1.8f,
+                SpriteEffects.None, 0f);
+            }
+          }
+          else
+          {
+            b.Draw(npcMarker.Marker,
+              new Rectangle((int)(mapX + npcMarker.MapLocation.X), (int)(mapY + npcMarker.MapLocation.Y),
+                32, 30),
+              new Rectangle?(new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), Color.White);
+            if (npcMarker.IsBirthday)
+            {
+              // Gift icon
+              b.Draw(Game1.mouseCursors,
+                new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
+                new Rectangle?(new Rectangle(147, 412, 10, 11)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
+                0f);
+            }
 
-					if (npcMarker.HasQuest)
-					{
-						// Quest icon
-						b.Draw(Game1.mouseCursors,
-							new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
-							new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
-							0f);
-					}
-				}
-			}
+            if (npcMarker.HasQuest)
+            {
+              // Quest icon
+              b.Draw(Game1.mouseCursors,
+                new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
+                new Rectangle?(new Rectangle(403, 496, 5, 14)), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
+                0f);
+            }
+          }
+        }
+      }
 		}
 
 		// Draw NPC name tooltips map page

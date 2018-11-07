@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using Netcode;
+using NPCMapLocations;
 using StardewValley;
 
 namespace LocationCompass
@@ -20,6 +21,7 @@ namespace LocationCompass
     private static Texture2D pointer;
     private static ModData constants;
     private static List<Character> characters;
+    private static SyncedLocationData syncedLocationData;
     private static Dictionary<string, LocationContext> locationContexts; // Mapping of locations to root locations
     private static Dictionary<string, List<Locator>> locators;
     private static Dictionary<string, LocatorScroller> activeWarpLocators; // Active indices of locators of doors
@@ -39,6 +41,7 @@ namespace LocationCompass
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+      Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       GameEvents.UpdateTick += GameEvents_UpdateTick;
       InputEvents.ButtonPressed += InputEvents_ButtonPressed;
       GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
@@ -46,31 +49,13 @@ namespace LocationCompass
       ControlEvents.KeyPressed += ControlEvents_KeyPressed;
       ControlEvents.KeyReleased += ControlEvents_KeyReleased;
     }
-
-    private void GameEvents_OneSecondTick(object sender, EventArgs e)
-    {
-      if (characters != null && Context.IsMultiplayer)
-      {
-        foreach (var farmer in Game1.getOnlineFarmers())
-        {
-          if (!characters.Contains(farmer))
-            characters.Add(farmer);
-        }
-      }
-
-      var a = locationContexts;
-    }
-
+    
     private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
     {
       characters = new List<Character>();
-
-      if (Context.IsMainPlayer)
+      foreach (var NPC in GetVillagers())
       {
-        foreach (var NPC in GetVillagers())
-        {
-          characters.Add(NPC);
-        }
+        characters.Add(NPC);
       }
     }
 
@@ -105,7 +90,42 @@ namespace LocationCompass
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
       activeWarpLocators = new Dictionary<string, LocatorScroller>();
+      syncedLocationData = new SyncedLocationData();
       GetLocationContexts();
+    }
+
+    private void GameEvents_OneSecondTick(object sender, EventArgs e)
+    {
+      if (!Context.IsWorldReady) return;
+
+      if (characters != null && Context.IsMultiplayer)
+      {
+        foreach (var farmer in Game1.getOnlineFarmers())
+        {
+          if (!characters.Contains(farmer))
+            characters.Add(farmer);
+        }
+      }
+      
+      if (Context.IsMainPlayer)
+      {
+        syncedLocationData = new SyncedLocationData();
+        foreach (var npc in GetVillagers())
+        {
+          if (npc == null || npc.currentLocation == null) continue;
+          syncedLocationData.AddNpcLocation(npc.Name,
+            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
+              (int)npc.Position.Y));
+        }
+
+        Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", new[] { ModManifest.UniqueID });
+      }
+    }
+
+    private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+    {
+      if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedLocationData")
+        syncedLocationData = e.ReadAs<SyncedLocationData>();
     }
 
     // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
@@ -117,8 +137,8 @@ namespace LocationCompass
       // There can be multiple warps to the same location
       if (location == prevLocation) return root;
 
-      var currLocationName = location.Name == "Cabin" ? location.uniqueName.Value : location.Name;
-      var prevLocationName = prevLocation != null && prevLocation.Name == "Cabin" ? prevLocation.uniqueName.Value : prevLocation?.Name;
+      var currLocationName = location.uniqueName.Value ?? location.Name;
+      var prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
      
       if (!locationContexts.ContainsKey(currLocationName))
         locationContexts.Add(currLocationName, new LocationContext());
@@ -254,17 +274,17 @@ namespace LocationCompass
       foreach (var character in characters)
       {
         if (character.currentLocation == null) continue;
+        if (!syncedLocationData.SyncedLocations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
 
-
-        var playerLoc = Game1.player.currentLocation;
-        var characterLoc = character.currentLocation;
-        var playerLocName = playerLoc.Name == "Cabin" ? playerLoc.uniqueName.Value : playerLoc.Name;
-        var charLocName = characterLoc.Name == "Cabin" ? characterLoc.uniqueName.Value : characterLoc.Name;
-
+        var playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+        var charLocName = character is Farmer
+          ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
+          : npcLoc.LocationName;
+        var isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
 
         if (charLocName.StartsWith("UndergroundMine"))
         {
-          if (!playerLoc.IsOutdoors)
+          if (!isPlayerLocOutdoors)
           {
             continue;
           }
@@ -297,15 +317,31 @@ namespace LocationCompass
             Game1.player.position.Y);
         var IsWarp = false;
         var isOnScreen = false;
-        
+
+        Vector2 charPosition;
+        int charSpriteHeight;
+
+        if (character is Farmer)
+        {
+          charPosition = character.Position;
+          var farmer = (Farmer) character;
+          charSpriteHeight = farmer.FarmerSprite.SpriteHeight;
+
+        }
+        else
+        {
+          charPosition = new Vector2(npcLoc.PositionX, npcLoc.PositionY);
+          charSpriteHeight = character.Sprite.SpriteHeight;
+        }
+
         // Player and character in same location
-        if (playerLoc == characterLoc)
+        if (playerLocName == charLocName)
         {
           // Don't include locator if character is visible on screen
-          if (Utility.isOnScreen(new Vector2(character.position.X, character.position.Y), Game1.tileSize / 4))
+          if (Utility.isOnScreen(charPosition, Game1.tileSize / 4))
             continue;
 
-          characterPos = new Vector2(character.position.X + character.Sprite.SpriteHeight / 2 * Game1.pixelZoom, character.position.Y);
+          characterPos = new Vector2(charPosition.X + charSpriteHeight / 2 * Game1.pixelZoom, charPosition.Y);
         }
         // Indoor locations
         // Intended behavior is for all characters in a building, including rooms within the building
@@ -318,13 +354,13 @@ namespace LocationCompass
           // Finds the upper-most indoor location that the player is in
           var indoor = GetTargetIndoor(playerLocName, charLocName);
           if (indoor == null) continue;
-          if (playerLoc.Name != characterLocCtx.Root && playerLoc.Name != indoor) continue;
+          if (playerLocName != characterLocCtx.Root && playerLocName != indoor) continue;
           IsWarp = true;
-          charLocName = (playerLoc.IsOutdoors || characterLocCtx.Type != "room") ? indoor : charLocName;
+          charLocName = (isPlayerLocOutdoors || characterLocCtx.Type != "room") ? indoor : charLocName;
           
 
             // Point locators to the warps
-            if (!playerLoc.IsOutdoors)
+            if (!isPlayerLocOutdoors)
             {
               // Doors that lead to connected rooms to character
               if (characterLocCtx.Parent == playerLocName)

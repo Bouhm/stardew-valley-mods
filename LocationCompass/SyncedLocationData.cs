@@ -1,9 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 
 namespace NPCMapLocations
 {
@@ -33,14 +28,14 @@ namespace NPCMapLocations
   internal class LocationData
   {
     public string LocationName { get; set; }
-    public int TileX { get; set; }
-    public int TileY { get; set; }
+    public int PositionX { get; set; }
+    public int PositionY { get; set; }
 
-    public LocationData(string locationName, int tileX, int tileY)
+    public LocationData(string locationName, int positionX, int positionY)
     {
       this.LocationName = locationName;
-      this.TileX = tileX;
-      this.TileY = tileY;
+      this.PositionX = positionX;
+      this.PositionY = positionY;
     }
   }
 }
