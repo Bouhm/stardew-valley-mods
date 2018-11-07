@@ -87,7 +87,6 @@ namespace NPCMapLocations
 
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;
       /*
-      // COMMENT OUT FOR STABLE RELEASE
       if (LOCATION_SYNC)
       {
         GameEvents.OneSecondTick += GameEvents_OneSecondTick;
@@ -185,7 +184,7 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+      Config = Helper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
       CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
@@ -243,7 +242,7 @@ namespace NPCMapLocations
       if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
-        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
       // ModMenu
@@ -296,13 +295,13 @@ namespace NPCMapLocations
       {
         if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
 
-        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
       else
       {
         if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
 
-        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
     }
 
@@ -408,6 +407,7 @@ namespace NPCMapLocations
       UpdateMarkers(updateForMinimap);
     }
 
+    /*
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
       if (Context.IsMainPlayer && Context.IsWorldReady)
@@ -444,6 +444,7 @@ namespace NPCMapLocations
           }
       }
     }
+    */
 
     private void OpenModMap(GameMenu gameMenu)
     {

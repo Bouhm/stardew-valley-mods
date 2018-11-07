@@ -27,7 +27,7 @@ namespace NPCMapLocations
     public string MenuKey { get; set; } = "Tab";
 		public string TooltipKey { get; set; } = "Space";
 	  public string MinimapDragKey { get; set; } = "LeftAlt";
-	  public string MinimapToggleKey { get; set; } = "OemTilde";
+	  public string MinimapToggleKey { get; set; } = "OemPipe";
 		public Dictionary<string, int> CustomCropOffsets { get; set; } = new Dictionary<string, int>();
 		public bool ShowFarmBuildings { get; set; } = true;
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();

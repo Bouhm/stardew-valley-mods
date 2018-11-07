@@ -579,7 +579,7 @@ namespace NPCMapLocations
 				}
 			}
 
-			Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -684,7 +684,7 @@ namespace NPCMapLocations
 					break;
 			}
 
-			Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void receiveLeftClick(int x, int y)
@@ -824,7 +824,7 @@ namespace NPCMapLocations
 					break;
 			}
 
-			Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+			Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
 
 		public override void receiveKeyPress(Keys key)

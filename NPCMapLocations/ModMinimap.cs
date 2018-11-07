@@ -102,7 +102,7 @@ namespace NPCMapLocations
 		    isBeingDragged = false;
 		    Config.MinimapX = mmX;
 		    Config.MinimapY = mmY;
-		    Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+		    Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		    drawDelay = 30;
 		  }
 		}
