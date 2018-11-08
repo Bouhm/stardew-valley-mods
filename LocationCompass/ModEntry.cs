@@ -44,7 +44,6 @@ namespace LocationCompass
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       GameEvents.UpdateTick += GameEvents_UpdateTick;
       InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-      GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
       GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
       ControlEvents.KeyPressed += ControlEvents_KeyPressed;
       ControlEvents.KeyReleased += ControlEvents_KeyReleased;
@@ -102,6 +101,7 @@ namespace LocationCompass
       {
         foreach (var farmer in Game1.getOnlineFarmers())
         {
+          if (farmer == Game1.player) continue;
           if (!characters.Contains(farmer))
             characters.Add(farmer);
         }
@@ -109,15 +109,6 @@ namespace LocationCompass
       
       if (Context.IsMainPlayer)
       {
-        syncedLocationData = new SyncedLocationData();
-        foreach (var npc in GetVillagers())
-        {
-          if (npc == null || npc.currentLocation == null) continue;
-          syncedLocationData.AddNpcLocation(npc.Name,
-            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
-              (int)npc.Position.Y));
-        }
-
         Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", new[] { ModManifest.UniqueID });
       }
     }
@@ -159,7 +150,7 @@ namespace LocationCompass
       }
 
       // Root location found, set as root and return
-      if (location.isOutdoors)
+      if (location.IsOutdoors)
       {
         locationContexts[currLocationName].Type = "outdoors";
         locationContexts[currLocationName].Root = currLocationName;
@@ -248,14 +239,28 @@ namespace LocationCompass
 
     private void ControlEvents_KeyReleased(object sender, EventArgsKeyPressed e)
     {
-      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !config.Toggle)
+      if (!Context.IsWorldReady) return;
+
+      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      {
         showLocators = false;
+        Game1.displayHUD = true;
+      }
     }
 
     private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
     {
-      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode))
-        showLocators = true;
+      if (!Context.IsWorldReady) return;
+      
+      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      {
+        // Hide HUD to show locators
+        if (Game1.displayHUD)
+        {
+          showLocators = true;
+          Game1.displayHUD = false;
+        }
+      }
     }
 
     private void GameEvents_UpdateTick(object sender, EventArgs e)
@@ -263,8 +268,32 @@ namespace LocationCompass
       if (!Context.IsWorldReady)
         return;
 
-      if (!Game1.paused && showLocators)
+      if (!Game1.paused && showLocators && syncedLocationData != null)
+      {
+        if (Context.IsMainPlayer)
+        {
+          getSyncedLocationData();
+        }
         UpdateLocators();
+      }
+    }
+
+    private void getSyncedLocationData()
+    {
+      foreach (var npc in GetVillagers())
+      {
+        if (npc == null || npc.currentLocation == null) continue;
+        if (syncedLocationData.SyncedLocations.TryGetValue(npc.Name, out var locationData))
+        {
+          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X, (int)npc.Position.Y);
+        }
+        else
+        {
+          syncedLocationData.AddNpcLocation(npc.Name,
+            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
+              (int)npc.Position.Y));
+        }
+      }
     }
 
     private void UpdateLocators()
@@ -554,16 +583,9 @@ namespace LocationCompass
       }
     }
 
-    private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
-    {
-      if (!Context.IsWorldReady) return;
-
-      if (showLocators && !Game1.paused)
-        DrawLocators();
-    }
-
     private void DrawLocators()
     {
+
       // Individual locators, onscreen or offscreen
       foreach (var locPair in locators)
       {
@@ -795,7 +817,12 @@ namespace LocationCompass
 
     private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
     {
-      if (!DEBUG_MODE || !Context.IsWorldReady || locators == null)
+      if (!Context.IsWorldReady || locators == null) return;
+
+      if (showLocators)
+        DrawLocators();
+
+      if (!DEBUG_MODE)
         return;
 
       foreach (var locPair in locators)
