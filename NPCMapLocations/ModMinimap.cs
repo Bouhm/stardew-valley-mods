@@ -401,7 +401,7 @@ namespace NPCMapLocations
 		          b.Draw(
 		            CustomMarkerTex,
 		            new Vector2(offsetMmLoc.X + locationX, offsetMmLoc.Y + locationY),
-		            srcRect, Color.White * 0.5f, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+		            srcRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
 		          );
 
 		        }
@@ -520,7 +520,7 @@ namespace NPCMapLocations
               new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X),
                 NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y),
                 30, 32),
-              new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White * 0.5f);
+              new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White);
             if (npcMarker.IsBirthday)
               b.Draw(Game1.mouseCursors,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 20),
@@ -533,7 +533,7 @@ namespace NPCMapLocations
               b.Draw(Game1.mouseCursors,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 22),
                   NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y - 3)),
-                new Rectangle(403, 496, 5, 14), Color.White * 0.5f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
+                new Rectangle(403, 496, 5, 14), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
                 0f);
           }
         }

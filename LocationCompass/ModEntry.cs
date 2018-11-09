@@ -56,6 +56,7 @@ namespace LocationCompass
       {
         characters.Add(NPC);
       }
+      UpdateLocators();
     }
 
     private void GetLocationContexts()
@@ -106,7 +107,7 @@ namespace LocationCompass
             characters.Add(farmer);
         }
       }
-      
+
       if (Context.IsMainPlayer)
       {
         Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", new[] { ModManifest.UniqueID });
@@ -751,7 +752,7 @@ namespace LocationCompass
           }
           else
           {
-            locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 54), 0f, 3f, 0, locator.Farmer);
+            locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
           }
 
           if (locator.IsOnScreen || isHovering)
