@@ -544,7 +544,7 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || (!locationName.Contains("Cabin") && !MapVectors.TryGetValue(locationName, out var loc)))
+        if (locationName == null || (!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
@@ -655,12 +655,15 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (!locationName.Contains("Cabin") && !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        if ((!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) &&
+            !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        {
           if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
           {
             Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
             alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
           }
+        }
 
         var farmerId = farmer.UniqueMultiplayerID;
         var farmerLoc = LocationToMap(farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name,

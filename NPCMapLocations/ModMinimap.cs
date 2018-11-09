@@ -41,8 +41,9 @@ namespace NPCMapLocations
 		private int prevMouseX;
 		private int prevMouseY;
 	  private int drawDelay = 0;
+	  //private RenderTarget2D renderTarget;
 
-		public ModMinimap(
+    public ModMinimap(
 			HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, bool> secondaryNpcs,
 			Dictionary<long, CharacterMarker> farmerMarkers,
@@ -56,7 +57,8 @@ namespace NPCMapLocations
 			Texture2D CustomMarkerTex = null
     )
 		{
-			this.NpcMarkers = npcMarkers;
+      // renderTarget = new RenderTarget2D(Game1.graphics.GraphicsDevice,Game1.viewport.Width, Game1.viewport.Height);
+      this.NpcMarkers = npcMarkers;
 		  this.SecondaryNpcs = secondaryNpcs;
 		  this.FarmerMarkers = farmerMarkers;
 			this.MarkerCropOffsets = MarkerCropOffsets;
@@ -183,9 +185,10 @@ namespace NPCMapLocations
 		// Center or the player's position is used as reference; player is not center when reaching edge of map
 		public void DrawMiniMap()
 		{
-		  var IsHoveringMinimap = false;
+		  var b = Game1.spriteBatch;
+      var IsHoveringMinimap = false;
 		  var offsetMmX = mmX + offset;
-
+      
       // Move minimap along with mouse when held down
       if (Game1.getMouseX() > offsetMmX - borderWidth && Game1.getMouseX() < offsetMmX + mmWidth + borderWidth &&
 			    Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
@@ -205,13 +208,19 @@ namespace NPCMapLocations
 			}
 
       // Make transparent on hover
-			var b = Game1.spriteBatch;
 			var color = IsHoveringMinimap
 				? Color.White * 0.5f
 				: Color.White;
 
-      // Draw map
-			b.Draw(map, new Vector2(offsetMmX, mmY),
+      // Experimental stuff for uniform opacity using render target
+      // Doesn't seem to work due to dynamic background colors and
+      // An issue with doing this in PreRenderHud
+		  // Game1.graphics.GraphicsDevice.SetRenderTarget(renderTarget);
+		  // Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
+      // b.spriteBatch.End()
+      // b.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+
+		  b.Draw(map, new Vector2(offsetMmX, mmY),
 				new Rectangle((int) Math.Floor(cropX / Game1.pixelZoom),
 					(int) Math.Floor(cropY / Game1.pixelZoom), mmWidth / Game1.pixelZoom + 2,
 					mmHeight / Game1.pixelZoom + 2), color, 0f, Vector2.Zero,
@@ -224,7 +233,7 @@ namespace NPCMapLocations
 		    if (drawDelay == 0)
 		    {
 		      if (!IsHoveringMinimap)
-		        DrawMarkers(b);
+		        DrawMarkers();
 		    }
 		    else
 		      drawDelay--;
@@ -253,10 +262,19 @@ namespace NPCMapLocations
 				new Rectangle(48, 304, borderWidth, borderWidth), color * 1.5f);
 			b.Draw(Game1.menuTexture, new Rectangle(offsetMmX - borderWidth, mmY + mmHeight, borderWidth, borderWidth),
 				new Rectangle(0, 304, borderWidth, borderWidth), color * 1.5f);
+
+      // b.End();
+		  // Game1.graphics.GraphicsDevice.SetRenderTarget(null);
+		  // Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
+		  // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+      // b.Draw(renderTarget, new Rectangle(0, 0, 400, 240), Color.White * opacity);
+		  // b.End();
+		  // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 		}
 
-		private void DrawMarkers(SpriteBatch b)
+		private void DrawMarkers()
 		{
+		  var b = Game1.spriteBatch;
 			var color = Color.White;
 		  var offsetMmX = mmX + offset;
       var offsetMmLoc = new Vector2(mmLoc.X + offset, mmLoc.Y);
@@ -383,7 +401,7 @@ namespace NPCMapLocations
 		          b.Draw(
 		            CustomMarkerTex,
 		            new Vector2(offsetMmLoc.X + locationX, offsetMmLoc.Y + locationY),
-		            srcRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+		            srcRect, Color.White * 0.5f, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
 		          );
 
 		        }
@@ -502,7 +520,7 @@ namespace NPCMapLocations
               new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X),
                 NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y),
                 30, 32),
-              new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White);
+              new Rectangle(0, MarkerCropOffsets[npcMarker.Npc.Name], 16, 15), Color.White * 0.5f);
             if (npcMarker.IsBirthday)
               b.Draw(Game1.mouseCursors,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 20),
@@ -515,7 +533,7 @@ namespace NPCMapLocations
               b.Draw(Game1.mouseCursors,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 22),
                   NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y - 3)),
-                new Rectangle(403, 496, 5, 14), Color.White, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
+                new Rectangle(403, 496, 5, 14), Color.White * 0.5f, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
                 0f);
           }
         }

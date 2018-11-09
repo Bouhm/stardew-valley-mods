@@ -202,6 +202,11 @@ namespace LocationCompass
     // Assuming there are warps to get there from the NPC's position
     public string GetTargetIndoor(string playerLoc, string npcLoc)
     {
+      if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
+      {
+        return getMineName(playerLoc);
+      }
+
       var target = locationContexts[npcLoc].Parent;
 
       if (target == null) return null;
@@ -296,6 +301,19 @@ namespace LocationCompass
       }
     }
 
+    private string getMineName(string locationName)
+    {
+      var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+      var mineName = locationName;
+
+      if (Int32.TryParse(mine, out var mineLevel))
+      {
+        mineName = mineLevel > 120 ? "SkullCave" : "Mine";
+      }
+
+      return mineName;
+    }
+
     private void UpdateLocators()
     {
       locators = new Dictionary<string, List<Locator>>();
@@ -310,32 +328,25 @@ namespace LocationCompass
           ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
           : npcLoc.LocationName;
         var isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
+        LocationContext playerLocCtx;
+        LocationContext characterLocCtx;
 
-        if (charLocName.StartsWith("UndergroundMine"))
-        {
-          if (!isPlayerLocOutdoors)
-          {
-            continue;
-          }
-
-          var mine = charLocName.Substring("UndergroundMine".Length, charLocName.Length - "UndergroundMine".Length);
-          if (Int32.TryParse(mine, out var mineLevel))
-          {
-            // Skull cave
-            if (mineLevel > 120)
-            {
-              charLocName = "SkullCave";
-            }
-            else
-            {
-              charLocName = "Mine";
-            }
-          }
+        // Manually handle mines
+        if (isPlayerLocOutdoors && charLocName.Contains("UndergroundMine")) {
+            // If inside either mine, show characters as inside same general mine to player outside
+            charLocName = getMineName(charLocName); 
         }
-
-
-        if (!locationContexts.TryGetValue(playerLocName, out var playerLocCtx)) continue;
-        if (!locationContexts.TryGetValue(charLocName, out var characterLocCtx)) continue;
+        if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
+        {
+          // Leave mine levels distinguishred in name if player inside mine
+          locationContexts.TryGetValue(getMineName(playerLocName), out playerLocCtx);
+          locationContexts.TryGetValue(getMineName(charLocName), out characterLocCtx);
+        }
+        else
+        {
+          if (!locationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
+          if (!locationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+        }
 
         if (characterLocCtx.Root != playerLocCtx.Root)
           continue;
@@ -356,7 +367,7 @@ namespace LocationCompass
           var farmer = (Farmer) character;
           charSpriteHeight = farmer.FarmerSprite.SpriteHeight;
 
-        }
+        } 
         else
         {
           charPosition = new Vector2(npcLoc.PositionX, npcLoc.PositionY);
@@ -601,7 +612,6 @@ namespace LocationCompass
               Game1.getMouseX(),
               Game1.getMouseY());
 
-
             offsetX = 24;
             offsetY = 15;
 
@@ -780,14 +790,20 @@ namespace LocationCompass
           
           }
 
-          if (isHovering && locPair.Value.Count > 1)
+          if (isHovering)
           {
-            // Change mouse cursor on hover
-            Game1.mouseCursor = -1;
-            Game1.mouseCursorTransparency = 1f;
-            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            if (locPair.Value.Count > 1)
+            {
+              // Change mouse cursor on hover
+              Game1.mouseCursor = -1;
+              Game1.mouseCursorTransparency = 1f;
+              Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            }
+            else
+            {
+              Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle(0, 0, 8, 10), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            }
           }
-
         }
       }
     }
