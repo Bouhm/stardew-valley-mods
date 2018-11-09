@@ -44,7 +44,6 @@ namespace LocationCompass
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       GameEvents.UpdateTick += GameEvents_UpdateTick;
       InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-      GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
       GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
       ControlEvents.KeyPressed += ControlEvents_KeyPressed;
       ControlEvents.KeyReleased += ControlEvents_KeyReleased;
@@ -57,6 +56,7 @@ namespace LocationCompass
       {
         characters.Add(NPC);
       }
+      UpdateLocators();
     }
 
     private void GetLocationContexts()
@@ -102,22 +102,14 @@ namespace LocationCompass
       {
         foreach (var farmer in Game1.getOnlineFarmers())
         {
+          if (farmer == Game1.player) continue;
           if (!characters.Contains(farmer))
             characters.Add(farmer);
         }
       }
-      
+
       if (Context.IsMainPlayer)
       {
-        syncedLocationData = new SyncedLocationData();
-        foreach (var npc in GetVillagers())
-        {
-          if (npc == null || npc.currentLocation == null) continue;
-          syncedLocationData.AddNpcLocation(npc.Name,
-            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
-              (int)npc.Position.Y));
-        }
-
         Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", new[] { ModManifest.UniqueID });
       }
     }
@@ -159,7 +151,7 @@ namespace LocationCompass
       }
 
       // Root location found, set as root and return
-      if (location.isOutdoors)
+      if (location.IsOutdoors)
       {
         locationContexts[currLocationName].Type = "outdoors";
         locationContexts[currLocationName].Root = currLocationName;
@@ -211,6 +203,11 @@ namespace LocationCompass
     // Assuming there are warps to get there from the NPC's position
     public string GetTargetIndoor(string playerLoc, string npcLoc)
     {
+      if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
+      {
+        return getMineName(playerLoc);
+      }
+
       var target = locationContexts[npcLoc].Parent;
 
       if (target == null) return null;
@@ -248,14 +245,28 @@ namespace LocationCompass
 
     private void ControlEvents_KeyReleased(object sender, EventArgsKeyPressed e)
     {
-      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !config.Toggle)
+      if (!Context.IsWorldReady) return;
+
+      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      {
         showLocators = false;
+        Game1.displayHUD = true;
+      }
     }
 
     private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
     {
-      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode))
-        showLocators = true;
+      if (!Context.IsWorldReady) return;
+      
+      if (e.KeyPressed.ToString().Equals(config.HoldKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      {
+        // Hide HUD to show locators
+        if (Game1.displayHUD)
+        {
+          showLocators = true;
+          Game1.displayHUD = false;
+        }
+      }
     }
 
     private void GameEvents_UpdateTick(object sender, EventArgs e)
@@ -263,8 +274,45 @@ namespace LocationCompass
       if (!Context.IsWorldReady)
         return;
 
-      if (!Game1.paused && showLocators)
+      if (!Game1.paused && showLocators && syncedLocationData != null)
+      {
+        if (Context.IsMainPlayer)
+        {
+          getSyncedLocationData();
+        }
         UpdateLocators();
+      }
+    }
+
+    private void getSyncedLocationData()
+    {
+      foreach (var npc in GetVillagers())
+      {
+        if (npc == null || npc.currentLocation == null) continue;
+        if (syncedLocationData.SyncedLocations.TryGetValue(npc.Name, out var locationData))
+        {
+          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X, (int)npc.Position.Y);
+        }
+        else
+        {
+          syncedLocationData.AddNpcLocation(npc.Name,
+            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
+              (int)npc.Position.Y));
+        }
+      }
+    }
+
+    private string getMineName(string locationName)
+    {
+      var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+      var mineName = locationName;
+
+      if (Int32.TryParse(mine, out var mineLevel))
+      {
+        mineName = mineLevel > 120 ? "SkullCave" : "Mine";
+      }
+
+      return mineName;
     }
 
     private void UpdateLocators()
@@ -281,32 +329,25 @@ namespace LocationCompass
           ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
           : npcLoc.LocationName;
         var isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
+        LocationContext playerLocCtx;
+        LocationContext characterLocCtx;
 
-        if (charLocName.StartsWith("UndergroundMine"))
-        {
-          if (!isPlayerLocOutdoors)
-          {
-            continue;
-          }
-
-          var mine = charLocName.Substring("UndergroundMine".Length, charLocName.Length - "UndergroundMine".Length);
-          if (Int32.TryParse(mine, out var mineLevel))
-          {
-            // Skull cave
-            if (mineLevel > 120)
-            {
-              charLocName = "SkullCave";
-            }
-            else
-            {
-              charLocName = "Mine";
-            }
-          }
+        // Manually handle mines
+        if (isPlayerLocOutdoors && charLocName.Contains("UndergroundMine")) {
+            // If inside either mine, show characters as inside same general mine to player outside
+            charLocName = getMineName(charLocName); 
         }
-
-
-        if (!locationContexts.TryGetValue(playerLocName, out var playerLocCtx)) continue;
-        if (!locationContexts.TryGetValue(charLocName, out var characterLocCtx)) continue;
+        if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
+        {
+          // Leave mine levels distinguishred in name if player inside mine
+          locationContexts.TryGetValue(getMineName(playerLocName), out playerLocCtx);
+          locationContexts.TryGetValue(getMineName(charLocName), out characterLocCtx);
+        }
+        else
+        {
+          if (!locationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
+          if (!locationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+        }
 
         if (characterLocCtx.Root != playerLocCtx.Root)
           continue;
@@ -327,7 +368,7 @@ namespace LocationCompass
           var farmer = (Farmer) character;
           charSpriteHeight = farmer.FarmerSprite.SpriteHeight;
 
-        }
+        } 
         else
         {
           charPosition = new Vector2(npcLoc.PositionX, npcLoc.PositionY);
@@ -554,16 +595,9 @@ namespace LocationCompass
       }
     }
 
-    private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
-    {
-      if (!Context.IsWorldReady) return;
-
-      if (showLocators && !Game1.paused)
-        DrawLocators();
-    }
-
     private void DrawLocators()
     {
+
       // Individual locators, onscreen or offscreen
       foreach (var locPair in locators)
       {
@@ -578,7 +612,6 @@ namespace LocationCompass
             var isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(
               Game1.getMouseX(),
               Game1.getMouseY());
-
 
             offsetX = 24;
             offsetY = 15;
@@ -719,7 +752,7 @@ namespace LocationCompass
           }
           else
           {
-            locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 54), 0f, 3f, 0, locator.Farmer);
+            locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
           }
 
           if (locator.IsOnScreen || isHovering)
@@ -758,14 +791,20 @@ namespace LocationCompass
           
           }
 
-          if (isHovering && locPair.Value.Count > 1)
+          if (isHovering)
           {
-            // Change mouse cursor on hover
-            Game1.mouseCursor = -1;
-            Game1.mouseCursorTransparency = 1f;
-            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            if (locPair.Value.Count > 1)
+            {
+              // Change mouse cursor on hover
+              Game1.mouseCursor = -1;
+              Game1.mouseCursorTransparency = 1f;
+              Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            }
+            else
+            {
+              Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle(0, 0, 8, 10), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+            }
           }
-
         }
       }
     }
@@ -795,7 +834,12 @@ namespace LocationCompass
 
     private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
     {
-      if (!DEBUG_MODE || !Context.IsWorldReady || locators == null)
+      if (!Context.IsWorldReady || locators == null) return;
+
+      if (showLocators)
+        DrawLocators();
+
+      if (!DEBUG_MODE)
         return;
 
       foreach (var locPair in locators)

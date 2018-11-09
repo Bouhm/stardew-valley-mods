@@ -21,7 +21,7 @@ namespace NPCMapLocations
   {
     private const int DRAW_DELAY = 3;
     public static SButton HeldKey;
-    public static bool LOCATION_SYNC = false; // Experimental features
+    public static bool LOCATION_SYNC = true; // Experimental features
 
     // Debugging
     private static bool DEBUG_MODE;
@@ -86,14 +86,11 @@ namespace NPCMapLocations
         Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
 
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-      /*
       if (LOCATION_SYNC)
       {
         GameEvents.OneSecondTick += GameEvents_OneSecondTick;
         Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       }
-      */
-
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
       LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
@@ -184,7 +181,7 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
-      Config = Helper.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
       CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
@@ -242,7 +239,7 @@ namespace NPCMapLocations
       if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
       // ModMenu
@@ -295,13 +292,13 @@ namespace NPCMapLocations
       {
         if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
 
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
       else
       {
         if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
 
-        Helper.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+        Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
     }
 
@@ -407,7 +404,6 @@ namespace NPCMapLocations
       UpdateMarkers(updateForMinimap);
     }
 
-    /*
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
       if (Context.IsMainPlayer && Context.IsWorldReady)
@@ -444,7 +440,6 @@ namespace NPCMapLocations
           }
       }
     }
-    */
 
     private void OpenModMap(GameMenu gameMenu)
     {
@@ -538,7 +533,7 @@ namespace NPCMapLocations
           if (npc.currentLocation == null)
             locationName = npc.DefaultMap;
           else
-            locationName = npc.currentLocation.Name;
+            locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
         }
         else
         {
@@ -549,7 +544,7 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || !MapVectors.TryGetValue(locationName, out var loc))
+        if (locationName == null || (!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
@@ -655,17 +650,20 @@ namespace NPCMapLocations
       foreach (var farmer in Game1.getOnlineFarmers())
       {
         if (farmer?.currentLocation == null) continue;
-        var locationName = farmer.currentLocation.Name;
+        var locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (!MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        if ((!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) &&
+            !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        {
           if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
           {
             Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
             alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
           }
+        }
 
         var farmerId = farmer.UniqueMultiplayerID;
         var farmerLoc = LocationToMap(farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name,
