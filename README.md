@@ -7,7 +7,10 @@ SMAPI mods for Stardew Valley
 3. Run the game using StardewModdingAPI (SMAPI).
 
 ### [NPC Map Locations Mod]("https://www.nexusmods.com/stardewvalley/mods/239")
-Shows NPC locations on the map. Uses a modified map page much more accurate to the game.
+Shows character locations on the map. Uses a modified map page much more accurate to the game.
+
+### [Location Compass](https://www.nexusmods.com/stardewvalley/mods/3045)
+Locates characters on the screen indicating direction and distance from player's current position.
 
 ### [Pet Dogs Mod]("https://www.nexusmods.com/stardewvalley/mods/570")
 Replaces pet dog with a Shiba Inu, Shepherd, or Husky.
