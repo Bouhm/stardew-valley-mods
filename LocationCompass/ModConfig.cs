@@ -8,8 +8,11 @@ namespace LocationCompass
 {
     class ModConfig
     {
-        public string HoldKeyCode { get; set; } = "LeftAlt";
-        public bool ShowFarmersOnly { get; set; } = true;
-        public List<string> NPCBlacklist { get; set; } = new List<string>();
+      public bool HoldToToggle { get; set; } = true;
+      public string ToggleKeyCode { get; set; } = "LeftAlt";
+      public bool SameLocationOnly { get; set; } = true;
+      public bool ShowFarmersOnly { get; set; } = false;
+      public bool ShowHorses { get; set; } = false;
+      public List<string> NPCBlacklist { get; set; } = new List<string>();
     }
 }
