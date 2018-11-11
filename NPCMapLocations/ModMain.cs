@@ -767,8 +767,6 @@ namespace NPCMapLocations
           if ((upper == null || hasEqualTile) && tileX <= vector.TileX && tileY <= vector.TileY) upper = vector;
         }
 
-        var a = locVectors;
-
         // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
         // Uses fallback strategy - get closest points such that lower != upper
         var tilePos = "(" + tileX + ", " + tileY + ")";
