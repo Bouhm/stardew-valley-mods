@@ -43,7 +43,7 @@ namespace LivelyPets
 
       if (vanillaPet is Dog dog)
       {
-        livelyPet = (LivelyPet) new LivelyDog(vanillaPet);
+        livelyPet = (LivelyPet) new LivelyDog();
       }
       else if (vanillaPet is Cat cat)
       {

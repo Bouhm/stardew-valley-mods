@@ -9,6 +9,7 @@ using Netcode;
 using NPCMapLocations;
 using StardewValley;
 using StardewValley.Characters;
+using StardewValley.Quests;
 
 namespace LocationCompass
 {
@@ -349,6 +350,39 @@ namespace LocationCompass
         if (character.currentLocation == null) continue;
         if (!config.ShowHorses && character is Horse || config.ShowFarmersOnly && (character is NPC && !(character is Horse))) continue;
         if (!syncedLocationData.SyncedLocations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
+        if (character is NPC npc && config.ShowQuestsAndBirthdaysOnly) {
+          var isBirthday = false;
+          var hasQuest = false;
+          // Check if gifted for birthday
+          if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
+          {
+            isBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) && Game1.player.friendshipData[npc.Name].GiftsToday == 0;
+          }
+
+          // Check for daily quests
+          foreach (var quest in Game1.player.questLog)
+          {
+            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+              switch (quest.questType.Value)
+              {
+                case 3:
+                  hasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
+                  break;
+                case 4:
+                  hasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
+                  break;
+                case 7:
+                  hasQuest = ((FishingQuest)quest).target.Value == npc.Name;
+                  break;
+                case 10:
+                  hasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
+                  break;
+              }
+          }
+
+          if (!isBirthday && !hasQuest)
+            continue;
+        }
 
         var playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
         var charLocName = character is Farmer
