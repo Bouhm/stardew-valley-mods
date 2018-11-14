@@ -1,12 +1,12 @@
 {
   "Name": "Location Compass",
   "Author": "Bouhm",
-  "Version": "1.0.0",
+  "Version": "1.1.0-beta",
   "Description": "Locates villagers and farmers on the screen",
   "UniqueID": "Bouhm.LocationCompass",
   "EntryDll": "LocationCompass.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.8-beta",
   "UpdateKeys": [
-  	"Github:Bouhm/stardew-valley-mods"
+  	"Nexus:3045"
   ]
 }

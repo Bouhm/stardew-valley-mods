@@ -2,7 +2,7 @@
 	"Format": "1.3",
 	"ConfigSchema": {
 		"Dog": {
-			"AllowValues": "shibainu, shephed, husky"
+			"AllowValues": "shibainu, shepherd, husky"
 			},
 		},
 
