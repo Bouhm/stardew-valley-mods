@@ -89,8 +89,6 @@ namespace NPCMapLocations
 					rect.Value.Height
 				);
 			}
-
-		  var a = this.points;
 		}
 
 		public override void performHoverAction(int x, int y)
