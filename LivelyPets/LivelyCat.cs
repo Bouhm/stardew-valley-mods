@@ -19,6 +19,15 @@ namespace LivelyPets
       willDestroyObjectsUnderfoot = false;
     }
 
+    public LivelyCat(Pet pet)
+    {
+      Sprite = new AnimatedSprite("Animals\\cat", 0, 32, 32);
+      base.HideShadow = true;
+      base.Breather = false;
+      willDestroyObjectsUnderfoot = false;
+    }
+
+
     public LivelyCat(int xTile, int yTile)
     {
       base.Name = "Cat";

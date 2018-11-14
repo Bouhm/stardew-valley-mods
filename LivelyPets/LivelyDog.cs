@@ -5,17 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using StardewValley;
+using StardewValley.Characters;
 
 namespace LivelyPets
 {
   class LivelyDog : LivelyPet
   {
     public const int behavior_sit_right = 50;
-
     public const int behavior_sprint = 51;
-
     private int sprintTimer;
-
     private bool wagging;
 
     public LivelyDog()
@@ -477,6 +475,7 @@ namespace LivelyPets
       {
         base.currentLocation.localSound("thudStep");
       }
+      
     }
 
     public override void playContentSound()

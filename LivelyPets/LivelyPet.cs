@@ -12,29 +12,22 @@ using StardewValley.Locations;
 
 namespace LivelyPets
 {
-  class LivelyPet : NPC
+  public class LivelyPet : NPC
   {
     public const int bedTime = 2000;
-
     public const int maxFriendship = 1000;
-
     public const int behavior_walking = 0;
-
     public const int behavior_Sleep = 1;
-
     public const int behavior_Sit_Down = 2;
-
     public const int frame_basicSit = 18;
-
     private readonly NetInt netCurrentBehavior = new NetInt();
-
     private int startedBehavior = -1;
-
     private bool wasPetToday;
-
     public int friendshipTowardFarmer;
-
     private int pushingTimer;
+
+    private int closenessLevel;
+    private int obedienceLevel;
 
     public int CurrentBehavior
     {
@@ -277,4 +270,5 @@ namespace LivelyPets
       }
     }
   }
+
 }
