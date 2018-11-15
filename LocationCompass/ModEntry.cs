@@ -103,6 +103,20 @@ namespace LocationCompass
           if (doorLocator.Value.Characters.Count > 1)
             doorLocator.Value.ReceiveLeftClick();
         }
+
+      if (showLocators)
+      {
+        if (e.Button.ToString() == config.SameLocationToggleKey)
+          config.SameLocationOnly = !config.SameLocationOnly;
+        else if (e.Button.ToString() == config.FarmersOnlyToggleKey)
+          config.ShowFarmersOnly = !config.ShowFarmersOnly;
+        else if (e.Button.ToString() == config.QuestsOnlyToggleKey)
+          config.ShowQuestsAndBirthdaysOnly = !config.ShowQuestsAndBirthdaysOnly;
+        else if (e.Button.ToString() == config.HorsesToggleKey)
+          config.ShowHorses = !config.ShowHorses;
+
+        helper.Data.WriteJsonFile("config.json", config);
+      }
     }
 
     
@@ -273,26 +287,35 @@ namespace LocationCompass
     {
       if (!Context.IsWorldReady) return;
 
-      if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && config.HoldToToggle && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
       {
-        showLocators = false;
-        Game1.displayHUD = true;
-      }
+        if (config.HoldToToggle)
+        {
+          showLocators = false;
+          Game1.displayHUD = true;
+        }
+      }    
     }
 
     private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
     {
       if (!Context.IsWorldReady) return;
-      
-      if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
-      {
-        // Hide HUD to show locators
-        if (Game1.displayHUD)
+
+
+        if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null &&
+            !Game1.eventUp)
         {
-          showLocators = true;
-          Game1.displayHUD = false;
+          if (config.HoldToToggle)
+          {
+            // Hide HUD to show locators
+            if (Game1.displayHUD)
+              showLocators = true;
+          }
+          else
+            showLocators = !showLocators;
+
+          Game1.displayHUD = !showLocators;
         }
-      }
     }
 
     private void GameEvents_UpdateTick(object sender, EventArgs e)
@@ -770,7 +793,7 @@ namespace LocationCompass
 
           if (activeWarpLocators != null && activeWarpLocators.TryGetValue(locPair.Key, out activeLocator))
           {
-            locator = locPair.Value.ElementAt(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
+            locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
             activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);
           }
           else
