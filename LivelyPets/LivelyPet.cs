@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -12,7 +11,7 @@ using StardewValley.Locations;
 
 namespace LivelyPets
 {
-  public class LivelyPet : NPC
+  public class LivelyPet : Pet
   {
     public const int bedTime = 2000;
     public const int maxFriendship = 1000;
@@ -25,6 +24,9 @@ namespace LivelyPets
     private bool wasPetToday;
     public int friendshipTowardFarmer;
     private int pushingTimer;
+    private int skipHorizontal;
+    private bool skipHorizontalUp;
+    private int durationOfRandomMovements = 100;
 
     private int closenessLevel;
     private int obedienceLevel;
@@ -210,18 +212,239 @@ namespace LivelyPets
       {
         initiateCurrentBehavior();
       }
+      //moveTowardFarmer(Game1.player, time, location);
       base.update(time, location, id, move);
       pushingTimer = Math.Max(0, pushingTimer - 1);
     }
 
-    protected override void updateSlaveAnimation(GameTime time)
+    private void moveTowardFarmer(Farmer farmer, GameTime time, GameLocation location)
     {
+      if (((int)moveTowardPlayerThreshold.Value == -1 || withinPlayerThreshold()) && timeBeforeAIMovementAgain <= 0f && IsMonster && location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y] != null && !location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y].Properties.ContainsKey("NPCBarrier"))
+      {
+        if (skipHorizontal <= 0)
+        {
+          if (lastPosition.Equals(base.Position) && Game1.random.NextDouble() < 0.001)
+          {
+            switch (base.FacingDirection)
+            {
+              case 1:
+              case 3:
+                if (Game1.random.NextDouble() < 0.5)
+                {
+                  SetMovingOnlyUp();
+                }
+                else
+                {
+                  SetMovingOnlyDown();
+                }
+                break;
+              case 0:
+              case 2:
+                if (Game1.random.NextDouble() < 0.5)
+                {
+                  SetMovingOnlyRight();
+                }
+                else
+                {
+                  SetMovingOnlyLeft();
+                }
+                break;
+            }
+            skipHorizontal = 700;
+            return;
+          }
+          bool success = false;
+          bool setMoving = false;
+          bool scootSuccess = false;
+          if (lastPosition.X == base.Position.X)
+          {
+            checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+            checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+          }
+          else
+          {
+            checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+            checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+          }
+          if (!success && !setMoving)
+          {
+            Halt();
+            faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+          }
+          if (success)
+          {
+            skipHorizontal = 500;
+          }
+          if (scootSuccess)
+          {
+            return;
+          }
+        }
+        else
+        {
+          skipHorizontal -= time.ElapsedGameTime.Milliseconds;
+        }
+      }
+
+      MovePosition(time, Game1.viewport, location);
+      if (base.Position.Equals(lastPosition) && base.IsWalkingTowardPlayer && withinPlayerThreshold())
+      {
+        Halt();
+        faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+      }
+    }
+
+    private bool doHorizontalMovementTowardFarmer(Farmer farmer, GameLocation location)
+    {
+      bool wasAbleToMoveHorizontally = false;
+      if (base.Position.X > farmer.Position.X + 8f || (skipHorizontal > 0 && farmer.getStandingX() < getStandingX() - 8))
+      {
+        SetMovingOnlyLeft();
+        if (!location.isCollidingPosition(nextPosition(3), Game1.viewport, false, 0, false, this))
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          wasAbleToMoveHorizontally = true;
+        }
+        else
+        {
+          faceDirection(3);
+          if ((int)durationOfRandomMovements > 0 && Game1.random.NextDouble() < 0)
+          {
+            if (Game1.random.NextDouble() < 0.5)
+            {
+              tryToMoveInDirection(2, false, 0, false);
+            }
+            else
+            {
+              tryToMoveInDirection(0, false, 0, false);
+            }
+            timeBeforeAIMovementAgain = (float)(int)durationOfRandomMovements;
+          }
+        }
+      }
+      else if (base.Position.X < farmer.Position.X - 8f)
+      {
+        SetMovingOnlyRight();
+        if (!location.isCollidingPosition(nextPosition(1), Game1.viewport, false, 0, false, this))
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          wasAbleToMoveHorizontally = true;
+        }
+        else
+        {
+          faceDirection(1);
+          if ((int)durationOfRandomMovements > 0 && Game1.random.NextDouble() < 0)
+          {
+            if (Game1.random.NextDouble() < 0.5)
+            {
+              tryToMoveInDirection(2, false, 0, false);
+            }
+            else
+            {
+              tryToMoveInDirection(0, false, 0, false);
+            }
+            timeBeforeAIMovementAgain = (float)(int)durationOfRandomMovements;
+          }
+        }
+      }
+      else
+      {
+        faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+        setMovingInFacingDirection();
+        skipHorizontal = 500;
+      }
+      return wasAbleToMoveHorizontally;
+    }
+
+    private void checkHorizontalMovement(ref bool success, ref bool setMoving, ref bool scootSuccess, Farmer who, GameLocation location)
+    {
+      Vector2 position;
+      if (who.Position.X > base.Position.X + 16f)
+      {
+        SetMovingOnlyRight();
+        setMoving = true;
+        if (!location.isCollidingPosition(nextPosition(1), Game1.viewport, false, 0, false, this))
+        {
+          success = true;
+        }
+        else
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          position = base.Position;
+          if (!position.Equals(lastPosition))
+          {
+            scootSuccess = true;
+          }
+        }
+      }
+      if (!success && who.Position.X < base.Position.X - 16f)
+      {
+        SetMovingOnlyLeft();
+        setMoving = true;
+        if (!location.isCollidingPosition(nextPosition(3), Game1.viewport, false, 0, false, this))
+        {
+          success = true;
+        }
+        else
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          position = base.Position;
+          if (!position.Equals(lastPosition))
+          {
+            scootSuccess = true;
+          }
+        }
+      }
+    }
+
+    private void checkVerticalMovement(ref bool success, ref bool setMoving, ref bool scootSuccess, Farmer who,
+      GameLocation location)
+    {
+      Vector2 position;
+      if (!success && who.Position.Y < base.Position.Y - 16f)
+      {
+        SetMovingOnlyUp();
+        setMoving = true;
+        if (!location.isCollidingPosition(nextPosition(0), Game1.viewport, false, 0, false, this))
+        {
+          success = true;
+        }
+        else
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          position = base.Position;
+          if (!position.Equals(lastPosition))
+          {
+            scootSuccess = true;
+          }
+        }
+      }
+
+      if (!success && who.Position.Y > base.Position.Y + 16f)
+      {
+        SetMovingOnlyDown();
+        setMoving = true;
+        if (!location.isCollidingPosition(nextPosition(2), Game1.viewport, false, 0, false, this))
+        {
+          success = true;
+        }
+        else
+        {
+          MovePosition(Game1.currentGameTime, Game1.viewport, location);
+          position = base.Position;
+          if (!position.Equals(lastPosition))
+          {
+            scootSuccess = true;
+          }
+        }
+      }
     }
 
     public virtual void initiateCurrentBehavior()
     {
       flip = false;
       bool localFlip2 = false;
+
       switch (CurrentBehavior)
       {
         case 1:

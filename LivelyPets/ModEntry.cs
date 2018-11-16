@@ -1,4 +1,5 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,13 @@ namespace LivelyPets
       this.Helper = helper;
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       SaveEvents.BeforeSave += SaveEvents_BeforeSave;
+      GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+    }
+
+    private void GameEvents_OneSecondTick(object sender, EventArgs e)
+    {
+      if (!Context.IsWorldReady) return;
+      RemovePet(vanillaPet);
     }
 
     private void SaveEvents_BeforeSave(object sender, EventArgs e)
@@ -31,24 +39,44 @@ namespace LivelyPets
       // Preserve defaults in save so game doesn't break without mod
       var characters = Helper.Reflection.GetField<NetCollection<NPC>>(Game1.getFarm(), "characters").GetValue();
       if (!characters.Contains(vanillaPet)) characters.Add(vanillaPet);
-      if (characters.Contains(livelyPet)) characters.Remove(livelyPet);
+      RemovePet(livelyPet);
     }
 
     private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
     {
-      vanillaPet = (Pet) Game1.getCharacterFromName(Game1.player.getPetName());
+      vanillaPet = GetPet(Game1.player.getPetName());
       if (!Context.IsWorldReady || vanillaPet == null) return;
-      var characters = Helper.Reflection.GetField<NetCollection<NPC>>(Game1.getFarm(), "characters").GetValue();
-      if (characters.Contains(vanillaPet)) characters.Remove(vanillaPet);
-
+      RemovePet(vanillaPet);
+      
       if (vanillaPet is Dog dog)
-      {
-        livelyPet = (LivelyPet) new LivelyDog();
-      }
+        livelyPet = new LivelyDog(dog);
       else if (vanillaPet is Cat cat)
+        livelyPet = new LivelyCat(cat);
+
+      Game1.getFarm().characters.Add(livelyPet);
+    }
+
+    private void RemovePet(Pet target)
+    {
+      foreach (var pet in Game1.getFarm().characters.ToList())
       {
-        livelyPet = (LivelyPet) new LivelyCat(vanillaPet);
+        if (pet.GetType().IsInstanceOfType(target) && pet.Name == target.Name)
+        {
+          Game1.getFarm().characters.Remove(pet);
+          break;
+        }
       }
+    }
+
+    private Pet GetPet(string petName)
+    {
+      foreach (var npc in Game1.getFarm().characters.ToList())
+      {
+        if (npc is Pet pet && pet.Name == petName)
+          return pet;
+      }
+
+      return null;
     }
   }
 }

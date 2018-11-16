@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -16,18 +18,28 @@ namespace LivelyPets
     private int sprintTimer;
     private bool wagging;
 
-    public LivelyDog()
+    public LivelyDog(Dog pet)
     {
-      Sprite = new AnimatedSprite("Animals\\dog", 0, 32, 32);
-      base.HideShadow = true;
-      base.Breather = false;
-      willDestroyObjectsUnderfoot = false;
+      var petType = pet.GetType();
+      PropertyInfo[] properties = petType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+      FieldInfo[] fields = petType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+
+      foreach (PropertyInfo property in properties)
+      {
+        try
+        {
+          property.SetValue(pet, property.GetValue(pet, null), null);
+        }
+        catch (ArgumentException) { } // For Get-only-properties
+      }
+      foreach (FieldInfo field in fields)
+      {
+        field.SetValue(this, field.GetValue(pet));
+      }
     }
 
     public LivelyDog(int xTile, int yTile)
     {
-      base.Name = "Dog";
-      base.displayName = name;
       Sprite = new AnimatedSprite("Animals\\dog", 0, 32, 32);
       base.Position = new Vector2((float)xTile, (float)yTile) * 64f;
       base.Breather = false;
@@ -257,10 +269,12 @@ namespace LivelyPets
           {
             wagging = false;
           }
+          /*
           if (Game1.IsMasterGame && Sprite.CurrentAnimation == null)
           {
             MovePosition(time, Game1.viewport, location);
           }
+          */
         }
       }
     }

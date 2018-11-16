@@ -22,8 +22,8 @@ namespace NPCMapLocations
 	  public bool ShowMinimap { get; set; } = true;
 	  public int MinimapX { get; set; } = 12;
 	  public int MinimapY { get; set; } = 12;
-	  public int MinimapWidth { get; set; } = 100;
-	  public int MinimapHeight { get; set; } = 60;
+	  public int MinimapWidth { get; set; } = 75;
+	  public int MinimapHeight { get; set; } = 45;
     public string MenuKey { get; set; } = "Tab";
 		public string TooltipKey { get; set; } = "Space";
 	  public string MinimapDragKey { get; set; } = "LeftAlt";
