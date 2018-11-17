@@ -146,9 +146,9 @@ namespace LocationCompass
         }
       }
 
-      if (Context.IsMainPlayer)
+      if (Context.IsMainPlayer && Context.IsMultiplayer && syncedLocationData != null)
       {
-        Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", new[] { ModManifest.UniqueID });
+        Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
       }
     }
 

@@ -345,20 +345,23 @@ namespace NPCMapLocations
 
     private void ResetMarkers(List<NPC> villagers)
     {
-      NpcMarkers = new HashSet<CharacterMarker>();
-      foreach (var npc in villagers)
+      if (Context.IsMainPlayer || Context.IsMultiplayer)
       {
-        // Handle case where Kent appears even though he shouldn't
-        if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
-
-        var npcMarker = new CharacterMarker
+        NpcMarkers = new HashSet<CharacterMarker>();
+        foreach (var npc in villagers)
         {
-          Npc = npc,
-          Name = CustomNames[npc.Name],
-          Marker = npc.Sprite.Texture,
-          IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
-        };
-        NpcMarkers.Add(npcMarker);
+          // Handle case where Kent appears even though he shouldn't
+          if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
+
+          var npcMarker = new CharacterMarker
+          {
+            Npc = npc,
+            Name = CustomNames[npc.Name],
+            Marker = npc.Sprite.Texture,
+            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+          };
+          NpcMarkers.Add(npcMarker);
+        }
       }
       
       if (Context.IsMultiplayer)
@@ -399,7 +402,8 @@ namespace NPCMapLocations
 
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
-      if (Context.IsMainPlayer && Context.IsWorldReady)
+      if (!Context.IsWorldReady) return;
+      if (Context.IsMainPlayer && Context.IsMultiplayer)
       {
         var message = new SyncedLocationData();
         foreach (var npc in GetVillagers())
@@ -410,7 +414,7 @@ namespace NPCMapLocations
               npc.getTileY()));
         }
 
-        Helper.Multiplayer.SendMessage(message, "SyncedLocationData", new[] {ModManifest.UniqueID});
+       Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] {ModManifest.UniqueID});
       }
     }
 

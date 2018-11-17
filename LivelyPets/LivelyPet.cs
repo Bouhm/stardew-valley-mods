@@ -212,12 +212,19 @@ namespace LivelyPets
       {
         initiateCurrentBehavior();
       }
-      //moveTowardFarmer(Game1.player, time, location);
+      
       base.update(time, location, id, move);
       pushingTimer = Math.Max(0, pushingTimer - 1);
     }
 
-    private void moveTowardFarmer(Farmer farmer, GameTime time, GameLocation location)
+    /*
+    public override void updateMovement(GameLocation location, GameTime time)
+    {
+      moveTowardFarmer(Game1.player, location, time );
+    }
+    */
+
+    private void moveTowardFarmer(Farmer farmer, GameLocation location, GameTime time)
     {
       if (((int)moveTowardPlayerThreshold.Value == -1 || withinPlayerThreshold()) && timeBeforeAIMovementAgain <= 0f && IsMonster && location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y] != null && !location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y].Properties.ContainsKey("NPCBarrier"))
       {
