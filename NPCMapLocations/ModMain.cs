@@ -345,24 +345,22 @@ namespace NPCMapLocations
 
     private void ResetMarkers(List<NPC> villagers)
     {
-      if (Context.IsMainPlayer || Context.IsMultiplayer)
+      NpcMarkers = new HashSet<CharacterMarker>();
+      foreach (var npc in villagers)
       {
-        NpcMarkers = new HashSet<CharacterMarker>();
-        foreach (var npc in villagers)
-        {
-          // Handle case where Kent appears even though he shouldn't
-          if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
+        // Handle case where Kent appears even though he shouldn't
+        if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
 
-          var npcMarker = new CharacterMarker
-          {
-            Npc = npc,
-            Name = CustomNames[npc.Name],
-            Marker = npc.Sprite.Texture,
-            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
-          };
-          NpcMarkers.Add(npcMarker);
-        }
+        var npcMarker = new CharacterMarker
+        {
+          Npc = npc,
+          Name = CustomNames[npc.Name],
+          Marker = npc.Sprite.Texture,
+          IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+        };
+        NpcMarkers.Add(npcMarker);
       }
+
       
       if (Context.IsMultiplayer)
         FarmerMarkers = new Dictionary<long, CharacterMarker>();

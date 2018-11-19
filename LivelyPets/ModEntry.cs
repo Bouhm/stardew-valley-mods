@@ -16,13 +16,11 @@ namespace LivelyPets
 {
   public class ModEntry : Mod
   {
-    private IModHelper Helper;
     private Pet vanillaPet;
     private LivelyPet livelyPet;
 
     public override void Entry(IModHelper helper)
     {
-      this.Helper = helper;
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       SaveEvents.BeforeSave += SaveEvents_BeforeSave;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
@@ -47,11 +45,11 @@ namespace LivelyPets
       vanillaPet = GetPet(Game1.player.getPetName());
       if (!Context.IsWorldReady || vanillaPet == null) return;
       RemovePet(vanillaPet);
-      
+
       if (vanillaPet is Dog dog)
         livelyPet = new LivelyDog(dog);
       else if (vanillaPet is Cat cat)
-        livelyPet = new LivelyCat(cat);
+        livelyPet = new LivelyCat(cat, Monitor);
 
       Game1.getFarm().characters.Add(livelyPet);
     }

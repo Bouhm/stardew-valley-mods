@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
@@ -13,39 +14,19 @@ namespace LivelyPets
 {
   public class LivelyPet : Pet
   {
-    public const int bedTime = 2000;
-    public const int maxFriendship = 1000;
-    public const int behavior_walking = 0;
-    public const int behavior_Sleep = 1;
-    public const int behavior_Sit_Down = 2;
-    public const int frame_basicSit = 18;
+    public IMonitor Monitor;
     private readonly NetInt netCurrentBehavior = new NetInt();
     private int startedBehavior = -1;
     private bool wasPetToday;
-    public int friendshipTowardFarmer;
     private int pushingTimer;
+    public bool isByFarmer;
     private int skipHorizontal;
     private bool skipHorizontalUp;
-    private int durationOfRandomMovements = 100;
+    private int durationOfRandomMovements = 0;
+
 
     private int closenessLevel;
     private int obedienceLevel;
-
-    public int CurrentBehavior
-    {
-      get
-      {
-        if (isMoving())
-        {
-          return 0;
-        }
-        return netCurrentBehavior;
-      }
-      set
-      {
-        netCurrentBehavior.Value = value;
-      }
-    }
 
     protected override void initNetFields()
     {
@@ -208,98 +189,309 @@ namespace LivelyPets
 
     public override void update(GameTime time, GameLocation location, long id, bool move)
     {
+      /*
       if (startedBehavior != CurrentBehavior)
       {
         initiateCurrentBehavior();
       }
-      
-      base.update(time, location, id, move);
+      */
+      moveTowardFarmer(Game1.player, location, time);
+
       pushingTimer = Math.Max(0, pushingTimer - 1);
     }
 
-    /*
+
     public override void updateMovement(GameLocation location, GameTime time)
     {
       moveTowardFarmer(Game1.player, location, time );
     }
-    */
+
 
     private void moveTowardFarmer(Farmer farmer, GameLocation location, GameTime time)
     {
-      if (((int)moveTowardPlayerThreshold.Value == -1 || withinPlayerThreshold()) && timeBeforeAIMovementAgain <= 0f && IsMonster && location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y] != null && !location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y].Properties.ContainsKey("NPCBarrier"))
+      if (this.IsWalkingTowardPlayer)
       {
-        if (skipHorizontal <= 0)
+        if (((int)((NetFieldBase<int, NetInt>)this.moveTowardPlayerThreshold) == -1 || this.withinPlayerThreshold()) && ((double)this.timeBeforeAIMovementAgain <= 0.0) && location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y] != null && !location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y].Properties.ContainsKey("NPCBarrier"))
         {
-          if (lastPosition.Equals(base.Position) && Game1.random.NextDouble() < 0.001)
+          Monitor.Log($"{time.ElapsedGameTime} - Move Update");
+          if (this.skipHorizontal <= 0)
           {
-            switch (base.FacingDirection)
+            if (this.lastPosition.Equals(this.Position) && Game1.random.NextDouble() < 0.001)
             {
-              case 1:
-              case 3:
-                if (Game1.random.NextDouble() < 0.5)
-                {
-                  SetMovingOnlyUp();
-                }
-                else
-                {
-                  SetMovingOnlyDown();
-                }
-                break;
-              case 0:
-              case 2:
-                if (Game1.random.NextDouble() < 0.5)
-                {
-                  SetMovingOnlyRight();
-                }
-                else
-                {
-                  SetMovingOnlyLeft();
-                }
-                break;
+              switch (this.FacingDirection)
+              {
+                case 0:
+                case 2:
+                  if (Game1.random.NextDouble() < 0.5)
+                  {
+                    this.SetMovingOnlyRight();
+                    break;
+                  }
+                  this.SetMovingOnlyLeft();
+                  break;
+                case 1:
+                case 3:
+                  if (Game1.random.NextDouble() < 0.5)
+                  {
+                    this.SetMovingOnlyUp();
+                    break;
+                  }
+                  this.SetMovingOnlyDown();
+                  break;
+              }
+              this.skipHorizontal = 700;
+              return;
             }
-            skipHorizontal = 700;
-            return;
-          }
-          bool success = false;
-          bool setMoving = false;
-          bool scootSuccess = false;
-          if (lastPosition.X == base.Position.X)
-          {
-            checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
-            checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+            bool success = false;
+            bool setMoving = false;
+            bool scootSuccess = false;
+            if ((double)this.lastPosition.X == (double)this.Position.X)
+            {
+              this.checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+              this.checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+            }
+            else
+            {
+              this.checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+              this.checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
+            }
+            if (!success && !setMoving)
+            {
+              this.Halt();
+              this.faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+            }
+            if (success)
+              this.skipHorizontal = 500;
+            if (scootSuccess)
+              return;
           }
           else
-          {
-            checkVerticalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
-            checkHorizontalMovement(ref success, ref setMoving, ref scootSuccess, farmer, location);
-          }
-          if (!success && !setMoving)
-          {
-            Halt();
-            faceGeneralDirection(farmer.getStandingPosition(), 0, false);
-          }
-          if (success)
-          {
-            skipHorizontal = 500;
-          }
-          if (scootSuccess)
-          {
-            return;
-          }
+            this.skipHorizontal -= time.ElapsedGameTime.Milliseconds;
+        }
+      }
+      else
+        this.defaultMovementBehavior(time);
+      this.MovePosition(time, Game1.viewport, location);
+      if (!this.Position.Equals(this.lastPosition) || !this.IsWalkingTowardPlayer || !this.withinPlayerThreshold())
+        return;
+
+      this.Halt();
+      this.faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+    }
+
+
+        public virtual void defaultMovementBehavior(GameTime time)
+    {
+      switch (Game1.random.Next(6))
+      {
+        case 0:
+          this.SetMovingOnlyUp();
+          break;
+        case 1:
+          this.SetMovingOnlyRight();
+          break;
+        case 2:
+          this.SetMovingOnlyDown();
+          break;
+        case 3:
+          this.SetMovingOnlyLeft();
+          break;
+        default:
+          this.Halt();
+          break;
+      }
+    }
+
+    public override void MovePosition(GameTime time, xTile.Dimensions.Rectangle viewport, GameLocation currentLocation)
+    {
+      this.lastPosition = this.Position;
+      if ((double)this.xVelocity != 0.0 || (double)this.yVelocity != 0.0)
+      {
+        if (double.IsNaN((double)this.xVelocity) || double.IsNaN((double)this.yVelocity))
+        {
+          this.xVelocity = 0.0f;
+          this.yVelocity = 0.0f;
+        }
+        Microsoft.Xna.Framework.Rectangle boundingBox = this.GetBoundingBox();
+        boundingBox.X += (int)this.xVelocity;
+        boundingBox.Y -= (int)this.yVelocity;
+        if (!currentLocation.isCollidingPosition(boundingBox, viewport, false, 0, false, (Character)this))
+        {
+          this.position.X += this.xVelocity;
+          this.position.Y -= this.yVelocity;
+          this.xVelocity -= this.xVelocity;
+          this.yVelocity -= this.yVelocity;
+          if ((double)Math.Abs(this.xVelocity) <= 0.0500000007450581)
+            this.xVelocity = 0.0f;
+          if ((double)Math.Abs(this.yVelocity) <= 0.0500000007450581)
+            this.yVelocity = 0.0f;
+        }
+      }
+      if (this.moveUp)
+      {
+        if (!currentLocation.isCollidingPosition(this.nextPosition(0), viewport, false, 0, false, (Character)this) || this.isCharging)
+        {
+          this.position.Y -= (float)(this.speed + this.addedSpeed);
+          if (!this.ignoreMovementAnimations)
+            this.Sprite.AnimateUp(time, 0, "");
+          this.FacingDirection = 0;
+          this.faceDirection(0);
         }
         else
         {
-          skipHorizontal -= time.ElapsedGameTime.Milliseconds;
+          Microsoft.Xna.Framework.Rectangle position = this.nextPosition(0);
+          position.Width /= 4;
+          bool flag1 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          position.X += position.Width * 3;
+          bool flag2 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          if (flag1 && !flag2 && !currentLocation.isCollidingPosition(this.nextPosition(1), viewport, false, 0, false, (Character)this))
+            this.position.X += (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          else if (flag2 && !flag1 && !currentLocation.isCollidingPosition(this.nextPosition(3), viewport, false, 0, false, (Character)this))
+            this.position.X -= (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          if (!currentLocation.isTilePassable(this.nextPosition(0), viewport) || !this.willDestroyObjectsUnderfoot)
+            this.Halt();
+          else if (this.willDestroyObjectsUnderfoot)
+          {
+            Vector2 vector2 = new Vector2((float)(this.getStandingX() / 64), (float)(this.getStandingY() / 64 - 1));
+            if (currentLocation.characterDestroyObjectWithinRectangle(this.nextPosition(0), true))
+            {
+              currentLocation.playSound("stoneCrack");
+              this.position.Y -= (float)(this.speed + this.addedSpeed);
+            }
+            else
+              this.blockedInterval += time.ElapsedGameTime.Milliseconds;
+          }
         }
       }
-
-      MovePosition(time, Game1.viewport, location);
-      if (base.Position.Equals(lastPosition) && base.IsWalkingTowardPlayer && withinPlayerThreshold())
+      else if (this.moveRight)
       {
-        Halt();
-        faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+        if (!currentLocation.isCollidingPosition(this.nextPosition(1), viewport, false, 0, false, (Character)this) || this.isCharging)
+        {
+          this.position.X += (float)(this.speed + this.addedSpeed);
+          if (!this.ignoreMovementAnimations)
+            this.Sprite.AnimateRight(time, 0, "");
+          this.FacingDirection = 1;
+          this.faceDirection(1);
+        }
+        else
+        {
+          Microsoft.Xna.Framework.Rectangle position = this.nextPosition(1);
+          position.Height /= 4;
+          bool flag1 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          position.Y += position.Height * 3;
+          bool flag2 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          if (flag1 && !flag2 && !currentLocation.isCollidingPosition(this.nextPosition(2), viewport, false, 0, false, (Character)this))
+            this.position.Y += (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          else if (flag2 && !flag1 && !currentLocation.isCollidingPosition(this.nextPosition(0), viewport, false, 0, false, (Character)this))
+            this.position.Y -= (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          if (!currentLocation.isTilePassable(this.nextPosition(1), viewport) || !this.willDestroyObjectsUnderfoot)
+            this.Halt();
+          else if (this.willDestroyObjectsUnderfoot)
+          {
+            Vector2 vector2 = new Vector2((float)(this.getStandingX() / 64 + 1), (float)(this.getStandingY() / 64));
+            if (currentLocation.characterDestroyObjectWithinRectangle(this.nextPosition(1), true))
+            {
+              currentLocation.playSound("stoneCrack");
+              this.position.X += (float)(this.speed + this.addedSpeed);
+            }
+            else
+              this.blockedInterval += time.ElapsedGameTime.Milliseconds;
+          }
+        }
       }
+      else if (this.moveDown)
+      {
+        if (!currentLocation.isCollidingPosition(this.nextPosition(2), viewport, false, 0, false, (Character)this) || this.isCharging)
+        {
+          this.position.Y += (float)(this.speed + this.addedSpeed);
+          if (!this.ignoreMovementAnimations)
+            this.Sprite.AnimateDown(time, 0, "");
+          this.FacingDirection = 2;
+          this.faceDirection(2);
+        }
+        else
+        {
+          Microsoft.Xna.Framework.Rectangle position = this.nextPosition(2);
+          position.Width /= 4;
+          bool flag1 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          position.X += position.Width * 3;
+          bool flag2 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          if (flag1 && !flag2 && !currentLocation.isCollidingPosition(this.nextPosition(1), viewport, false, 0, false, (Character)this))
+            this.position.X += (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          else if (flag2 && !flag1 && !currentLocation.isCollidingPosition(this.nextPosition(3), viewport, false, 0, false, (Character)this))
+            this.position.X -= (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          if (!currentLocation.isTilePassable(this.nextPosition(2), viewport) || !this.willDestroyObjectsUnderfoot)
+            this.Halt();
+          else if (this.willDestroyObjectsUnderfoot)
+          {
+            Vector2 vector2 = new Vector2((float)(this.getStandingX() / 64), (float)(this.getStandingY() / 64 + 1));
+            if (currentLocation.characterDestroyObjectWithinRectangle(this.nextPosition(2), true))
+            {
+              currentLocation.playSound("stoneCrack");
+              this.position.Y += (float)(this.speed + this.addedSpeed);
+            }
+            else
+              this.blockedInterval += time.ElapsedGameTime.Milliseconds;
+          }
+        }
+      }
+      else if (this.moveLeft)
+      {
+        if (!currentLocation.isCollidingPosition(this.nextPosition(3), viewport, false, 0, false, (Character)this) || this.isCharging)
+        {
+          this.position.X -= (float)(this.speed + this.addedSpeed);
+          this.FacingDirection = 3;
+          if (!this.ignoreMovementAnimations)
+            this.Sprite.AnimateLeft(time, 0, "");
+          this.faceDirection(3);
+        }
+        else
+        {
+          Microsoft.Xna.Framework.Rectangle position = this.nextPosition(3);
+          position.Height /= 4;
+          bool flag1 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          position.Y += position.Height * 3;
+          bool flag2 = currentLocation.isCollidingPosition(position, viewport, false, 0, false, (Character)this);
+          if (flag1 && !flag2 && !currentLocation.isCollidingPosition(this.nextPosition(2), viewport, false, 0, false, (Character)this))
+            this.position.Y += (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          else if (flag2 && !flag1 && !currentLocation.isCollidingPosition(this.nextPosition(0), viewport, false, 0, false, (Character)this))
+            this.position.Y -= (float)this.speed * ((float)time.ElapsedGameTime.Milliseconds / 64f);
+          if (!currentLocation.isTilePassable(this.nextPosition(3), viewport) || !this.willDestroyObjectsUnderfoot)
+            this.Halt();
+          else if (this.willDestroyObjectsUnderfoot)
+          {
+            Vector2 vector2 = new Vector2((float)(this.getStandingX() / 64 - 1), (float)(this.getStandingY() / 64));
+            if (currentLocation.characterDestroyObjectWithinRectangle(this.nextPosition(3), true))
+            {
+              currentLocation.playSound("stoneCrack");
+              this.position.X -= (float)(this.speed + this.addedSpeed);
+            }
+            else
+              this.blockedInterval += time.ElapsedGameTime.Milliseconds;
+          }
+        }
+      }
+      else if (!this.ignoreMovementAnimations)
+      {
+        if (this.moveUp)
+          this.Sprite.AnimateUp(time, 0, "");
+        else if (this.moveRight)
+          this.Sprite.AnimateRight(time, 0, "");
+        else if (this.moveDown)
+          this.Sprite.AnimateDown(time, 0, "");
+        else if (this.moveLeft)
+          this.Sprite.AnimateLeft(time, 0, "");
+      }
+      if ((this.blockedInterval < 3000 || (double)this.blockedInterval > 3750.0) && this.blockedInterval >= 5000)
+      {
+        this.speed = 4;
+        this.isCharging = true;
+        this.blockedInterval = 0;
+      }
+      if (0 <= 0 || Game1.random.NextDouble() >= 0.000333333333333333)
+        return;
     }
+
 
     private bool doHorizontalMovementTowardFarmer(Farmer farmer, GameLocation location)
     {
