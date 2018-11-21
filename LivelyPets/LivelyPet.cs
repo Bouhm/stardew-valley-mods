@@ -19,7 +19,8 @@ namespace LivelyPets
     private int startedBehavior = -1;
     private bool wasPetToday;
     private int pushingTimer;
-    public bool isByFarmer;
+    public bool isNearFarmer = true;
+    private int proximity = 64 * 7;
     private int skipHorizontal;
     private bool skipHorizontalUp;
     private int durationOfRandomMovements = 0;
@@ -189,31 +190,32 @@ namespace LivelyPets
 
     public override void update(GameTime time, GameLocation location, long id, bool move)
     {
-      /*
-      if (startedBehavior != CurrentBehavior)
+      if (startedBehavior == -1)
+      {
+        base.update(time, location, id, move);
+        return;
+      }
+
+      var farmerPos = Game1.player.Position;
+      isNearFarmer = ((Position.X - farmerPos.X) * (Position.X - farmerPos.X) + (Position.Y - farmerPos.Y) * (Position.Y - farmerPos.Y)) < proximity*proximity;
+      if (!isNearFarmer)
+      {
+        moveTowardFarmer(Game1.player, location, time);
+      }
+      else
+        if (startedBehavior != CurrentBehavior)
       {
         initiateCurrentBehavior();
       }
-      */
-      moveTowardFarmer(Game1.player, location, time);
-
+      
       pushingTimer = Math.Max(0, pushingTimer - 1);
     }
 
-
-    public override void updateMovement(GameLocation location, GameTime time)
-    {
-      moveTowardFarmer(Game1.player, location, time );
-    }
-
-
     private void moveTowardFarmer(Farmer farmer, GameLocation location, GameTime time)
     {
-      if (this.IsWalkingTowardPlayer)
-      {
-        if (((int)((NetFieldBase<int, NetInt>)this.moveTowardPlayerThreshold) == -1 || this.withinPlayerThreshold()) && ((double)this.timeBeforeAIMovementAgain <= 0.0) && location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y] != null && !location.map.GetLayer("Back").Tiles[(int)farmer.getTileLocation().X, (int)farmer.getTileLocation().Y].Properties.ContainsKey("NPCBarrier"))
-        {
           Monitor.Log($"{time.ElapsedGameTime} - Move Update");
+
+
           if (this.skipHorizontal <= 0)
           {
             if (this.lastPosition.Equals(this.Position) && Game1.random.NextDouble() < 0.001)
@@ -258,7 +260,7 @@ namespace LivelyPets
             if (!success && !setMoving)
             {
               this.Halt();
-              this.faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+              this.faceGeneralDirection(farmer.getStandingPosition(), 0, true);
             }
             if (success)
               this.skipHorizontal = 500;
@@ -267,20 +269,17 @@ namespace LivelyPets
           }
           else
             this.skipHorizontal -= time.ElapsedGameTime.Milliseconds;
-        }
-      }
-      else
-        this.defaultMovementBehavior(time);
+
+
       this.MovePosition(time, Game1.viewport, location);
       if (!this.Position.Equals(this.lastPosition) || !this.IsWalkingTowardPlayer || !this.withinPlayerThreshold())
         return;
 
       this.Halt();
-      this.faceGeneralDirection(farmer.getStandingPosition(), 0, false);
+      this.faceGeneralDirection(farmer.getStandingPosition(), 0, true);
     }
 
-
-        public virtual void defaultMovementBehavior(GameTime time)
+    public virtual void defaultMovementBehavior(GameTime time)
     {
       switch (Game1.random.Next(6))
       {

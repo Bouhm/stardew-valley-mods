@@ -1,5 +1,4 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +28,6 @@ namespace LivelyPets
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
       if (!Context.IsWorldReady) return;
-      RemovePet(vanillaPet);
     }
 
     private void SaveEvents_BeforeSave(object sender, EventArgs e)

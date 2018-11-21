@@ -51,12 +51,9 @@ namespace LivelyPets
 
     public override void update(GameTime time, GameLocation location)
     {
-      Monitor.Log($"{time.ToString()} - Cat Update Start");
       base.update(time, location);
-
-      Monitor.Log($"{time.ToString()} - Cat Update End");
-      return;
-        
+      if (!isNearFarmer) return;
+      
       if (base.currentLocation == null)
       {
         base.currentLocation = location;
@@ -70,7 +67,6 @@ namespace LivelyPets
         switch (base.CurrentBehavior)
         {
           case 1:
-            Monitor.Log($"{time.ToString()} - Cat Behavior 1");
             if (Game1.timeOfDay < 2000 && Game1.random.NextDouble() < 0.001)
             {
               base.CurrentBehavior = 0;
@@ -81,7 +77,6 @@ namespace LivelyPets
             }
             return;
           case 2:
-            Monitor.Log($"{time.ToString()} - Cat Behavior 2");
             if (Sprite.currentFrame != 18 && Sprite.CurrentAnimation == null)
             {
               initiateCurrentBehavior();
@@ -91,7 +86,6 @@ namespace LivelyPets
               switch (Game1.random.Next(10))
               {
                 case 0:
-                  Monitor.Log($"{time.ToString()} - Cat Behavior 2a");
                   base.CurrentBehavior = 0;
                   Halt();
                   faceDirection(2);
@@ -107,7 +101,6 @@ namespace LivelyPets
                 case 2:
                 case 3:
                   {
-                    Monitor.Log($"{time.ToString()} - Cat Behavior 2b");
                     List<FarmerSprite.AnimationFrame> licks = new List<FarmerSprite.AnimationFrame>
             {
               new FarmerSprite.AnimationFrame(19, 300),
@@ -130,7 +123,6 @@ namespace LivelyPets
                   }
                 default:
                   {
-                    Monitor.Log($"{time.ToString()} - Cat Behavior 2c");
                     bool blink = Game1.random.NextDouble() < 0.45;
                     Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
             {
@@ -149,7 +141,6 @@ namespace LivelyPets
             }
             break;
           case 0:
-            Monitor.Log($"{time.ToString()} - Cat Behavior 0");
             if (Sprite.CurrentAnimation == null && Game1.random.NextDouble() < 0.01)
             {
               switch (Game1.random.Next(4))
@@ -157,7 +148,6 @@ namespace LivelyPets
                 case 0:
                 case 1:
                 case 2:
-                  Monitor.Log($"{time.ToString()} - Cat Behavior 0a");
                   initiateCurrentBehavior();
                   break;
                 case 3:
@@ -165,14 +155,12 @@ namespace LivelyPets
                   {
                     case 0:
                     case 2:
-                      Monitor.Log($"{time.ToString()} - Cat Behavior 0b");
                       Halt();
                       faceDirection(2);
                       Sprite.loop = false;
                       base.CurrentBehavior = 2;
                       break;
                     case 1:
-                      Monitor.Log($"{time.ToString()} - Cat Behavior 0c");
                       if (Game1.random.NextDouble() < 0.85)
                       {
                         Sprite.loop = false;
@@ -201,7 +189,6 @@ namespace LivelyPets
                       }
                       break;
                     case 3:
-                      Monitor.Log($"{time.ToString()} - Cat Behavior 0d");
                       if (Game1.random.NextDouble() < 0.85)
                       {
                         Sprite.loop = false;
@@ -258,8 +245,6 @@ namespace LivelyPets
           yVelocity = (float)(int)(yVelocity - yVelocity / 4f);
         }
       }
-
-      Monitor.Log($"{time.ToString()} - Cat Update End");
     }
 
     protected override void updateSlaveAnimation(GameTime time)

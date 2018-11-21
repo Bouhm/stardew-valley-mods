@@ -1,5 +1,4 @@
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -9,7 +8,7 @@ using StardewValley;
 
 namespace NPCMapLocations
 {
-	internal class ModMinimap
+  internal class ModMinimap
 	{
 		private readonly Texture2D BuildingMarkers;
     private readonly ModConfig Config;

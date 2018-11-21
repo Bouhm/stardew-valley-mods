@@ -59,32 +59,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StardewValley">
+      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\StardewValley.exe</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="StardewModdingAPI">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe</HintPath>
-    </Reference>
-    <Reference Include="StardewModdingAPI.Toolkit.CoreInterfaces">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\smapi-internal\StardewModdingAPI.Toolkit.CoreInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="StardewValley">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\StardewValley.exe</HintPath>
-    </Reference>
-    <Reference Include="xTile">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\xTile.dll</HintPath>
-    </Reference>
-    <Reference Include="StardewValley">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\StardewValley.exe</HintPath>
-    </Reference>
-    <Reference Include="xTile">
-      <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\xTile.dll</HintPath>
-    </Reference>
     <Reference Include="StardewValley">
       <HintPath>..\..\..\.steam\steam\steamapps\common\Stardew Valley\StardewValley.exe</HintPath>
     </Reference>
