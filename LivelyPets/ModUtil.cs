@@ -11,14 +11,14 @@ namespace LivelyPets
     //
     // ====== RNG =====
     //
-    public int PickRandom(int[] options)
+    public static int PickRandom(int[] options)
     {
       Random r = new Random();
       int rand = r.Next(0, options.Length - 1);
       return options[rand];
     }
 
-    public bool DoRandom(double probability) {
+    public static bool DoRandom(double probability) {
       Random r = new Random();
       double rand = r.NextDouble();
       return rand <= probability;
@@ -27,7 +27,7 @@ namespace LivelyPets
     //
     // ===== Path Finding =====
     //
-    public List<Point> GetPath(GameLocation location, Vector2 from, Vector2 to)
+    public static List<Point> GetPath(GameLocation location, Vector2 from, Vector2 to)
     {
       var gridPos = new Vector2(MathHelper.Min(from.X, to.X), MathHelper.Min(from.Y, to.Y));
       var gridWidth = (int)Math.Abs(to.X - from.X);
@@ -40,10 +40,11 @@ namespace LivelyPets
       Point _from = new Point((int)from.X, (int)from.Y);
       Point _to = new Point((int)to.X, (int)to.Y);
 
-      return PathFinder.FindPath(grid, _from, _to);
+      var a = PathFinder.FindPath(grid, _from, _to);
+      return a;
     }
 
-    private bool[,] GenerateGrid(Vector2 gridPos, int width, int height, Func<Vector2, bool> f)
+    private static bool[,] GenerateGrid(Vector2 gridPos, int width, int height, Func<Vector2, bool> f)
     {
       bool[,] grid = new bool[width, height];
 
