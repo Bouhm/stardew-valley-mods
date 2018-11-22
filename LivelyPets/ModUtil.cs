@@ -27,16 +27,21 @@ namespace LivelyPets
     //
     // ===== Path Finding =====
     //
-    public static List<int> GetPath(GameLocation location, Vector2 from, Vector2 to)
+    public static List<int> GetPath(GameLocation location, Vector2 from, Vector2 to, Character pet)
     {
-      var gridPos = new Vector2(MathHelper.Min(from.X, to.X), MathHelper.Min(from.Y, to.Y));
-      var gridWidth = (int)Math.Abs(to.X - from.X)+1;
-      var gridHeight = (int)Math.Abs(to.Y - from.Y)+1;
-      bool f(Vector2 tile) => location.isTilePassable(new xTile.Dimensions.Location((int)tile.X, (int)tile.Y), Game1.viewport);
+      var padding = 5;
+      var gridPos = new Vector2(MathHelper.Min(from.X, to.X) - padding, MathHelper.Min(from.Y, to.Y) - padding);
+      var width = (int)Math.Abs(to.X - from.X)+1 + padding;
+      var height = (int)Math.Abs(to.Y - from.Y)+1 + padding;
 
-      bool[,] tileGrid = GenerateGrid(gridPos, gridWidth, gridHeight, f);
+      bool[,] tileGrid = new bool[width, height];
 
-      Grid grid = new Grid(gridWidth, gridHeight, tileGrid);
+      for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
+          tileGrid[x, y] = !location.isCollidingPosition(new Rectangle((int)(gridPos.X + x) * Game1.tileSize, (int)(gridPos.Y + y) * Game1.tileSize, 64, 64), Game1.viewport, pet) || (gridPos.X + x == to.X && gridPos.Y + y == to.Y);
+
+
+      Grid grid = new Grid(width, height, tileGrid);
       Point _from = new Point((int)(from.X - gridPos.X), (int)(from.Y - gridPos.Y));
       Point _to = new Point((int)(to.X - gridPos.X), (int)(to.Y - gridPos.Y));
 
@@ -63,13 +68,22 @@ namespace LivelyPets
       return pathDirections;
     }
 
+    private void IsTileObstructed(GameLocation location, Vector2 tile)
+    {
+      var obj = location.getObjectAtTile((int)tile.X, (int)tile.Y);
+      var isObjectPassable = obj == null ? true : obj.isPassable();
+
+    }
+
     private static bool[,] GenerateGrid(Vector2 gridPos, int width, int height, Func<Vector2, bool> f)
     {
       bool[,] grid = new bool[width, height];
 
       for (int x = 0; x < width; x++)
         for (int y = 0; y < height; y++)
-          grid[x, y] = f(new Vector2(gridPos.X + x, gridPos.Y + y));
+        {
+          grid[x, y] = f(new Vector2((gridPos.X + x), (gridPos.Y + y)));
+        }
 
       return grid;
     }

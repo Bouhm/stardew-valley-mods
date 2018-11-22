@@ -25,7 +25,7 @@ namespace LivelyPets
 
     private Farmer activeFarmer= Game1.player;
     private Vector2 prevFarmerPos;
-    private int proximity = 2;
+    private int proximity = 5;
     private int pathToFarmerIndex;
     private List<int> pathToFarmer;
     private int pathingIndex;
@@ -203,11 +203,12 @@ namespace LivelyPets
         moveTowardFarmer(Game1.player, location, time);
       }
       else
-        if (startedBehavior != CurrentBehavior)
       {
-        initiateCurrentBehavior();
+        if (startedBehavior != CurrentBehavior)
+        {
+          initiateCurrentBehavior();
+        }
       }
-
       pushingTimer = Math.Max(0, pushingTimer - 1);
     }
 
@@ -239,12 +240,9 @@ namespace LivelyPets
 
     public void UpdatePathToFarmer()
     {
-      if (prevFarmerPos != activeFarmer.getTileLocation())
-      {
         prevFarmerPos = activeFarmer.getTileLocation();
         pathingIndex = 0;
-        pathToFarmer = ModUtil.GetPath(activeFarmer.currentLocation, getTileLocation(), activeFarmer.getTileLocation());
-      }
+        pathToFarmer = ModUtil.GetPath(currentLocation, getTileLocation(), activeFarmer.getTileLocation(), this);
     }
 
     protected override void updateSlaveAnimation(GameTime time)
