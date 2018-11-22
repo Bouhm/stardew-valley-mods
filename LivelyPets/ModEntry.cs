@@ -27,7 +27,9 @@ namespace LivelyPets
 
     private void GameEvents_OneSecondTick(object sender, EventArgs e)
     {
-      if (!Context.IsWorldReady) return;
+      if (!Context.IsWorldReady || livelyPet == null) return;
+      if (!livelyPet.isNearFarmer)
+        livelyPet.UpdatePathToFarmer();
     }
 
     private void SaveEvents_BeforeSave(object sender, EventArgs e)

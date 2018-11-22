@@ -19,12 +19,17 @@ namespace LivelyPets
     private int startedBehavior = -1;
     private bool wasPetToday;
     private int pushingTimer;
-    public bool isNearFarmer = true;
     private int skipHorizontal;
     private bool skipHorizontalUp;
     private int durationOfRandomMovements = 0;
-    private int proximity = 64 * 7;
+
+    private Farmer activeFarmer= Game1.player;
+    private Vector2 prevFarmerPos;
+    private int proximity = 2;
     private int pathToFarmerIndex;
+    private List<int> pathToFarmer;
+    private int pathingIndex;
+    public bool isNearFarmer = true;
 
     private int closenessLevel;
     private int obedienceLevel;
@@ -192,8 +197,7 @@ namespace LivelyPets
         return;
       }
 
-      var farmerPos = Game1.player.Position;
-      isNearFarmer = ((Position.X - farmerPos.X) * (Position.X - farmerPos.X) + (Position.Y - farmerPos.Y) * (Position.Y - farmerPos.Y)) < proximity * proximity;
+      isNearFarmer = (getTileX() - activeFarmer.getTileX()) * (getTileX() - activeFarmer.getTileX()) + (getTileY() - activeFarmer.getTileY()) * (getTileY() - activeFarmer.getTileY()) < proximity * proximity;
       if (!isNearFarmer)
       {
         moveTowardFarmer(Game1.player, location, time);
@@ -209,7 +213,38 @@ namespace LivelyPets
 
     private void moveTowardFarmer(Farmer farmer, GameLocation location, GameTime time)
     {
-      ModUtil.GetPath(location, getTileLocation(), farmer.getTileLocation());
+      if (pathToFarmer != null && pathingIndex < pathToFarmer.Count)
+      {
+        switch (pathToFarmer[pathingIndex])
+        {
+          case 0:
+            this.SetMovingOnlyUp();
+            break;
+          case 1:
+            this.SetMovingOnlyRight();
+            break;
+          case 2:
+            this.SetMovingOnlyDown();
+            break;
+          case 3:
+            this.SetMovingOnlyLeft();
+            break;
+          default:
+            break;
+        }
+
+        MovePosition(time, Game1.viewport, location);
+      }
+    }
+
+    public void UpdatePathToFarmer()
+    {
+      if (prevFarmerPos != activeFarmer.getTileLocation())
+      {
+        prevFarmerPos = activeFarmer.getTileLocation();
+        pathingIndex = 0;
+        pathToFarmer = ModUtil.GetPath(activeFarmer.currentLocation, getTileLocation(), activeFarmer.getTileLocation());
+      }
     }
 
     protected override void updateSlaveAnimation(GameTime time)

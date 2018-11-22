@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\buildings.png" />
-	<Content Include="assets\customLocations.png" />
+    <Content Include="assets\customLocations.png" />
     <Content Include="assets\default_map.png" />
     <Content Include="assets\eemie_recolour_map.png" />
     <Content Include="assets\starblue_map.png" />

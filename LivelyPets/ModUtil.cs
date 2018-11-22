@@ -27,30 +27,49 @@ namespace LivelyPets
     //
     // ===== Path Finding =====
     //
-    public static List<Point> GetPath(GameLocation location, Vector2 from, Vector2 to)
+    public static List<int> GetPath(GameLocation location, Vector2 from, Vector2 to)
     {
       var gridPos = new Vector2(MathHelper.Min(from.X, to.X), MathHelper.Min(from.Y, to.Y));
-      var gridWidth = (int)Math.Abs(to.X - from.X);
-      var gridHeight = (int)Math.Abs(to.Y - from.Y);
+      var gridWidth = (int)Math.Abs(to.X - from.X)+1;
+      var gridHeight = (int)Math.Abs(to.Y - from.Y)+1;
       bool f(Vector2 tile) => location.isTilePassable(new xTile.Dimensions.Location((int)tile.X, (int)tile.Y), Game1.viewport);
 
       bool[,] tileGrid = GenerateGrid(gridPos, gridWidth, gridHeight, f);
 
       Grid grid = new Grid(gridWidth, gridHeight, tileGrid);
-      Point _from = new Point((int)from.X, (int)from.Y);
-      Point _to = new Point((int)to.X, (int)to.Y);
+      Point _from = new Point((int)(from.X - gridPos.X), (int)(from.Y - gridPos.Y));
+      Point _to = new Point((int)(to.X - gridPos.X), (int)(to.Y - gridPos.Y));
 
-      var a = PathFinder.FindPath(grid, _from, _to);
-      return a;
+      var path = PathFinder.FindPath(grid, _from, _to);
+      var pathDirections = new List<int>();
+
+      // Translate the path in grid to list of directions to move through path
+      for (int i = 0; i < path.Count - 1; i++)
+      {
+        // Left
+        if (path[i + 1].X - path[i].X < 0)
+          pathDirections.Add(3);
+        // Right
+        else if (path[i + 1].X - path[i].X > 0)
+          pathDirections.Add(1);
+        // Up
+        if (path[i + 1].Y - path[i].Y < 0)
+          pathDirections.Add(0);
+        // Down
+        else if (path[i + 1].Y - path[i].Y > 0)
+          pathDirections.Add(2);
+      }
+
+      return pathDirections;
     }
 
     private static bool[,] GenerateGrid(Vector2 gridPos, int width, int height, Func<Vector2, bool> f)
     {
       bool[,] grid = new bool[width, height];
 
-      for (int x = (int)gridPos.X; x < width; x++)
-        for (int y = (int)gridPos.Y; y < height; y++)
-          grid[x, y] = f(new Vector2(x, y));
+      for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
+          grid[x, y] = f(new Vector2(gridPos.X + x, gridPos.Y + y));
 
       return grid;
     }
