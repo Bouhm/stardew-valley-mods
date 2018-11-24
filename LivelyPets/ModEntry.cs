@@ -23,6 +23,12 @@ namespace LivelyPets
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       SaveEvents.BeforeSave += SaveEvents_BeforeSave;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+      PlayerEvents.Warped += PlayerEvents_Warped;
+    }
+
+    private void PlayerEvents_Warped(object sender, EventArgsPlayerWarped e)
+    {
+      livelyPet?.warpToFarmer();
     }
 
     private void GameEvents_OneSecondTick(object sender, EventArgs e)

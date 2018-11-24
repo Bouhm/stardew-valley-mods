@@ -133,6 +133,74 @@ namespace LivelyPets
       this.position.X -= 64f;
     }
 
+    public void warpToFarmer()
+    {
+      var farmerPos = activeFarmer.getTileLocation();
+      var warpPos = farmerPos;
+      switch (activeFarmer.FacingDirection)
+      {
+        case 0:
+          // Check right
+          if (activeFarmer.currentLocation.isCollidingPosition(
+            new Rectangle((int) (farmerPos.X+1)*Game1.tileSize, (int) farmerPos.Y * Game1.tileSize, 64, 64),
+            Game1.viewport, this))
+          {
+            warpPos.X++;
+          }
+          else
+          {
+            warpPos.X--;
+          }
+
+          break;
+        case 1:
+          // Check down
+          if (activeFarmer.currentLocation.isCollidingPosition(
+            new Rectangle((int)farmerPos.X * Game1.tileSize, (int)(farmerPos.Y+1)*Game1.tileSize, 64, 64),
+            Game1.viewport, this))
+          {
+            warpPos.Y++;
+          }
+          else
+          {
+            warpPos.Y--;
+          }
+
+          break;
+        case 2:
+          // Check right
+          if (activeFarmer.currentLocation.isCollidingPosition(
+            new Rectangle((int)(farmerPos.X + 1) * Game1.tileSize, (int)farmerPos.Y * Game1.tileSize, 64, 64),
+            Game1.viewport, this))
+          {
+            warpPos.X++;
+          }
+          else
+          {
+            warpPos.X--;
+          }
+
+          break;
+        case 3:
+          // Check down
+          if (activeFarmer.currentLocation.isCollidingPosition(
+            new Rectangle((int)farmerPos.X * Game1.tileSize, (int)(farmerPos.Y + 1) * Game1.tileSize, 64, 64),
+            Game1.viewport, this))
+          {
+            warpPos.Y++;
+          }
+          else
+          {
+            warpPos.Y--;
+          }
+
+          break;
+      }
+
+      this.faceDirection(activeFarmer.FacingDirection);
+      Game1.warpCharacter((NPC)this, activeFarmer.currentLocation.Name, warpPos);
+    }
+
     public override bool shouldCollideWithBuildingLayer(GameLocation location)
     {
       return true;
@@ -240,9 +308,9 @@ namespace LivelyPets
 
     public void UpdatePathToFarmer()
     {
-        prevFarmerPos = activeFarmer.getTileLocation();
-        pathingIndex = 0;
-        pathToFarmer = ModUtil.GetPath(currentLocation, getTileLocation(), activeFarmer.getTileLocation(), this);
+      prevFarmerPos = activeFarmer.getTileLocation();
+      pathingIndex = 0;
+      pathToFarmer = ModUtil.GetPath(currentLocation, getTileLocation(), activeFarmer.getTileLocation(), this);
     }
 
     protected override void updateSlaveAnimation(GameTime time)
