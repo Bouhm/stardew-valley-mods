@@ -18,14 +18,23 @@ namespace LivelyPets
   {
     private Pet vanillaPet;
     private LivelyPet livelyPet;
+    private ModData petData;
+    private PetCommands petCommands;
 
     public override void Entry(IModHelper helper)
     {
+      petCommands = Helper.Data.ReadJsonFile<PetCommands>("commands.json") ?? new PetCommands();
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+      SaveEvents.AfterLoad += SaveEvents_AfterLoad;
       SaveEvents.BeforeSave += SaveEvents_BeforeSave;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
       GameEvents.UpdateTick += GameEvents_UpdateTick;
       PlayerEvents.Warped += PlayerEvents_Warped;
+    }
+
+    private void SaveEvents_AfterLoad(object sender, EventArgs e)
+    {
+      petData = Helper.Data.ReadJsonFile<ModData>($"data/{Constants.SaveFolderName}.json") ?? new ModData();
     }
 
     private void GameEvents_UpdateTick(object sender, EventArgs e)
