@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Characters;
+using StardewValley.Menus;
 
 namespace LivelyPets
 {
@@ -23,7 +24,22 @@ namespace LivelyPets
       TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
       SaveEvents.BeforeSave += SaveEvents_BeforeSave;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+      GameEvents.UpdateTick += GameEvents_UpdateTick;
       PlayerEvents.Warped += PlayerEvents_Warped;
+    }
+
+    private void GameEvents_UpdateTick(object sender, EventArgs e)
+    {
+    }
+
+    private void CheckChatForCommands()
+    {
+      var messages = this.Helper.Reflection.GetField<List<ChatMessage>>(Game1.chatBox, "messages", true).GetValue();
+      var lastMsg = ChatMessage.makeMessagePlaintext(messages.LastOrDefault()?.message);
+      var farmerName = lastMsg.Substring(0, lastMsg.IndexOf(':'));
+      lastMsg = lastMsg.Replace($"{farmerName}: ", ""); // Remove sender name from text
+      Monitor.Log(farmerName);
+      Monitor.Log(lastMsg);
     }
 
     private void PlayerEvents_Warped(object sender, EventArgsPlayerWarped e)
@@ -36,6 +52,8 @@ namespace LivelyPets
       if (!Context.IsWorldReady || livelyPet == null) return;
       if (!livelyPet.isNearFarmer)
         livelyPet.UpdatePathToFarmer();
+
+      CheckChatForCommands();
     }
 
     private void SaveEvents_BeforeSave(object sender, EventArgs e)
