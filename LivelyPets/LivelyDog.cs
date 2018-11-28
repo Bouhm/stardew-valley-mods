@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
@@ -13,16 +14,17 @@ namespace LivelyPets
 {
   class LivelyDog : LivelyPet
   {
-    public const int behavior_sit_right = 50;
-    public const int behavior_sprint = 51;
     private int sprintTimer;
     private bool wagging;
 
-    public LivelyDog(Dog pet)
+    public LivelyDog(Dog pet, IMonitor monitor)
     {
+      base.Monitor = monitor;
       var petType = pet.GetType();
-      PropertyInfo[] properties = petType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-      FieldInfo[] fields = petType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+      PropertyInfo[] properties = petType.GetProperties(BindingFlags.Public | BindingFlags.NonPublic |
+                                                        BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+      FieldInfo[] fields = petType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+                                             BindingFlags.FlattenHierarchy);
 
       foreach (PropertyInfo property in properties)
       {
@@ -30,22 +32,23 @@ namespace LivelyPets
         {
           property.SetValue(pet, property.GetValue(pet, null), null);
         }
-        catch (ArgumentException) { } // For Get-only-properties
+        catch (ArgumentException)
+        {
+          continue;
+        }
       }
+
       foreach (FieldInfo field in fields)
       {
-        field.SetValue(this, field.GetValue(pet));
+        try
+        {
+          field.SetValue(this, field.GetValue(pet));
+        }
+        catch (ArgumentException)
+        {
+          continue;
+        }
       }
-    }
-
-    public LivelyDog(int xTile, int yTile)
-    {
-      Sprite = new AnimatedSprite("Animals\\dog", 0, 32, 32);
-      base.Position = new Vector2((float)xTile, (float)yTile) * 64f;
-      base.Breather = false;
-      willDestroyObjectsUnderfoot = false;
-      base.currentLocation = Game1.currentLocation;
-      base.HideShadow = true;
     }
 
     public override void dayUpdate(int dayOfMonth)
@@ -57,10 +60,13 @@ namespace LivelyPets
     public override void update(GameTime time, GameLocation location)
     {
       base.update(time, location);
+      if (!isNearFarmer) return;
+
       if (base.currentLocation == null)
       {
         base.currentLocation = location;
       }
+
       if (!Game1.eventUp && !Game1.IsClient)
       {
         if (sprintTimer > 0)
@@ -84,6 +90,9 @@ namespace LivelyPets
           {
             base.CurrentBehavior = 1;
           }
+
+          if (commandBehavior != null) setCommandBehavior();
+
           switch (base.CurrentBehavior)
           {
             case 1:
@@ -95,6 +104,7 @@ namespace LivelyPets
               {
                 doEmote(24, true);
               }
+
               return;
             case 2:
               if (Sprite.currentFrame != 18 && Sprite.CurrentAnimation == null)
@@ -110,49 +120,61 @@ namespace LivelyPets
                     Halt();
                     faceDirection(2);
                     Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(17, 200),
-                new FarmerSprite.AnimationFrame(16, 200),
-                new FarmerSprite.AnimationFrame(0, 200)
-              });
+                    {
+                      new FarmerSprite.AnimationFrame(17, 200),
+                      new FarmerSprite.AnimationFrame(16, 200),
+                      new FarmerSprite.AnimationFrame(0, 200)
+                    });
                     Sprite.loop = false;
                     break;
                   case 1:
+                  {
+                    List<FarmerSprite.AnimationFrame> pant = new List<FarmerSprite.AnimationFrame>
                     {
-                      List<FarmerSprite.AnimationFrame> pant = new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false),
-                new FarmerSprite.AnimationFrame(19, 200)
-              };
-                      int pants = Game1.random.Next(7, 20);
-                      for (int i = 0; i < pants; i++)
-                      {
-                        pant.Add(new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false));
-                        pant.Add(new FarmerSprite.AnimationFrame(19, 200));
-                      }
-                      Sprite.setCurrentAnimation(pant);
-                      break;
+                      new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false),
+                      new FarmerSprite.AnimationFrame(19, 200)
+                    };
+                    int pants = Game1.random.Next(7, 20);
+                    for (int i = 0; i < pants; i++)
+                    {
+                      pant.Add(new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false));
+                      pant.Add(new FarmerSprite.AnimationFrame(19, 200));
                     }
+
+                    Sprite.setCurrentAnimation(pant);
+                    break;
+                  }
                   case 2:
                   case 3:
                     Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(27, (Game1.random.NextDouble() < 0.3) ? 500 : Game1.random.Next(2000, 15000)),
-                new FarmerSprite.AnimationFrame(18, 1, false, false, base.hold, false)
-              });
+                    {
+                      new FarmerSprite.AnimationFrame(27,
+                        (Game1.random.NextDouble() < 0.3) ? 500 : Game1.random.Next(2000, 15000)),
+                      new FarmerSprite.AnimationFrame(18, 1, false, false, base.hold, false)
+                    });
                     Sprite.loop = false;
                     break;
                 }
               }
+
               break;
             case 50:
-              if (withinPlayerThreshold(2))
+              if (commandBehavior == "speak")
+              {
+                if (Utility.isOnScreen(getTileLocationPoint(), 640, base.currentLocation))
+                {
+                  Game1.playSound("dog_bark");
+                  shake(500);
+                }
+              }
+              else if (withinPlayerThreshold(2))
               {
                 if (!wagging)
                 {
                   wag(base.FacingDirection == 3);
                 }
               }
+              // Sit
               else if (Sprite.currentFrame != 23 && Sprite.CurrentAnimation == null)
               {
                 Sprite.currentFrame = 23;
@@ -162,30 +184,54 @@ namespace LivelyPets
                 bool localFlip = base.FacingDirection == 3;
                 switch (Game1.random.Next(7))
                 {
+                  // Pant
                   case 0:
                     base.CurrentBehavior = 0;
                     Halt();
                     faceDirection((!localFlip) ? 1 : 3);
                     Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(23, 100, false, localFlip, null, false),
-                new FarmerSprite.AnimationFrame(22, 100, false, localFlip, null, false),
-                new FarmerSprite.AnimationFrame(21, 100, false, localFlip, null, false),
-                new FarmerSprite.AnimationFrame(20, 100, false, localFlip, base.hold, false)
-              });
+                    {
+                      new FarmerSprite.AnimationFrame(23, 100, false, localFlip, null, false),
+                      new FarmerSprite.AnimationFrame(22, 100, false, localFlip, null, false),
+                      new FarmerSprite.AnimationFrame(21, 100, false, localFlip, null, false),
+                      new FarmerSprite.AnimationFrame(20, 100, false, localFlip, base.hold, false)
+                    });
                     Sprite.loop = false;
                     break;
+                  // Bark
                   case 1:
-                    if (Utility.isOnScreen(getTileLocationPoint(), 640, base.currentLocation))
+                    if (commandBehavior == "sit")
                     {
-                      Game1.playSound("dog_bark");
-                      shake(500);
+                      Sprite.loop = false;
+                      List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
+                      {
+                        new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
+                        new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
+                      };
+                      int pantings = Game1.random.Next(5, 15);
+                      for (int j = 0; j < pantings; j++)
+                      {
+                        panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
+                        panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
+                      }
+
+                      Sprite.setCurrentAnimation(panting);
+                      break;
                     }
-                    Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(26, 500, false, localFlip, null, false),
-                new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
-              });
+                    else
+                    {
+                      if (Utility.isOnScreen(getTileLocationPoint(), 640, base.currentLocation))
+                      {
+                        Game1.playSound("dog_bark");
+                        shake(500);
+                      }
+
+                      Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
+                      {
+                        new FarmerSprite.AnimationFrame(26, 500, false, localFlip, null, false),
+                        new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
+                      });
+                    }
                     break;
                   case 2:
                     wag(localFlip);
@@ -193,30 +239,32 @@ namespace LivelyPets
                   case 3:
                   case 4:
                     Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(23, Game1.random.Next(2000, 6000), false, localFlip, null, false),
-                new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
-              });
+                    {
+                      new FarmerSprite.AnimationFrame(23, Game1.random.Next(2000, 6000), false, localFlip, null, false),
+                      new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
+                    });
                     break;
                   default:
+                  {
+                    Sprite.loop = false;
+                    List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
                     {
-                      Sprite.loop = false;
-                      List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
-              {
-                new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
-                new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
-              };
-                      int pantings = Game1.random.Next(5, 15);
-                      for (int j = 0; j < pantings; j++)
-                      {
-                        panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
-                        panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
-                      }
-                      Sprite.setCurrentAnimation(panting);
-                      break;
+                      new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
+                      new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
+                    };
+                    int pantings = Game1.random.Next(5, 15);
+                    for (int j = 0; j < pantings; j++)
+                    {
+                      panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
+                      panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
                     }
+
+                    Sprite.setCurrentAnimation(panting);
+                    break;
+                  }
                 }
               }
+
               break;
             case 0:
               if (Sprite.CurrentAnimation == null && Game1.random.NextDouble() < 0.01)
@@ -247,11 +295,13 @@ namespace LivelyPets
                         {
                           base.FacingDirection = ((!(Game1.random.NextDouble() < 0.5)) ? 1 : 3);
                         }
+
                         faceDirection(base.FacingDirection);
                         Sprite.loop = false;
                         base.CurrentBehavior = 50;
                         break;
                     }
+
                     break;
                   case 6:
                   case 7:
@@ -259,22 +309,28 @@ namespace LivelyPets
                     break;
                 }
               }
+
               break;
           }
+
           if (Sprite.CurrentAnimation != null)
           {
+            if (commandBehaviorTimer == 0)
+            {
+              base.CurrentBehavior = 0;
+            }
+            commandBehavior = null;
             Sprite.loop = false;
           }
           else
           {
             wagging = false;
           }
-          /*
+
           if (Game1.IsMasterGame && Sprite.CurrentAnimation == null)
           {
             MovePosition(time, Game1.viewport, location);
           }
-          */
         }
       }
     }
@@ -288,6 +344,7 @@ namespace LivelyPets
           {
             doEmote(24, true);
           }
+
           return;
         case 2:
           if (Sprite.currentFrame == 18 && Game1.random.NextDouble() < 0.01)
@@ -295,32 +352,35 @@ namespace LivelyPets
             switch (Game1.random.Next(4))
             {
               case 1:
+              {
+                List<FarmerSprite.AnimationFrame> pant = new List<FarmerSprite.AnimationFrame>
                 {
-                  List<FarmerSprite.AnimationFrame> pant = new List<FarmerSprite.AnimationFrame>
-          {
-            new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false),
-            new FarmerSprite.AnimationFrame(19, 200)
-          };
-                  int pants = Game1.random.Next(7, 20);
-                  for (int i = 0; i < pants; i++)
-                  {
-                    pant.Add(new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false));
-                    pant.Add(new FarmerSprite.AnimationFrame(19, 200));
-                  }
-                  Sprite.setCurrentAnimation(pant);
-                  break;
+                  new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false),
+                  new FarmerSprite.AnimationFrame(19, 200)
+                };
+                int pants = Game1.random.Next(7, 20);
+                for (int i = 0; i < pants; i++)
+                {
+                  pant.Add(new FarmerSprite.AnimationFrame(18, 200, false, false, pantSound, false));
+                  pant.Add(new FarmerSprite.AnimationFrame(19, 200));
                 }
+
+                Sprite.setCurrentAnimation(pant);
+                break;
+              }
               case 2:
               case 3:
                 Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-          {
-            new FarmerSprite.AnimationFrame(27, (Game1.random.NextDouble() < 0.3) ? 500 : Game1.random.Next(2000, 15000)),
-            new FarmerSprite.AnimationFrame(18, 1, false, false, base.hold, false)
-          });
+                {
+                  new FarmerSprite.AnimationFrame(27,
+                    (Game1.random.NextDouble() < 0.3) ? 500 : Game1.random.Next(2000, 15000)),
+                  new FarmerSprite.AnimationFrame(18, 1, false, false, base.hold, false)
+                });
                 Sprite.loop = false;
                 break;
             }
           }
+
           break;
         case 50:
           if (withinPlayerThreshold(2))
@@ -345,11 +405,12 @@ namespace LivelyPets
                   Game1.playSound("dog_bark");
                   shake(500);
                 }
+
                 Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-          {
-            new FarmerSprite.AnimationFrame(26, 500, false, localFlip, null, false),
-            new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
-          });
+                {
+                  new FarmerSprite.AnimationFrame(26, 500, false, localFlip, null, false),
+                  new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
+                });
                 break;
               case 2:
                 wag(localFlip);
@@ -357,32 +418,34 @@ namespace LivelyPets
               case 3:
               case 4:
                 Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-          {
-            new FarmerSprite.AnimationFrame(23, Game1.random.Next(2000, 6000), false, localFlip, null, false),
-            new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
-          });
+                {
+                  new FarmerSprite.AnimationFrame(23, Game1.random.Next(2000, 6000), false, localFlip, null, false),
+                  new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
+                });
                 break;
               default:
+              {
+                Sprite.loop = false;
+                List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
                 {
-                  Sprite.loop = false;
-                  List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
-          {
-            new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
-            new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
-          };
-                  int pantings = Game1.random.Next(5, 15);
-                  for (int j = 0; j < pantings; j++)
-                  {
-                    panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
-                    panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
-                  }
-                  Sprite.setCurrentAnimation(panting);
-                  break;
+                  new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
+                  new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
+                };
+                int pantings = Game1.random.Next(5, 15);
+                for (int j = 0; j < pantings; j++)
+                {
+                  panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
+                  panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
                 }
+
+                Sprite.setCurrentAnimation(panting);
+                break;
+              }
               case 0:
                 break;
             }
           }
+
           break;
         case 0:
           faceDirection(base.FacingDirection);
@@ -394,8 +457,10 @@ namespace LivelyPets
           {
             Sprite.StopAnimation();
           }
+
           break;
       }
+
       if (Sprite.CurrentAnimation != null)
       {
         Sprite.loop = false;
@@ -406,22 +471,37 @@ namespace LivelyPets
       }
     }
 
+    private void setCommandBehavior()
+    {
+      commandBehaviorTimer = 10;
+      switch (commandBehavior)
+      {
+        case "sit":
+          base.CurrentBehavior = 50;
+          break;
+        case "speak":
+          base.CurrentBehavior = 50;
+          break;
+      }
+    }
+
     public void wag(bool localFlip)
     {
       int delay = withinPlayerThreshold(2) ? 120 : 200;
       wagging = true;
       Sprite.loop = false;
       List<FarmerSprite.AnimationFrame> wag = new List<FarmerSprite.AnimationFrame>
-    {
-      new FarmerSprite.AnimationFrame(31, delay, false, localFlip, null, false),
-      new FarmerSprite.AnimationFrame(23, delay, false, localFlip, hitGround, false)
-    };
+      {
+        new FarmerSprite.AnimationFrame(31, delay, false, localFlip, null, false),
+        new FarmerSprite.AnimationFrame(23, delay, false, localFlip, hitGround, false)
+      };
       int wags = Game1.random.Next(2, 6);
       for (int i = 0; i < wags; i++)
       {
         wag.Add(new FarmerSprite.AnimationFrame(31, delay, false, localFlip, null, false));
         wag.Add(new FarmerSprite.AnimationFrame(23, delay, false, localFlip, hitGround, false));
       }
+
       wag.Add(new FarmerSprite.AnimationFrame(23, 2, false, localFlip, doneWagging, false));
       Sprite.setCurrentAnimation(wag);
     }
@@ -440,12 +520,12 @@ namespace LivelyPets
       {
         case 50:
           Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-      {
-        new FarmerSprite.AnimationFrame(20, 100, false, localflip2, null, false),
-        new FarmerSprite.AnimationFrame(21, 100, false, localflip2, null, false),
-        new FarmerSprite.AnimationFrame(22, 100, false, localflip2, null, false),
-        new FarmerSprite.AnimationFrame(23, 100, false, localflip2, base.hold, false)
-      });
+          {
+            new FarmerSprite.AnimationFrame(20, 100, false, localflip2, null, false),
+            new FarmerSprite.AnimationFrame(21, 100, false, localflip2, null, false),
+            new FarmerSprite.AnimationFrame(22, 100, false, localflip2, null, false),
+            new FarmerSprite.AnimationFrame(23, 100, false, localflip2, base.hold, false)
+          });
           break;
         case 51:
           faceDirection((!(Game1.random.NextDouble() < 0.5)) ? 1 : 3);
@@ -455,14 +535,15 @@ namespace LivelyPets
           {
             Game1.playSound("dog_bark");
           }
+
           Sprite.loop = true;
           Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
-      {
-        new FarmerSprite.AnimationFrame(32, 100, false, localflip2, null, false),
-        new FarmerSprite.AnimationFrame(33, 100, false, localflip2, null, false),
-        new FarmerSprite.AnimationFrame(34, 100, false, localflip2, hitGround, false),
-        new FarmerSprite.AnimationFrame(33, 100, false, localflip2, null, false)
-      });
+          {
+            new FarmerSprite.AnimationFrame(32, 100, false, localflip2, null, false),
+            new FarmerSprite.AnimationFrame(33, 100, false, localflip2, null, false),
+            new FarmerSprite.AnimationFrame(34, 100, false, localflip2, hitGround, false),
+            new FarmerSprite.AnimationFrame(33, 100, false, localflip2, null, false)
+          });
           break;
       }
     }
@@ -489,7 +570,6 @@ namespace LivelyPets
       {
         base.currentLocation.localSound("thudStep");
       }
-      
     }
 
     public override void playContentSound()
@@ -501,5 +581,4 @@ namespace LivelyPets
       }
     }
   }
-
 }

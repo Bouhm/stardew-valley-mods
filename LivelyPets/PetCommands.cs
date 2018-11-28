@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace LivelyPets
 {
-  class PetCommands
+  public class PetCommands
   {
-    public Dictionary<string, int> Commands { get; set; }
+    public Dictionary<string, string[]> Commands { get; set; }
   }
 }

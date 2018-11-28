@@ -1,0 +1,9 @@
+{
+  "Commands": {
+    "follow": ["follow", "come"],
+    "stay": ["stay"],
+    "sit": ["sit"],
+    "speak": ["speak"],
+    "lie": ["down"]
+  }
+}

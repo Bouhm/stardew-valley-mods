@@ -53,14 +53,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModData.cs" />
     <Compile Include="ModUtil.cs" />
     <Compile Include="LivelyCat.cs" />
     <Compile Include="LivelyDog.cs" />
     <Compile Include="LivelyPet.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="PetCommands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="commands.json" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>

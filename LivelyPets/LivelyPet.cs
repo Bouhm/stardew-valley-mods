@@ -25,12 +25,14 @@ namespace LivelyPets
 
     private Farmer activeFarmer= Game1.player;
     private Vector2 prevFarmerPos;
-    private int proximity = 5;
+    private int proximity = 100;
     private int pathToFarmerIndex;
     private List<int> pathToFarmer;
     private int pathingIndex;
     public bool isNearFarmer = true;
 
+    public int commandBehaviorTimer { get; set; }
+    public string commandBehavior { get; set; }
     private int closenessLevel;
     private int obedienceLevel;
 
@@ -38,7 +40,7 @@ namespace LivelyPets
     {
       get
       {
-        if (this.isMoving())
+        if (this.isMoving() && commandBehavior == null)
           return 0;
         return (int)((NetFieldBase<int, NetInt>)this.netCurrentBehavior);
       }
@@ -259,13 +261,14 @@ namespace LivelyPets
 
     public override void update(GameTime time, GameLocation location, long id, bool move)
     {
+      /*
       if (startedBehavior == -1)
       {
         base.update(time, location, id, move);
         return;
       }
+      */
 
-      isNearFarmer = (getTileX() - activeFarmer.getTileX()) * (getTileX() - activeFarmer.getTileX()) + (getTileY() - activeFarmer.getTileY()) * (getTileY() - activeFarmer.getTileY()) < proximity * proximity;
       if (!isNearFarmer)
       {
         moveTowardFarmer(Game1.player, location, time);
@@ -274,6 +277,7 @@ namespace LivelyPets
       {
         if (startedBehavior != CurrentBehavior)
         {
+          Monitor.Log(CurrentBehavior + "");
           initiateCurrentBehavior();
         }
       }
@@ -308,6 +312,7 @@ namespace LivelyPets
 
     public void UpdatePathToFarmer()
     {
+      isNearFarmer = (getTileX() - activeFarmer.getTileX()) * (getTileX() - activeFarmer.getTileX()) + (getTileY() - activeFarmer.getTileY()) * (getTileY() - activeFarmer.getTileY()) < proximity * proximity;
       prevFarmerPos = activeFarmer.getTileLocation();
       pathingIndex = 0;
       pathToFarmer = ModUtil.GetPath(currentLocation, getTileLocation(), activeFarmer.getTileLocation(), this);

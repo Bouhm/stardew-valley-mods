@@ -34,21 +34,6 @@ namespace LivelyPets
       }
     }
 
-    public LivelyCat(int xTile, int yTile)
-    {
-      Sprite = new AnimatedSprite("Animals\\cat", 0, 32, 32);
-      base.Position = new Vector2((float) xTile, (float) yTile) * 64f;
-      base.Breather = false;
-      willDestroyObjectsUnderfoot = false;
-      base.currentLocation = Game1.currentLocation;
-      base.HideShadow = true;
-    }
-
-    public override void initiateCurrentBehavior()
-    {
-      base.initiateCurrentBehavior();
-    }
-
     public override void update(GameTime time, GameLocation location)
     {
       base.update(time, location);

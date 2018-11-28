@@ -8,5 +8,6 @@ namespace LivelyPets
 {
   class ModData
   {
+   
   }
 }
