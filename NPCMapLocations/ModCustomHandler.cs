@@ -21,15 +21,19 @@ namespace NPCMapLocations
 		private Dictionary<string, int> MarkerCropOffsets;
 		private HashSet<string> NpcCustomizations;
 
-		public ModCustomHandler(IModHelper helper, ModConfig config, IMonitor monitor)
+		public ModCustomHandler(IModHelper helper, IMonitor monitor)
 		{
 			this.MarkerCropOffsets = ModConstants.MarkerCropOffsets;
 			this.Helper = helper;
-			this.Config = config;
 			this.Monitor = monitor;
 			this.CustomNames = new Dictionary<string, string>();
 			this.NpcCustomizations = new HashSet<string>();
 		}
+
+    public void LoadConfig(ModConfig config)
+	  {
+	    this.Config = config;
+	  }
 
 		// Handles customizations for NPCs
 		// Custom NPCs and custom names or sprites for existing NPCs

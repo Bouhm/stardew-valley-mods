@@ -83,6 +83,7 @@ namespace NPCMapLocations
         Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
       CustomMarkerTex =
         Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
+      CustomHandler = new ModCustomHandler(Helper, Monitor);
 
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;
       GameEvents.OneSecondTick += GameEvents_OneSecondTick;
@@ -178,7 +179,7 @@ namespace NPCMapLocations
     private void SaveEvents_AfterLoad(object sender, EventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
-      CustomHandler = new ModCustomHandler(Helper, Config, Monitor);
+      CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
       locationContexts = new Dictionary<string, LocationContext>();
@@ -538,7 +539,7 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || (!locationName.Equals("Cabin") || !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
+        if (locationName == null || (!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
@@ -649,7 +650,7 @@ namespace NPCMapLocations
         if (locationName.Contains("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if ((!locationName.Equals("Cabin") || !locationName.Contains("UndergroundMine")) &&
+        if ((!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) &&
             !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
