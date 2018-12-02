@@ -29,7 +29,7 @@ namespace LivelyPets
     //
     public static List<int> GetPath(GameLocation location, Vector2 from, Vector2 to, Character pet)
     {
-      var padding = 5;
+      var padding = 1;
       var gridPos = new Vector2(MathHelper.Min(from.X, to.X) - padding, MathHelper.Min(from.Y, to.Y) - padding);
       var width = (int)Math.Abs(to.X - from.X)+1 + padding;
       var height = (int)Math.Abs(to.Y - from.Y)+1 + padding;
@@ -38,7 +38,7 @@ namespace LivelyPets
 
       for (int x = 0; x < width; x++)
         for (int y = 0; y < height; y++)
-          tileGrid[x, y] = !location.isCollidingPosition(new Rectangle((int)(gridPos.X + x) * Game1.tileSize, (int)(gridPos.Y + y) * Game1.tileSize, 64, 64), Game1.viewport, pet) || (gridPos.X + x == to.X && gridPos.Y + y == to.Y);
+          tileGrid[x, y] = !pet.currentLocation.isCollidingPosition(new Rectangle((int)(gridPos.X + x)*Game1.tileSize, (int)(gridPos.Y + y)*Game1.tileSize, pet.GetBoundingBox().Width, pet.GetBoundingBox().Height), Game1.viewport, false, 0, false, pet) || (gridPos.X + x == to.X && gridPos.Y + y == to.Y);
 
 
       Grid grid = new Grid(width, height, tileGrid);

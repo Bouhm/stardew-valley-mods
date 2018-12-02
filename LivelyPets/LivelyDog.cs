@@ -159,13 +159,18 @@ namespace LivelyPets
 
               break;
             case 50:
-              if (commandBehavior == "speak")
-              {
+              if (commandBehavior == "speak") {
                 if (Utility.isOnScreen(getTileLocationPoint(), 640, base.currentLocation))
                 {
                   Game1.playSound("dog_bark");
                   shake(500);
                 }
+
+                Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>
+                {
+                  new FarmerSprite.AnimationFrame(26, 500, false, facingDirection == 3, null, false),
+                  new FarmerSprite.AnimationFrame(23, 1, false, facingDirection == 3, base.hold, false),
+                });
               }
               else if (withinPlayerThreshold(2))
               {
@@ -200,26 +205,6 @@ namespace LivelyPets
                     break;
                   // Bark
                   case 1:
-                    if (commandBehavior == "sit")
-                    {
-                      Sprite.loop = false;
-                      List<FarmerSprite.AnimationFrame> panting = new List<FarmerSprite.AnimationFrame>
-                      {
-                        new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false),
-                        new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false)
-                      };
-                      int pantings = Game1.random.Next(5, 15);
-                      for (int j = 0; j < pantings; j++)
-                      {
-                        panting.Add(new FarmerSprite.AnimationFrame(24, 200, false, localFlip, pantSound, false));
-                        panting.Add(new FarmerSprite.AnimationFrame(25, 200, false, localFlip, null, false));
-                      }
-
-                      Sprite.setCurrentAnimation(panting);
-                      break;
-                    }
-                    else
-                    {
                       if (Utility.isOnScreen(getTileLocationPoint(), 640, base.currentLocation))
                       {
                         Game1.playSound("dog_bark");
@@ -231,7 +216,7 @@ namespace LivelyPets
                         new FarmerSprite.AnimationFrame(26, 500, false, localFlip, null, false),
                         new FarmerSprite.AnimationFrame(23, 1, false, localFlip, base.hold, false)
                       });
-                    }
+                    
                     break;
                   case 2:
                     wag(localFlip);
@@ -317,7 +302,9 @@ namespace LivelyPets
           {
             if (commandBehaviorTimer == 0)
             {
-              base.CurrentBehavior = 0;
+              resetCurrentBehavior();
+              commandBehaviorTimer = -1;
+              base.CurrentBehavior = ModUtil.PickRandom(new int[]{0, 50});
             }
             commandBehavior = null;
             Sprite.loop = false;
@@ -473,7 +460,7 @@ namespace LivelyPets
 
     private void setCommandBehavior()
     {
-      commandBehaviorTimer = 10;
+      base.setCommandBehavior();
       switch (commandBehavior)
       {
         case "sit":

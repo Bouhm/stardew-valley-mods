@@ -25,13 +25,15 @@ namespace LivelyPets
 
     private Farmer activeFarmer= Game1.player;
     private Vector2 prevFarmerPos;
-    private int proximity = 100;
+    private int proximity = 1;
     private int pathToFarmerIndex;
-    private List<int> pathToFarmer;
-    private int pathingIndex;
+    public List<int> pathToFarmer;
+    public int pathingIndex;
     public bool isNearFarmer = true;
-
-    public int commandBehaviorTimer { get; set; }
+    private Vector2 start;
+    
+    public int behaviorTimerMax = 20;
+    public int commandBehaviorTimer;
     public string commandBehavior { get; set; }
     private int closenessLevel;
     private int obedienceLevel;
@@ -54,6 +56,18 @@ namespace LivelyPets
     {
       base.initNetFields();
       this.NetFields.AddFields((INetSerializable)this.netCurrentBehavior);
+    }
+
+    public void resetCurrentBehavior()
+    {
+      //Sprite.StopAnimation();
+      //Halt();
+    }
+
+    public virtual void setCommandBehavior()
+    {
+      resetCurrentBehavior();
+      commandBehaviorTimer = behaviorTimerMax;
     }
 
     public override void behaviorOnFarmerLocationEntry(GameLocation location, Farmer who)
@@ -271,13 +285,14 @@ namespace LivelyPets
 
       if (!isNearFarmer)
       {
+        //Halt();
+        //Sprite.StopAnimation();
         moveTowardFarmer(Game1.player, location, time);
       }
       else
       {
         if (startedBehavior != CurrentBehavior)
         {
-          Monitor.Log(CurrentBehavior + "");
           initiateCurrentBehavior();
         }
       }
@@ -286,7 +301,9 @@ namespace LivelyPets
 
     private void moveTowardFarmer(Farmer farmer, GameLocation location, GameTime time)
     {
-      if (pathToFarmer != null && pathingIndex < pathToFarmer.Count)
+      if (pathToFarmer == null) return;
+      
+    if (pathingIndex < pathToFarmer.Count)
       {
         switch (pathToFarmer[pathingIndex])
         {
@@ -306,16 +323,141 @@ namespace LivelyPets
             break;
         }
 
-        MovePosition(time, Game1.viewport, location);
+        MoveAlongPath(time, Game1.viewport);
+      }
+    }
+
+    public void MoveAlongPath(GameTime time, xTile.Dimensions.Rectangle viewport)
+    {
+      Speed = 4;
+
+      willDestroyObjectsUnderfoot = false;
+      TimeSpan elapsedGameTime;
+      var step = speed + addedSpeed;
+      if (xVelocity != 0f || yVelocity != 0f)
+      {
+        applyVelocity(currentLocation);
+      }
+      else if (moveUp)
+      {
+        if ((Position.Y % 64 != 0) && position.Y - step < (int) Math.Floor(Position.Y / Game1.tileSize) * Game1.tileSize)
+        {
+          step = (int)(Math.Floor(Position.Y / Game1.tileSize) * Game1.tileSize - Position.Y);
+          pathingIndex++;
+        }
+
+        position.Y -= step;
+
+        if (!ignoreMovementAnimation)
+        {
+          Sprite.AnimateUp(time, (speed - 2 + addedSpeed) * -25, Utility.isOnScreen(getTileLocationPoint(), 1, currentLocation) ? "Cowboy_Footstep" : "");
+          faceDirection(0);
+        }
+      }
+      else if (moveRight)
+      {
+        if ((Position.X % 64 != 0) && position.X + step > (int)Math.Ceiling(Position.X / Game1.tileSize) * Game1.tileSize)
+        {
+          step = (int)(Math.Ceiling(Position.X / Game1.tileSize) * Game1.tileSize - Position.X);
+          pathingIndex++;
+        }
+        position.X += step;
+
+        if (!ignoreMovementAnimation)
+        {
+          Sprite.AnimateRight(time, (speed - 2 + addedSpeed) * -25, Utility.isOnScreen(getTileLocationPoint(), 1, currentLocation) ? "Cowboy_Footstep" : "");
+          faceDirection(1);
+        }
+      }
+      else if (moveDown)
+      {
+        if ((Position.Y % 64 != 0) && position.Y + step > (int)Math.Ceiling(Position.Y / Game1.tileSize) * Game1.tileSize)
+        {
+          step = (int)(Math.Ceiling(Position.Y / Game1.tileSize) * Game1.tileSize - Position.Y);
+          pathingIndex++;
+        }
+        position.Y += step;
+        if (!ignoreMovementAnimation)
+        {
+          Sprite.AnimateDown(time, (speed - 2 + addedSpeed) * -25, Utility.isOnScreen(getTileLocationPoint(), 1, currentLocation) ? "Cowboy_Footstep" : "");
+          faceDirection(2);
+        }
+      }
+      else if (moveLeft)
+      {
+        if ((Position.X % 64 != 0) && position.X - step < (int)Math.Floor(Position.X / Game1.tileSize) * Game1.tileSize)
+        {
+          step = (int)(Math.Floor(Position.X / Game1.tileSize) * Game1.tileSize - Position.X);
+          pathingIndex++;
+        }
+        position.X -= step;
+
+        if (!ignoreMovementAnimation)
+        {
+          Sprite.AnimateLeft(time, (speed - 2 + addedSpeed) * -25, Utility.isOnScreen(getTileLocationPoint(), 1, currentLocation) ? "Cowboy_Footstep" : "");
+          faceDirection(3);
+        }
+      }
+      else
+      {
+        Sprite.animateOnce(time);
+      }
+ 
+
+      if (blockedInterval >= 3000 && (float)blockedInterval <= 3750f && !Game1.eventUp)
+      {
+        doEmote((Game1.random.NextDouble() < 0.5) ? 8 : 40, true);
+        blockedInterval = 3750;
+      }
+      else if (blockedInterval >= 5000)
+      {
+        speed = 4;
+        isCharging = true;
+        blockedInterval = 0;
       }
     }
 
     public void UpdatePathToFarmer()
     {
       isNearFarmer = (getTileX() - activeFarmer.getTileX()) * (getTileX() - activeFarmer.getTileX()) + (getTileY() - activeFarmer.getTileY()) * (getTileY() - activeFarmer.getTileY()) < proximity * proximity;
+      if (isNearFarmer || currentLocation != activeFarmer.currentLocation) return;
+      if (prevFarmerPos == activeFarmer.getTileLocation()) return;
       prevFarmerPos = activeFarmer.getTileLocation();
       pathingIndex = 0;
-      pathToFarmer = ModUtil.GetPath(currentLocation, getTileLocation(), activeFarmer.getTileLocation(), this);
+      Vector2 tile = activeFarmer.getTileLocation();
+
+      // Get nearest tile adjacent to farmer
+      if (activeFarmer.getTileX() < getTileX())
+      {
+        if (!currentLocation.isCollidingPosition(activeFarmer.nextPosition(3), Game1.viewport, false, 0, false, this))
+        {
+          tile = new Vector2(activeFarmer.nextPosition(3).X/Game1.tileSize, activeFarmer.nextPosition(3).Y / Game1.tileSize);
+        }
+      }
+      else
+      {
+        if (!currentLocation.isCollidingPosition(activeFarmer.nextPosition(1), Game1.viewport, false, 0, false, this))
+        {
+          tile = new Vector2(activeFarmer.nextPosition(1).X / Game1.tileSize, activeFarmer.nextPosition(1).Y / Game1.tileSize);
+        }
+      }
+
+      if (activeFarmer.getTileY() < getTileY())
+      {
+        if (!currentLocation.isCollidingPosition(activeFarmer.nextPosition(2), Game1.viewport, false, 0, false, this))
+        {
+          tile = new Vector2(activeFarmer.nextPosition(2).X / Game1.tileSize, activeFarmer.nextPosition(2).Y / Game1.tileSize);
+        }
+      }
+      else
+      {
+        if (!currentLocation.isCollidingPosition(activeFarmer.nextPosition(0), Game1.viewport, false, 0, false, this))
+        {
+          tile = new Vector2(activeFarmer.nextPosition(0).X / Game1.tileSize, activeFarmer.nextPosition(0).Y / Game1.tileSize);
+        }
+      }
+      start = getStandingPosition();
+      pathToFarmer = ModUtil.GetPath(currentLocation, new Vector2((int)Math.Ceiling(Position.X/Game1.tileSize), (int)Math.Ceiling(Position.Y/Game1.tileSize)), new Vector2((int)Math.Ceiling(activeFarmer.Position.X / Game1.tileSize), (int)Math.Ceiling(activeFarmer.Position.Y / Game1.tileSize)), this);
     }
 
     protected override void updateSlaveAnimation(GameTime time)
@@ -341,18 +483,18 @@ namespace LivelyPets
           this.Sprite.loop = true;
           bool flip2 = Game1.random.NextDouble() < 0.5;
           this.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                    {
-                        new FarmerSprite.AnimationFrame(28, 1000, false, flip2, (AnimatedSprite.endOfAnimationBehavior)null, false),
-                        new FarmerSprite.AnimationFrame(29, 1000, false, flip2, (AnimatedSprite.endOfAnimationBehavior)null, false)
-                    });
+          {
+              new FarmerSprite.AnimationFrame(28, 1000, false, flip2, (AnimatedSprite.endOfAnimationBehavior)null, false),
+              new FarmerSprite.AnimationFrame(29, 1000, false, flip2, (AnimatedSprite.endOfAnimationBehavior)null, false)
+          });
           break;
         case 2:
           this.Sprite.setCurrentAnimation(new List<FarmerSprite.AnimationFrame>()
-                    {
-                        new FarmerSprite.AnimationFrame(16, 100, false, flip1, (AnimatedSprite.endOfAnimationBehavior)null, false),
-                        new FarmerSprite.AnimationFrame(17, 100, false, flip1, (AnimatedSprite.endOfAnimationBehavior)null, false),
-                        new FarmerSprite.AnimationFrame(18, 100, false, flip1, new AnimatedSprite.endOfAnimationBehavior(this.hold), false)
-                    });
+          {
+              new FarmerSprite.AnimationFrame(16, 100, false, flip1, (AnimatedSprite.endOfAnimationBehavior)null, false),
+              new FarmerSprite.AnimationFrame(17, 100, false, flip1, (AnimatedSprite.endOfAnimationBehavior)null, false),
+              new FarmerSprite.AnimationFrame(18, 100, false, flip1, new AnimatedSprite.endOfAnimationBehavior(this.hold), false)
+          });
           break;
       }
       this.startedBehavior = this.CurrentBehavior;
@@ -360,7 +502,7 @@ namespace LivelyPets
 
     public override Rectangle GetBoundingBox()
     {
-      return new Rectangle((int)this.Position.X + 16, (int)this.Position.Y + 16, this.Sprite.SpriteWidth * 4 * 3 / 4, 32);
+      return new Rectangle((int)this.Position.X+16, (int)this.Position.Y+16, 32, 32);
     }
 
     public override void draw(SpriteBatch b)

@@ -12,10 +12,11 @@
 			"Action": "EditImage",
 			"PatchMode": "Replace",
 			"Target": "LooseSprites/Cursors",
-			"FromFile": "assets/shibePortrait.png",
+			"FromFile": "assets/shibainu.png",
 			"When": {
 				"Dog": "shibainu"
 			},
+			"FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
 			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
 			"Enabled": true
 		},
@@ -23,10 +24,11 @@
 			"Action": "EditImage",
 			"PatchMode": "Replace",
 			"Target": "LooseSprites/Cursors",
-			"FromFile": "assets/shepherdPortrait.png",
+			"FromFile": "assets/shepherd.png",
 			"When": {
 				"Dog": "shepherd"
 			},
+			"FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
 			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
 			"Enabled": true
 		},
@@ -34,10 +36,11 @@
 			"Action": "EditImage",
 			"PatchMode": "Replace",
 			"Target": "LooseSprites/Cursors",
-			"FromFile": "assets/huskyPortrait.png",
+			"FromFile": "assets/husky.png",
 			"When": {
 				"Dog": "husky"
 			},
+			"FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
 			"ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 },
 			"Enabled": true
 		},
