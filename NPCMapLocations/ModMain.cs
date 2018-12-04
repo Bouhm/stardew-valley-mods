@@ -351,11 +351,12 @@ namespace NPCMapLocations
       {
         // Handle case where Kent appears even though he shouldn't
         if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
+        if (!CustomNames.TryGetValue(npc.Name, out var npcName)) continue;
 
         var npcMarker = new CharacterMarker
         {
           Npc = npc,
-          Name = CustomNames[npc.Name],
+          Name = npcName,
           Marker = npc.Sprite.Texture,
           IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
         };
