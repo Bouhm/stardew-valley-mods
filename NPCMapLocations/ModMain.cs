@@ -5,7 +5,9 @@ Shows NPC locations on a modified map.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -79,10 +81,8 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       MarkerCropOffsets = ModConstants.MarkerCropOffsets;
-      BuildingMarkers =
-        Helper.Content.Load<Texture2D>(@"assets/buildings.png"); // Load farm buildings
-      CustomMarkerTex =
-        Helper.Content.Load<Texture2D>(@"assets/customLocations.png"); // Load custom location markers
+      BuildingMarkers = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
+      CustomMarkerTex = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null;
       CustomHandler = new ModCustomHandler(Helper, Monitor);
 
       SaveEvents.AfterLoad += SaveEvents_AfterLoad;

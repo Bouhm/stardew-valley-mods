@@ -393,7 +393,7 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
-			if (Config.ShowFarmBuildings && FarmBuildings != null)
+			if (Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -418,7 +418,7 @@ namespace NPCMapLocations
 			}
 
       // ===== Custom locations =====
-      if (Config.CustomMapMarkers != null)
+      if (Config.CustomMapMarkers != null && CustomMarkerTex != null)
       {
         foreach (var location in Config.CustomMapMarkers)
         {
