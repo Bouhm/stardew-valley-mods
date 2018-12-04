@@ -9,6 +9,9 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
+// Basically just game code with some AI additions
+// In the future, much better off rewriting everything
+// instead of using game code
 namespace LivelyPets
 {
   class LivelyCat : LivelyPet

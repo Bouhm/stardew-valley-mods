@@ -146,7 +146,7 @@ namespace LivelyPets
       // Preserve defaults in save so game doesn't break without mod
       if (vanillaPet == null) return;
       var characters = Helper.Reflection.GetField<NetCollection<NPC>>(Game1.getFarm(), "characters").GetValue();
-      if (!characters.Contains(vanillaPet)) characters.Add(vanillaPet);
+      characters.Add(vanillaPet);
       RemovePet(livelyPet);
     }
 

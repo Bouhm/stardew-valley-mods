@@ -10,6 +10,9 @@ using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
 
+// Basically just game code with some AI additions
+// In the future, much better off rewriting everything
+// instead of using game code
 namespace LivelyPets
 {
   public class LivelyPet : Pet
