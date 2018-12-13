@@ -5,7 +5,7 @@
   "Description": "Locates villagers and farmers on the screen",
   "UniqueID": "Bouhm.LocationCompass",
   "EntryDll": "LocationCompass.dll",
-  "MinimumApiVersion": "2.8",
+  "MinimumApiVersion": "2.9",
   "UpdateKeys": [
   	"Nexus:3045"
   ]
