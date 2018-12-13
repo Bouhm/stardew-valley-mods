@@ -85,21 +85,18 @@ namespace NPCMapLocations
       CustomMarkerTex = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null;
       CustomHandler = new ModCustomHandler(Helper, Monitor);
 
-      SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-      GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+      Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
-      TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-      LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
-      LocationEvents.BuildingsChanged += LocationEvents_BuildingsChanged;
-      InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-      InputEvents.ButtonReleased += InputEvents_ButtonReleased;
-      GameEvents.HalfSecondTick += GameEvents_HalfSecondTick;
-      GameEvents.UpdateTick += GameEvents_UpdateTick;
-      MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-      PlayerEvents.Warped += PlayerEvents_Warped;
-      GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
-      GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-      GraphicsEvents.Resize += GraphicsEvents_Resize;
+      Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+      Helper.Events.World.BuildingListChanged += World_BuildingListChanged;
+      Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+      Helper.Events.Input.ButtonReleased += Input_ButtonReleased;
+      Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+      Helper.Events.Player.Warped += Player_Warped;
+      Helper.Events.Display.MenuChanged += Display_MenuChanged;
+      Helper.Events.Display.RenderingHud += Display_RenderingHud;
+      Helper.Events.Display.Rendered += Display_Rendered;
+      Helper.Events.Display.WindowResized += Display_WindowResized;
     }
 
     // Get only relevant villagers for map
@@ -162,21 +159,18 @@ namespace NPCMapLocations
       }
     }
 
-    private void LocationEvents_BuildingsChanged(object sender, EventArgsLocationBuildingsChanged e)
+    private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
     {
-      if (e.Location.Name.Equals("Farm"))
+      if (e.Location.IsFarm)
         UpdateFarmBuildingLocs();
-    }
 
-    private void LocationEvents_LocationsChanged(object sender, EventArgsLocationsChanged e)
-    {
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
     }
 
     // Load config and other one-off data
-    private void SaveEvents_AfterLoad(object sender, EventArgs e)
+    private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
       CustomHandler.LoadConfig(Config);
@@ -211,7 +205,7 @@ namespace NPCMapLocations
     }
 
     // Handle opening mod menu and changing tooltip options
-    private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+    private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
 
@@ -228,7 +222,7 @@ namespace NPCMapLocations
         {
           Minimap.HandleMouseDown();
           if (Minimap.isBeingDragged)
-            e.SuppressButton();
+            this.Helper.Input.Suppress(e.Button);
         }
       }
 
@@ -249,7 +243,7 @@ namespace NPCMapLocations
         Game1.player.setTileLocation(Game1.currentCursorTile);
     }
 
-    private void InputEvents_ButtonReleased(object sender, EventArgsInput e)
+    private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
       if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey) ||
@@ -300,7 +294,7 @@ namespace NPCMapLocations
     }
 
     // Handle any checks that need to be made per day
-    private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+    private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
       var npcEntries = new Dictionary<string, bool>(SecondaryNpcs);
       foreach (var npc in npcEntries)
@@ -351,12 +345,12 @@ namespace NPCMapLocations
       {
         // Handle case where Kent appears even though he shouldn't
         if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
-        if (!CustomNames.TryGetValue(npc.Name, out var npcName)) continue;
+        //if (!CustomNames.TryGetValue(npc.Name, out var npcName)) continue;
 
         var npcMarker = new CharacterMarker
         {
           Npc = npc,
-          Name = npcName,
+          Name = CustomNames[npc.Name],
           Marker = npc.Sprite.Texture,
           IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
         };
@@ -369,8 +363,47 @@ namespace NPCMapLocations
     }
 
     // To initialize ModMap quicker for smoother rendering when opening map
-    private void GameEvents_UpdateTick(object sender, EventArgs e)
+    private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
     {
+      if (!Context.IsWorldReady) return;
+
+      // One-second tick
+      if (e.IsOneSecond)
+      {
+        // Sync multiplayer data
+        if (Context.IsMainPlayer && Context.IsMultiplayer)
+        {
+          var message = new SyncedLocationData();
+          foreach (var npc in GetVillagers())
+          {
+            if (npc == null || npc.currentLocation == null) continue;
+            message.AddNpcLocation(npc.Name,
+              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(),
+                npc.getTileY()));
+          }
+
+          Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
+        }
+      }
+
+      // Half-second tick
+      if (e.IsMultipleOf(30))
+      {
+        // Map page updates
+        if (!Context.IsWorldReady) return;
+        var updateForMinimap = false;
+
+        if (Config.ShowMinimap)
+          if (Minimap != null)
+          {
+            Minimap.Update();
+            updateForMinimap = true;
+          }
+
+        UpdateMarkers(updateForMinimap);
+      }
+
+      // Update tick
       if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
       {
         isModMapOpen = false;
@@ -380,42 +413,15 @@ namespace NPCMapLocations
       hasOpenedMap =
         gameMenu.currentTab == GameMenu.mapTab; // When map accessed by switching GameMenu tab or pressing M
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
+      if (!alertFlags.Contains("Debug: isModMapOpen"))
+      {
+        Monitor.Log($"Opened Mod Map", LogLevel.Debug);
+        alertFlags.Add("Debug: isModMapOpen");
+      }
+
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
         OpenModMap(gameMenu);
-    }
 
-    // Map page updates
-    private void GameEvents_HalfSecondTick(object sender, EventArgs e)
-    {
-      if (!Context.IsWorldReady) return;
-      var updateForMinimap = false;
-
-      if (Config.ShowMinimap)
-        if (Minimap != null)
-        {
-          Minimap.Update();
-          updateForMinimap = true;
-        }
-
-      UpdateMarkers(updateForMinimap);
-    }
-
-    private void GameEvents_OneSecondTick(object sender, EventArgs e)
-    {
-      if (!Context.IsWorldReady) return;
-      if (Context.IsMainPlayer && Context.IsMultiplayer)
-      {
-        var message = new SyncedLocationData();
-        foreach (var npc in GetVillagers())
-        {
-          if (npc == null || npc.currentLocation == null) continue;
-          message.AddNpcLocation(npc.Name,
-            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(),
-              npc.getTileY()));
-        }
-
-       Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] {ModManifest.UniqueID});
-      }
     }
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
@@ -802,7 +808,7 @@ namespace NPCMapLocations
       return null;
     }
 
-    private void GraphicsEvents_Resize(object sender, EventArgs e)
+    private void Display_WindowResized(object sender, WindowResizedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
 
@@ -811,19 +817,22 @@ namespace NPCMapLocations
       Minimap?.CheckOffsetForMap();
     }
 
-    private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+    private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
-      if (e.PriorMenu is ModMenu)
+
+      // Check for resize after mod menu closed
+      if (e.OldMenu is ModMenu)
         Minimap?.Resize();
     }
 
-    private void PlayerEvents_Warped(object sender, EventArgsPlayerWarped e)
+    private void Player_Warped(object sender, WarpedEventArgs e)
     {
+      // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }
 
-    private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
+    private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
     {
       if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
@@ -837,7 +846,7 @@ namespace NPCMapLocations
     }
 
     // DEBUG 
-    private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
+    private void Display_Rendered(object sender, RenderedEventArgs e)
     {
       if (!Context.IsWorldReady || Game1.player == null) return;
 

@@ -39,19 +39,18 @@ namespace LocationCompass
       pointer =
         helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
       constants = this.helper.Data.ReadJsonFile<ModData>("constants.json") ?? new ModData();
-      SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-      TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
-      LocationEvents.LocationsChanged += LocationEvents_LocationsChanged;
-      GameEvents.OneSecondTick += GameEvents_OneSecondTick;
+
+      Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
+      Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+      Helper.Events.World.LocationListChanged += World_LocationListChanged;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
-      GameEvents.UpdateTick += GameEvents_UpdateTick;
-      InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-      GraphicsEvents.OnPostRenderEvent += GraphicsEvents_OnPostRenderEvent;
-      ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-      ControlEvents.KeyReleased += ControlEvents_KeyReleased;
+      Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+      Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
+      Helper.Events.Input.ButtonReleased += Input_ButtonReleased;
+      Helper.Events.Display.Rendered += Display_Rendered;
     }
-    
-    private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+
+    private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
       characters = new List<Character>();
 
@@ -94,62 +93,63 @@ namespace LocationCompass
         MapRootLocations(location.indoors.Value, null, null, false, new Vector2(-1000, -1000));
     }
 
-    private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+    private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
     {
-      if (!Context.IsWorldReady || activeWarpLocators == null) return;
-      if (e.Button.Equals(SButton.MouseRight) || e.Button.Equals(SButton.ControllerA))
-        foreach (var doorLocator in activeWarpLocators)
-        {
-          if (doorLocator.Value.Characters.Count > 1)
-            doorLocator.Value.ReceiveLeftClick();
-        }
+      if (!Context.IsWorldReady) return;
 
-      if (showLocators)
+      // Handle toggle
+      if (e.Button.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null &&
+          !Game1.eventUp)
       {
-        if (e.Button.ToString() == config.SameLocationToggleKey)
-          config.SameLocationOnly = !config.SameLocationOnly;
-        else if (e.Button.ToString() == config.FarmersOnlyToggleKey)
-          config.ShowFarmersOnly = !config.ShowFarmersOnly;
-        else if (e.Button.ToString() == config.QuestsOnlyToggleKey)
-          config.ShowQuestsAndBirthdaysOnly = !config.ShowQuestsAndBirthdaysOnly;
-        else if (e.Button.ToString() == config.HorsesToggleKey)
-          config.ShowHorses = !config.ShowHorses;
+        if (config.HoldToToggle)
+        {
+          // Hide HUD to show locators
+          if (Game1.displayHUD)
+            showLocators = true;
+        }
+        else
+          showLocators = !showLocators;
 
-        helper.Data.WriteJsonFile("config.json", config);
+        Game1.displayHUD = !showLocators;
+      }
+
+      // Configs
+      if (activeWarpLocators != null)
+      {
+        // Handle scroller click
+        if (e.Button.Equals(SButton.MouseRight) || e.Button.Equals(SButton.ControllerA))
+          foreach (var doorLocator in activeWarpLocators)
+          {
+            if (doorLocator.Value.Characters.Count > 1)
+              doorLocator.Value.ReceiveLeftClick();
+          }
+
+        if (showLocators)
+        {
+          if (e.Button.ToString() == config.SameLocationToggleKey)
+            config.SameLocationOnly = !config.SameLocationOnly;
+          else if (e.Button.ToString() == config.FarmersOnlyToggleKey)
+            config.ShowFarmersOnly = !config.ShowFarmersOnly;
+          else if (e.Button.ToString() == config.QuestsOnlyToggleKey)
+            config.ShowQuestsAndBirthdaysOnly = !config.ShowQuestsAndBirthdaysOnly;
+          else if (e.Button.ToString() == config.HorsesToggleKey)
+            config.ShowHorses = !config.ShowHorses;
+
+          helper.Data.WriteJsonFile("config.json", config);
+        }
       }
     }
 
-    
-    private void LocationEvents_LocationsChanged(object sender, EventArgsLocationsChanged e)
+    private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
     {
       GetLocationContexts();
     }
 
-    private void SaveEvents_AfterLoad(object sender, EventArgs e)
+    private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       activeWarpLocators = new Dictionary<string, LocatorScroller>();
       syncedLocationData = new SyncedLocationData();
       GetLocationContexts();
-    }
-
-    private void GameEvents_OneSecondTick(object sender, EventArgs e)
-    {
-      if (!Context.IsWorldReady) return;
-
-      if (characters != null && Context.IsMultiplayer)
-      {
-        foreach (var farmer in Game1.getOnlineFarmers())
-        {
-          if (farmer == Game1.player) continue;
-          if (!characters.Contains(farmer))
-            characters.Add(farmer);
-        }
-      }
-
-      if (Context.IsMainPlayer && Context.IsMultiplayer && syncedLocationData != null)
-      {
-        Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
-      }
     }
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
@@ -283,11 +283,11 @@ namespace LocationCompass
       return villagers;
     }
 
-    private void ControlEvents_KeyReleased(object sender, EventArgsKeyPressed e)
+    private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
 
-      if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      if (e.Button.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
       {
         if (config.HoldToToggle)
         {
@@ -297,32 +297,31 @@ namespace LocationCompass
       }    
     }
 
-    private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
-    {
-      if (!Context.IsWorldReady) return;
-
-
-        if (e.KeyPressed.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null &&
-            !Game1.eventUp)
-        {
-          if (config.HoldToToggle)
-          {
-            // Hide HUD to show locators
-            if (Game1.displayHUD)
-              showLocators = true;
-          }
-          else
-            showLocators = !showLocators;
-
-          Game1.displayHUD = !showLocators;
-        }
-    }
-
-    private void GameEvents_UpdateTick(object sender, EventArgs e)
+    private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
     {
       if (!Context.IsWorldReady)
         return;
 
+      // One-second tick
+      if (e.IsOneSecond)
+      {
+        if (characters != null && Context.IsMultiplayer)
+        {
+          foreach (var farmer in Game1.getOnlineFarmers())
+          {
+            if (farmer == Game1.player) continue;
+            if (!characters.Contains(farmer))
+              characters.Add(farmer);
+          }
+        }
+
+        if (Context.IsMainPlayer && Context.IsMultiplayer && syncedLocationData != null)
+        {
+          Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
+        }
+      }
+
+      // Update tick
       if (!Game1.paused && showLocators && syncedLocationData != null)
       {
         if (Context.IsMainPlayer)
@@ -955,7 +954,7 @@ namespace LocationCompass
         SpriteEffects.None, 0f);
     }
 
-    private void GraphicsEvents_OnPostRenderEvent(object sender, EventArgs e)
+    private void Display_Rendered(object sender, RenderedEventArgs e)
     {
       if (!Context.IsWorldReady || locators == null) return;
 
