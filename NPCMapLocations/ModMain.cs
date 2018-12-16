@@ -81,6 +81,7 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       MarkerCropOffsets = ModConstants.MarkerCropOffsets;
+      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
       BuildingMarkers = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
       CustomMarkerTex = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null;
       CustomHandler = new ModCustomHandler(Helper, Monitor);
@@ -172,7 +173,8 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? new ModConfig();
+      this.Helper.Data.WriteJsonFile($"config/default.json", Config);
+      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
       CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
@@ -345,12 +347,16 @@ namespace NPCMapLocations
       {
         // Handle case where Kent appears even though he shouldn't
         if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
-        //if (!CustomNames.TryGetValue(npc.Name, out var npcName)) continue;
+        if (!CustomNames.TryGetValue(npc.Name, out var npcName))
+        {
+          npcName = npc.displayName ?? npc.Name;
+          this.CustomNames.Add(npc.Name, npcName);
+        }
 
         var npcMarker = new CharacterMarker
         {
           Npc = npc,
-          Name = CustomNames[npc.Name],
+          Name = npcName,
           Marker = npc.Sprite.Texture,
           IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
         };
@@ -390,7 +396,6 @@ namespace NPCMapLocations
       if (e.IsMultipleOf(30))
       {
         // Map page updates
-        if (!Context.IsWorldReady) return;
         var updateForMinimap = false;
 
         if (Config.ShowMinimap)
@@ -413,11 +418,6 @@ namespace NPCMapLocations
       hasOpenedMap =
         gameMenu.currentTab == GameMenu.mapTab; // When map accessed by switching GameMenu tab or pressing M
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
-      if (!alertFlags.Contains("Debug: isModMapOpen"))
-      {
-        Monitor.Log($"Opened Mod Map", LogLevel.Debug);
-        alertFlags.Add("Debug: isModMapOpen");
-      }
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
         OpenModMap(gameMenu);
@@ -426,12 +426,14 @@ namespace NPCMapLocations
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
-      if (NpcMarkers == null) return;
+      if (NpcMarkers == null)
+        ResetMarkers(GetVillagers());
 
       if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedLocationData")
       {
         var message = e.ReadAs<SyncedLocationData>();
         foreach (var marker in NpcMarkers)
+        {
           if (message.SyncedLocations.TryGetValue(marker.Npc.Name, out var npcLoc))
           {
             marker.SyncedLocationName = npcLoc.LocationName;
@@ -441,6 +443,11 @@ namespace NPCMapLocations
               marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
             }
           }
+          else
+          {
+            marker.MapLocation = new Vector2(-1000, -1000);
+          }
+        }
       }
     }
 
@@ -546,7 +553,7 @@ namespace NPCMapLocations
         if (locationName.StartsWith("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if (locationName == null || (!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
+        if (locationName == null || (!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) && !MapVectors.TryGetValue(locationName, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
@@ -657,13 +664,13 @@ namespace NPCMapLocations
         if (locationName.Contains("UndergroundMine"))
           locationName = getMinesLocationName(locationName);
 
-        if ((!locationName.Contains("Cabin") || !locationName.Contains("UndergroundMine")) &&
-            !MapVectors.TryGetValue(farmer.currentLocation.Name, out var loc))
+        if ((!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
+            !MapVectors.TryGetValue(locationName, out var loc))
         {
-          if (!alertFlags.Contains("UnknownLocation:" + farmer.currentLocation.Name))
+          if (!alertFlags.Contains("UnknownLocation:" + locationName))
           {
-            Monitor.Log($"Unknown location: {farmer.currentLocation.Name}.", LogLevel.Debug);
-            alertFlags.Add("UnknownLocation:" + farmer.currentLocation.Name);
+            Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
+            alertFlags.Add("UnknownLocation:" + locationName);
           }
         }
 

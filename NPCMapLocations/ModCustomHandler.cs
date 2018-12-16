@@ -41,10 +41,7 @@ namespace NPCMapLocations
 		{
 			foreach (NPC npc in Utility.getAllCharacters())
 			{
-				if (npc == null)
-				{
-					continue;
-				}
+				if (npc == null) continue;
 
 				if (!ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
 				{
