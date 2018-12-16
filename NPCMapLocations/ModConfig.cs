@@ -19,7 +19,7 @@ namespace NPCMapLocations
 	  public bool MarkQuests { get; set; } = true;
 	  public bool ShowTravelingMerchant { get; set; } = true;
 	  public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
-	  public bool ShowMinimap { get; set; } = true;
+	  public bool ShowMinimap { get; set; } = false;
 	  public int MinimapX { get; set; } = 12;
 	  public int MinimapY { get; set; } = 12;
 	  public int MinimapWidth { get; set; } = 75;
