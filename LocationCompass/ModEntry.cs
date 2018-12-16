@@ -99,7 +99,7 @@ namespace LocationCompass
 
       // Handle toggle
       if (e.Button.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null &&
-          !Game1.eventUp)
+          !Game1.eventUp && Game1.activeClickableMenu == null)
       {
         if (config.HoldToToggle)
         {
@@ -287,7 +287,7 @@ namespace LocationCompass
     {
       if (!Context.IsWorldReady) return;
 
-      if (e.Button.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp)
+      if (e.Button.ToString().Equals(config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp && Game1.activeClickableMenu == null)
       {
         if (config.HoldToToggle)
         {
@@ -957,9 +957,9 @@ namespace LocationCompass
 
     private void Display_Rendered(object sender, RenderedEventArgs e)
     {
-      if (!Context.IsWorldReady || locators == null) return;
+      //if (!Context.IsWorldReady || locators == null) return;
 
-      if (showLocators)
+      if (showLocators && Game1.activeClickableMenu == null)
         DrawLocators();
 
       if (!DEBUG_MODE)
