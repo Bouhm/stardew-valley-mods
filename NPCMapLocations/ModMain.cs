@@ -426,8 +426,7 @@ namespace NPCMapLocations
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
-      if (NpcMarkers == null)
-        ResetMarkers(GetVillagers());
+      if (NpcMarkers == null) return;
 
       if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedLocationData")
       {

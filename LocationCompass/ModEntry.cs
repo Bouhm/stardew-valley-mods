@@ -317,6 +317,7 @@ namespace LocationCompass
 
         if (Context.IsMainPlayer && Context.IsMultiplayer && syncedLocationData != null)
         {
+          getSyncedLocationData();
           Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
         }
       }
