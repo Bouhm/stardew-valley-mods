@@ -461,7 +461,6 @@ namespace NPCMapLocations
       // allows for better compatibility with other mods that use MapPage
       pages[GameMenu.mapTab] = new ModMapPage(
         NpcMarkers,
-        CustomNames,
         SecondaryNpcs,
         FarmerMarkers,
         MarkerCropOffsets,
@@ -581,21 +580,21 @@ namespace NPCMapLocations
         }
 
         // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npcMarker.Name)
-                             || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npcMarker.Name)
+        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npcMarker.Npc.Name)
+                             || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npcMarker.Npc.Name)
                              || Config.OnlySameLocation && !isSameLocation
                              || Config.ByHeartLevel
-                             && !(Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
-                                  >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
+                             && !(Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Npc.Name)
+                                  >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Npc.Name)
                                   <= Config.HeartLevelMax);
 
         // NPCs that will be drawn onto the map
-        if (!Config.NpcBlacklist.Contains(npcMarker.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+        if (!Config.NpcBlacklist.Contains(npcMarker.Npc.Name) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
         {
           // Check if gifted for birthday
           if (npcMarker.IsBirthday)
-            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Name) &&
-                                   Game1.player.friendshipData[npcMarker.Name].GiftsToday == 0;
+            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Npc.Name) &&
+                                   Game1.player.friendshipData[npcMarker.Npc.Name].GiftsToday == 0;
 
           // Check for daily quests
           foreach (var quest in Game1.player.questLog)
@@ -603,16 +602,16 @@ namespace NPCMapLocations
               switch (quest.questType.Value)
               {
                 case 3:
-                  npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npcMarker.Name;
+                  npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 4:
-                  npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npcMarker.Name;
+                  npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 7:
-                  npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npcMarker.Name;
+                  npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 10:
-                  npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npcMarker.Name;
+                  npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npcMarker.Npc.Name;
                   break;
               }
             else
