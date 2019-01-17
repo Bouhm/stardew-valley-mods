@@ -322,11 +322,6 @@ namespace NPCMapLocations
         }
       }
 
-      foreach (var a in locationContexts)
-      {
-        Monitor.Log($"{a.Key} - {a.Value.Root}, {a.Value.Type}");
-      }
-
       ResetMarkers(GetVillagers());
       UpdateMarkers(true);
 
