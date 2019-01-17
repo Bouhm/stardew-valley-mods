@@ -161,8 +161,7 @@ namespace LocationCompass
     // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
     // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations 
     // Which means there will be some rooms left out unless all the locations are iterated
-    private string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp,
-      Vector2 warpPosition)
+    private string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
     {
       // There can be multiple warps to the same location
       if (location == prevLocation) return root;
@@ -208,6 +207,9 @@ namespace LocationCompass
       // Iterate warps of current location and traverse recursively
       foreach (var warp in location.warps)
       {
+        // Avoid circular loop
+        if (currLocationName == warp.TargetName || prevLocationName == currLocationName) continue;
+
         var warpLocation = Game1.getLocationFromName(warp.TargetName);
 
         // If one of the warps is a root location, current location is an indoor building 

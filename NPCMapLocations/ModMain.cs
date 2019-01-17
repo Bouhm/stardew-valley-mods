@@ -322,6 +322,11 @@ namespace NPCMapLocations
         }
       }
 
+      foreach (var a in locationContexts)
+      {
+        Monitor.Log($"{a.Key} - {a.Value.Root}, {a.Value.Type}");
+      }
+
       ResetMarkers(GetVillagers());
       UpdateMarkers(true);
 
@@ -421,7 +426,6 @@ namespace NPCMapLocations
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
         OpenModMap(gameMenu);
-
     }
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
@@ -475,7 +479,7 @@ namespace NPCMapLocations
     }
 
     // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-    private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp)
+    private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp, string prevLocationName = null)
     {
       var locationName = location.uniqueName.Value ?? location.Name;
       if (!locationContexts.ContainsKey(locationName))
@@ -499,13 +503,17 @@ namespace NPCMapLocations
       // Iterate warps of current location and traverse recursively
       foreach (var warp in location.warps)
       {
+        // Avoid circular loop (shout-out to SgtPickles)
+        if (warp.TargetName == locationName || prevLocationName == warp.TargetName)
+          continue;
+
         // If one of the warps is a root location, current location is an indoor building 
         if (Game1.getLocationFromName(warp.TargetName).IsOutdoors)
           hasOutdoorWarp = true;
 
         // If all warps are indoors, then the current location is a room
         locationContexts[locationName].Type = hasOutdoorWarp ? "indoors" : "room";
-        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp);
+        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp, locationName);
         locationContexts[locationName].Root = root;
         return root;
       }
