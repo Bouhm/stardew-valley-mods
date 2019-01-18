@@ -150,6 +150,24 @@ namespace LocationCompass
       activeWarpLocators = new Dictionary<string, LocatorScroller>();
       syncedLocationData = new SyncedLocationData();
       GetLocationContexts();
+
+      // Log warning if host does not have mod installed
+      if (Context.IsMultiplayer)
+      {
+        var hostHasMod = false;
+
+        foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
+        {
+          if (peer.GetMod("Bouhm.LocationCompass") != null && peer.IsHost)
+          {
+            hostHasMod = true;
+            break;
+          }
+        }
+
+        if (!hostHasMod)
+          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+      }
     }
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)

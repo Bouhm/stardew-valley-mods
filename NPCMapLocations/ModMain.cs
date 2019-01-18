@@ -178,6 +178,25 @@ namespace NPCMapLocations
       CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       DEBUG_MODE = Config.DEBUG_MODE;
+
+      // Log warning if host does not have mod installed
+      if (Context.IsMultiplayer)
+      {
+        var hostHasMod = false;
+
+        foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
+        {
+          if (peer.GetMod("Bouhm.NPCMapLocations") != null && peer.IsHost)
+          {
+            hostHasMod = true;
+            break;
+          }
+        }
+
+        if (!hostHasMod)
+          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+      }
+
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
