@@ -166,7 +166,7 @@ namespace LocationCompass
         }
 
         if (!hostHasMod)
-          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+          Monitor.Log("Since the server host does not have LocationCompass installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
       }
     }
 
