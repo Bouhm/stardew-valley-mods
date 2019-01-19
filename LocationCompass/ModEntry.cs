@@ -226,7 +226,7 @@ namespace LocationCompass
       foreach (var warp in location.warps)
       {
         // Avoid circular loop
-        if (currLocationName == warp.TargetName || prevLocationName == currLocationName) continue;
+        if (currLocationName == warp.TargetName || prevLocationName == warp.TargetName) continue;
 
         var warpLocation = Game1.getLocationFromName(warp.TargetName);
 
