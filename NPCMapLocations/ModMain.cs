@@ -749,14 +749,15 @@ namespace NPCMapLocations
         }
       }
 
-      MapVector[] locVectors = null;
-      if (CustomMapLocations != null && !CustomMapLocations.TryGetValue(locationName, out locVectors) &&
-          !ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
+      if (CustomMapLocations != null  &&
+          !CustomMapLocations.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
         return new Vector2(-1000, -1000);
-      if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
+      if (!ModConstants.MapVectors.ContainsKey(locationName))
         return new Vector2(-1000, -1000);
 
-      int x;
+      MapVector[] locVectors = (CustomMapLocations != null && CustomMapLocations.ContainsKey(locationName)) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+
+;      int x;
       int y;
 
       // Precise (static) regions and indoor locations
