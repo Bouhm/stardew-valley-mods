@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -24,23 +23,17 @@ namespace NPCMapLocations
     private const int DRAW_DELAY = 3;
     public static SButton HeldKey;
 
-    // Debugging
-    private static bool DEBUG_MODE;
-    private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
-    private static Vector2 _tileLower;
-    private static Vector2 _tileUpper;
-    private static List<string> alertFlags;
     private Texture2D BuildingMarkers;
     private ModConfig Config;
     private ModCustomHandler CustomHandler;
     private Dictionary<string, MapVector[]> CustomMapLocations;
     private Texture2D CustomMarkerTex;
     private Dictionary<string, string> CustomNames;
+    private bool hasOpenedMap;
+    private bool isModMapOpen;
 
     // Multiplayer
     private Dictionary<long, CharacterMarker> FarmerMarkers;
-    private bool hasOpenedMap;
-    private bool isModMapOpen;
     private Dictionary<string, LocationContext> locationContexts;
 
     // Customizations/Custom mods
@@ -50,6 +43,13 @@ namespace NPCMapLocations
     private ModMinimap Minimap;
     private HashSet<CharacterMarker> NpcMarkers;
     private Dictionary<string, bool> SecondaryNpcs;
+
+    // Debugging
+    private static bool DEBUG_MODE;
+    private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+    private static Vector2 _tileLower;
+    private static Vector2 _tileUpper;
+    private static List<string> alertFlags;
 
 
     // Replace game map with modified map
@@ -82,7 +82,7 @@ namespace NPCMapLocations
     {
       MarkerCropOffsets = ModConstants.MarkerCropOffsets;
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
-      BuildingMarkers = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
+      BuildingMarkers = File.Exists(@"assets/buildings.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
       CustomMarkerTex = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null;
       CustomHandler = new ModCustomHandler(Helper, Monitor);
 
@@ -98,6 +98,60 @@ namespace NPCMapLocations
       Helper.Events.Display.RenderingHud += Display_RenderingHud;
       Helper.Events.Display.Rendered += Display_Rendered;
       Helper.Events.Display.WindowResized += Display_WindowResized;
+    }
+    
+    // Load config and other one-off data
+    private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+    {
+      this.Helper.Data.WriteJsonFile($"config/default.json", Config);
+      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
+      CustomHandler.LoadConfig(Config);
+      CustomMapLocations = CustomHandler.GetCustomMapLocations();
+      DEBUG_MODE = Config.DEBUG_MODE;
+
+      locationContexts = new Dictionary<string, LocationContext>();
+      foreach (var location in Game1.locations)
+        MapRootLocations(location, null, false);
+
+      SecondaryNpcs = new Dictionary<string, bool>
+      {
+        {"Kent", false},
+        {"Marlon", false},
+        {"Merchant", false},
+        {"Sandy", false},
+        {"Wizard", false}
+      };
+      CustomHandler.UpdateCustomNpcs();
+      CustomNames = CustomHandler.GetNpcNames();
+      MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
+      MapVectors = ModConstants.MapVectors;
+
+      foreach (var locVectors in CustomMapLocations)
+        if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
+          MapVectors[locVectors.Key] = locVectors.Value;
+        else
+          MapVectors.Add(locVectors.Key, locVectors.Value);
+
+      UpdateFarmBuildingLocs();
+      alertFlags = new List<string>();
+
+      // Log warning if host does not have mod installed
+      if (Context.IsMultiplayer)
+      {
+        var hostHasMod = false;
+
+        foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
+        {
+          if (peer.GetMod("Bouhm.NPCMapLocations") != null && peer.IsHost)
+          {
+            hostHasMod = true;
+            break;
+          }
+        }
+
+        if (!hostHasMod && !Context.IsMainPlayer)
+          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+      }
     }
 
     // Get only relevant villagers for map
@@ -151,7 +205,7 @@ namespace NPCMapLocations
       }
 
       // Greenhouse unlocked after pantry bundles completed
-      if (((CommunityCenter) Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+      if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
       {
         var locVector = LocationToMap("Greenhouse");
         locVector.X -= 5 / 2 * 3;
@@ -168,61 +222,6 @@ namespace NPCMapLocations
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
-    }
-
-    // Load config and other one-off data
-    private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
-    {
-      this.Helper.Data.WriteJsonFile($"config/default.json", Config);
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
-      CustomHandler.LoadConfig(Config);
-      CustomMapLocations = CustomHandler.GetCustomMapLocations();
-      DEBUG_MODE = Config.DEBUG_MODE;
-
-      // Log warning if host does not have mod installed
-      if (Context.IsMultiplayer)
-      {
-        var hostHasMod = false;
-
-        foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
-        {
-          if (peer.GetMod("Bouhm.NPCMapLocations") != null && peer.IsHost)
-          {
-            hostHasMod = true;
-            break;
-          }
-        }
-
-        if (!hostHasMod)
-          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
-      }
-
-      locationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations)
-        MapRootLocations(location, null, false);
-
-      SecondaryNpcs = new Dictionary<string, bool>
-      {
-        {"Kent", false},
-        {"Marlon", false},
-        {"Merchant", false},
-        {"Sandy", false},
-        {"Wizard", false}
-      };
-      CustomHandler.UpdateCustomNpcs();
-      CustomNames = CustomHandler.GetNpcNames();
-      MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
-      CustomMapLocations = CustomHandler.GetCustomMapLocations();
-      MapVectors = ModConstants.MapVectors;
-
-      foreach (var locVectors in CustomMapLocations)
-        if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
-          MapVectors[locVectors.Key] = locVectors.Value;
-        else
-          MapVectors.Add(locVectors.Key, locVectors.Value);
-
-      UpdateFarmBuildingLocs();
-      alertFlags = new List<string>();
     }
 
     // Handle opening mod menu and changing tooltip options

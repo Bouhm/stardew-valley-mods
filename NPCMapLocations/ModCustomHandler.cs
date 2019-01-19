@@ -99,6 +99,8 @@ namespace NPCMapLocations
 	  public Dictionary<string, MapVector[]> GetCustomMapLocations()
 	  {
       var customMapVectors = new Dictionary<string, MapVector[]>();
+	    var moddedLocations = new List<string>();
+
       foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomMapLocations)
 	    {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
@@ -126,10 +128,49 @@ namespace NPCMapLocations
             );
           }
 	      }
-	      customMapVectors.Add(mapVectors.Key, mapVectorArr);        
+	      moddedLocations.Add(mapVectors.Key);
+        customMapVectors.Add(mapVectors.Key, mapVectorArr);        
 	    }
 
-	    return customMapVectors;
+      // Automatically adjust tracking for modded maps that are sized differently from vanilla map
+	    foreach (var location in Game1.locations)
+	    {
+	      if (!location.IsOutdoors || location.Name == "Summit" || customMapVectors.ContainsKey(location.Name) || !ModConstants.MapVectors.TryGetValue(location.Name, out var mapVector)) continue;
+	      if (mapVector.LastOrDefault().TileX != location.Map.DisplayWidth / Game1.tileSize ||
+	          mapVector.LastOrDefault().TileY != location.Map.DisplayHeight / Game1.tileSize)
+	      {
+          moddedLocations.Add(location.Name);
+	        customMapVectors.Add(location.Name,
+	          new MapVector[]
+	          {
+	            mapVector.FirstOrDefault(),
+	            new MapVector(
+	              mapVector.LastOrDefault().MapX,
+	              mapVector.LastOrDefault().MapY,
+	              location.Map.DisplayWidth / Game1.tileSize,
+	              location.Map.DisplayHeight / Game1.tileSize
+	            )
+	          });
+	      }
+	    }
+
+	    if (moddedLocations.Count > 0)
+	    {
+	      if (moddedLocations.Count == 1)
+	      {
+	        Monitor.Log($"Detected modded location {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Info);
+        }
+	      else
+	      {
+	        var locationList = "";
+          for (var i = 0; i < moddedLocations.Count; i++)
+            locationList += moddedLocations[i] + (i + 1 == moddedLocations.Count ? ", " : "");
+
+	        Monitor.Log($"Detected modded locations {locationList}. Adjusting map tracking to scale.", LogLevel.Info);
+        }
+      }
+
+      return customMapVectors;
 	  }
 
     // Handle any modified NPC names 
