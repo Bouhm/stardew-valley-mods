@@ -75,6 +75,7 @@ namespace LocationCompass
 
           foreach (var warp in location.warps)
           {
+            if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
             var warpLocation = Game1.getLocationFromName(warp.TargetName);
 
             if (warpLocation.IsOutdoors)
