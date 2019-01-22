@@ -516,6 +516,8 @@ namespace NPCMapLocations
       // Iterate warps of current location and traverse recursively
       foreach (var warp in location.warps)
       {
+        if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
+
         // Avoid circular loop (shout-out to SgtPickles)
         if (warp.TargetName == locationName || prevLocationName == warp.TargetName)
           continue;
