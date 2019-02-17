@@ -38,6 +38,7 @@ namespace NPCMapLocations
 
     // Customizations/Custom mods
     private string MapName;
+    private string Season;
     private Dictionary<string, MapVector[]> MapVectors;
     private Dictionary<string, int> MarkerCropOffsets;
     private ModMinimap Minimap;
@@ -65,14 +66,14 @@ namespace NPCMapLocations
       try
       {
         if (!MapName.Equals("default_map"))
-          Monitor.Log($"Using recolored map {CustomHandler.LoadMap()}.", LogLevel.Debug);
+          Monitor.Log($"Using recolored map {MapName}_{Season}.", LogLevel.Debug);
 
-        map = Helper.Content.Load<T>($@"assets\{MapName}.png"); // Replace map page
+        map = Helper.Content.Load<T>($@"assets\{MapName}\{MapName}_{Season}.png"); // Replace map page
       }
       catch
       {
         Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Debug);
-        map = Helper.Content.Load<T>(@"assets\default_map.png");
+        map = Helper.Content.Load<T>($@"assets\default\default_{Season}.png");
       }
 
       return map;
@@ -104,6 +105,7 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       this.Helper.Data.WriteJsonFile($"config/default.json", Config);
+      Season = Game1.currentSeason;
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
       CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
@@ -317,6 +319,8 @@ namespace NPCMapLocations
     private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
       var npcEntries = new Dictionary<string, bool>(SecondaryNpcs);
+
+      // Characters that are not always available, for avoiding spoilers
       foreach (var npc in npcEntries)
       {
         var name = npc.Key;
@@ -407,6 +411,15 @@ namespace NPCMapLocations
           }
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
+        }
+
+        // Check season change (for when it's changed via console)
+        if (Season != Game1.currentSeason)
+        {
+          Season = Game1.currentSeason;
+
+          // Force reload of map for season changes
+          this.Helper.Content.InvalidateCache("LooseSprites/Map");
         }
       }
 

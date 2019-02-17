@@ -58,7 +58,7 @@ namespace NPCMapLocations
 					names += name + ", ";
 				}
 
-				this.Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Info);
+				this.Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Debug);
 			}
 			this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
 		}
@@ -69,17 +69,22 @@ namespace NPCMapLocations
 			// Eemie's Map Recolour
 			if (this.Helper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
 			{
-				return "eemie_recolour_map";
+				return "eemie_recolour";
 			}
 			// Starblue Valley
 			else if (this.Helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
 			{
-				return "starblue_map";
+				return "starblue_valley";
 			}
-			// Default
-			else
+			// Elle's Dirt and Cliff Recolor
+			else if (this.Helper.ModRegistry.IsLoaded("Elle.DirtCliffRecolor"))
 			{
-				return "default_map";
+			  return "elles_recolor";
+			}
+      // Default
+      else
+			{
+				return "default";
 			}
 		}
 
@@ -158,7 +163,7 @@ namespace NPCMapLocations
 	    {
 	      if (moddedLocations.Count == 1)
 	      {
-	        Monitor.Log($"Detected modded location {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Info);
+	        Monitor.Log($"Detected modded location {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Debug);
         }
 	      else
 	      {
@@ -166,7 +171,7 @@ namespace NPCMapLocations
           for (var i = 0; i < moddedLocations.Count; i++)
             locationList += moddedLocations[i] + (i + 1 == moddedLocations.Count ? ", " : "");
 
-	        Monitor.Log($"Detected modded locations {locationList}. Adjusting map tracking to scale.", LogLevel.Info);
+	        Monitor.Log($"Detected modded locations {locationList}. Adjusting map tracking to scale.", LogLevel.Debug);
         }
       }
 
