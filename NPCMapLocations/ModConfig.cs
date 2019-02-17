@@ -19,12 +19,13 @@ namespace NPCMapLocations
 	  public bool MarkQuests { get; set; } = true;
 	  public bool ShowTravelingMerchant { get; set; } = true;
 	  public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
-	  public bool UseSeasonalMaps { get; set; } = true;
+    public bool UseSeasonalMaps { get; set; } = true;
 	  public bool ShowMinimap { get; set; } = false;
 	  public int MinimapX { get; set; } = 12;
 	  public int MinimapY { get; set; } = 12;
 	  public int MinimapWidth { get; set; } = 75;
 	  public int MinimapHeight { get; set; } = 45;
+	  public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() { };
     public string MenuKey { get; set; } = "Tab";
 		public string TooltipKey { get; set; } = "Space";
 	  public string MinimapDragKey { get; set; } = "LeftAlt";

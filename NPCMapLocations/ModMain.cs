@@ -31,6 +31,7 @@ namespace NPCMapLocations
     private Dictionary<string, string> CustomNames;
     private bool hasOpenedMap;
     private bool isModMapOpen;
+    private bool shouldShowMinimap;
 
     // Multiplayer
     private Dictionary<long, CharacterMarker> FarmerMarkers;
@@ -110,6 +111,7 @@ namespace NPCMapLocations
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       DEBUG_MODE = Config.DEBUG_MODE;
+      shouldShowMinimap = Config.ShowMinimap;
 
       locationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
@@ -427,7 +429,7 @@ namespace NPCMapLocations
       if (e.IsMultipleOf(30))
       {
         // Map page updates
-        var updateForMinimap = false;
+        var updateForMinimap = false || shouldShowMinimap;
 
         if (Config.ShowMinimap)
           if (Minimap != null)
@@ -870,13 +872,19 @@ namespace NPCMapLocations
 
     private void Player_Warped(object sender, WarpedEventArgs e)
     {
+      if (!e.IsLocalPlayer) return;
+
+      // Hide minimap in blacklisted locations with special case for Mines as usual
+      shouldShowMinimap = !(Config.MinimapBlacklist.Contains(e.NewLocation.Name) ||
+                            ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && e.NewLocation.Name.Contains("Mine")));
+
       // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }
 
     private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
     {
-      if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
+      if (Context.IsWorldReady && Config.ShowMinimap && shouldShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
       if (DEBUG_MODE && HeldKey == SButton.LeftAlt)
