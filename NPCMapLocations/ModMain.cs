@@ -105,10 +105,10 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       this.Helper.Data.WriteJsonFile($"config/default.json", Config);
-      Season = Game1.currentSeason;
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
       CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
+      Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       DEBUG_MODE = Config.DEBUG_MODE;
 
       locationContexts = new Dictionary<string, LocationContext>();
@@ -414,7 +414,7 @@ namespace NPCMapLocations
         }
 
         // Check season change (for when it's changed via console)
-        if (Season != Game1.currentSeason)
+        if (Config.UseSeasonalMaps && Season != Game1.currentSeason)
         {
           Season = Game1.currentSeason;
 
