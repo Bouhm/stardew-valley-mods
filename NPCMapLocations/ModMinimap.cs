@@ -22,7 +22,7 @@ namespace NPCMapLocations
 	  private readonly Texture2D CustomMarkerTex;
 
     public bool isBeingDragged;
-		private readonly Texture2D map;
+		private Texture2D map;
 	  private Vector2 prevCenter;
 	  private Vector2 center; // Center position of minimap
 	  private float cropX; // Top-left position of crop on map
@@ -107,6 +107,11 @@ namespace NPCMapLocations
 		    drawDelay = 30;
 		  }
 		}
+
+	  public void UpdateMapForSeason()
+	  {
+	    map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+    }
 
 	  public void CheckOffsetForMap()
 	  {

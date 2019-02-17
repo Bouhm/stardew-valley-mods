@@ -79,7 +79,7 @@ namespace NPCMapLocations
 			// Elle's Dirt and Cliff Recolor
 			else if (this.Helper.ModRegistry.IsLoaded("Elle.DirtCliffRecolor"))
 			{
-			  return "elles_recolor";
+			  return "elle_recolor";
 			}
       // Default
       else

@@ -73,7 +73,7 @@ namespace NPCMapLocations
       }
       catch
       {
-        Monitor.Log($"Unable to find {MapName}; loaded default map instead.", LogLevel.Debug);
+        Monitor.Log($"Unable to find {MapName}_{Season}; loaded default map instead.", LogLevel.Debug);
         map = Helper.Content.Load<T>($@"assets\default\default_{Season}.png");
       }
 
@@ -422,6 +422,7 @@ namespace NPCMapLocations
 
           // Force reload of map for season changes
           this.Helper.Content.InvalidateCache("LooseSprites/Map");
+          Minimap?.UpdateMapForSeason();
         }
       }
 
