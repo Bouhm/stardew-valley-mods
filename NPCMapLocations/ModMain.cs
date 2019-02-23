@@ -362,6 +362,8 @@ namespace NPCMapLocations
         CustomMapLocations,
         CustomMarkerTex
       );
+
+      shouldShowMinimap = !Config.MinimapBlacklist.Contains(Game1.player.currentLocation.Name);
     }
 
     private void ResetMarkers(List<NPC> villagers)

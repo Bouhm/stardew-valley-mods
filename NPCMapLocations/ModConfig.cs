@@ -20,6 +20,7 @@ namespace NPCMapLocations
 	  public bool ShowTravelingMerchant { get; set; } = true;
 	  public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
     public bool UseSeasonalMaps { get; set; } = true;
+	  public string MapRecolor { get; set; } = "";
 	  public bool ShowMinimap { get; set; } = false;
 	  public int MinimapX { get; set; } = 12;
 	  public int MinimapY { get; set; } = 12;
