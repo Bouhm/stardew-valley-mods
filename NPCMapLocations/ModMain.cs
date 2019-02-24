@@ -878,9 +878,11 @@ namespace NPCMapLocations
       if (!e.IsLocalPlayer) return;
 
       // Hide minimap in blacklisted locations with special case for Mines as usual
-      shouldShowMinimap = !(Config.MinimapBlacklist.Contains(e.NewLocation.Name) ||
-                            ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && e.NewLocation.Name.Contains("Mine")));
 
+      shouldShowMinimap = !(Config.MinimapBlacklist.Any(loc => loc != "Farm" && e.NewLocation.Name.StartsWith(loc)) ||
+                              ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && e.NewLocation.Name.Contains("Mine")));
+    
+      
       // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }

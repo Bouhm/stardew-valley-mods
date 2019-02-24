@@ -146,13 +146,20 @@ public static class ModConstants
 				new MapVector(554, 687, 120, 120)
 			}
 		},
-        {
+    {
 			"Woods", new MapVector[]
 			{
 				new MapVector(136, 346, 0, 0),
 				new MapVector(230, 395, 60, 32)
 			}
-		},
+    },
+	  {
+	    "DeepWoods", new MapVector[]
+	    {
+	      new MapVector(136, 346, 0, 0),
+	      new MapVector(230, 395, 60, 32)
+	    }
+    },
 		{
 			"WizardHouse", new MapVector[]
 			{

@@ -73,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\buildings.png" />
-    <Content Include="assets\customLocations.png" />
     <Content Include="assets\default\default_fall.png" />
     <Content Include="assets\default\default_spring.png" />
     <Content Include="assets\default\default_summer.png" />
