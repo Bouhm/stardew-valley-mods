@@ -71,8 +71,13 @@ namespace NPCMapLocations
 			{
 				return "eemie_recolour";
 			}
-			// Starblue Valley
-			else if (this.Helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
+		  // A Toned Down SDV
+		  if (this.Helper.ModRegistry.IsLoaded("Lavender.TonedDownSDV"))
+		  {
+		    return "toned_down";
+		  }
+      // Starblue Valley
+      else if (this.Helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
 			{
 				return "starblue_valley";
 			}
