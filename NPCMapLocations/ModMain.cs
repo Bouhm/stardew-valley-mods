@@ -367,7 +367,13 @@ namespace NPCMapLocations
         CustomMarkerTex
       );
 
-      shouldShowMinimap = !Config.MinimapBlacklist.Contains(Game1.player.currentLocation.Name);
+      shouldShowMinimap = !IsLocationBlacklisted(Game1.player.currentLocation.Name);
+    }
+
+    private bool IsLocationBlacklisted(string location)
+    {
+      return Config.ShowMinimap && Config.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
+               ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
     }
 
     private void ResetMarkers(List<NPC> villagers)
@@ -882,11 +888,8 @@ namespace NPCMapLocations
       if (!e.IsLocalPlayer) return;
 
       // Hide minimap in blacklisted locations with special case for Mines as usual
-
-      shouldShowMinimap = !(Config.MinimapBlacklist.Any(loc => loc != "Farm" && e.NewLocation.Name.StartsWith(loc)) ||
-                              ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && e.NewLocation.Name.Contains("Mine")));
-    
-      
+      shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
+       
       // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }
