@@ -63,7 +63,7 @@ namespace NPCMapLocations
     public T Load<T>(IAssetInfo asset)
     {
       T map;
-      MapName = Config.MapRecolor ?? CustomHandler.LoadMap();
+      MapName = Config.MapRecolor != "" ? Config.MapRecolor : CustomHandler.LoadMap();
       var mapFile = MapName;
       if (mapFile == "toned_down") MapName = "eemie_recolour";
 
