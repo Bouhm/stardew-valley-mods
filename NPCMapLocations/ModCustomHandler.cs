@@ -89,7 +89,7 @@ namespace NPCMapLocations
 		  // Extended Farm
 		  else if (this.Helper.ModRegistry.IsLoaded("Forkmaster.ExtendedFarm"))
 		  {
-		    return "extended_farm";
+		    return "farm_extended";
 		  }
       // Default
       else

@@ -66,7 +66,11 @@ namespace NPCMapLocations
       MapName = Config.MapRecolor != "" ? Config.MapRecolor : CustomHandler.LoadMap();
       var mapFile = MapName;
       if (mapFile == "toned_down") MapName = "eemie_recolour";
-      if (Season == null) Season = "spring";
+      if (Season == null)
+      {
+        Monitor.Log($"Unable to get current season. Defaulting to spring.", LogLevel.Debug);
+        Season = "spring";
+      }
 
       try
       {
@@ -429,7 +433,7 @@ namespace NPCMapLocations
         }
        
         // Check season change (for when it's changed via console)
-        if (Config.UseSeasonalMaps && Season != Game1.currentSeason)
+        if (Config.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
         {
           Season = Game1.currentSeason;
 
