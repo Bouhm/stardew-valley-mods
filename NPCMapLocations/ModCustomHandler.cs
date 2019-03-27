@@ -86,6 +86,11 @@ namespace NPCMapLocations
 			{
 			  return "elle_recolor";
 			}
+		  // Extended Farm
+		  else if (this.Helper.ModRegistry.IsLoaded("Forkmaster.ExtendedFarm"))
+		  {
+		    return "extended_farm";
+		  }
       // Default
       else
 			{

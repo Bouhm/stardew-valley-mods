@@ -66,6 +66,7 @@ namespace NPCMapLocations
       MapName = Config.MapRecolor != "" ? Config.MapRecolor : CustomHandler.LoadMap();
       var mapFile = MapName;
       if (mapFile == "toned_down") MapName = "eemie_recolour";
+      if (Season == null) Season = "spring";
 
       try
       {
@@ -426,7 +427,7 @@ namespace NPCMapLocations
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
         }
-
+       
         // Check season change (for when it's changed via console)
         if (Config.UseSeasonalMaps && Season != Game1.currentSeason)
         {
