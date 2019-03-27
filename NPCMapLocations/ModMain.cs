@@ -68,7 +68,7 @@ namespace NPCMapLocations
       if (mapFile == "toned_down") MapName = "eemie_recolour";
       if (Season == null)
       {
-        Monitor.Log($"Unable to get current season. Defaulting to spring.", LogLevel.Debug);
+        Monitor.Log($"Unable to get current season. Defaulted to spring.", LogLevel.Debug);
         Season = "spring";
       }
 
@@ -83,7 +83,7 @@ namespace NPCMapLocations
         return map;
       }
 
-      if (!MapName.Equals("default_map"))
+      if (!MapName.Equals("default"))
         Monitor.Log($"Using recolored map {mapFile}_{Season}.", LogLevel.Debug);
 
       return map;
