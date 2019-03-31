@@ -118,6 +118,7 @@ namespace NPCMapLocations
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
       CustomHandler.LoadConfig(Config);
       CustomMapLocations = CustomHandler.GetCustomMapLocations();
+      this.Helper.Content.InvalidateCache("LooseSprites/Map");
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       DEBUG_MODE = Config.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;

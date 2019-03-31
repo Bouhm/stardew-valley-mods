@@ -77,18 +77,6 @@
     <Content Include="assets\default\default_spring.png" />
     <Content Include="assets\default\default_summer.png" />
     <Content Include="assets\default\default_winter.png" />
-    <Content Include="assets\eemie_recolour\eemie_recolour_fall.png" />
-    <Content Include="assets\eemie_recolour\eemie_recolour_spring.png" />
-    <Content Include="assets\eemie_recolour\eemie_recolour_summer.png" />
-    <Content Include="assets\eemie_recolour\eemie_recolour_winter.png" />
-    <Content Include="assets\elle_recolor\elle_recolor_fall.png" />
-    <Content Include="assets\elle_recolor\elle_recolor_spring.png" />
-    <Content Include="assets\elle_recolor\elle_recolor_summer.png" />
-    <Content Include="assets\elle_recolor\elle_recolor_winter.png" />
-    <Content Include="assets\starblue_valley\starblue_valley_fall.png" />
-    <Content Include="assets\starblue_valley\starblue_valley_spring.png" />
-    <Content Include="assets\starblue_valley\starblue_valley_summer.png" />
-    <Content Include="assets\starblue_valley\starblue_valley_winter.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Pathoschild.Stardew.ModBuildConfig.2.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets" Condition="Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.2.2.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" />
