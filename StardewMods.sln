@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationCompass", "LocationCompass\LocationCompass.csproj", "{DE3B91FA-F6D6-456D-874C-74B9250DC298}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivelyPets", "LivelyPets\LivelyPets.csproj", "{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPCMapLocations", "NPCMapLocations\NPCMapLocations.csproj", "{DEBB8305-B850-42B7-8384-7216E71A1A2D}"
 EndProject
 Global
@@ -32,14 +30,6 @@ Global
 		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|x86.ActiveCfg = Release|x86
 		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|x86.Build.0 = Release|x86
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Debug|x86.Build.0 = Debug|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Release|x86.ActiveCfg = Release|Any CPU
-		{BD9B84AA-F6DD-4D13-8023-B3F858E33A15}.Release|x86.Build.0 = Release|Any CPU
 		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|x86.ActiveCfg = Debug|Any CPU
