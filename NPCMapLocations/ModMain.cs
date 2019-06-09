@@ -859,10 +859,8 @@ namespace NPCMapLocations
         if (upper == null)
           upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-        x = (int) (lower.MapX +
-                   (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX));
-        y = (int) (lower.MapY +
-                   (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY));
+        x = (int) MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
+        y = (int) MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
 
         if (DEBUG_MODE && isPlayer)
         {
