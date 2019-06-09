@@ -29,12 +29,12 @@ namespace NPCMapLocations
 	  public int MinimapHeight { get; set; } = 45;
 	  public string MinimapDragKey { get; set; } = "LeftAlt";
 	  public string MinimapToggleKey { get; set; } = "OemPipe";
-	  public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() { };
+	  public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() {};
 
     public string MapRecolor { get; set; } = "";
 	  public bool UseSeasonalMaps { get; set; } = true;
     public Dictionary<string, int> CustomNpcs { get; set; } = new Dictionary<string, int>();
-    public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
+    public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() {};
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
     public Dictionary<string, JObject> CustomMapMarkers { get; set; } = new Dictionary<string, JObject>();
 	  public bool DEBUG_MODE { get; set; } = false;

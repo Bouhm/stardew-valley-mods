@@ -143,7 +143,6 @@ namespace NPCMapLocations
             );
           }
 	      }
-	      moddedLocations.Add(mapVectors.Key);
         customMapVectors.Add(mapVectors.Key, mapVectorArr);        
 	    }
 
@@ -175,16 +174,37 @@ namespace NPCMapLocations
 	    {
 	      if (moddedLocations.Count == 1)
 	      {
-	        Monitor.Log($"Detected modded location {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Debug);
+	        Monitor.Log($"Detected modded location: {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Debug);
         }
 	      else
 	      {
 	        var locationList = "";
-          for (var i = 0; i < moddedLocations.Count; i++)
-            locationList += moddedLocations[i] + (i + 1 == moddedLocations.Count ? ", " : "");
+	        for (var i = 0; i < moddedLocations.Count; i++)
+	        {
+	          locationList += moddedLocations[i] + (i + 1 == moddedLocations.Count ? "" : ", ");
+	        }
 
-	        Monitor.Log($"Detected modded locations {locationList}. Adjusting map tracking to scale.", LogLevel.Debug);
+	        Monitor.Log($"Detected modded locations: {locationList}. Adjusting map tracking to scale.", LogLevel.Debug);
         }
+      }
+      
+	    string[] customLocations = customMapVectors.Keys.ToArray();
+       if (customMapVectors.Keys.Count > 0)
+	    {
+	      if (customLocations.Length == 1)
+	      {
+	        Monitor.Log($"Handled custom location: { customLocations[0]}.", LogLevel.Debug);
+	      }
+	      else
+	      {
+	        var locationList = "";
+	        for (var i = 0; i < customLocations.Length; i++)
+	        {
+	          locationList += customLocations[i] + (i + 1 == customLocations.Length ? "" : ", ");
+	        }
+
+	        Monitor.Log($"Handled custom locations: {locationList}.", LogLevel.Debug);
+	      }
       }
 
       return customMapVectors;
