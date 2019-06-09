@@ -199,14 +199,17 @@ public static class ModConstants
 		{
 			"Town", new MapVector[]
 			{
+			  // Top-Right of town
+			  new MapVector(899, 197, 102, 1),
+
 				// Top half of town
 				new MapVector(593, 173, 0, 0),
 				new MapVector(921, 275, 120, 40),
 
 				// Bottom half of town
 				new MapVector(602, 268, 0, 41),
-				new MapVector(958, 513, 120, 110)
-			}
+				new MapVector(958, 513, 120, 110),
+      }
 		},
 		{
 			"TownSquare", new MapVector[]
