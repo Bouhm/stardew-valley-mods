@@ -114,7 +114,6 @@ namespace NPCMapLocations
 	  public Dictionary<string, MapVector[]> GetCustomMapLocations()
 	  {
       var customMapVectors = new Dictionary<string, MapVector[]>();
-	    var moddedLocations = new List<string>();
 
       foreach (KeyValuePair<string, JObject[]> mapVectors in Config.CustomMapLocations)
 	    {
@@ -155,7 +154,6 @@ namespace NPCMapLocations
 	      if (mapVector.LastOrDefault().TileX != location.Map.DisplayWidth / Game1.tileSize ||
 	          mapVector.LastOrDefault().TileY != location.Map.DisplayHeight / Game1.tileSize) 
 	      {
-          moddedLocations.Add(locationName);
 	        customMapVectors.Add(locationName,
 	          new MapVector[]
 	          {
@@ -170,24 +168,6 @@ namespace NPCMapLocations
 	      }
 	    }
 
-	    if (moddedLocations.Count > 0)
-	    {
-	      if (moddedLocations.Count == 1)
-	      {
-	        Monitor.Log($"Detected modded location: {moddedLocations[0]}. Adjusting map tracking to scale.", LogLevel.Debug);
-        }
-	      else
-	      {
-	        var locationList = "";
-	        for (var i = 0; i < moddedLocations.Count; i++)
-	        {
-	          locationList += moddedLocations[i] + (i + 1 == moddedLocations.Count ? "" : ", ");
-	        }
-
-	        Monitor.Log($"Detected modded locations: {locationList}. Adjusting map tracking to scale.", LogLevel.Debug);
-        }
-      }
-      
 	    string[] customLocations = customMapVectors.Keys.ToArray();
        if (customMapVectors.Keys.Count > 0)
 	    {
