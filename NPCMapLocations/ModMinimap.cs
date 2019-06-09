@@ -137,7 +137,7 @@ namespace NPCMapLocations
 				Game1.player.getTileY(), CustomMapLocations, true);
 
       // Player in unknown location, use previous location as center
-		  if (center.X < 0 && prevCenter != null)
+		  if (center.Equals(Vector2.Zero) && prevCenter != null)
 		    center = prevCenter;
 		  else
 		    prevCenter = center;
@@ -458,7 +458,7 @@ namespace NPCMapLocations
 						// Temporary solution to handle desync of farmhand location/tile position when changing location
 						if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
 						{
-						  if (farMarker.MapLocation.X < 0) continue;
+						  if (farMarker.MapLocation.Equals(Vector2.Zero)) continue;
 							if (farMarker.DrawDelay == 0 &&
 							    IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
 							{
@@ -491,7 +491,7 @@ namespace NPCMapLocations
         foreach (var npcMarker in sortedMarkers)
         {
           // Skip if no specified location
-          if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
+          if (npcMarker.MapLocation.Equals(Vector2.Zero) || npcMarker.Marker == null ||
               !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name) ||
               !IsWithinMapArea(npcMarker.MapLocation.X, npcMarker.MapLocation.Y))
             continue;

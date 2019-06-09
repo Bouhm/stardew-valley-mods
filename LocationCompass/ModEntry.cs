@@ -87,11 +87,11 @@ namespace LocationCompass
         }
         // Get root locations from indoor locations
         else
-          MapRootLocations(location, null, null, false, new Vector2(-1000, -1000));
+          MapRootLocations(location, null, null, false, Vector2.Zero);
       }
 
       foreach (var location in Game1.getFarm().buildings)
-        MapRootLocations(location.indoors.Value, null, null, false, new Vector2(-1000, -1000));
+        MapRootLocations(location.indoors.Value, null, null, false, Vector2.Zero);
     }
 
     private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -457,7 +457,7 @@ namespace LocationCompass
         if (config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
           continue;
 
-        var characterPos = new Vector2(-1000, 1000);
+        var characterPos = Vector2.Zero;
         var playerPos =
           new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom,
             Game1.player.position.Y);
@@ -726,7 +726,7 @@ namespace LocationCompass
           x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2));
           return new Vector2(x, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
         default:
-          return new Vector2(-1000, -1000);
+          return Vector2.Zero;
       }
     }
 

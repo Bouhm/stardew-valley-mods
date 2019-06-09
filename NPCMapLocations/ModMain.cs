@@ -495,7 +495,7 @@ namespace NPCMapLocations
           }
           else
           {
-            marker.MapLocation = new Vector2(-1000, -1000);
+            marker.MapLocation = Vector2.Zero;
           }
         }
       }
@@ -715,7 +715,7 @@ namespace NPCMapLocations
         else
         {
           // Set no location so they don't get drawn
-          npcMarker.MapLocation = new Vector2(-1000, -1000);
+          npcMarker.MapLocation = Vector2.Zero;
         }
       }
     }
@@ -781,6 +781,12 @@ namespace NPCMapLocations
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
       Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
     {
+      if (isPlayer)
+      {
+        
+        
+      }
+
       if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
 
       if (locationName.StartsWith("UndergroundMine"))
@@ -799,9 +805,9 @@ namespace NPCMapLocations
 
       if (CustomMapLocations != null  &&
           !CustomMapLocations.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
-        return new Vector2(-1000, -1000);
+        return Vector2.Zero;
       if (!ModConstants.MapVectors.ContainsKey(locationName))
-        return new Vector2(-1000, -1000);
+        return Vector2.Zero;
 
       MapVector[] locVectors = (CustomMapLocations != null && CustomMapLocations.ContainsKey(locationName)) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
 

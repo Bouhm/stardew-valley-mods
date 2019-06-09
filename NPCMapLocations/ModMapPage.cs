@@ -450,7 +450,7 @@ namespace NPCMapLocations
 				{
 					// Temporary solution to handle desync of farmhand location/tile position when changing location
 					if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out CharacterMarker farMarker))
-            if (farMarker == null || farMarker.MapLocation.X < 0)
+            if (farMarker == null || farMarker.MapLocation.Equals(Vector2.Zero))
 					    continue;
 				    if (farMarker != null && farMarker.DrawDelay == 0)
 				    {
@@ -480,7 +480,7 @@ namespace NPCMapLocations
         foreach (CharacterMarker npcMarker in sortedMarkers)
         {
           // Skip if no specified location
-          if (npcMarker.MapLocation.X < 0 || npcMarker.Marker == null ||
+          if (npcMarker.MapLocation.Equals(Vector2.Zero) || npcMarker.Marker == null ||
               !MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
           {
             continue;
@@ -525,7 +525,7 @@ namespace NPCMapLocations
 		{
 			if (hoveredNames.Equals("")) return;
 
-			indoorIconVector = new Vector2(-1000, -1000);
+			indoorIconVector = Vector2.Zero;
 			var lines = names.Split('\n');
 			int height = (int) Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
 			int width = (int) Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
