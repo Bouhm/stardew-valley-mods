@@ -937,14 +937,17 @@ namespace NPCMapLocations
     {
       if (Game1.player.currentLocation == null) return;
       string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+      string locationText =
+        $"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})";
 
       // Black background for legible text
-      Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 200 + (int)Game1.dialogueFont.MeasureString(locationName).X, 200), new Rectangle(3, 0, 1, 1),
+      Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 200 + (int)Game1.smallFont
+                                                                        .MeasureString(locationText).X, 200), new Rectangle(3, 0, 1, 1),
         Color.Black);
 
       // Show map location and tile positions
       DrawText(
-        $"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})",
+        locationText,
         new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
       DrawText(
         "Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " +
