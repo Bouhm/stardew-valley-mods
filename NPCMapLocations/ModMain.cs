@@ -801,11 +801,21 @@ namespace NPCMapLocations
           !CustomMapLocations.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
       {
         return Vector2.Zero;
-      } 
+      }
 
-      MapVector[] locVectors = (CustomMapLocations != null && CustomMapLocations.ContainsKey(locationName)) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+      MapVector[] locVectors;
 
-;      int x;
+      // Handle custom farm & different types of farms
+      if (locationName.Equals("Farm"))
+      {
+        locVectors = (CustomMapLocations != null && (CustomMapLocations.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+      }
+      else
+      {
+        locVectors = (CustomMapLocations != null && (CustomMapLocations.ContainsKey(locationName))) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+      }
+
+      int x;
       int y;
 
       // Precise (static) regions and indoor locations

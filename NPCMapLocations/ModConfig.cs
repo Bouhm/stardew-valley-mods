@@ -37,6 +37,7 @@ namespace NPCMapLocations
     public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() {};
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
     public Dictionary<string, JObject> CustomMapMarkers { get; set; } = new Dictionary<string, JObject>();
+    public Dictionary<string, JObject> CustomMapLabels { get; set; } = new Dictionary<string, JObject>();
 	  public bool DEBUG_MODE { get; set; } = false;
   }
 }
