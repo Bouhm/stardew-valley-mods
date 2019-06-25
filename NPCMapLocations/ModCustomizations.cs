@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -30,11 +31,9 @@ namespace NPCMapLocations
       Names = new Dictionary<string, string>();
       NpcCustomizations = new HashSet<string>();
       Locations = new Dictionary<string, CustomLocation>();
+      Tooltips = new List<ClickableComponent>();
 
-      if (ModMain.Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP"))
-      {
-        Monitor.Log("Using SVE customizations.", LogLevel.Debug);
-      }
+      if (ModMain.Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP")) Monitor.Log("Using SVE customizations.", LogLevel.Debug);
 
       LoadMap();
       LoadTooltips();
@@ -94,6 +93,16 @@ namespace NPCMapLocations
 
     private void LoadTooltips()
     {
+      foreach (var tooltip in ModMain.Config.CustomMapTooltips)
+        Tooltips.Add(new ClickableComponent(
+          new Rectangle(
+            (int) tooltip.Value.GetValue("X"),
+            (int) tooltip.Value.GetValue("Y"),
+            (int) tooltip.Value.GetValue("Width"),
+            (int) tooltip.Value.GetValue("Height")
+          ),
+          tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText"))
+        );
     }
 
     private void LoadMarkerCropOffsets()

@@ -73,7 +73,13 @@ namespace NPCMapLocations
 					rect.Value.Height
 				);
 			}
-		}
+
+      // Add custom tooltips
+      foreach (var tooltip in Customizations.Tooltips)
+		  {
+		    this.points.Add(tooltip);
+      }
+    }
 
 		public override void performHoverAction(int x, int y)
 		{
