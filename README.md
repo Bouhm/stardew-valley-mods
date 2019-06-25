@@ -1,5 +1,5 @@
 # StardewValleyMods
-SMAPI mods for Stardew Valley
+A collection of Stardew Valley mods that improve player experience, quality of life, and add new content to the game.
 
 ## Install
 1. [Install the latest version of SMAPI](https://smapi.io)
