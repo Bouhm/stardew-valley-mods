@@ -33,9 +33,6 @@ namespace NPCMapLocations
 		private Vector2 indoorIconVector;
 		private bool drawPamHouseUpgrade;
 
-	  private readonly Dictionary<string, MapVector[]> CustomMapLocations;
-	  private readonly Texture2D CustomMarkerTex;
-
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
 			HashSet<CharacterMarker> npcMarkers,
@@ -47,8 +44,8 @@ namespace NPCMapLocations
     ) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
 			Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
 			600 + IClickableMenu.borderWidth * 2)
-		{
-			this.NpcMarkers = npcMarkers;
+    {
+      this.NpcMarkers = npcMarkers;
 			this.ConditionalNpcs = conditionalNpcs;
 			this.FarmerMarkers = farmerMarkers;
 			this.FarmBuildings = farmBuildings;
@@ -241,8 +238,6 @@ namespace NPCMapLocations
         DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, ModMain.Config.NameTooltipMode);
       }
 
-      
-
       // Draw indoor icon
       if (hasIndoorCharacter && !String.IsNullOrEmpty(hoveredNames))
 				b.Draw(Game1.mouseCursors, indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
@@ -409,7 +404,7 @@ namespace NPCMapLocations
 
       // ===== Custom locations =====
       foreach (var location in Customizations.Locations)
-      {
+      {   
         b.Draw(Customizations.LocationTextures, new Vector2(mapX + location.Value.LocVector.X, mapY + location.Value.LocVector.Y),
           location.Value.SrcRect, Color.White,
           0f,
@@ -445,7 +440,7 @@ namespace NPCMapLocations
 			else
 			{
 				Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-					Game1.player.getTileY(), CustomMapLocations, true);
+					Game1.player.getTileY(), Customizations.MapVectors, true);
         if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 					  new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,

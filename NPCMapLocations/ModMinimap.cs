@@ -368,7 +368,9 @@ namespace NPCMapLocations
 			  }
 			}
 
+      //
       // ===== Custom locations =====
+      //
 		  foreach (var location in Customizations.Locations)
 		  {
 		    if (Customizations.MapVectors.TryGetValue(location.Key, out var locationVector))

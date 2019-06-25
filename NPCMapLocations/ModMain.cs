@@ -135,10 +135,12 @@ namespace NPCMapLocations
       MapVectors = ModConstants.MapVectors;
 
       foreach (var locVectors in Customizations.MapVectors)
+      {
         if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
           MapVectors[locVectors.Key] = locVectors.Value;
         else
           MapVectors.Add(locVectors.Key, locVectors.Value);
+      }
 
       UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
