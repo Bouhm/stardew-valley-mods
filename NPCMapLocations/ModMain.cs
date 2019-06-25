@@ -20,16 +20,16 @@ namespace NPCMapLocations
 {
   public class ModMain : Mod, IAssetLoader
   {
-    private const int DRAW_DELAY = 3;
+    public static ModConfig Config;
+    public static IModHelper Helper;
     public static SButton HeldKey;
 
+    private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
-    private ModConfig Config;
     private Dictionary<string, MapVector[]> MapVectors;
-    private Dictionary<string, int> MarkerCropOffsets;
     private ModMinimap Minimap;
     private HashSet<CharacterMarker> NpcMarkers;
-    private Dictionary<string, bool> SecondaryNpcs;
+    private Dictionary<string, bool> ConditionalNpcs;
     private bool hasOpenedMap;
     private bool isModMapOpen;
     private bool shouldShowMinimap;
@@ -39,12 +39,8 @@ namespace NPCMapLocations
     private Dictionary<string, LocationContext> locationContexts;
 
     // Customizations/Custom mods
-    private string MapName;
     private string Season;
-    private ModCustomHandler CustomHandler;
-    private Dictionary<string, MapVector[]> CustomMapLocations;
-    private Texture2D CustomMarkerTex;
-    private Dictionary<string, string> CustomNames;
+    private ModCustomizations Customizations;
 
     // Debugging
     private static bool DEBUG_MODE;
@@ -52,7 +48,6 @@ namespace NPCMapLocations
     private static Vector2 _tileLower;
     private static Vector2 _tileUpper;
     private static List<string> alertFlags;
-
 
     // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
@@ -63,9 +58,9 @@ namespace NPCMapLocations
     public T Load<T>(IAssetInfo asset)
     {
       T map;
-      MapName = Config.MapRecolor != "" ? Config.MapRecolor : CustomHandler.LoadMap();
-      var mapFile = MapName;
-      if (mapFile == "toned_down") MapName = "eemie_recolour";
+      string mapName = Config.MapRecolor != "" ? Config.MapRecolor : Customizations.MapName;
+      var mapFile = mapName;
+      if (mapFile == "toned_down") mapName = "eemie_recolour";
       if (Season == null)
       {
         Monitor.Log($"Unable to get current season. Defaulted to spring.", LogLevel.Debug);
@@ -74,7 +69,10 @@ namespace NPCMapLocations
 
       try
       {
-        map = Helper.Content.Load<T>($@"assets\{MapName}\{MapName}_{Season}.png"); // Replace map page
+        if (ModMain.Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP"))
+          map = Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png"); // Replace map page
+        else
+          map = Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png"); // Replace map page
       }
       catch
       {
@@ -83,7 +81,7 @@ namespace NPCMapLocations
         return map;
       }
 
-      if (!MapName.Equals("default"))
+      if (!mapName.Equals("default"))
         Monitor.Log($"Using recolored map {mapFile}_{Season}.", LogLevel.Debug);
 
       return map;
@@ -91,12 +89,10 @@ namespace NPCMapLocations
 
     public override void Entry(IModHelper helper)
     {
-      MarkerCropOffsets = ModConstants.MarkerCropOffsets;
+      Helper = helper;
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
       BuildingMarkers = File.Exists(@"assets/buildings.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
-      CustomMarkerTex = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null;
-      CustomHandler = new ModCustomHandler(Helper, Monitor);
-
+      
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -114,11 +110,11 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-      this.Helper.Data.WriteJsonFile($"config/default.json", Config);
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
-      CustomHandler.LoadConfig(Config);
-      CustomMapLocations = CustomHandler.GetCustomMapLocations();
-      this.Helper.Content.InvalidateCache("LooseSprites/Map");
+      Customizations = new ModCustomizations(Monitor)
+      {
+        LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
+      };
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       DEBUG_MODE = Config.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;
@@ -127,7 +123,7 @@ namespace NPCMapLocations
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
 
-      SecondaryNpcs = new Dictionary<string, bool>
+      ConditionalNpcs = new Dictionary<string, bool>
       {
         {"Kent", false},
         {"Marlon", false},
@@ -135,12 +131,10 @@ namespace NPCMapLocations
         {"Sandy", false},
         {"Wizard", false}
       };
-      CustomHandler.UpdateCustomNpcs();
-      CustomNames = CustomHandler.GetNpcNames();
-      MarkerCropOffsets = CustomHandler.GetMarkerCropOffsets();
+
       MapVectors = ModConstants.MapVectors;
 
-      foreach (var locVectors in CustomMapLocations)
+      foreach (var locVectors in Customizations.MapVectors)
         if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
           MapVectors[locVectors.Key] = locVectors.Value;
         else
@@ -154,7 +148,7 @@ namespace NPCMapLocations
       {
         var hostHasMod = false;
 
-        foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
+        foreach (IMultiplayerPeer peer in Helper.Multiplayer.GetConnectedPlayers())
         {
           if (peer.GetMod("Bouhm.NPCMapLocations") != null && peer.IsHost)
           {
@@ -204,7 +198,7 @@ namespace NPCMapLocations
           "Farm", // Get building position in farm
           building.tileX.Value,
           building.tileY.Value,
-          CustomMapLocations
+          Customizations.MapVectors
         );
         // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
         // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
@@ -256,7 +250,7 @@ namespace NPCMapLocations
         {
           Minimap.HandleMouseDown();
           if (Minimap.isBeingDragged)
-            this.Helper.Input.Suppress(e.Button);
+            Helper.Input.Suppress(e.Button);
         }
       }
 
@@ -299,11 +293,8 @@ namespace NPCMapLocations
       if (menu.currentTab != GameMenu.mapTab) return;
       if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
-          SecondaryNpcs,
-          CustomNames,
-          MarkerCropOffsets,
-          Helper,
-          Config
+          ConditionalNpcs,
+          Customizations
         );
 
       if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
@@ -330,7 +321,7 @@ namespace NPCMapLocations
     // Handle any checks that need to be made per day
     private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
-      var npcEntries = new Dictionary<string, bool>(SecondaryNpcs);
+      var npcEntries = new Dictionary<string, bool>(ConditionalNpcs);
 
       // Characters that are not always available, for avoiding spoilers
       foreach (var npc in npcEntries)
@@ -339,19 +330,19 @@ namespace NPCMapLocations
         switch (name)
         {
           case "Kent":
-            SecondaryNpcs[name] = Game1.year >= 2;
+            ConditionalNpcs[name] = Game1.year >= 2;
             break;
           case "Marlon":
-            SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(100162);
+            ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(100162);
             break;
           case "Merchant":
-            SecondaryNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+            ConditionalNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
             break;
           case "Sandy":
-            SecondaryNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
+            ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
             break;
           case "Wizard":
-            SecondaryNpcs[name] = Game1.player.eventsSeen.Contains(112);
+            ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(112);
             break;
         }
       }
@@ -361,16 +352,11 @@ namespace NPCMapLocations
 
       Minimap = new ModMinimap(
         NpcMarkers,
-        SecondaryNpcs,
+        ConditionalNpcs,
         FarmerMarkers,
-        MarkerCropOffsets,
         FarmBuildings,
         BuildingMarkers,
-        Helper,
-        Config,
-        MapName,
-        CustomMapLocations,
-        CustomMarkerTex
+        Customizations
       );
 
       shouldShowMinimap = !IsLocationBlacklisted(Game1.player.currentLocation.Name);
@@ -388,11 +374,11 @@ namespace NPCMapLocations
       foreach (var npc in villagers)
       {
         // Handle case where Kent appears even though he shouldn't
-        if (npc.Name.Equals("Kent") && !SecondaryNpcs["Kent"]) continue;
-        if (!CustomNames.TryGetValue(npc.Name, out var npcName))
+        if (npc.Name.Equals("Kent") && !ConditionalNpcs["Kent"]) continue;
+        if (!Customizations.Names.TryGetValue(npc.Name, out var npcName))
         {
           npcName = npc.displayName ?? npc.Name;
-          this.CustomNames.Add(npc.Name, npcName);
+          Customizations.Names.Add(npc.Name, npcName);
         }
 
         var npcMarker = new CharacterMarker
@@ -439,7 +425,7 @@ namespace NPCMapLocations
           Season = Game1.currentSeason;
 
           // Force reload of map for season changes
-          this.Helper.Content.InvalidateCache("LooseSprites/Map");
+          Helper.Content.InvalidateCache("LooseSprites/Map");
           Minimap?.UpdateMapForSeason();
         }
       }
@@ -512,16 +498,11 @@ namespace NPCMapLocations
       // allows for better compatibility with other mods that use MapPage
       pages[GameMenu.mapTab] = new ModMapPage(
         NpcMarkers,
-        SecondaryNpcs,
+        ConditionalNpcs,
         FarmerMarkers,
-        MarkerCropOffsets,
         FarmBuildings,
         BuildingMarkers,
-        Helper,
-        Config,
-        MapName,
-        CustomMapLocations,
-        CustomMarkerTex
+        Customizations
       );
     }
 
@@ -707,8 +688,8 @@ namespace NPCMapLocations
           if (npcMarker.SyncedLocationName == null)
           {
             // Get center of NPC marker 
-            var x = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), CustomMapLocations).X - 16;
-            var y = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), CustomMapLocations).Y - 15;
+            var x = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
+            var y = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
             npcMarker.MapLocation = new Vector2(x, y);
           }
         }
@@ -743,7 +724,7 @@ namespace NPCMapLocations
         var farmerId = farmer.UniqueMultiplayerID;
         var farmerLocationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
         var farmerLoc = LocationToMap(farmerLocationName,
-          farmer.getTileX(), farmer.getTileY(), CustomMapLocations);
+          farmer.getTileX(), farmer.getTileY(), Customizations.MapVectors);
 
         if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
         {
@@ -779,7 +760,7 @@ namespace NPCMapLocations
     // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
     // Requires MapModConstants and modified map page in ./assets
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-      Dictionary<string, MapVector[]> CustomMapLocations = null, bool isPlayer = false)
+      Dictionary<string, MapVector[]> CustomMapVectors = null, bool isPlayer = false)
     {
       if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
 
@@ -797,8 +778,8 @@ namespace NPCMapLocations
         }
       }
 
-      if (CustomMapLocations != null &&
-          !CustomMapLocations.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
+      if (CustomMapVectors != null &&
+          !CustomMapVectors.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
       {
         return Vector2.Zero;
       }
@@ -808,11 +789,11 @@ namespace NPCMapLocations
       // Handle custom farm & different types of farms
       if (locationName.Equals("Farm"))
       {
-        locVectors = (CustomMapLocations != null && (CustomMapLocations.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+        locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapVectors[locationName] : ModConstants.MapVectors[locationName];
       }
       else
       {
-        locVectors = (CustomMapLocations != null && (CustomMapLocations.ContainsKey(locationName))) ? CustomMapLocations[locationName] : ModConstants.MapVectors[locationName];
+        locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName))) ? CustomMapVectors[locationName] : ModConstants.MapVectors[locationName];
       }
 
       int x;

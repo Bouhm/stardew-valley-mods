@@ -49,7 +49,7 @@
     <Compile Include="ModMinimap.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModConstants.cs" />
-    <Compile Include="ModCustomHandler.cs" />
+    <Compile Include="ModCustomizations.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="ModMapPage.cs" />
     <Compile Include="ModMenu.cs" />
