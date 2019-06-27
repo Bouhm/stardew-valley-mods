@@ -90,8 +90,17 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
+
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
-      BuildingMarkers = File.Exists(@"assets/buildings.png") ? Helper.Content.Load<Texture2D>(@"assets/buildings.png") : null; // Load farm buildings
+      // Load farm buildings
+      try
+      {
+        BuildingMarkers = Helper.Content.Load<Texture2D>(@"assets/buildings.png");
+      }
+      catch
+      {
+        BuildingMarkers = null;
+      }
       
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
@@ -217,7 +226,7 @@ namespace NPCMapLocations
       // Greenhouse unlocked after pantry bundles completed
       if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
       {
-        var locVector = LocationToMap("Greenhouse");
+        var locVector = LocationToMap("Greenhouse", -1, -1, Customizations.MapVectors);
         locVector.X -= 5 / 2 * 3;
         locVector.Y -= 7 / 2 * 3;
         FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", locVector);
@@ -418,7 +427,7 @@ namespace NPCMapLocations
                 npc.getTileY()));
           }
 
-          Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new[] { ModManifest.UniqueID });
+          Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });
         }
        
         // Check season change (for when it's changed via console)
@@ -815,7 +824,10 @@ namespace NPCMapLocations
 
         MapVector lower = null;
         MapVector upper = null;
-        var hasEqualTile = false;
+        var isSameAxis = false;
+        int a;
+        if (isPlayer)
+          a = 1;
 
         // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
         foreach (var vector in vectors)
@@ -823,18 +835,21 @@ namespace NPCMapLocations
           if (lower != null && upper != null)
           {
             if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
-              hasEqualTile = true;
+              isSameAxis = true;
             else
               break;
           }
 
-          if ((lower == null || hasEqualTile) && tileX >= vector.TileX && tileY >= vector.TileY)
+          if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
           {
             lower = vector;
             continue;
           }
 
-          if ((upper == null || hasEqualTile) && tileX <= vector.TileX && tileY <= vector.TileY) upper = vector;
+          if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
+          {
+            upper = vector;
+          }
         }
 
         // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
