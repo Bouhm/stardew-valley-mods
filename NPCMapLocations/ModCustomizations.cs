@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,7 @@ namespace NPCMapLocations
     public Dictionary<string, int> MarkerCropOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapName { get; set; }
+    private ModConfig SVEConfig;
 
     public ModCustomizations(IMonitor monitor)
     {
@@ -33,7 +35,19 @@ namespace NPCMapLocations
       Locations = new Dictionary<string, CustomLocation>();
       Tooltips = new List<ClickableComponent>();
 
-      if (ModMain.IsSVE) Monitor.Log("Using SVE customizations.", LogLevel.Debug);
+      if (ModMain.IsSVE)
+      {
+        Monitor.Log("Using SVE customizations.", LogLevel.Debug);
+        try
+        {
+          SVEConfig = ModMain.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
+        }
+        catch
+        {
+          SVEConfig = null;
+        }
+  
+      }
 
       LoadMap();
       LoadTooltips();
@@ -93,7 +107,13 @@ namespace NPCMapLocations
 
     private void LoadTooltips()
     {
-      foreach (var tooltip in ModMain.Config.CustomMapTooltips)
+      // Merge SVE Config with main config
+      var CustomMapTooltips = SVEConfig != null
+        ? ModMain.Config.CustomMapTooltips.Concat(SVEConfig.CustomMapTooltips).ToLookup(x => x.Key, x => x.Value)
+          .ToDictionary(x => x.Key, g => g.First())
+        : ModMain.Config.CustomMapTooltips;
+
+      foreach (var tooltip in CustomMapTooltips)
       {
         string text = tooltip.Value.GetValue("SecondaryText") != null
           ? (string) tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText")
@@ -121,7 +141,13 @@ namespace NPCMapLocations
     // Any custom locations with given location on the map
     private void LoadCustomMapLocations()
     {
-      foreach (var mapVectors in ModMain.Config.CustomMapLocations)
+      // Merge SVE Config with main config
+      var CustomMapLocations = SVEConfig != null
+        ? ModMain.Config.CustomMapLocations.Concat(SVEConfig.CustomMapLocations).ToLookup(x => x.Key, x => x.Value)
+          .ToDictionary(x => x.Key, g => g.First())
+        : ModMain.Config.CustomMapLocations;
+
+      foreach (var mapVectors in CustomMapLocations)
       {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
         for (var i = 0; i < mapVectors.Value.Length; i++)
@@ -149,7 +175,9 @@ namespace NPCMapLocations
       }
 
       foreach (var location in ModMain.Config.CustomMapTextures)
+      {
         Locations.Add(location.Key, new CustomLocation(location.Value));
+      }
 
       // Automatically adjust tracking for modded maps that are sized differently from vanilla map
       foreach (var location in Game1.locations)
