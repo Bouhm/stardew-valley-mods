@@ -37,14 +37,15 @@ namespace NPCMapLocations
 
       if (ModMain.IsSVE)
       {
-        Monitor.Log("Using SVE customizations.", LogLevel.Debug);
         try
         {
           SVEConfig = ModMain.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
+          Monitor.Log("Using SVE customizations.", LogLevel.Debug);
         }
         catch
         {
           SVEConfig = null;
+          Monitor.Log("SVE customizations not found.", LogLevel.Debug);
         }
   
       }
@@ -152,25 +153,33 @@ namespace NPCMapLocations
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
         for (var i = 0; i < mapVectors.Value.Length; i++)
         {
-          var mapVector = mapVectors.Value[i];
-
-          // Marker doesn't need to specify corresponding Tile position
-          if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
-            mapVectorArr[i] = new MapVector(
-              (int) mapVector.GetValue("MapX"),
-              (int) mapVector.GetValue("MapY")
-            );
-          // Region must specify corresponding Tile positions for
-          // Calculations on movement within location
+          // Don't use IF2R config for greenhouse if not default farm (hard-coded location)
+          if (ModMain.IsSVE && mapVectors.Key == "Greenhouse" && Game1.whichFarm != 0)
+          {
+            mapVectorArr[i] = ModConstants.MapVectors["Greenhouse"].FirstOrDefault();
+          }
           else
-            mapVectorArr[i] = new MapVector(
-              (int) mapVector.GetValue("MapX"),
-              (int) mapVector.GetValue("MapY"),
-              (int) mapVector.GetValue("TileX"),
-              (int) mapVector.GetValue("TileY")
-            );
-        }
+          {
 
+            var mapVector = mapVectors.Value[i];
+
+            // Marker doesn't need to specify corresponding Tile position
+            if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
+              mapVectorArr[i] = new MapVector(
+                (int)mapVector.GetValue("MapX"),
+                (int)mapVector.GetValue("MapY")
+              );
+            // Region must specify corresponding Tile positions for
+            // Calculations on movement within location
+            else
+              mapVectorArr[i] = new MapVector(
+                (int)mapVector.GetValue("MapX"),
+                (int)mapVector.GetValue("MapY"),
+                (int)mapVector.GetValue("TileX"),
+                (int)mapVector.GetValue("TileY")
+              );
+          }
+        }
         MapVectors.Add(mapVectors.Key, mapVectorArr);
       }
 
@@ -206,7 +215,7 @@ namespace NPCMapLocations
       {
         if (customLocations.Length == 1)
         {
-          Monitor.Log($"Added custom location: {customLocations[0]}.", LogLevel.Debug);
+          Monitor.Log($"Handled tracking for custom location: {customLocations[0]}.", LogLevel.Debug);
         }
         else
         {
@@ -214,7 +223,7 @@ namespace NPCMapLocations
           for (var i = 0; i < customLocations.Length; i++)
             locationList += customLocations[i] + (i + 1 == customLocations.Length ? "" : ", ");
 
-          Monitor.Log($"Added custom locations: {locationList}.", LogLevel.Debug);
+          Monitor.Log($"Handled tracking for custom locations: {locationList}.", LogLevel.Debug);
         }
       }
     }

@@ -130,8 +130,9 @@ namespace NPCMapLocations
       shouldShowMinimap = Config.ShowMinimap;
 
       locationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations)
+      foreach (var location in Game1.locations) { 
         MapRootLocations(location, null, false);
+      }
 
       ConditionalNpcs = new Dictionary<string, bool>
       {
@@ -821,6 +822,8 @@ namespace NPCMapLocations
       {
         locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName))) ? CustomMapVectors[locationName] : ModConstants.MapVectors[locationName];
       }
+
+      if (locVectors == null) return Vector2.Zero;
 
       int x;
       int y;
