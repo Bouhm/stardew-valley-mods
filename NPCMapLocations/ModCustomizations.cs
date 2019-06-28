@@ -73,7 +73,7 @@ namespace NPCMapLocations
 
       if (NpcCustomizations.Count != 0)
       {
-        var names = "Handled custom NPCs: ";
+        var names = "Adjusted markers for ";
         foreach (var name in NpcCustomizations) names += name + ", ";
 
         Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Debug);
@@ -206,7 +206,7 @@ namespace NPCMapLocations
       {
         if (customLocations.Length == 1)
         {
-          Monitor.Log($"Handled custom location: {customLocations[0]}.", LogLevel.Debug);
+          Monitor.Log($"Added custom location: {customLocations[0]}.", LogLevel.Debug);
         }
         else
         {
@@ -214,7 +214,7 @@ namespace NPCMapLocations
           for (var i = 0; i < customLocations.Length; i++)
             locationList += customLocations[i] + (i + 1 == customLocations.Length ? "" : ", ");
 
-          Monitor.Log($"Handled custom locations: {locationList}.", LogLevel.Debug);
+          Monitor.Log($"Added custom locations: {locationList}.", LogLevel.Debug);
         }
       }
     }
