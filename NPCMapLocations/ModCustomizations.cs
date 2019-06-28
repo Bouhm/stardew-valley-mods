@@ -241,7 +241,6 @@ namespace NPCMapLocations
     // Load user-specified NPC crops for custom sprites
     private void LoadNpcCrop(NPC npc)
     {
-      LoadCustomNpcs();
       var CustomNpcMarkerOffsets = SVEConfig != null
         ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
           .ToDictionary(x => x.Key, g => g.First())
