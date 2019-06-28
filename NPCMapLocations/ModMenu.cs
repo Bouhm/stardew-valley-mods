@@ -566,15 +566,15 @@ namespace NPCMapLocations
 			if (whichOption > 6 && whichOption < 49)
 			{
 				var npc = Game1.getCharacterFromName(label);
-				if (npc == null || (npc != null && !Customizations.MarkerCropOffsets.ContainsKey(npc.Name))) return;
+				if (npc == null || (npc != null && !Customizations.NpcMarkerOffsets.ContainsKey(npc.Name))) return;
 
 				if (isChecked)
 					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + bounds.X + 50, slotY),
-						new Rectangle(0, Customizations.MarkerCropOffsets[npc.Name], 16, 15), Color.White, 0f, Vector2.Zero,
+						new Rectangle(0, Customizations.NpcMarkerOffsets[npc.Name], 16, 15), Color.White, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				else
 					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + bounds.X + 50, slotY),
-						new Rectangle(0, Customizations.MarkerCropOffsets[npc.Name], 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
+						new Rectangle(0, Customizations.NpcMarkerOffsets[npc.Name], 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 
 				// Draw names

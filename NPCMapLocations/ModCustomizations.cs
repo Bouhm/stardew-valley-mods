@@ -21,7 +21,7 @@ namespace NPCMapLocations
     public Dictionary<string, string> Names { get; set; }
     public Texture2D LocationTextures { get; set; }
     public Dictionary<string, CustomLocation> Locations { get; set; }
-    public Dictionary<string, int> MarkerCropOffsets { get; set; }
+    public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapName { get; set; }
     private ModConfig SVEConfig;
@@ -133,7 +133,7 @@ namespace NPCMapLocations
 
     private void LoadMarkerCropOffsets()
     {
-      MarkerCropOffsets = ModConstants.NpcMarkerOffsets;
+      NpcMarkerOffsets = ModConstants.NpcMarkerOffsets;
     }
 
     // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
@@ -223,6 +223,11 @@ namespace NPCMapLocations
     // Specifically mods that change names in dialogue files (displayName)
     private void LoadCustomNames(NPC npc)
     {
+      var CustomNpcMarkerOffsets = SVEConfig != null
+        ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
+          .ToDictionary(x => x.Key, g => g.First())
+        : ModMain.Config.CustomNpcMarkerOffsets;
+
       if (!Names.TryGetValue(npc.Name, out var customName))
       {
         if (npc.displayName == null)
@@ -232,7 +237,7 @@ namespace NPCMapLocations
         else
         {
           Names.Add(npc.Name, npc.displayName);
-          if (!npc.Name.Equals(npc.displayName) || ModMain.Config.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
+          if (!npc.Name.Equals(npc.displayName) || CustomNpcMarkerOffsets.ContainsKey(npc.Name))
             NpcCustomizations.Add(npc.Name);
         }
       }
@@ -250,12 +255,12 @@ namespace NPCMapLocations
         foreach (var villager in CustomNpcMarkerOffsets)
           if (npc.Name.Equals(villager.Key))
           {
-            MarkerCropOffsets[npc.Name] = villager.Value;
+            NpcMarkerOffsets[npc.Name] = villager.Value;
             NpcCustomizations.Add(npc.Name);
           }
 
       // If custom crop offset is not specified, default to 0
-      if (!MarkerCropOffsets.TryGetValue(npc.Name, out var crop)) MarkerCropOffsets[npc.Name] = 0;
+      if (!NpcMarkerOffsets.TryGetValue(npc.Name, out var crop)) NpcMarkerOffsets[npc.Name] = 0;
     }
 
     public class CustomLocation

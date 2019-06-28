@@ -21,10 +21,10 @@
   "MinimapBlacklist": [],
   "MapRecolor": "",
   "UseSeasonalMaps": true,
-  "CustomNpcs": {
+  "CustomNpcMarkerOffsets": {
   	"Andy": 1,
   	"Olivia": 1,
-  	"Victor": 0
+    "Victor": 0
   },
   "NpcBlacklist": [],
   "CustomMapLocations": {

@@ -496,7 +496,7 @@ namespace NPCMapLocations
         {
           // Skip if no specified location
           if (npcMarker.MapLocation.Equals(Vector2.Zero) || npcMarker.Marker == null ||
-              !Customizations.MarkerCropOffsets.ContainsKey(npcMarker.Npc.Name))
+              !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Npc.Name))
           {
             continue;
           }
@@ -508,7 +508,7 @@ namespace NPCMapLocations
           b.Draw(npcMarker.Marker,
             new Rectangle((int)(mapX + npcMarker.MapLocation.X), (int)(mapY + npcMarker.MapLocation.Y),
               32, 30),
-            new Rectangle?(new Rectangle(0, Customizations.MarkerCropOffsets[npcMarker.Npc.Name], 16, 15)), markerColor);
+            new Rectangle?(new Rectangle(0, Customizations.NpcMarkerOffsets[npcMarker.Npc.Name], 16, 15)), markerColor);
 
           // Draw icons for quests/birthday
           if (ModMain.Config.MarkQuests)

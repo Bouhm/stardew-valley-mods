@@ -21,7 +21,7 @@
   "TooltipKey": "Space",
   "MinimapDragKey": "LeftAlt",
   "MinimapToggleKey": "OemPipe",
-  "CustomCropOffsets": {},
+  "CustomNpcMarkerOffsets": {},
   "ShowFarmBuildings": true,
   "CustomMapLocations": {},
   "CustomMapTextures": {},
