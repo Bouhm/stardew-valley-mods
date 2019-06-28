@@ -94,6 +94,11 @@ namespace NPCMapLocations
     private void LoadTooltips()
     {
       foreach (var tooltip in ModMain.Config.CustomMapTooltips)
+      {
+        string text = tooltip.Value.GetValue("SecondaryText") != null
+          ? (string) tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText")
+          : (string) tooltip.Value.GetValue("PrimaryText");
+
         Tooltips.Add(new ClickableComponent(
           new Rectangle(
             (int) tooltip.Value.GetValue("X"),
@@ -101,8 +106,9 @@ namespace NPCMapLocations
             (int) tooltip.Value.GetValue("Width"),
             (int) tooltip.Value.GetValue("Height")
           ),
-          tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText"))
-        );
+          text
+        ));
+      }
     }
 
     private void LoadMarkerCropOffsets()

@@ -258,6 +258,7 @@ namespace NPCMapLocations
 		  // Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
 		  // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
       // b.Draw(renderTarget, new Rectangle(0, 0, 400, 240), Color.White * opacity);
+
 		  // b.End();
 		  // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 		}
