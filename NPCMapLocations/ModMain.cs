@@ -71,10 +71,8 @@ namespace NPCMapLocations
 
       try
       {
-        if (ModMain.Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP"))
-          map = Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png"); // Replace map page
-        else
-          map = Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png"); // Replace map page
+        // Replace map page
+        map = IsSVE ? Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png") : Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png"); 
       }
       catch
       {
