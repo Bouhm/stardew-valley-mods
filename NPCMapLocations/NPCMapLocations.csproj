@@ -57,7 +57,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\buildings.png" />
+    <Content Include="assets\buildings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\default\default_fall.png" />
     <Content Include="assets\default\default_spring.png" />
     <Content Include="assets\default\default_summer.png" />
