@@ -23,6 +23,7 @@ namespace NPCMapLocations
     public static ModConfig Config;
     public static IModHelper Helper;
     public static SButton HeldKey;
+    public static bool IsSVE;
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -120,6 +121,7 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
+      IsSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
       Customizations = new ModCustomizations(Monitor)
       {
         LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
@@ -825,9 +827,6 @@ namespace NPCMapLocations
         MapVector lower = null;
         MapVector upper = null;
         var isSameAxis = false;
-        int a;
-        if (isPlayer)
-          a = 1;
 
         // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
         foreach (var vector in vectors)

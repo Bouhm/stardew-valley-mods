@@ -33,7 +33,7 @@ namespace NPCMapLocations
       Locations = new Dictionary<string, CustomLocation>();
       Tooltips = new List<ClickableComponent>();
 
-      if (ModMain.Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP")) Monitor.Log("Using SVE customizations.", LogLevel.Debug);
+      if (ModMain.IsSVE) Monitor.Log("Using SVE customizations.", LogLevel.Debug);
 
       LoadMap();
       LoadTooltips();

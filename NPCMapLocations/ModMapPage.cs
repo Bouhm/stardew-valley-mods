@@ -61,19 +61,42 @@ namespace NPCMapLocations
 			var regionRects = RegionRects().ToList();
 			for (int i = 0; i < this.points.Count; i++)
 			{
-				var rect = regionRects.ElementAt(i);
-				this.points[i].bounds = new Rectangle(
-					// Snaps the cursor to the center instead of bottom right (default)
-					(int) (mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
-					(int) (mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
-					rect.Value.Width,
-					rect.Value.Height
-				);
-			}
+			  var rect = regionRects.ElementAt(i);
+			  this.points[i].bounds = new Rectangle(
+			    // Snaps the cursor to the center instead of bottom right (default)
+			    (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
+			    (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
+			    rect.Value.Width,
+			    rect.Value.Height
+			  );
+
+			  if (ModMain.IsSVE)
+			  {
+			    // Adventure's Guild is in a different location in SVE
+			    if (this.points[i].myID == 1025)
+			    {
+			      this.points[i].bounds = new Rectangle(mapX + 682, mapY + 451, 22, 30);
+			    }
+			    // Remove sewer which gets replaced by Adventure Guild
+			    else if (this.points[i].myID == 1018)
+			    {
+			      this.points[i].bounds.Width = 0;
+			      this.points[i].bounds.Height = 0;
+			    }
+			    // So it doesn't cover up the other new points in the railroad
+			    else if (this.points[i].myID == 1034)
+			    {
+			      this.points[i].bounds.Width /= 2;
+			    }
+			  }
+      }
 
       // Add custom tooltips
       foreach (var tooltip in Customizations.Tooltips)
-		  {
+      {
+        tooltip.bounds.X = tooltip.bounds.X + mapX;
+        tooltip.bounds.Y = tooltip.bounds.Y + mapY;
+
 		    this.points.Add(tooltip);
       }
     }
