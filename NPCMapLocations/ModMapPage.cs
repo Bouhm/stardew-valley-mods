@@ -18,10 +18,11 @@ namespace NPCMapLocations
 {
 	public class ModMapPage : MapPage
 	{
-		private Dictionary<string, bool> ConditionalNpcs { get; }
-		private HashSet<CharacterMarker> NpcMarkers;
-		private Dictionary<long, CharacterMarker> FarmerMarkers;
+		private Dictionary<string, bool> ConditionalNpcs { get; set; }
+		private HashSet<CharacterMarker> NpcMarkers { get; set; }
+		private Dictionary<long, CharacterMarker> FarmerMarkers { get; set; }
 		private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
+
     private readonly Texture2D BuildingMarkers;
 	  private readonly ModCustomizations Customizations;
 		private string hoveredNames = "";
@@ -94,11 +95,25 @@ namespace NPCMapLocations
       // Add custom tooltips
       foreach (var tooltip in Customizations.Tooltips)
       {
-        tooltip.bounds.X = tooltip.bounds.X + mapX;
-        tooltip.bounds.Y = tooltip.bounds.Y + mapY;
-
-		    this.points.Add(tooltip);
+        tooltip.bounds = new Rectangle(
+          tooltip.bounds.X + mapX,
+          tooltip.bounds.Y + mapY,
+          tooltip.bounds.Width,
+          tooltip.bounds.Height
+        );
+        this.points.Add(tooltip);
       }
+    }
+
+	  public void UpdateFields(
+	    HashSet<CharacterMarker> npcMarkers,
+	    Dictionary<string, bool> conditionalNpcs,
+	    Dictionary<long, CharacterMarker> farmerMarkers
+	  )
+	  {
+	    this.NpcMarkers = npcMarkers;
+	    this.ConditionalNpcs = conditionalNpcs;
+	    this.FarmerMarkers = farmerMarkers;
     }
 
 		public override void performHoverAction(int x, int y)

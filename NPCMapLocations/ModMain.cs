@@ -31,6 +31,7 @@ namespace NPCMapLocations
     private ModMinimap Minimap;
     private HashSet<CharacterMarker> NpcMarkers;
     private Dictionary<string, bool> ConditionalNpcs;
+    private ModMapPage mapPage;
     private bool hasOpenedMap;
     private bool isModMapOpen;
     private bool shouldShowMinimap;
@@ -509,14 +510,20 @@ namespace NPCMapLocations
 
       // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
       // allows for better compatibility with other mods that use MapPage
-      pages[GameMenu.mapTab] = new ModMapPage(
-        NpcMarkers,
-        ConditionalNpcs,
-        FarmerMarkers,
-        FarmBuildings,
-        BuildingMarkers,
-        Customizations
-      );
+      if (mapPage == null) {
+        mapPage = new ModMapPage(
+          NpcMarkers,
+          ConditionalNpcs,
+          FarmerMarkers,
+          FarmBuildings,
+          BuildingMarkers,
+          Customizations
+        );
+      } else {
+        mapPage.UpdateFields(NpcMarkers, ConditionalNpcs, FarmerMarkers);
+      }
+
+      pages[GameMenu.mapTab] = mapPage;
     }
 
     // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
