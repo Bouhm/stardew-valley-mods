@@ -21,7 +21,11 @@
   "MinimapBlacklist": [],
   "MapRecolor": "",
   "UseSeasonalMaps": true,
-  "CustomNpcs": {},
+  "CustomNpcs": {
+  	"Andy": 1,
+  	"Olivia": 1,
+  	"Victor": 0
+  },
   "NpcBlacklist": [],
   "CustomMapLocations": {
     "Farm": [
