@@ -55,7 +55,8 @@ public static class ModConstants
 		"Bouncer",
 		"Henchman",
 		"Gunther",
-		"Krobus"
+		"Krobus",
+    "Dusty"
 	};
 
 	// tileX and TileY (the first two values) are tile positions in the game for that location
