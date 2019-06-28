@@ -315,8 +315,8 @@ public static class ModConstants
 		{
 			"Sewer", new MapVector[]
 			{
-				new MapVector(701, 465)
-			}
+			  new MapVector(489, 643)
+      }
 		},
 		{
 			"BugLand", new MapVector[]
