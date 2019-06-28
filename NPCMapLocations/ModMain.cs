@@ -439,7 +439,15 @@ namespace NPCMapLocations
           Season = Game1.currentSeason;
 
           // Force reload of map for season changes
-          Helper.Content.InvalidateCache("LooseSprites/Map");
+          try
+          {
+            Helper.Content.InvalidateCache("LooseSprites/Map");
+          }
+          catch
+          {
+            Monitor.Log("Failed to update map for current season.", LogLevel.Error);
+          }
+
           Minimap?.UpdateMapForSeason();
         }
       }

@@ -566,7 +566,7 @@ namespace NPCMapLocations
 			if (whichOption > 6 && whichOption < 49)
 			{
 				var npc = Game1.getCharacterFromName(label);
-				if (npc == null) return;
+				if (npc == null || (npc != null && !Customizations.MarkerCropOffsets.ContainsKey(npc.Name))) return;
 
 				if (isChecked)
 					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + bounds.X + 50, slotY),
