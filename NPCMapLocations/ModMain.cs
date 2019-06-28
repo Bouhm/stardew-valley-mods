@@ -69,16 +69,33 @@ namespace NPCMapLocations
         Season = "spring";
       }
 
-      try
+      // Replace map page
+      if (IsSVE)
       {
-        // Replace map page
-        map = IsSVE ? Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png") : Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png"); 
+        try
+        {
+          map = Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png");
+        }
+        catch
+        {
+          Monitor.Log($"Unable to find sve\\{mapFile}_{Season}; loaded sve\\default map instead.", LogLevel.Debug);
+          map = Helper.Content.Load<T>($@"assets\sve\default\default_{Season}.png");
+          return map;
+        }
       }
-      catch
+      else
       {
-        Monitor.Log($"Unable to find {mapFile}_{Season}; loaded default map instead.", LogLevel.Debug);
-        map = Helper.Content.Load<T>($@"assets\default\default_{Season}.png");
-        return map;
+        try
+        {
+
+          map = Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png");
+        }
+        catch
+        {
+          Monitor.Log($"Unable to find {mapFile}_{Season}; loaded default map instead.", LogLevel.Debug);
+          map = Helper.Content.Load<T>($@"assets\default\default_{Season}.png");
+          return map;
+        }
       }
 
       if (!mapName.Equals("default"))
