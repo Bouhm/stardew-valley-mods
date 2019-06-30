@@ -123,43 +123,49 @@
     "JenkinsHouse": [
       {
         "MapX": 776,
-        "MapY": 307
+        "MapY": 303
       }
     ],
     "OliviaCellar": [
       {
         "MapX": 776,
-        "MapY": 307
+        "MapY": 303
       }
     ],
     "SusanHouse": [
       {
-        "MapX": 710,
-        "MapY": 45
+        "MapX": 712,
+        "MapY": 35
       }
     ],
     "SophiaHouse": [
       {
-        "MapX": 618,
-        "MapY": 500
+        "MapX": 619,
+        "MapY": 498
       }
     ],
     "SophiaCellar": [
       {
-        "MapX": 618,
-        "MapY": 500
+        "MapX": 619,
+        "MapY": 498
       }
     ],
     "AndyHouse": [
       {
-        "MapX": 409,
-        "MapY": 563
+        "MapX": 410,
+        "MapY": 561
       }
     ],
     "MarnieShed": [
       {
         "MapX": 473,
         "MapY": 400
+      }
+    ],
+    "MarnieBarn": [
+      {
+        "MapX": 499,
+        "MapY": 413
       }
     ],
     "AdventureGuild": [
