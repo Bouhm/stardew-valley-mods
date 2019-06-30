@@ -128,8 +128,8 @@
     ],
     "OliviaCellar": [
       {
-        "MapX": 773,
-        "MapY": 310
+        "MapX": 776,
+        "MapY": 307
       }
     ],
     "SusanHouse": [
@@ -159,7 +159,7 @@
     "MarnieShed": [
       {
         "MapX": 473,
-        "MapY": 403
+        "MapY": 400
       }
     ],
     "AdventureGuild": [
@@ -172,6 +172,30 @@
       {
         "MapX": 403,
         "MapY": 335
+      }
+    ],
+    "ForestWest": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "AuroraVineyard": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "SpriteSpring": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "LostWoods": [
+    	{
+        "MapX": 156,
+        "MapY": 698
       }
     ],
     "Desert": [
