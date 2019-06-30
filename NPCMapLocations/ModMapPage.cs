@@ -36,7 +36,7 @@ namespace NPCMapLocations
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
-			HashSet<CharacterMarker> npcMarkers,
+      HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, bool> conditionalNpcs,
 			Dictionary<long, CharacterMarker> farmerMarkers,
 			Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
@@ -60,9 +60,12 @@ namespace NPCMapLocations
 			mapY = (int) center.Y;
 
 			var regionRects = RegionRects().ToList();
-			for (int i = 0; i < this.points.Count; i++)
+      var customTooltips = Customizations.Tooltips.ToList();
+
+			for (int i = 0; i < regionRects.Count; i++)
 			{
-			  var rect = regionRects.ElementAt(i);
+			  var rect = regionRects.ElementAtOrDefault(i);
+
 			  this.points[i].bounds = new Rectangle(
 			    // Snaps the cursor to the center instead of bottom right (default)
 			    (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
@@ -92,28 +95,32 @@ namespace NPCMapLocations
 			  }
       }
 
+      int idx = 0;
+
       // Add custom tooltips
-      foreach (var tooltip in Customizations.Tooltips)
+      for(int i = regionRects.Count; i < regionRects.Count + customTooltips.Count; i++)
       {
-        tooltip.bounds = new Rectangle(
+        var tooltip = customTooltips.ElementAtOrDefault(idx);
+        if (tooltip == null) break;
+
+        var point = new ClickableComponent(new Rectangle(
           tooltip.bounds.X + mapX,
           tooltip.bounds.Y + mapY,
           tooltip.bounds.Width,
           tooltip.bounds.Height
-        );
-        this.points.Add(tooltip);
-      }
-    }
+        ), tooltip.name);
 
-	  public void UpdateFields(
-	    HashSet<CharacterMarker> npcMarkers,
-	    Dictionary<string, bool> conditionalNpcs,
-	    Dictionary<long, CharacterMarker> farmerMarkers
-	  )
-	  {
-	    this.NpcMarkers = npcMarkers;
-	    this.ConditionalNpcs = conditionalNpcs;
-	    this.FarmerMarkers = farmerMarkers;
+        if (this.points.Count <= i)
+        {
+          this.points.Add(point);
+        }
+        else
+        {
+          this.points[i] = point;
+        }
+
+        idx++;
+      }
     }
 
 		public override void performHoverAction(int x, int y)
