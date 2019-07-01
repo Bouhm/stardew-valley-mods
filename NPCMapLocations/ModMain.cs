@@ -512,7 +512,7 @@ namespace NPCMapLocations
             marker.SyncedLocationName = npcLoc.LocationName;
             if (!marker.IsHidden)
             {
-              var mapLocation = LocationToMap(npcLoc.LocationName, npcLoc.TileX, npcLoc.TileY);
+              var mapLocation = LocationToMap(npcLoc.LocationName, npcLoc.TileX, npcLoc.TileY, Customizations.MapVectors);
               marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
             }
           }
@@ -815,24 +815,31 @@ namespace NPCMapLocations
         }
       }
 
-      if (CustomMapVectors != null &&
-          !CustomMapVectors.ContainsKey(locationName) && !ModConstants.MapVectors.ContainsKey(locationName))
-      {
-        return Vector2.Zero;
-      }
-
       MapVector[] locVectors;
 
-      if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
+      if (CustomMapVectors != null && locationName == "Farm")
       {
-        // Handle custom farm & different types of farms
-        if (locationName.Equals("Farm"))
+        // Handle different farm types for custom vectors
+        if (!(
+          (CustomMapVectors.TryGetValue(locationName, out locVectors) && Game1.whichFarm == 0) ||
+          (CustomMapVectors.TryGetValue(locationName + "_Riverland", out locVectors) && Game1.whichFarm == 1) ||
+          (CustomMapVectors.TryGetValue(locationName + "_Forest", out locVectors) && Game1.whichFarm == 2) ||
+          (CustomMapVectors.TryGetValue(locationName + "_Hills", out locVectors) && Game1.whichFarm == 3) ||
+          (CustomMapVectors.TryGetValue(locationName + "_Wilderness", out locVectors) && Game1.whichFarm == 4)
+        ))
         {
-          locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapVectors[locationName] : null;
+          if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
+          {
+            return Vector2.Zero;
+          }
         }
-        else
+      }
+      // If not in custom vectors, use default
+      else if (!(CustomMapVectors != null && CustomMapVectors.TryGetValue(locationName, out locVectors)))
+      {
+        if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
         {
-          locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName))) ? CustomMapVectors[locationName] : null;
+          return Vector2.Zero;
         }
       }
 
@@ -899,6 +906,10 @@ namespace NPCMapLocations
         }
       }
 
+      if (locationName == "AdventureGuild")
+      {
+        var a = 1;
+      }
       return new Vector2(x, y);
     }
 
