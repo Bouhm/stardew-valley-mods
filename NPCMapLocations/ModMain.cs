@@ -823,14 +823,17 @@ namespace NPCMapLocations
 
       MapVector[] locVectors;
 
-      // Handle custom farm & different types of farms
-      if (locationName.Equals("Farm"))
+      if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
       {
-        locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapVectors[locationName] : ModConstants.MapVectors[locationName];
-      }
-      else
-      {
-        locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName))) ? CustomMapVectors[locationName] : ModConstants.MapVectors[locationName];
+        // Handle custom farm & different types of farms
+        if (locationName.Equals("Farm"))
+        {
+          locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName)) && Game1.whichFarm == 0) ? CustomMapVectors[locationName] : null;
+        }
+        else
+        {
+          locVectors = (CustomMapVectors != null && (CustomMapVectors.ContainsKey(locationName))) ? CustomMapVectors[locationName] : null;
+        }
       }
 
       if (locVectors == null) return Vector2.Zero;
