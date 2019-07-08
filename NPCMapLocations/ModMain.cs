@@ -53,7 +53,7 @@ namespace NPCMapLocations
     // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
     {
-      return asset.AssetNameEquals(@"LooseSprites\Map");
+      return asset.AssetNameEquals(@"LooseSprites\Map") && Customizations != null;
     }
 
     public T Load<T>(IAssetInfo asset)
@@ -142,6 +142,8 @@ namespace NPCMapLocations
         LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
       };
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
+      Helper.Content.InvalidateCache("LooseSprites/Map");
+
       DEBUG_MODE = Config.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;
 

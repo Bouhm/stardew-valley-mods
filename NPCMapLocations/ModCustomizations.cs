@@ -40,7 +40,7 @@ namespace NPCMapLocations
           SVEConfig = ModMain.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
         if (SVEConfig == null)
         {
-          Monitor.Log("SVE customizations not found; \'\\config\\sve_config.json\' not found.", LogLevel.Warn);
+          Monitor.Log("Unable to load SVE customizations; \'\\config\\sve_config.json\' not found.", LogLevel.Warn);
         }
         else
         {
