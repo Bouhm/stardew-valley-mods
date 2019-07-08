@@ -1,7 +1,7 @@
 {
   "Name": "NPC Map Locations",
   "Author": "Bouhm",
-  "Version": "2.4.0",
+  "Version": "2.4.1",
   "Description": "Shows NPCs and farmers on the map. Uses a modified map page for accurate tracking.",
   "UniqueID": "Bouhm.NPCMapLocations",
   "EntryDll": "NPCMapLocations.dll",
