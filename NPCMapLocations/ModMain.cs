@@ -854,7 +854,7 @@ namespace NPCMapLocations
       {
         // Handle different farm types for custom vectors
         var farms = new string[5] { "Farm", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness" };
-        if (CustomMapVectors.Keys.Any(locName => locName == farms[Game1.whichFarm]))
+        if (CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm)))
         {
           if (!CustomMapVectors.TryGetValue(locationName, out locVectors))
           {
