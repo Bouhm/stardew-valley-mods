@@ -50,6 +50,12 @@ namespace NPCMapLocations
     private static Vector2 _tileUpper;
     private static List<string> alertFlags;
 
+    /// <summary>The relative path to the folder containing tilesheet subfolders.</summary>
+    private readonly string TilesheetsRootPath = Path.Combine("assets", "tilesheets");
+
+    /// <summary>The relative path to the folder containing the tilesheet asset to load, if any.</summary>
+    private string TilesheetsPath = null;
+
     // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
     {
@@ -59,46 +65,21 @@ namespace NPCMapLocations
     public T Load<T>(IAssetInfo asset)
     {
       T map;
-      string mapName = Config.MapRecolor != "" ? Config.MapRecolor : Customizations.MapName;
-      var mapFile = mapName;
-      if (mapFile == "toned_down") mapName = "eemie_recolour";
+
       if (Season == null)
       {
-        Monitor.Log($"Unable to get current season. Defaulted to spring.", LogLevel.Debug);
+        Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
         Season = "spring";
       }
 
       // Replace map page
-      if (IsSVE)
-      {
-        try
-        {
-          map = Helper.Content.Load<T>($@"assets\sve\{mapName}\{mapName}_{Season}.png");
-        }
-        catch
-        {
-          Monitor.Log($"Unable to find sve\\{mapFile}_{Season}; loaded sve\\default map instead.", LogLevel.Debug);
-          map = Helper.Content.Load<T>($@"assets\sve\default\default_{Season}.png");
-          return map;
-        }
-      }
-      else
-      {
-        try
-        {
-
-          map = Helper.Content.Load<T>($@"assets\{mapName}\{mapName}_{Season}.png");
-        }
-        catch
-        {
-          Monitor.Log($"Unable to find {mapFile}_{Season}; loaded default map instead.", LogLevel.Debug);
-          map = Helper.Content.Load<T>($@"assets\default\default_{Season}.png");
-          return map;
-        }
-      }
-
-      if (!mapName.Equals("default"))
-        Monitor.Log($"Using recolored map {mapFile}_{Season}.", LogLevel.Debug);
+      string filename = $"{this.Season}_map.png";
+      bool useRecolor = this.TilesheetsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, this.TilesheetsPath, filename));
+      map = useRecolor
+        ? Helper.Content.Load<T>(Path.Combine(this.TilesheetsPath, filename))
+        : Helper.Content.Load<T>(Path.Combine(this.TilesheetsRootPath, "_default", filename));
+      if (useRecolor)
+        Monitor.Log($"Using recolored map {Path.Combine(this.TilesheetsPath, filename)}.", LogLevel.Debug);
 
       return map;
     }
@@ -106,6 +87,10 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
+
+      this.TilesheetsPath = this.GetCustomTilesheetFolderName();
+      if (this.TilesheetsPath != null)
+        this.TilesheetsPath = Path.Combine(this.TilesheetsRootPath, this.TilesheetsPath);
 
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
       // Load farm buildings
@@ -117,7 +102,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
-      
+
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
       Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -131,7 +116,7 @@ namespace NPCMapLocations
       Helper.Events.Display.Rendered += Display_Rendered;
       Helper.Events.Display.WindowResized += Display_WindowResized;
     }
-    
+
     // Load config and other one-off data
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
@@ -191,6 +176,52 @@ namespace NPCMapLocations
         if (!hostHasMod && !Context.IsMainPlayer)
           Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
       }
+    }
+
+    /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
+    /// <remarks>This selects a folder in assets/tilesheets by checking the folder name against the installed mod IDs. Each folder can optionally be comma-delimited to require multiple mods, with ~ separating alternative IDs. For example "A ~ B, C" means "if the player has (A OR B) AND C installed". If multiple folders match, the first one sorted alphabetically which matches the most mods is used.</remarks>
+    private string GetCustomTilesheetFolderName()
+    {
+      // get root compatibility folder
+      DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, this.TilesheetsRootPath));
+      if (!compatFolder.Exists)
+        return null;
+
+      // get tilesheet subfolder matching the highest number of installed mods
+      string folderName = null;
+      {
+        int modsMatched = 0;
+        foreach (DirectoryInfo folder in compatFolder.GetDirectories().OrderBy(p => p.Name))
+        {
+          if (folder.Name == "_default")
+            continue;
+
+          // get mod ID groups
+          string[] modGroups = folder.Name.Split(',');
+          if (modGroups.Length <= modsMatched)
+            continue;
+
+          // check if all mods are installed
+          bool matched = true;
+          foreach (string group in modGroups)
+          {
+            string[] modIDs = group.Split('~');
+            if (!modIDs.Any(id => ModMain.Helper.ModRegistry.IsLoaded(id.Trim())))
+            {
+              matched = false;
+              break;
+            }
+          }
+
+          if (matched)
+          {
+            folderName = folder.Name;
+            modsMatched = modGroups.Length;
+          }
+        }
+      }
+
+      return folderName;
     }
 
     // Get only relevant villagers for map

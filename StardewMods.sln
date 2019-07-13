@@ -1,43 +1,34 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{72FF8D2F-9C10-4FF8-A11C-D789DA903B23}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{72FF8D2F-9C10-4FF8-A11C-D789DA903B23}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationCompass", "LocationCompass\LocationCompass.csproj", "{DE3B91FA-F6D6-456D-874C-74B9250DC298}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocationCompass", "LocationCompass\LocationCompass.csproj", "{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NPCMapLocations", "NPCMapLocations\NPCMapLocations.csproj", "{DEBB8305-B850-42B7-8384-7216E71A1A2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLocations\NPCMapLocations.csproj", "{657A6295-99BE-4E58-A6B8-D5557FC1B46F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Debug|Any CPU.Build.0 = Debug|x86
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Debug|x86.Build.0 = Debug|Any CPU
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|x86.ActiveCfg = Release|x86
-		{DE3B91FA-F6D6-456D-874C-74B9250DC298}.Release|x86.Build.0 = Release|x86
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Debug|x86.Build.0 = Debug|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Release|x86.ActiveCfg = Release|Any CPU
-		{DEBB8305-B850-42B7-8384-7216E71A1A2D}.Release|x86.Build.0 = Release|Any CPU
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Debug|x86.ActiveCfg = Debug|x86
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Debug|x86.Build.0 = Debug|x86
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.ActiveCfg = Release|x86
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.Build.0 = Release|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.ActiveCfg = Debug|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.Build.0 = Debug|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.ActiveCfg = Release|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
