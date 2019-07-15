@@ -893,10 +893,6 @@ namespace NPCMapLocations
         }
       }
 
-      if (locationName == "AdventureGuild")
-      {
-        var a = 1;
-      }
       return new Vector2(x, y);
     }
 
