@@ -1,14 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>NPCMapLocations</AssemblyName>
     <RootNamespace>NPCMapLocations</RootNamespace>
-    <Version>2.4.1</Version>
+    <Version>2.4.2</Version>
     <TargetFramework>net452</TargetFramework>
-    <PlatformTarget>x86</PlatformTarget>
-    <ApplicationIcon />
-    <OutputType>Library</OutputType>
-    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>
