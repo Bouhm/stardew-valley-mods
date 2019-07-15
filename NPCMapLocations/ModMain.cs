@@ -5,8 +5,8 @@ Shows NPC locations on a modified map.
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -74,12 +74,12 @@ namespace NPCMapLocations
 
       // Replace map page
       string filename = $"{this.Season}_map.png";
-      bool useRecolor = this.TilesheetsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, this.TilesheetsPath, filename));
+      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
-        ? Helper.Content.Load<T>(Path.Combine(this.TilesheetsPath, filename))
-        : Helper.Content.Load<T>(Path.Combine(this.TilesheetsRootPath, "_default", filename));
+        ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
+        : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
       if (useRecolor)
-        Monitor.Log($"Using recolored map {Path.Combine(this.TilesheetsPath, filename)}.", LogLevel.Debug);
+        Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
       return map;
     }
@@ -87,11 +87,6 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
-
-      this.TilesheetsPath = this.GetCustomTilesheetFolderName();
-      if (this.TilesheetsPath != null)
-        this.TilesheetsPath = Path.Combine(this.TilesheetsRootPath, this.TilesheetsPath);
-
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
       // Load farm buildings
       try
@@ -174,54 +169,8 @@ namespace NPCMapLocations
         }
 
         if (!hostHasMod && !Context.IsMainPlayer)
-          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+          Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
       }
-    }
-
-    /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
-    /// <remarks>This selects a folder in assets/tilesheets by checking the folder name against the installed mod IDs. Each folder can optionally be comma-delimited to require multiple mods, with ~ separating alternative IDs. For example "A ~ B, C" means "if the player has (A OR B) AND C installed". If multiple folders match, the first one sorted alphabetically which matches the most mods is used.</remarks>
-    private string GetCustomTilesheetFolderName()
-    {
-      // get root compatibility folder
-      DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, this.TilesheetsRootPath));
-      if (!compatFolder.Exists)
-        return null;
-
-      // get tilesheet subfolder matching the highest number of installed mods
-      string folderName = null;
-      {
-        int modsMatched = 0;
-        foreach (DirectoryInfo folder in compatFolder.GetDirectories().OrderBy(p => p.Name))
-        {
-          if (folder.Name == "_default")
-            continue;
-
-          // get mod ID groups
-          string[] modGroups = folder.Name.Split(',');
-          if (modGroups.Length <= modsMatched)
-            continue;
-
-          // check if all mods are installed
-          bool matched = true;
-          foreach (string group in modGroups)
-          {
-            string[] modIDs = group.Split('~');
-            if (!modIDs.Any(id => ModMain.Helper.ModRegistry.IsLoaded(id.Trim())))
-            {
-              matched = false;
-              break;
-            }
-          }
-
-          if (matched)
-          {
-            folderName = folder.Name;
-            modsMatched = modGroups.Length;
-          }
-        }
-      }
-
-      return folderName;
     }
 
     // Get only relevant villagers for map

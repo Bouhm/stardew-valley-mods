@@ -31,7 +31,6 @@ namespace NPCMapLocations
 	  public string MinimapToggleKey { get; set; } = "OemPipe";
 	  public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() {};
 
-    public string MapRecolor { get; set; } = "";
 	  public bool UseSeasonalMaps { get; set; } = true;
     public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() {};
