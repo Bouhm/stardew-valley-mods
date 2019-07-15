@@ -50,12 +50,6 @@ namespace NPCMapLocations
     private static Vector2 _tileUpper;
     private static List<string> alertFlags;
 
-    /// <summary>The relative path to the folder containing tilesheet subfolders.</summary>
-    private readonly string TilesheetsRootPath = Path.Combine("assets", "tilesheets");
-
-    /// <summary>The relative path to the folder containing the tilesheet asset to load, if any.</summary>
-    private string TilesheetsPath = null;
-
     // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
     {
