@@ -6,6 +6,9 @@
     <Version>2.4.1</Version>
     <TargetFramework>net452</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <ItemGroup>

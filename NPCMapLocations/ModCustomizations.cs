@@ -25,7 +25,6 @@ namespace NPCMapLocations
     public Dictionary<string, CustomLocation> Locations { get; set; }
     public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
-    public string MapName { get; set; }
     public string MapsPath { get; set; }
     private ModConfig SVEConfig;
 
@@ -54,7 +53,6 @@ namespace NPCMapLocations
         }
       }
 
-      LoadMap();
       LoadTooltips();
       LoadMarkerCropOffsets();
       LoadCustomNpcs();
@@ -85,29 +83,6 @@ namespace NPCMapLocations
       }
 
       ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
-    }
-
-    // Load recolored map if user has recolor mods
-    private void LoadMap()
-    {
-      // Eemie's Map Recolour
-      if (ModMain.Helper.ModRegistry.IsLoaded("minervamaga.CP.eemieMapRecolour"))
-        MapName = "eemie_recolour";
-      // A Toned Down SDV
-      else if (ModMain.Helper.ModRegistry.IsLoaded("Lavender.TonedDownSDV"))
-        MapName = "toned_down";
-      // Starblue Valley
-      else if (ModMain.Helper.ModRegistry.IsLoaded("Lita.StarblueValley"))
-        MapName = "starblue_valley";
-      // Elle's Dirt and Cliff Recolor
-      else if (ModMain.Helper.ModRegistry.IsLoaded("Elle.DirtCliffRecolor"))
-        MapName = "elle_recolor";
-      // Extended Farm
-      else if (ModMain.Helper.ModRegistry.IsLoaded("Forkmaster.ExtendedFarm"))
-        MapName = "farm_extended";
-      // Default
-      else
-        MapName = "default";
     }
 
     /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>

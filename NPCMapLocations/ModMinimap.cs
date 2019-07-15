@@ -351,10 +351,10 @@ namespace NPCMapLocations
 			      if (IsWithinMapArea(building.Value.Value.X - buildingRect.Width / 2,
 			        building.Value.Value.Y - buildingRect.Height / 2))
 			      {
-			        if (Customizations.MapName == "starblue_map")
-			          buildingRect.Y = 7;
-			        else if (Customizations.MapName == "eemie_recolour_map")
-			          buildingRect.Y = 14;
+			      //  if (Customizations.MapName == "starblue_map")
+			      //   buildingRect.Y = 7;
+			      //  else if (Customizations.MapName == "eemie_recolour_map")
+			      //    buildingRect.Y = 14;
 
 			        b.Draw(
 			          BuildingMarkers,

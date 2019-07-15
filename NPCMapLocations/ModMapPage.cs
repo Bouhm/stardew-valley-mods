@@ -430,20 +430,22 @@ namespace NPCMapLocations
 
 				foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
 				{
-					if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
-					  if (Customizations.MapName == "starblue_map")
-					    buildingRect.Y = 7;
-					  else if (Customizations.MapName == "eemie_recolour_map")
-					    buildingRect.Y = 14;
+				  if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
+				  {
+				    //	  if (Customizations.MapName == "starblue_map")
+				    //	    buildingRect.Y = 7;
+				    //	  else if (Customizations.MapName == "eemie_recolour_map")
+				    //	    buildingRect.Y = 14;
 
-          b.Draw(
-							BuildingMarkers,
-							new Vector2(
-								mapX + building.Value.Value.X - buildingRect.Width / 2,
-								mapY + building.Value.Value.Y - buildingRect.Height / 2
-							),
-							new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
-						);
+				    b.Draw(
+				      BuildingMarkers,
+				      new Vector2(
+				        mapX + building.Value.Value.X - buildingRect.Width / 2,
+				        mapY + building.Value.Value.Y - buildingRect.Height / 2
+				      ),
+				      new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+				    );
+				  }
 				}
 			}
 
