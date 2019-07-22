@@ -507,9 +507,20 @@ namespace NPCMapLocations
       var pages = Helper.Reflection
         .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
+      var mapTab = GameMenu.mapTab;
+
+      // Find index of MapPage since it's a different value for SDV mobile
+      foreach (var page in pages)
+      {
+        if (page is MapPage)
+        {
+          mapTab = pages.IndexOf(page);
+        }
+      }
+
       // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
       // allows for better compatibility with other mods that use MapPage
-      pages[GameMenu.mapTab] = new ModMapPage(
+      pages[mapTab] = new ModMapPage(
         NpcMarkers,
         ConditionalNpcs,
         FarmerMarkers,
