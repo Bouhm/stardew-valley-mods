@@ -10,6 +10,7 @@ using NPCMapLocations;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Quests;
+using static LocationUtil;
 
 namespace LocationCompass
 {
@@ -24,7 +25,6 @@ namespace LocationCompass
     private static ModData constants;
     private static List<Character> characters;
     private static SyncedLocationData syncedLocationData;
-    private static Dictionary<string, LocationContext> locationContexts; // Mapping of locations to root locations
     private static Dictionary<string, List<Locator>> locators;
     private static Dictionary<string, LocatorScroller> activeWarpLocators; // Active indices of locators of doors
     private ModConfig config;
@@ -62,37 +62,7 @@ namespace LocationCompass
       UpdateLocators();
     }
 
-    private void GetLocationContexts()
-    {
-      locationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations)
-      {
-        // Get outdoor neighbors
-        if (location.IsOutdoors)
-        {
-          if (!locationContexts.ContainsKey(location.Name))
-            locationContexts.Add(location.Name, new LocationContext());
-
-          foreach (var warp in location.warps)
-          {
-            if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
-            var warpLocation = Game1.getLocationFromName(warp.TargetName);
-
-            if (warpLocation.IsOutdoors)
-            {
-              if (!locationContexts[location.Name].Neighbors.ContainsKey(warp.TargetName))
-                locationContexts[location.Name].Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
-            }
-          }
-        }
-        // Get root locations from indoor locations
-        else
-          MapRootLocations(location, null, null, false, Vector2.Zero);
-      }
-
-      foreach (var location in Game1.getFarm().buildings)
-        MapRootLocations(location.indoors.Value, null, null, false, Vector2.Zero);
-    }
+   
 
     private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
     {
@@ -175,107 +145,6 @@ namespace LocationCompass
     {
       if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedLocationData")
         syncedLocationData = e.ReadAs<SyncedLocationData>();
-    }
-
-    // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-    // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations 
-    // Which means there will be some rooms left out unless all the locations are iterated
-    private string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
-    {
-      // There can be multiple warps to the same location
-      if (location == prevLocation) return root;
-
-      var currLocationName = location.uniqueName.Value ?? location.Name;
-      var prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
-     
-      if (!locationContexts.ContainsKey(currLocationName))
-        locationContexts.Add(currLocationName, new LocationContext());
-
-      if (prevLocation != null && warpPosition.X >= 0)
-      {
-        locationContexts[prevLocationName].Warp = warpPosition;
-
-        if (root != currLocationName)
-          locationContexts[prevLocationName].Parent = currLocationName;
-      }
-
-      // Pass root location back recursively
-      if (root != null)
-      {
-        locationContexts[currLocationName].Root = root;
-        return root;
-      }
-
-      // Root location found, set as root and return
-      if (location.IsOutdoors)
-      {
-        locationContexts[currLocationName].Type = "outdoors";
-        locationContexts[currLocationName].Root = currLocationName;
-
-        if (prevLocation != null)
-        {
-          if (locationContexts[currLocationName].Children == null)
-            locationContexts[currLocationName].Children = new List<string> {prevLocationName};
-          else if (!locationContexts[currLocationName].Children.Contains(prevLocationName))
-            locationContexts[currLocationName].Children.Add(prevLocationName);
-        }
-
-        return currLocationName;
-      }
-
-      // Iterate warps of current location and traverse recursively
-      foreach (var warp in location.warps)
-      {
-        // Avoid circular loop
-        if (currLocationName == warp.TargetName || prevLocationName == warp.TargetName) continue;
-
-        var warpLocation = Game1.getLocationFromName(warp.TargetName);
-
-        // If one of the warps is a root location, current location is an indoor building 
-        if (warpLocation.IsOutdoors)
-        {
-
-          hasOutdoorWarp = true;
-        }
-
-        // If all warps are indoors, then the current location is a room
-        locationContexts[currLocationName].Type = hasOutdoorWarp ? "indoors" : "room";
-
-        if (prevLocation != null)
-        {
-         locationContexts[prevLocationName].Parent = currLocationName;
-
-          if (locationContexts[currLocationName].Children == null)
-            locationContexts[currLocationName].Children = new List<string> {prevLocationName};
-          else if (!locationContexts[currLocationName].Children.Contains(prevLocationName))
-            locationContexts[currLocationName].Children.Add(prevLocationName);
-        }
-
-        root = MapRootLocations(warpLocation, location, root, hasOutdoorWarp,
-          new Vector2(warp.TargetX, warp.TargetY));
-        locationContexts[currLocationName].Root = root;
-
-        return root;
-      }
-
-      return root;
-    }
-
-    // Finds the upper-most indoor location the player is in
-    // Assuming there are warps to get there from the NPC's position
-    public string GetTargetIndoor(string playerLoc, string npcLoc)
-    {
-      if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
-      {
-        return getMineName(playerLoc);
-      }
-
-      var target = locationContexts[npcLoc].Parent;
-
-      if (target == null) return null;
-      if (target == locationContexts[npcLoc].Root) return npcLoc;
-      if (target == playerLoc) return target;
-      return GetTargetIndoor(playerLoc, target);
     }
 
     // Get only relevant villagers for map
@@ -445,13 +314,13 @@ namespace LocationCompass
         if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
         {
           // Leave mine levels distinguished in name if player inside mine
-          locationContexts.TryGetValue(getMineName(playerLocName), out playerLocCtx);
-          locationContexts.TryGetValue(getMineName(charLocName), out characterLocCtx);
+          LocationUtil.LocationContexts.TryGetValue(getMineName(playerLocName), out playerLocCtx);
+          LocationUtil.LocationContexts.TryGetValue(getMineName(charLocName), out characterLocCtx);
         }
         else
         {
-          if (!locationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
-          if (!locationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+          if (!LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
+          if (!LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
         }
 
         if (config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
@@ -528,8 +397,8 @@ namespace LocationCompass
             else
             {
               characterPos = new Vector2(
-                locationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                locationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
               );
             }
           }
@@ -540,8 +409,8 @@ namespace LocationCompass
               // Point locators to the neighboring outdoor warps and
               // doors of buildings including nested rooms
               characterPos = new Vector2(
-                locationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                locationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                LocationUtil.LocationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                LocationUtil.LocationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
               );
             }
             else if (!config.SameLocationOnly)
@@ -1045,17 +914,5 @@ namespace LocationCompass
           Index = 0;
       }
     }
-  }
-
-  // Used for determining if an NPC is in the same root location
-  // as the player as well as indoor location a room belongs to
-  internal class LocationContext
-  {
-    public string Type { get; set; } // outdoors, indoors, or room
-    public string Root { get; set; } // Top-most outdoor location
-    public string Parent { get; set; } // Level above
-    public Dictionary<string, Vector2> Neighbors { get; set; } = new Dictionary<string, Vector2>(); // Connected outdoor locations
-    public List<string> Children { get; set; } // Levels below
-    public Vector2 Warp { get; set; } // Position of warp
   }
 }

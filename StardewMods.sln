@@ -15,18 +15,29 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocationCompass", "Location
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLocations\NPCMapLocations.csproj", "{657A6295-99BE-4E58-A6B8-D5557FC1B46F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocationUtil", "LocationUtil\LocationUtil.shproj", "{B5722EEF-6C91-400D-B644-9FAC63FE2777}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		LocationUtil\LocationUtil.projitems*{b5722eef-6c91-400d-b644-9fac63fe2777}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Debug|x86.ActiveCfg = Debug|x86
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Debug|x86.Build.0 = Debug|x86
+		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|Any CPU.ActiveCfg = Release|x86
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.ActiveCfg = Release|x86
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.Build.0 = Release|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.ActiveCfg = Debug|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.Build.0 = Debug|x86
+		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|Any CPU.ActiveCfg = Release|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.ActiveCfg = Release|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection

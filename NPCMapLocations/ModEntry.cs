@@ -1,8 +1,3 @@
-/*
-NPC Map Locations Mod by Bouhm.
-Shows NPC locations on a modified map.
-*/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +13,7 @@ using StardewValley.Quests;
 
 namespace NPCMapLocations
 {
-  public class ModMain : Mod, IAssetLoader
+  public class ModEntry : Mod, IAssetLoader
   {
     public static ModConfig Config;
     public static IModHelper Helper;
@@ -37,7 +32,6 @@ namespace NPCMapLocations
 
     // Multiplayer
     private Dictionary<long, CharacterMarker> FarmerMarkers;
-    private Dictionary<string, LocationContext> locationContexts;
 
     // Customizations/Custom mods
     private string Season;
@@ -68,7 +62,7 @@ namespace NPCMapLocations
 
       // Replace map page
       string filename = $"{this.Season}_map.png";
-      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
+      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModEntry.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
         ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
         : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
@@ -121,7 +115,7 @@ namespace NPCMapLocations
       DEBUG_MODE = Config.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;
 
-      locationContexts = new Dictionary<string, LocationContext>();
+      LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations) { 
         MapRootLocations(location, null, false);
       }
@@ -232,7 +226,7 @@ namespace NPCMapLocations
       if (e.Location.IsFarm)
         UpdateFarmBuildingLocs();
 
-      locationContexts = new Dictionary<string, LocationContext>();
+      LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
         MapRootLocations(location, null, false);
     }
@@ -534,21 +528,21 @@ namespace NPCMapLocations
     private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp, string prevLocationName = null)
     {
       var locationName = location.uniqueName.Value ?? location.Name;
-      if (!locationContexts.ContainsKey(locationName))
-        locationContexts.Add(locationName, new LocationContext());
+      if (!LocationUtil.LocationContexts.ContainsKey(locationName))
+        LocationUtil.LocationContexts.Add(locationName, new LocationContext());
 
       // Pass root location back recursively
       if (root != null)
       {
-        locationContexts[locationName].Root = root;
+        LocationUtil.LocationContexts[locationName].Root = root;
         return root;
       }
 
       // Root location found, set as root and return
       if (location.IsOutdoors)
       {
-        locationContexts[locationName].Type = "outdoors";
-        locationContexts[locationName].Root = locationName;
+        LocationUtil.LocationContexts[locationName].Type = "outdoors";
+        LocationUtil.LocationContexts[locationName].Root = locationName;
         return locationName;
       }
 
@@ -566,15 +560,15 @@ namespace NPCMapLocations
           hasOutdoorWarp = true;
 
         // If all warps are indoors, then the current location is a room
-        locationContexts[locationName].Type = hasOutdoorWarp ? "indoors" : "room";
+        LocationUtil.LocationContexts[locationName].Type = hasOutdoorWarp ? "indoors" : "room";
         root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp, locationName);
-        locationContexts[locationName].Root = root;
+        LocationUtil.LocationContexts[locationName].Root = root;
         return root;
       }
 
       return root;
     }
-
+   
     private void UpdateMarkers(bool forceUpdate = false)
     {
       if (isModMapOpen || forceUpdate)
@@ -611,7 +605,7 @@ namespace NPCMapLocations
 
         // Special case for Mines
         if (locationName.StartsWith("UndergroundMine"))
-          locationName = getMinesLocationName(locationName);
+          locationName = LocationUtil.GetMinesLocationName(locationName);
 
         if (locationName == null || (!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
             !MapVectors.TryGetValue(locationName, out var loc))
@@ -626,7 +620,7 @@ namespace NPCMapLocations
         }
 
         // For layering indoor/outdoor NPCs and indoor indicator
-        if (locationContexts.TryGetValue(locationName, out var locCtx))
+        if (LocationUtil.LocationContexts.TryGetValue(locationName, out var locCtx))
         {
           npcMarker.IsOutdoors = locCtx.Type == "outdoors";
         }
@@ -645,8 +639,8 @@ namespace NPCMapLocations
           {
             isSameLocation = true;
           }
-          else if (locationContexts.TryGetValue(locationName, out var npcLocCtx) &&
-                   locationContexts.TryGetValue(playerLocationName, out var playerLocCtx))
+          else if (LocationUtil.LocationContexts.TryGetValue(locationName, out var npcLocCtx) &&
+                   LocationUtil.LocationContexts.TryGetValue(playerLocationName, out var playerLocCtx))
           {
             isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
           }
@@ -733,7 +727,7 @@ namespace NPCMapLocations
         var locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
         if (locationName.Contains("UndergroundMine"))
-          locationName = getMinesLocationName(locationName);
+          locationName = LocationUtil.GetMinesLocationName(locationName);
 
         if ((!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
             !MapVectors.TryGetValue(locationName, out var loc))
@@ -901,21 +895,6 @@ namespace NPCMapLocations
       return new Vector2(x, y);
     }
 
-    private string getMinesLocationName(string locationName)
-    {
-      var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-      if (int.TryParse(mine, out var mineLevel))
-      {
-        // Skull cave
-        if (mineLevel > 120)
-          return "SkullCave";
-        // Mines
-        return "Mine";
-      }
-
-      return null;
-    }
-
     private void Display_WindowResized(object sender, WindowResizedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
@@ -1066,17 +1045,5 @@ namespace NPCMapLocations
     public int TileY { get; set; } // tileY in a game location
     public int MapX { get; set; } // Absolute position relative to map
     public int MapY { get; set; } // Absolute position relative to map
-  }
-
-  internal class LocationContext
-  {
-    public LocationContext()
-    {
-      Type = null;
-      Root = null;
-    }
-
-    public string Type { get; set; } // outdoors, indoors, or room
-    public string Root { get; set; } // Top-most location
   }
 }

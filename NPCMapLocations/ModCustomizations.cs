@@ -40,9 +40,9 @@ namespace NPCMapLocations
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
 
-      if (ModMain.IsSVE)
+      if (ModEntry.IsSVE)
       {
-          SVEConfig = ModMain.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
+          SVEConfig = ModEntry.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
         if (SVEConfig == null)
         {
           Monitor.Log("Unable to load SVE customizations; \'\\config\\sve_config.json\' not found.", LogLevel.Warn);
@@ -82,7 +82,7 @@ namespace NPCMapLocations
         Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Debug);
       }
 
-      ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+      ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
     }
 
     /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
@@ -90,7 +90,7 @@ namespace NPCMapLocations
     private string GetCustomMapFolderName()
     {
       // get root compatibility folder
-      DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, MapsRootPath));
+      DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModEntry.Helper.DirectoryPath, MapsRootPath));
       if (!compatFolder.Exists)
         return null;
 
@@ -113,7 +113,7 @@ namespace NPCMapLocations
           foreach (string group in modGroups)
           {
             string[] modIDs = group.Split('~');
-            if (!modIDs.Any(id => ModMain.Helper.ModRegistry.IsLoaded(id.Trim())))
+            if (!modIDs.Any(id => ModEntry.Helper.ModRegistry.IsLoaded(id.Trim())))
             {
               matched = false;
               break;
@@ -135,9 +135,9 @@ namespace NPCMapLocations
     {
       // Merge SVE Config with main config
       var CustomMapTooltips = SVEConfig != null
-        ? ModMain.Config.CustomMapTooltips.Concat(SVEConfig.CustomMapTooltips).ToLookup(x => x.Key, x => x.Value)
+        ? ModEntry.Config.CustomMapTooltips.Concat(SVEConfig.CustomMapTooltips).ToLookup(x => x.Key, x => x.Value)
           .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomMapTooltips;
+        : ModEntry.Config.CustomMapTooltips;
 
       foreach (var tooltip in CustomMapTooltips)
       {
@@ -169,9 +169,9 @@ namespace NPCMapLocations
     {
       // Merge SVE Config with main config
       var CustomMapLocations = SVEConfig != null
-        ? ModMain.Config.CustomMapLocations.Concat(SVEConfig.CustomMapLocations).ToLookup(x => x.Key, x => x.Value)
+        ? ModEntry.Config.CustomMapLocations.Concat(SVEConfig.CustomMapLocations).ToLookup(x => x.Key, x => x.Value)
           .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomMapLocations;
+        : ModEntry.Config.CustomMapLocations;
 
       foreach (var mapVectors in CustomMapLocations)
       {
@@ -179,7 +179,7 @@ namespace NPCMapLocations
         for (var i = 0; i < mapVectors.Value.Length; i++)
         {
           // Don't use IF2R config for greenhouse if not default farm (hard-coded location)
-          if (ModMain.IsSVE && mapVectors.Key == "Greenhouse" && Game1.whichFarm != 0)
+          if (ModEntry.IsSVE && mapVectors.Key == "Greenhouse" && Game1.whichFarm != 0)
           {
             mapVectorArr[i] = ModConstants.MapVectors["Greenhouse"].FirstOrDefault();
           }
@@ -208,7 +208,7 @@ namespace NPCMapLocations
         MapVectors.Add(mapVectors.Key, mapVectorArr);
       }
 
-      foreach (var location in ModMain.Config.CustomMapTextures)
+      foreach (var location in ModEntry.Config.CustomMapTextures)
       {
         Locations.Add(location.Key, new CustomLocation(location.Value));
       }
@@ -258,9 +258,9 @@ namespace NPCMapLocations
     private void LoadCustomNames(NPC npc)
     {
       var CustomNpcMarkerOffsets = SVEConfig != null
-        ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
+        ? ModEntry.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
           .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomNpcMarkerOffsets;
+        : ModEntry.Config.CustomNpcMarkerOffsets;
 
       if (!Names.TryGetValue(npc.Name, out var customName))
       {
@@ -281,9 +281,9 @@ namespace NPCMapLocations
     private void LoadNpcCrop(NPC npc)
     {
       var CustomNpcMarkerOffsets = SVEConfig != null
-        ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
+        ? ModEntry.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
           .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomNpcMarkerOffsets;
+        : ModEntry.Config.CustomNpcMarkerOffsets;
 
       if (CustomNpcMarkerOffsets != null && CustomNpcMarkerOffsets.Count > 0)
         foreach (var villager in CustomNpcMarkerOffsets)

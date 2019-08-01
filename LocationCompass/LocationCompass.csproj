@@ -8,8 +8,10 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
+  <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
+
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0-beta.7" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.0.0-beta.8" />
   </ItemGroup>
 
 </Project>

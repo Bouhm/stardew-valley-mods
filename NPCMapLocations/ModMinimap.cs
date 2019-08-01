@@ -59,10 +59,10 @@ namespace NPCMapLocations
       map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
 
-			mmX = ModMain.Config.MinimapX;
-			mmY = ModMain.Config.MinimapY;
-			mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
-			mmHeight = ModMain.Config.MinimapHeight * Game1.pixelZoom;
+			mmX = ModEntry.Config.MinimapX;
+			mmY = ModEntry.Config.MinimapY;
+			mmWidth = ModEntry.Config.MinimapWidth * Game1.pixelZoom;
+			mmHeight = ModEntry.Config.MinimapHeight * Game1.pixelZoom;
 		}
 
 		private Dictionary<string, bool> ConditionalNpcs { get; }
@@ -87,9 +87,9 @@ namespace NPCMapLocations
 		      Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
 		  {
 		    isBeingDragged = false;
-		    ModMain.Config.MinimapX = mmX;
-		    ModMain.Config.MinimapY = mmY;
-		    ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+		    ModEntry.Config.MinimapX = mmX;
+		    ModEntry.Config.MinimapY = mmY;
+		    ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
 		    drawDelay = 30;
 		  }
 		}
@@ -110,8 +110,8 @@ namespace NPCMapLocations
 
 		public void Resize()
 		{
-			mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
-			mmHeight = ModMain.Config.MinimapHeight * Game1.pixelZoom;
+			mmWidth = ModEntry.Config.MinimapWidth * Game1.pixelZoom;
+			mmHeight = ModEntry.Config.MinimapHeight * Game1.pixelZoom;
 		}
 
     public void Update()
@@ -119,7 +119,7 @@ namespace NPCMapLocations
       // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
       // Positions relative to the map (the map image) are not.
 
-		  center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
+		  center = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY(), Customizations.MapVectors, true);
 
       // Player in unknown location, use previous location as center
@@ -185,7 +185,7 @@ namespace NPCMapLocations
 			{
         IsHoveringMinimap = true;
 
-        if (ModMain.HeldKey.ToString().Equals(ModMain.Config.MinimapDragKey))
+        if (ModEntry.HeldKey.ToString().Equals(ModEntry.Config.MinimapDragKey))
 			    Game1.mouseCursor = 2;
 
         if (isBeingDragged)
@@ -339,7 +339,7 @@ namespace NPCMapLocations
       //
       // ===== Farm buildings =====
       //
-      if (ModMain.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
+      if (ModEntry.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -421,7 +421,7 @@ namespace NPCMapLocations
       //
       // ===== Traveling Merchant =====
       //
-      if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
+      if (ModEntry.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
 			{
 			  Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
@@ -484,7 +484,7 @@ namespace NPCMapLocations
             new Rectangle(0, Customizations.NpcMarkerOffsets[npcMarker.Npc.Name], 16, 15), markerColor);
 
           // Icons for birthday/quest
-          if (ModMain.Config.MarkQuests)
+          if (ModEntry.Config.MarkQuests)
           {
             if (npcMarker.IsBirthday)
               b.Draw(Game1.mouseCursors,
