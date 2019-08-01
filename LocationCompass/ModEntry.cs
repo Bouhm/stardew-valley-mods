@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using Netcode;
-using NPCMapLocations;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Quests;
@@ -235,8 +234,7 @@ namespace LocationCompass
         else
         {
           syncedLocationData.AddNpcLocation(npc.Name,
-            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X,
-              (int)npc.Position.Y));
+            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(), npc.getTileY()));
         }
       }
     }
@@ -347,7 +345,7 @@ namespace LocationCompass
         } 
         else
         {
-          charPosition = new Vector2(npcLoc.PositionX, npcLoc.PositionY);
+          charPosition = new Vector2(npcLoc.TileX * Game1.tileSize, npcLoc.TileY * Game1.tileSize);
           charSpriteHeight = character.Sprite.SpriteHeight;
         }
 
