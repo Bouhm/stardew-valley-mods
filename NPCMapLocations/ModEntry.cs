@@ -117,7 +117,7 @@ namespace NPCMapLocations
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations) { 
-        MapRootLocations(location, null, false);
+        LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
       }
 
       ConditionalNpcs = new Dictionary<string, bool>
@@ -228,7 +228,7 @@ namespace NPCMapLocations
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
-        MapRootLocations(location, null, false);
+        LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
     }
 
     // Handle opening mod menu and changing tooltip options
@@ -523,52 +523,7 @@ namespace NPCMapLocations
         Customizations
       );
     }
-
-    // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-    private string MapRootLocations(GameLocation location, string root, bool hasOutdoorWarp, string prevLocationName = null)
-    {
-      var locationName = location.uniqueName.Value ?? location.Name;
-      if (!LocationUtil.LocationContexts.ContainsKey(locationName))
-        LocationUtil.LocationContexts.Add(locationName, new LocationContext());
-
-      // Pass root location back recursively
-      if (root != null)
-      {
-        LocationUtil.LocationContexts[locationName].Root = root;
-        return root;
-      }
-
-      // Root location found, set as root and return
-      if (location.IsOutdoors)
-      {
-        LocationUtil.LocationContexts[locationName].Type = "outdoors";
-        LocationUtil.LocationContexts[locationName].Root = locationName;
-        return locationName;
-      }
-
-      // Iterate warps of current location and traverse recursively
-      foreach (var warp in location.warps)
-      {
-        if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
-
-        // Avoid circular loop (shout-out to SgtPickles)
-        if (warp.TargetName == locationName || prevLocationName == warp.TargetName)
-          continue;
-
-        // If one of the warps is a root location, current location is an indoor building 
-        if (Game1.getLocationFromName(warp.TargetName).IsOutdoors)
-          hasOutdoorWarp = true;
-
-        // If all warps are indoors, then the current location is a room
-        LocationUtil.LocationContexts[locationName].Type = hasOutdoorWarp ? "indoors" : "room";
-        root = MapRootLocations(Game1.getLocationFromName(warp.TargetName), root, hasOutdoorWarp, locationName);
-        LocationUtil.LocationContexts[locationName].Root = root;
-        return root;
-      }
-
-      return root;
-    }
-   
+ 
     private void UpdateMarkers(bool forceUpdate = false)
     {
       if (isModMapOpen || forceUpdate)
@@ -601,22 +556,6 @@ namespace NPCMapLocations
         else
         {
           locationName = npcMarker.SyncedLocationName;
-        }
-
-        // Special case for Mines
-        if (locationName.StartsWith("UndergroundMine"))
-          locationName = LocationUtil.GetMinesLocationName(locationName);
-
-        if (locationName == null || (!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
-            !MapVectors.TryGetValue(locationName, out var loc))
-        {
-          if (!alertFlags.Contains("UnknownLocation:" + locationName))
-          {
-            Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
-            alertFlags.Add("UnknownLocation:" + locationName);
-          }
-
-          continue;
         }
 
         // For layering indoor/outdoor NPCs and indoor indicator
@@ -796,13 +735,27 @@ namespace NPCMapLocations
         }
       }
 
-      MapVector[] locVectors;
+      // Get location of indoor location by its warp position in the outdoor location
+      if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc) && loc.Type != "outdoors" && loc.Root != null)
+      {
+        var building = LocationUtil.GetBuilding(locationName);
 
-      if (CustomMapVectors != null && ((locationName.StartsWith("Farm") && locationName != "Farm") || locationName == "FarmHouse" || locationName == "Cellar"))
+        if (building != null)
+        {
+          var doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
+          var doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
+
+          return LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, isPlayer);
+        }
+      }
+
+      MapVector[] locVectors = null;
+
+      if (locationName.StartsWith("Farm") && locationName != "Farm")
       {
         // Handle different farm types for custom vectors
         var farms = new string[5] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness" };
-        if (CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm)))
+        if (CustomMapVectors != null && CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm)))
         {
           if (!CustomMapVectors.TryGetValue(locationName, out locVectors))
           {
@@ -810,13 +763,6 @@ namespace NPCMapLocations
             {
               return Vector2.Zero;
             }
-          }
-        } 
-        else
-        {
-          if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
-          {
-            return Vector2.Zero;
           }
         }
       }

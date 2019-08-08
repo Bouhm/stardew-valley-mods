@@ -109,7 +109,7 @@ internal class LocationUtil
             }
 
             // If all warps are indoors, then the current location is a room
-            LocationContexts[currLocationName].Type = hasOutdoorWarp ? "indoors" : "room";
+            LocationContexts[currLocationName].Type = hasOutdoorWarp ? "building" : "room";
 
             if (prevLocation != null)
             {
@@ -148,8 +148,20 @@ internal class LocationUtil
         return GetTargetIndoor(playerLoc, target);
     }
 
-    // Get Mines name from floor level
-    public static string GetMinesLocationName(string locationName)
+    // Finds the upper-most indoor location (building)
+    public static string GetBuilding(string loc)
+    {
+      if (loc.Contains("UndergroundMine")) return GetMinesLocationName(loc);
+      if (LocationContexts[loc].Type == "building") return loc;
+
+      var building = LocationContexts[loc].Parent;
+      if (building == null) return null;
+      if (building == LocationContexts[loc].Root) return loc;
+      return GetBuilding(building);
+    }
+
+  // Get Mines name from floor level
+  public static string GetMinesLocationName(string locationName)
     {
         var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
         if (int.TryParse(mine, out var mineLevel))
