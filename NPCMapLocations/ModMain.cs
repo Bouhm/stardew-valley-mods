@@ -745,7 +745,9 @@ namespace NPCMapLocations
           var doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
           var doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
-          return LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, isPlayer);
+          // Slightly adjust warp location to depict being inside the building 
+          var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, isPlayer);
+          return new Vector2(warpPos.X + 1, warpPos.Y - 8);
         }
       }
 
