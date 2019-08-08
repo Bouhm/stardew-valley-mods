@@ -68,13 +68,13 @@ namespace NPCMapLocations
 
 			  this.points[i].bounds = new Rectangle(
 			    // Snaps the cursor to the center instead of bottom right (default)
-			    (int)(mapX + ModEntry.LocationToMap(rect.Key).X - rect.Value.Width / 2),
-			    (int)(mapY + ModEntry.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
+			    (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
+			    (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
 			    rect.Value.Width,
 			    rect.Value.Height
 			  );
 
-			  if (ModEntry.IsSVE)
+			  if (ModMain.IsSVE)
 			  {
 			    // Adventure's Guild is in a different location in SVE
 			    if (this.points[i].myID == 1025)
@@ -230,7 +230,7 @@ namespace NPCMapLocations
           y += Game1.tileSize / 4;
         }
 
-        if (ModEntry.Config.NameTooltipMode == 1)
+        if (ModMain.Config.NameTooltipMode == 1)
         {
           if (y + height > Game1.viewport.Height)
           {
@@ -240,7 +240,7 @@ namespace NPCMapLocations
 
           offsetY = 2 - Game1.tileSize;
         }
-        else if (ModEntry.Config.NameTooltipMode == 2)
+        else if (ModMain.Config.NameTooltipMode == 2)
         {
           if (y + height > Game1.viewport.Height)
           {
@@ -260,7 +260,7 @@ namespace NPCMapLocations
         }
 
         // Draw name tooltip positioned around location tooltip
-        DrawNames(b, hoveredNames, x, y, offsetY, height, ModEntry.Config.NameTooltipMode);
+        DrawNames(b, hoveredNames, x, y, offsetY, height, ModMain.Config.NameTooltipMode);
 
         // Draw location tooltip
         IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height,
@@ -280,7 +280,7 @@ namespace NPCMapLocations
       else
       {
         // Draw name tooltip only
-        DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, ModEntry.Config.NameTooltipMode);
+        DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, ModMain.Config.NameTooltipMode);
       }
 
       // Draw indoor icon
@@ -325,13 +325,14 @@ namespace NPCMapLocations
 					break;
 			}
 
-//			if (drawPamHouseUpgrade)
-//			{
-//				b.Draw(map,
-//					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].MapX - 13),
-//						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].MapY - 16)), new Rectangle(263, 181, 8, 8), Color.White,
-//					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-//			}
+			if (drawPamHouseUpgrade)
+			{
+			  var houseLoc = ModMain.LocationToMap("Trailer_Big");
+				b.Draw(map,
+					new Vector2((float) (mapX + houseLoc.X - 13),
+						(float) (mapY + houseLoc.Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
+					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+			}
 
 			var player = Game1.player;
 			int x = player.getTileX();
@@ -423,7 +424,7 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
-			if (ModEntry.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
+			if (ModMain.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -459,7 +460,7 @@ namespace NPCMapLocations
       }
 
       // Traveling Merchant
-      if (ModEntry.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
+      if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
 			{
 				Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         b.Draw(Game1.mouseCursors, new Vector2(mapX + merchantLoc.X - 16, mapY + merchantLoc.Y - 15),
@@ -486,7 +487,7 @@ namespace NPCMapLocations
 			}
 			else
 			{
-				Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
+				Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
 					Game1.player.getTileY(), Customizations.MapVectors, true);
         if (playerLoc.X >= 0)
 				  Game1.player.FarmerRenderer.drawMiniPortrat(b,
@@ -520,7 +521,7 @@ namespace NPCMapLocations
             new Rectangle?(new Rectangle(0, Customizations.NpcMarkerOffsets[npcMarker.Npc.Name], 16, 15)), markerColor);
 
           // Draw icons for quests/birthday
-          if (ModEntry.Config.MarkQuests)
+          if (ModMain.Config.MarkQuests)
           {
             if (npcMarker.IsBirthday)
             {

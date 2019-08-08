@@ -13,7 +13,7 @@ using StardewValley.Quests;
 
 namespace NPCMapLocations
 {
-  public class ModEntry : Mod, IAssetLoader
+  public class ModMain : Mod, IAssetLoader
   {
     public static ModConfig Config;
     public static IModHelper Helper;
@@ -62,7 +62,7 @@ namespace NPCMapLocations
 
       // Replace map page
       string filename = $"{this.Season}_map.png";
-      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModEntry.Helper.DirectoryPath, Customizations.MapsPath, filename));
+      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
         ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
         : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));

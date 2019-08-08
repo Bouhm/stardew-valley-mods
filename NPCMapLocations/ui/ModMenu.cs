@@ -74,9 +74,9 @@ namespace NPCMapLocations
 						width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
 
 			// Translate labels and initialize buttons to handle button press
-			string minimapLabel = ModEntry.Helper.Translation.Get("minimap.label");
-			string immersionLabel = ModEntry.Helper.Translation.Get("immersion.label");
-			string villagersLabel = ModEntry.Helper.Translation.Get("villagers.label");
+			string minimapLabel = ModMain.Helper.Translation.Get("minimap.label");
+			string immersionLabel = ModMain.Helper.Translation.Get("immersion.label");
+			string villagersLabel = ModMain.Helper.Translation.Get("villagers.label");
 			immersionButton1 = new MapModButton("immersion.option1", 4, -1, -1, -1, -1);
 			immersionButton2 = new MapModButton("immersion.option2", 5, -1, -1, -1, -1);
 			immersionButton3 = new MapModButton("immersion.option3", 6, -1, -1, -1, -1);
@@ -184,7 +184,7 @@ namespace NPCMapLocations
 				return;
 			}
 
-			if (key.ToString().Equals(ModEntry.Config.MenuKey) && readyToClose() && canClose)
+			if (key.ToString().Equals(ModMain.Config.MenuKey) && readyToClose() && canClose)
 			{
 				Game1.exitActiveMenu();
 				Game1.activeClickableMenu = new GameMenu();
@@ -345,7 +345,7 @@ namespace NPCMapLocations
 		  Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen, width, height, false, true, null,
 		    false);
 		  okButton.draw(b);
-      var buttonWidth = (int) Game1.dialogueFont.MeasureString(ModEntry.Helper.Translation.Get("immersion.option3")).X;
+      var buttonWidth = (int) Game1.dialogueFont.MeasureString(ModMain.Helper.Translation.Get("immersion.option3")).X;
 			if (!GameMenu.forcePreventClose)
 			{
 				upArrow.draw(b);
@@ -418,10 +418,10 @@ namespace NPCMapLocations
 			int height
 		) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
 		{
-			this.label = ModEntry.Helper.Translation.Get(label);
+			this.label = ModMain.Helper.Translation.Get(label);
 			rect = new Rectangle(x, y, width, height);
 
-			if (ModEntry.Config.ImmersionOption == whichOption - 3)
+			if (ModMain.Config.ImmersionOption == whichOption - 3)
 				greyedOut = false;
 			else
 				greyedOut = true;
@@ -436,7 +436,7 @@ namespace NPCMapLocations
 					base.receiveLeftClick(x, y);
 					isActive = true;
 					greyedOut = false;
-				  ModEntry.Config.ImmersionOption = whichOption - 3;
+				  ModMain.Config.ImmersionOption = whichOption - 3;
 				}
 		}
 
@@ -477,34 +477,34 @@ namespace NPCMapLocations
 
 				if (whichOption > 6 && whichOption < 49)
 				{
-					isChecked = !ModEntry.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
+					isChecked = !ModMain.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
 					return;
 				}
 			}
 			else if (whichOption > 48)
 			{
-				this.label = ModEntry.Helper.Translation.Get(label);
+				this.label = ModMain.Helper.Translation.Get(label);
 			}
 
 			switch (whichOption)
 			{
 				case 49:
-					isChecked = ModEntry.Config.OnlySameLocation;
+					isChecked = ModMain.Config.OnlySameLocation;
 					return;
 				case 50:
-					isChecked = ModEntry.Config.ByHeartLevel;
+					isChecked = ModMain.Config.ByHeartLevel;
 					return;
 				case 51:
-					isChecked = ModEntry.Config.MarkQuests;
+					isChecked = ModMain.Config.MarkQuests;
 					return;
 				case 52:
-					isChecked = ModEntry.Config.ShowHiddenVillagers;
+					isChecked = ModMain.Config.ShowHiddenVillagers;
 					return;
 				case 53:
-					isChecked = ModEntry.Config.ShowTravelingMerchant;
+					isChecked = ModMain.Config.ShowTravelingMerchant;
 					return;
 				case 54:
-					isChecked = ModEntry.Config.ShowMinimap;
+					isChecked = ModMain.Config.ShowMinimap;
 					return;
 				default:
 					return;
@@ -523,38 +523,38 @@ namespace NPCMapLocations
 			if (whichOption > 6 && whichOption < 49)
 			{
 				if (isChecked)
-				  ModEntry.Config.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
+				  ModMain.Config.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
 				else
-				  ModEntry.Config.NpcBlacklist.Add(orderedNames[whichOption - 7]);
+				  ModMain.Config.NpcBlacklist.Add(orderedNames[whichOption - 7]);
 			}
 			else
 			{
 				switch (whichOption)
 				{
 					case 49:
-					  ModEntry.Config.OnlySameLocation = isChecked;
+					  ModMain.Config.OnlySameLocation = isChecked;
 						break;
 					case 50:
-					  ModEntry.Config.ByHeartLevel = isChecked;
+					  ModMain.Config.ByHeartLevel = isChecked;
 						break;
 					case 51:
-					  ModEntry.Config.MarkQuests = isChecked;
+					  ModMain.Config.MarkQuests = isChecked;
 						break;
 					case 52:
-					  ModEntry.Config.ShowHiddenVillagers = isChecked;
+					  ModMain.Config.ShowHiddenVillagers = isChecked;
 						break;
 					case 53:
-					  ModEntry.Config.ShowTravelingMerchant = isChecked;
+					  ModMain.Config.ShowTravelingMerchant = isChecked;
 						break;
 					case 54:
-					  ModEntry.Config.ShowMinimap = isChecked;
+					  ModMain.Config.ShowMinimap = isChecked;
 						break;
 					default:
 						break;
 				}
 			}
 
-		  ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+		  ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
 		}
 
 		public override void draw(SpriteBatch b, int slotX, int slotY)
@@ -614,15 +614,15 @@ namespace NPCMapLocations
 			this.min = min;
 			this.max = max;
 			if (whichOption != 0 && whichOption != 1) bounds.Width = bounds.Width * 2;
-			valueLabel = ModEntry.Helper.Translation.Get(label);
+			valueLabel = ModMain.Helper.Translation.Get(label);
 
 			switch (whichOption)
 			{
 				case 0:
-					value = ModEntry.Config.HeartLevelMin;
+					value = ModMain.Config.HeartLevelMin;
 					break;
 				case 1:
-					value = ModEntry.Config.HeartLevelMax;
+					value = ModMain.Config.HeartLevelMax;
 					break;
 				default:
 					break;
@@ -644,16 +644,16 @@ namespace NPCMapLocations
 			switch (whichOption)
 			{
 				case 0:
-				  ModEntry.Config.HeartLevelMin = (int) value;
+				  ModMain.Config.HeartLevelMin = (int) value;
 					break;
 				case 1:
-				  ModEntry.Config.HeartLevelMax = (int) value;
+				  ModMain.Config.HeartLevelMax = (int) value;
 					break;
 				default:
 					break;
 			}
 
-		  ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+		  ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
 		}
 
 		public override void receiveLeftClick(int x, int y)
@@ -668,7 +668,7 @@ namespace NPCMapLocations
 		{
 			label = valueLabel + ": " + value;
 			greyedOut = false;
-			if (whichOption == 0 || whichOption == 1) greyedOut = !ModEntry.Config.ByHeartLevel;
+			if (whichOption == 0 || whichOption == 1) greyedOut = !ModMain.Config.ByHeartLevel;
 
 			base.draw(b, slotX, slotY);
 			IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + bounds.X,
@@ -713,7 +713,7 @@ namespace NPCMapLocations
 			}
 
 			bounds = new Rectangle(x, y, (int) (1.5 * txtSize), 32);
-			this.label = ModEntry.Helper.Translation.Get(label);
+			this.label = ModMain.Helper.Translation.Get(label);
 			this.whichOption = whichOption;
 			minusButton = new Rectangle(x, 16, 28, 32);
 			plusButton = new Rectangle(bounds.Right - 96, 16, 28, 32);
@@ -721,14 +721,14 @@ namespace NPCMapLocations
 			switch (whichOption)
 			{
 				case 55:
-					selected = (int) MathHelper.Clamp(((int) Math.Floor((ModEntry.Config.MinimapWidth - 75) / 15.0)), 0,
+					selected = (int) MathHelper.Clamp(((int) Math.Floor((ModMain.Config.MinimapWidth - 75) / 15.0)), 0,
 						options.Count - 1);
-					options[selected] = ModEntry.Config.MinimapWidth;
+					options[selected] = ModMain.Config.MinimapWidth;
 					break;
 				case 56:
-					selected = (int) MathHelper.Clamp(((int) Math.Floor((ModEntry.Config.MinimapHeight - 45) / 15.0)), 0,
+					selected = (int) MathHelper.Clamp(((int) Math.Floor((ModMain.Config.MinimapHeight - 45) / 15.0)), 0,
 						options.Count - 1);
-					options[selected] = ModEntry.Config.MinimapHeight;
+					options[selected] = ModMain.Config.MinimapHeight;
 					break;
 				/*
 				case 57:
@@ -767,10 +767,10 @@ namespace NPCMapLocations
 			switch (whichOption)
 			{
 				case 55:
-				  ModEntry.Config.MinimapWidth = options[selected];
+				  ModMain.Config.MinimapWidth = options[selected];
 					break;
 				case 56:
-				  ModEntry.Config.MinimapHeight = options[selected];
+				  ModMain.Config.MinimapHeight = options[selected];
 					break;
       /*
       case 57:
@@ -781,7 +781,7 @@ namespace NPCMapLocations
 					break;
 			}
 
-		  ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+		  ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
 		}
 
 		public override void receiveKeyPress(Keys key)
@@ -798,7 +798,7 @@ namespace NPCMapLocations
 
 		public override void draw(SpriteBatch b, int slotX, int slotY)
 		{
-			greyedOut = !ModEntry.Config.ShowMinimap;
+			greyedOut = !ModMain.Config.ShowMinimap;
 			b.Draw(Game1.mouseCursors, new Vector2(slotX + minusButton.X, slotY + minusButton.Y), minusButtonSource,
 				Color.White * (greyedOut ? 0.33f : 1f) * (selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
 				0.4f);
