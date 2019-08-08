@@ -798,10 +798,10 @@ namespace NPCMapLocations
 
       MapVector[] locVectors;
 
-      if (CustomMapVectors != null && (locationName == "Farm" || locationName == "FarmHouse" || locationName == "Cellar"))
+      if (CustomMapVectors != null && ((locationName.StartsWith("Farm") && locationName != "Farm") || locationName == "FarmHouse" || locationName == "Cellar"))
       {
         // Handle different farm types for custom vectors
-        var farms = new string[5] { "Farm", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness" };
+        var farms = new string[5] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness" };
         if (CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm)))
         {
           if (!CustomMapVectors.TryGetValue(locationName, out locVectors))

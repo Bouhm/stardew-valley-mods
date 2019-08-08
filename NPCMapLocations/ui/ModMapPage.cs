@@ -325,13 +325,13 @@ namespace NPCMapLocations
 					break;
 			}
 
-			if (drawPamHouseUpgrade)
-			{
-				b.Draw(map,
-					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].MapX - 13),
-						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].MapY - 16)), new Rectangle(263, 181, 8, 8), Color.White,
-					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-			}
+//			if (drawPamHouseUpgrade)
+//			{
+//				b.Draw(map,
+//					new Vector2((float) (mapX + ModConstants.MapVectors["Trailer_Big"][0].MapX - 13),
+//						(float) (mapY + ModConstants.MapVectors["Trailer_Big"][0].MapY - 16)), new Rectangle(263, 181, 8, 8), Color.White,
+//					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+//			}
 
 			var player = Game1.player;
 			int x = player.getTileX();
