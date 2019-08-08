@@ -156,7 +156,7 @@ namespace NPCMapLocations
 		      if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
 		          Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
 		      {
-		        if (!npcMarker.IsHidden)
+		        if (!npcMarker.IsHidden && !npcMarker.MapLocation.Equals(Vector2.Zero))
 		          hoveredList.Add(npcMarker.Name);
 
 		        if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
