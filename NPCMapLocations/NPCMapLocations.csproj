@@ -5,9 +5,10 @@
     <RootNamespace>NPCMapLocations</RootNamespace>
     <Version>2.4.2</Version>
     <TargetFramework>net452</TargetFramework>
-    <ApplicationIcon />
     <OutputType>Library</OutputType>
-    <StartupObject></StartupObject>
+    <StartAction>Program</StartAction>
+    <StartProgram>E:\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe</StartProgram>
+    <StartWorkingDirectory>E:\Steam\steamapps\common\Stardew Valley</StartWorkingDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="assets\buildings.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="config\default.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
