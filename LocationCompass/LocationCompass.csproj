@@ -5,10 +5,6 @@
     <RootNamespace>LocationCompass</RootNamespace>
     <Version>1.3.1</Version>
     <TargetFramework>net452</TargetFramework>
-    <PlatformTarget>x86</PlatformTarget>
-	<StartAction>Program</StartAction>
-    <StartProgram>E:\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe</StartProgram>
-    <StartWorkingDirectory>E:\Steam\steamapps\common\Stardew Valley</StartWorkingDirectory>
   </PropertyGroup>
 
   <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
