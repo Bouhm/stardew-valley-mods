@@ -449,7 +449,7 @@ namespace NPCMapLocations
 				}
 				else
 				{
-          if (playerLoc.X >= 0)
+          if (!playerLoc.Equals(Vector2.Zero))
 					  Game1.player.FarmerRenderer.drawMiniPortrat(b,
 						  new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
 						  2f, 1,

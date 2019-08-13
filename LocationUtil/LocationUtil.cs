@@ -61,7 +61,7 @@ internal class LocationUtil
         if (!LocationContexts.ContainsKey(currLocationName))
             LocationContexts.Add(currLocationName, new LocationContext());
 
-        if (prevLocation != null && warpPosition.X >= 0)
+        if (prevLocation != null && !warpPosition.Equals(Vector2.Zero))
         {
             LocationContexts[prevLocationName].Warp = warpPosition;
 
