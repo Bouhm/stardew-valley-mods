@@ -135,17 +135,17 @@ internal class LocationUtil
     // Assuming there are warps to get there from the NPC's position
     public static string GetTargetIndoor(string playerLoc, string npcLoc)
     {
-        if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
-        {
-            return GetMinesLocationName(playerLoc);
-        }
+      if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
+      {
+        return GetMinesLocationName(playerLoc);
+      }
 
-        var target = LocationContexts[npcLoc].Parent;
+      var target = LocationContexts[npcLoc].Parent;
 
-        if (target == null) return null;
-        if (target == LocationContexts[npcLoc].Root) return npcLoc;
-        if (target == playerLoc) return target;
-        return GetTargetIndoor(playerLoc, target);
+      if (target == null) return null;
+      if (target == LocationContexts[npcLoc].Root) return npcLoc;
+      if (target == playerLoc) return target;
+      return GetTargetIndoor(playerLoc, target);
     }
 
     // Finds the upper-most indoor location (building)

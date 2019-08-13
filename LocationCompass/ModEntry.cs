@@ -229,10 +229,11 @@ namespace LocationCompass
         if (npc == null || npc.currentLocation == null) continue;
         if (syncedLocationData.SyncedLocations.TryGetValue(npc.Name, out var locationData))
         {
-          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.Position.X, (int)npc.Position.Y);
+          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.getTileX(), (int)npc.getTileY());
         }
         else
         {
+
           syncedLocationData.AddNpcLocation(npc.Name,
             new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(), npc.getTileY()));
         }
