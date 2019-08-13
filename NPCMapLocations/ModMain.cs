@@ -752,6 +752,7 @@ namespace NPCMapLocations
       }
 
       MapVector[] locVectors = null;
+      bool locationNotFound = false;
 
       if (locationName == "Farm")
       {
@@ -761,33 +762,24 @@ namespace NPCMapLocations
         {
           if (!CustomMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
           {
-            if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
-            {
-              return Vector2.Zero;
-            }
+            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
           }
         }
         else
         {
           if (!CustomMapVectors.TryGetValue("Farm", out locVectors))
           {
-            if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
-            {
-              return Vector2.Zero;
-            }
+            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
           }
         }
       }
       // If not in custom vectors, use default
       else if (!(CustomMapVectors != null && CustomMapVectors.TryGetValue(locationName, out locVectors)))
       {
-        if (!ModConstants.MapVectors.TryGetValue(locationName, out locVectors))
-        {
-          return Vector2.Zero;
-        }
+        locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
       }
 
-      if (locVectors == null) return Vector2.Zero;
+      if (locVectors == null || locationNotFound) return Vector2.Zero;
       
       int x;
       int y;
