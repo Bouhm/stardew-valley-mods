@@ -320,7 +320,15 @@ namespace NPCMapLocations
     // Handle any checks that need to be made per day
     private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
-      var npcEntries = new Dictionary<string, bool>(ConditionalNpcs);
+
+      var npcEntries = ConditionalNpcs != null ? new Dictionary<string, bool>(ConditionalNpcs) : new Dictionary<string, bool>(new Dictionary<string, bool>
+      {
+        {"Kent", false},
+        {"Marlon", false},
+        {"Merchant", false},
+        {"Sandy", false},
+        {"Wizard", false}
+      });
 
       // Characters that are not always available, for avoiding spoilers
       foreach (var npc in npcEntries)
