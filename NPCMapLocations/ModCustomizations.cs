@@ -178,33 +178,24 @@ namespace NPCMapLocations
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
         for (var i = 0; i < mapVectors.Value.Length; i++)
         {
-          // Don't use IF2R config for greenhouse if not default farm (hard-coded location)
-          if (ModMain.IsSVE && mapVectors.Key == "Greenhouse" && Game1.whichFarm != 0)
-          {
-            mapVectorArr[i] = ModConstants.MapVectors["Greenhouse"].FirstOrDefault();
-          }
+          var mapVector = mapVectors.Value[i];
+
+          // Marker doesn't need to specify corresponding Tile position
+          if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY")
+            );
+          // Region must specify corresponding Tile positions for
+          // Calculations on movement within location
           else
-          {
-
-            var mapVector = mapVectors.Value[i];
-
-            // Marker doesn't need to specify corresponding Tile position
-            if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
-              mapVectorArr[i] = new MapVector(
-                (int)mapVector.GetValue("MapX"),
-                (int)mapVector.GetValue("MapY")
-              );
-            // Region must specify corresponding Tile positions for
-            // Calculations on movement within location
-            else
-              mapVectorArr[i] = new MapVector(
-                (int)mapVector.GetValue("MapX"),
-                (int)mapVector.GetValue("MapY"),
-                (int)mapVector.GetValue("TileX"),
-                (int)mapVector.GetValue("TileY")
-              );
-          }
-        }
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY"),
+              (int)mapVector.GetValue("TileX"),
+              (int)mapVector.GetValue("TileY")
+            );
+          }   
         MapVectors.Add(mapVectors.Key, mapVectorArr);
       }
 
