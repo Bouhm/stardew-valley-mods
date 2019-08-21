@@ -40,19 +40,6 @@ namespace NPCMapLocations
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
 
-      if (ModMain.IsSVE)
-      {
-          SVEConfig = ModMain.Helper.Data.ReadJsonFile<ModConfig>("config/sve_config.json");
-        if (SVEConfig == null)
-        {
-          Monitor.Log("Unable to load SVE customizations; \'\\config\\sve_config.json\' not found.", LogLevel.Warn);
-        }
-        else
-        {
-          Monitor.Log("Using SVE customizations.", LogLevel.Debug);
-        }
-      }
-
       LoadTooltips();
       LoadMarkerCropOffsets();
       LoadCustomNpcs();
@@ -133,13 +120,7 @@ namespace NPCMapLocations
 
     private void LoadTooltips()
     {
-      // Merge SVE Config with main config
-      var CustomMapTooltips = SVEConfig != null
-        ? ModMain.Config.CustomMapTooltips.Concat(SVEConfig.CustomMapTooltips).ToLookup(x => x.Key, x => x.Value)
-          .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomMapTooltips;
-
-      foreach (var tooltip in CustomMapTooltips)
+      foreach (var tooltip in ModMain.CustomData.CustomMapTooltips)
       {
         string text = tooltip.Value.GetValue("SecondaryText") != null
           ? (string) tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText")
@@ -167,48 +148,33 @@ namespace NPCMapLocations
     // Any custom locations with given location on the map
     private void LoadCustomMapLocations()
     {
-      // Merge SVE Config with main config
-      var CustomMapLocations = SVEConfig != null
-        ? ModMain.Config.CustomMapLocations.Concat(SVEConfig.CustomMapLocations).ToLookup(x => x.Key, x => x.Value)
-          .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomMapLocations;
-
-      foreach (var mapVectors in CustomMapLocations)
+      foreach (var mapVectors in ModMain.CustomData.CustomMapLocations)
       {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
         for (var i = 0; i < mapVectors.Value.Length; i++)
         {
-          // Don't use IF2R config for greenhouse if not default farm (hard-coded location)
-          if (ModMain.IsSVE && mapVectors.Key == "Greenhouse" && Game1.whichFarm != 0)
-          {
-            mapVectorArr[i] = ModConstants.MapVectors["Greenhouse"].FirstOrDefault();
-          }
+          var mapVector = mapVectors.Value[i];
+
+          // Marker doesn't need to specify corresponding Tile position
+          if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY")
+            );
+          // Region must specify corresponding Tile positions for
+          // Calculations on movement within location
           else
-          {
-
-            var mapVector = mapVectors.Value[i];
-
-            // Marker doesn't need to specify corresponding Tile position
-            if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
-              mapVectorArr[i] = new MapVector(
-                (int)mapVector.GetValue("MapX"),
-                (int)mapVector.GetValue("MapY")
-              );
-            // Region must specify corresponding Tile positions for
-            // Calculations on movement within location
-            else
-              mapVectorArr[i] = new MapVector(
-                (int)mapVector.GetValue("MapX"),
-                (int)mapVector.GetValue("MapY"),
-                (int)mapVector.GetValue("TileX"),
-                (int)mapVector.GetValue("TileY")
-              );
-          }
+            mapVectorArr[i] = new MapVector(
+              (int)mapVector.GetValue("MapX"),
+              (int)mapVector.GetValue("MapY"),
+              (int)mapVector.GetValue("TileX"),
+              (int)mapVector.GetValue("TileY")
+            );      
         }
         MapVectors.Add(mapVectors.Key, mapVectorArr);
       }
 
-      foreach (var location in ModMain.Config.CustomMapTextures)
+      foreach (var location in ModMain.CustomData.CustomMapTextures)
       {
         Locations.Add(location.Key, new CustomLocation(location.Value));
       }
@@ -257,11 +223,6 @@ namespace NPCMapLocations
     // Specifically mods that change names in dialogue files (displayName)
     private void LoadCustomNames(NPC npc)
     {
-      var CustomNpcMarkerOffsets = SVEConfig != null
-        ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
-          .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomNpcMarkerOffsets;
-
       if (!Names.TryGetValue(npc.Name, out var customName))
       {
         if (npc.displayName == null)
@@ -271,7 +232,7 @@ namespace NPCMapLocations
         else
         {
           Names.Add(npc.Name, npc.displayName);
-          if (!npc.Name.Equals(npc.displayName) || CustomNpcMarkerOffsets.ContainsKey(npc.Name))
+          if (!npc.Name.Equals(npc.displayName) || ModMain.CustomData.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
             NpcCustomizations.Add(npc.Name);
         }
       }
@@ -280,10 +241,7 @@ namespace NPCMapLocations
     // Load user-specified NPC crops for custom sprites
     private void LoadNpcCrop(NPC npc)
     {
-      var CustomNpcMarkerOffsets = SVEConfig != null
-        ? ModMain.Config.CustomNpcMarkerOffsets.Concat(SVEConfig.CustomNpcMarkerOffsets).ToLookup(x => x.Key, x => x.Value)
-          .ToDictionary(x => x.Key, g => g.First())
-        : ModMain.Config.CustomNpcMarkerOffsets;
+      var CustomNpcMarkerOffsets = ModMain.CustomData.CustomNpcMarkerOffsets;
 
       if (CustomNpcMarkerOffsets != null && CustomNpcMarkerOffsets.Count > 0)
         foreach (var villager in CustomNpcMarkerOffsets)
@@ -312,5 +270,14 @@ namespace NPCMapLocations
         LocVector = new Vector2(toAreaRect.Value<int>("X"), toAreaRect.Value<int>("Y"));
       }
     }
+  }
+
+  public class CustomData
+  {
+    public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
+    public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
+    public Dictionary<string, JObject> CustomMapTextures { get; set; } = new Dictionary<string, JObject>();
+    public Dictionary<string, JObject> CustomMapTooltips { get; set; } = new Dictionary<string, JObject>();
+    public bool DEBUG_MODE { get; set; } = false;
   }
 }

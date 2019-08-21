@@ -16,9 +16,9 @@ namespace NPCMapLocations
   public class ModMain : Mod, IAssetLoader
   {
     public static ModConfig Config;
+    public static CustomData CustomData;
     public static IModHelper Helper;
     public static SButton HeldKey;
-    public static bool IsSVE;
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -75,7 +75,7 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
+      Config = Helper.Data.ReadJsonFile<ModConfig>("config/default.json") ?? new ModConfig();
       // Load farm buildings
       try
       {
@@ -85,6 +85,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
+      CustomData = Helper.Data.ReadJsonFile<CustomData>("config/customdata.json") ?? new CustomData();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
@@ -104,7 +105,6 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
-      IsSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
       Customizations = new ModCustomizations(Monitor)
       {
         LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
@@ -112,7 +112,7 @@ namespace NPCMapLocations
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
 
-      DEBUG_MODE = Config.DEBUG_MODE;
+      DEBUG_MODE = CustomData.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();

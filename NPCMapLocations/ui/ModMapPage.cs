@@ -60,67 +60,48 @@ namespace NPCMapLocations
 			mapY = (int) center.Y;
 
 			var regionRects = RegionRects().ToList();
+
+      for (int i = 0; i < regionRects.Count; i++)
+      {
+        var rect = regionRects.ElementAtOrDefault(i);
+
+        this.points[i].bounds = new Rectangle(
+          // Snaps the cursor to the center instead of bottom right (default)
+          (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
+          (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
+          rect.Value.Width,
+          rect.Value.Height
+        );
+      }
+
       var customTooltips = Customizations.Tooltips.ToList();
 
-			for (int i = 0; i < regionRects.Count; i++)
-			{
-			  var rect = regionRects.ElementAtOrDefault(i);
-
-			  this.points[i].bounds = new Rectangle(
-			    // Snaps the cursor to the center instead of bottom right (default)
-			    (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
-			    (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
-			    rect.Value.Width,
-			    rect.Value.Height
-			  );
-
-			  if (ModMain.IsSVE)
-			  {
-			    // Adventure's Guild is in a different location in SVE
-			    if (this.points[i].myID == 1025)
-			    {
-			      this.points[i].bounds = new Rectangle(mapX + 682, mapY + 451, 22, 30);
-			    }
-			    // Remove sewer which gets replaced by Adventure Guild
-			    else if (this.points[i].myID == 1018)
-			    {
-			      this.points[i].bounds.Width = 0;
-			      this.points[i].bounds.Height = 0;
-			    }
-			    // So it doesn't cover up the other new points in the railroad
-			    else if (this.points[i].myID == 1034)
-			    {
-			      this.points[i].bounds.Width /= 2;
-			    }
-			  }
-      }
-
-      int idx = 0;
-
-      // Add custom tooltips
-      for(int i = regionRects.Count; i < regionRects.Count + customTooltips.Count; i++)
+      foreach (var tooltip in customTooltips)
       {
-        var tooltip = customTooltips.ElementAtOrDefault(idx);
-        if (tooltip == null) break;
-
-        var point = new ClickableComponent(new Rectangle(
-          tooltip.bounds.X + mapX,
-          tooltip.bounds.Y + mapY,
+        var vanillaTooltip = this.points.Find(x => x.name == tooltip.name);
+        var tooltipRect = new Rectangle(
+          mapX + tooltip.bounds.X,
+          mapY + tooltip.bounds.Y,
           tooltip.bounds.Width,
           tooltip.bounds.Height
-        ), tooltip.name);
+        );
 
-        if (this.points.Count <= i)
+        // Replace vanilla with custom
+        if (vanillaTooltip != null)
         {
-          this.points.Add(point);
+          vanillaTooltip.bounds = tooltipRect;
         }
         else
+        // If new custom location, add it
         {
-          this.points[i] = point;
+          tooltip.bounds = tooltipRect;
+          this.points.Add(tooltip);
         }
-
-        idx++;
       }
+
+      // If two tooltip area overlap, the one earlier in the list takes precendence
+      // Reversing order allows custom tooltips to take precendence.
+      this.points.Reverse();
     }
 
 		public override void performHoverAction(int x, int y)
@@ -629,6 +610,7 @@ namespace NPCMapLocations
 		}
 
 		/// <summary>Get the map points to display on a map.</summary>
+		/// vanilla locations that have to be tweaked to match modified map
 		private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
 		{
 			{"Desert_Region", new Rectangle(-1, -1, 261, 175)},

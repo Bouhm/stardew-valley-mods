@@ -1,32 +1,9 @@
 {
-  "NameTooltipMode": 1,
-  "ImmersionOption": 1,
-  "ByHeartLevel": false,
-  "HeartLevelMin": 0,
-  "HeartLevelMax": 0,
-  "OnlySameLocation": false,
-  "ShowHiddenVillagers": false,
-  "MarkQuests": true,
-  "ShowTravelingMerchant": true,
-  "MenuKey": "Tab",
-  "TooltipKey": "Space",
-  "ShowFarmBuildings": true,
-  "ShowMinimap": false,
-  "MinimapX": 12,
-  "MinimapY": 12,
-  "MinimapWidth": 75,
-  "MinimapHeight": 45,
-  "MinimapDragKey": "LeftAlt",
-  "MinimapToggleKey": "OemPipe",
-  "MinimapBlacklist": [],
-  "MapRecolor": "",
-  "UseSeasonalMaps": true,
   "CustomNpcMarkerOffsets": {
   	"Andy": 1,
   	"Olivia": 1,
     "Victor": 0
   },
-  "NpcBlacklist": [],
   "CustomMapLocations": {
     "Farm": [
       {

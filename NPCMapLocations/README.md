@@ -24,9 +24,11 @@ Ideally, if the custom location is drawn accurately in proportion onto the map, 
 
 ## Creating an accurate map
 
-In order to most effectivly make tracking accurate for the custom location, the recommended method for drawing on the map is by using the actual tilemap of the custom location and drawing it to scale. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a screenshot of the whole tilemap of the location. Using this as a reference, you can be resize and overlay the tilemap to accurately trace it onto the map.
+Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. If you are looking to add just a few buildings or a small area, refer to [Adding location markers](#adding-location-markers).
 
-Here is a video guide on doing this part.
+In order to most effectively make tracking accurate for the custom location, the recommended method for drawing on the map is by using the actual tilemap of the custom location and drawing it to scale. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a screenshot of the whole tilemap of the location. Using this as a reference, you can be resize and overlay the tilemap to accurately trace it onto the map.
+
+Here is a video guide on how this can be done.
 
 ## Loading the custom map
 
@@ -68,7 +70,7 @@ LocationName: [
     TileX: 500,
     TileY: 450
   }
-];
+]
 ```
 
 Where `LocationName` is the name of the location. Each field between the curly brackets represents one point that maps the tile position to the pixel position on the map.
@@ -82,6 +84,8 @@ After making the changes to the config, make sure to use the [JSON validator](ht
 ## Adding location markers
 
 Users can also add markers for buildings that will display on the existing map instead of creating a custom map for them.
+
+Here is a video guide on doing this part.
 
 ## Adding location tooltips
 
