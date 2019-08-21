@@ -79,23 +79,22 @@ namespace NPCMapLocations
       foreach (var tooltip in customTooltips)
       {
         var vanillaTooltip = this.points.Find(x => x.name == tooltip.name);
-        var tooltipRect = new Rectangle(
+        var customTooltip = new ClickableComponent(new Rectangle(
           mapX + tooltip.bounds.X,
           mapY + tooltip.bounds.Y,
           tooltip.bounds.Width,
           tooltip.bounds.Height
-        );
+        ), tooltip.name);
 
         // Replace vanilla with custom
         if (vanillaTooltip != null)
         {
-          vanillaTooltip.bounds = tooltipRect;
+          vanillaTooltip = customTooltip;
         }
         else
         // If new custom location, add it
         {
-          tooltip.bounds = tooltipRect;
-          this.points.Add(tooltip);
+          this.points.Add(customTooltip);
         }
       }
 
