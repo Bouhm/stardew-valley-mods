@@ -107,7 +107,7 @@ namespace NPCMapLocations
       Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
       Customizations = new ModCustomizations(Monitor)
       {
-        LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
+        LocationTextures = File.Exists(@"assets/customlocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customlocations.png") : null
       };
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
