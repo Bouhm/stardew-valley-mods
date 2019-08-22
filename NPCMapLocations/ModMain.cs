@@ -19,6 +19,7 @@ namespace NPCMapLocations
     public static CustomData CustomData;
     public static IModHelper Helper;
     public static SButton HeldKey;
+    public static Texture2D Map;
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -69,6 +70,7 @@ namespace NPCMapLocations
       if (useRecolor)
         Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
+      Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
       return map;
     }
 
@@ -248,7 +250,7 @@ namespace NPCMapLocations
                  (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
                  Game1.activeClickableMenu == null)
         {
-          Minimap.HandleMouseDown();
+          MouseUtil.HandleMouseDown(Minimap.HandleMouseDown);
           if (Minimap.isBeingDragged)
             Helper.Input.Suppress(e.Button);
         }
@@ -281,7 +283,7 @@ namespace NPCMapLocations
       if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
       {
         if (Game1.activeClickableMenu == null)
-          Minimap.HandleMouseRelease();
+          MouseUtil.HandleMouseDown(Minimap.HandleMouseRelease);
         else if (Game1.activeClickableMenu is ModMenu)
           Minimap.Resize();
       }

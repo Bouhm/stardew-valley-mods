@@ -27,14 +27,13 @@ namespace NPCMapLocations
 	  private readonly ModCustomizations Customizations;
 		private string hoveredNames = "";
 		private string hoveredLocationText = "";
-		private Texture2D map;
 		private int mapX;
 		private int mapY;
 		private bool hasIndoorCharacter;
 		private Vector2 indoorIconVector;
 		private bool drawPamHouseUpgrade;
 
-    // Map menu that uses modified map page and modified component locations for hover
+    // Map menu that uses modified ModMain.Map page and modified component locations for hover
     public ModMapPage(
       HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, bool> conditionalNpcs,
@@ -53,9 +52,8 @@ namespace NPCMapLocations
 			this.BuildingMarkers = buildingMarkers;
 		  this.Customizations = customizations;
 
-      map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(map.Bounds.Width * 4, 720, 0, 0);
+			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
 			mapX = (int) center.X;
 			mapY = (int) center.Y;
 
@@ -276,31 +274,32 @@ namespace NPCMapLocations
 					Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
 		}
 
-		// Draw map to cover base rendering 
+		// Draw ModMain.Map to cover base rendering 
 		public void DrawMap(SpriteBatch b)
 		{
 			int boxY = mapY - 96;
 			int mY = mapY;
-			Game1.drawDialogueBox(mapX - 32, boxY, (map.Bounds.Width + 16) * 4, 848, false, true, null, false);
-			b.Draw(map, new Vector2((float) mapX, (float) mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
+
+			Game1.drawDialogueBox(mapX - 32, boxY, (ModMain.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
+			b.Draw(ModMain.Map, new Vector2((float) mapX, (float) mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
 			switch (Game1.whichFarm)
 			{
 				case 1:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 2:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 3:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 4:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 			}
@@ -308,7 +307,7 @@ namespace NPCMapLocations
 			if (drawPamHouseUpgrade)
 			{
 			  var houseLoc = ModMain.LocationToMap("Trailer_Big");
-				b.Draw(map,
+				b.Draw(ModMain.Map,
 					new Vector2((float) (mapX + houseLoc.X - 13),
 						(float) (mapY + houseLoc.Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
@@ -525,7 +524,7 @@ namespace NPCMapLocations
       }
 		}
 
-		// Draw NPC name tooltips map page
+		// Draw NPC name tooltips ModMain.Map page
 		public void DrawNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
 		{
 			if (hoveredNames.Equals("")) return;
@@ -608,8 +607,8 @@ namespace NPCMapLocations
 				0f);
 		}
 
-		/// <summary>Get the map points to display on a map.</summary>
-		/// vanilla locations that have to be tweaked to match modified map
+		/// <summary>Get the ModMain.Map points to display on a ModMain.Map.</summary>
+		/// vanilla locations that have to be tweaked to match modified ModMain.Map
 		private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
 		{
 			{"Desert_Region", new Rectangle(-1, -1, 261, 175)},

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using System;
 
 // Library for methods that get tile position, map position, drag and drop position
 // based on the location of the cursor
@@ -25,17 +26,21 @@ internal class MouseUtil
   }
 
   // Handle mouse down for beginning of drag and drop action
-  public static void HandleMouseDown()
+  // Accepts a callback function as an argument
+  public static void HandleMouseDown(Action fn = null)
   {
     IsMouseHeldDown = true;
     BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+    fn();
   }
 
   // Handle mouse release for end of drag and drop action
-  public static void HandleMouseRelease()
+  // Accepts a callback function as an argument
+  public static void HandleMouseRelease(Action fn = null)
   {
     IsMouseHeldDown = false;
     EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+    fn();
   }
 
   // Return Rectangle of drag and drop area
