@@ -254,6 +254,13 @@ namespace NPCMapLocations
           if (MouseUtil.IsMouseHeldDown)
             Helper.Input.Suppress(e.Button);
         }
+        else if
+          (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+        {
+          MouseUtil.HandleMouseDown();
+          if (MouseUtil.IsMouseHeldDown)
+            Helper.Input.Suppress(e.Button);
+        }
       }
 
       // Minimap toggle
@@ -286,6 +293,11 @@ namespace NPCMapLocations
           MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
         else if (Game1.activeClickableMenu is ModMenu)
           Minimap.Resize();
+      }
+      else if
+        (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      {
+        MouseUtil.HandleMouseRelease();
       }
     }
 
@@ -926,8 +938,9 @@ namespace NPCMapLocations
       //          : Color.White);
 
       // Show tile position of tile at cursor
+      var tilePos = MouseUtil.GetTilePositionAtCursor();
       DrawText(locationText, new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-      DrawText($"Tile Position: ({Game1.currentCursorTile.X}, {Game1.currentCursorTile.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.White);
+      DrawText($"Tile Position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.White);
 
 
       var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
@@ -954,11 +967,43 @@ namespace NPCMapLocations
       // If map is open, show map position at cursor
       if (isModMapOpen)
       {
-        Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(Game1.content.Load<Texture2D>("LooseSprites\\map").Bounds.Width * 4, 720, 0, 0);
-        var mapX = center.X;
-        var mapY = center.Y;
+        int borderWidth = 4;
+        float borderOpacity = 0.65f;
+        Vector2 mapPos = MouseUtil.GetMapPositionAtCursor();
 
-        DrawText($"Map Position: ({Math.Floor(Game1.getMousePosition().X - mapX)}, {Math.Floor(Game1.getMousePosition().Y - mapY)})",
+        var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
+        tex.SetData(new Color[] { Color.Red });
+
+        // Draw drag and drop area
+        if (MouseUtil.IsMouseHeldDown)
+        {
+          // Draw dragging box
+          DrawBorder(tex,
+            MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
+        }
+        else
+        {
+          // Draw drag and drop box
+          DrawBorder(tex,
+            MouseUtil.GetDragAndDropArea(),
+            borderWidth, Color.White * borderOpacity);
+
+          // Make points more distinct
+          Game1.spriteBatch.Draw(tex,
+            new Rectangle((int)MouseUtil.BeginMousePosition.X - borderWidth / 2, (int)MouseUtil.BeginMousePosition.Y - borderWidth / 2, borderWidth * 2, borderWidth * 2),
+            Rectangle.Empty, Color.White);
+
+          Game1.spriteBatch.Draw(tex,
+            new Rectangle((int)MouseUtil.EndMousePosition.X - borderWidth*3/2, (int)MouseUtil.EndMousePosition.Y - borderWidth*3/2, borderWidth*2, borderWidth * 2),
+            Rectangle.Empty, Color.White);
+        }
+
+        // Draw point at cursor on map
+        Game1.spriteBatch.Draw(tex,
+          new Rectangle(Game1.getMouseX() - borderWidth/2, Game1.getMouseY() - borderWidth/2, borderWidth * 2, borderWidth * 2),
+          Rectangle.Empty, Color.White);
+
+        DrawText($"Map Position: ({mapPos.X}, {mapPos.Y})",
           new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.White);
       }
     }
@@ -971,6 +1016,28 @@ namespace NPCMapLocations
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
+    }
+
+    // Draw rectangle border
+    private static void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
+    {
+      // Draw top line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X, rect.Y, rect.Width, borderWidth), color);
+
+      // Draw left line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X, rect.Y, borderWidth, rect.Height), color);
+
+      // Draw right line
+      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth),
+        rect.Y,
+        borderWidth,
+        rect.Height), color);
+
+      // Draw bottom line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X,
+        rect.Y + rect.Height - borderWidth,
+        rect.Width,
+        borderWidth), color);
     }
   }
 

@@ -29,10 +29,9 @@ internal class MouseUtil
   // Accepts a callback function as an argument
   public static void HandleMouseDown(Action fn = null)
   {
-    EndMousePosition = Vector2.Zero;
     IsMouseHeldDown = true;
     BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-    fn();
+    fn?.Invoke();
   }
 
   // Handle mouse release for end of drag and drop action
@@ -40,8 +39,14 @@ internal class MouseUtil
   public static void HandleMouseRelease(Action fn = null)
   {
     IsMouseHeldDown = false;
-    EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-    fn();
+    EndMousePosition = new Vector2(Game1.getMouseX()+4, Game1.getMouseY()+4);
+    fn?.Invoke();
+  }
+
+  // Return Rectangle of current dragging area
+  public static Rectangle GetCurrentDraggingArea()
+  {
+    return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() + 4 - BeginMousePosition.X), (int)(Game1.getMouseY() + 4 - BeginMousePosition.Y));
   }
 
   // Return Rectangle of drag and drop area
