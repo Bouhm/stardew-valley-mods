@@ -116,7 +116,8 @@ namespace NPCMapLocations
       shouldShowMinimap = Config.ShowMinimap;
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations) { 
+      foreach (var location in Game1.locations)
+      {
         LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
       }
 
@@ -262,7 +263,7 @@ namespace NPCMapLocations
 
       // ModMenu
       if (Game1.activeClickableMenu is GameMenu)
-        HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
+        HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
       if (DEBUG_MODE && e.Button == SButton.LeftAlt) HeldKey = e.Button;
 
@@ -335,7 +336,7 @@ namespace NPCMapLocations
             ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(100162);
             break;
           case "Merchant":
-            ConditionalNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+            ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
             break;
           case "Sandy":
             ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
@@ -390,7 +391,7 @@ namespace NPCMapLocations
         NpcMarkers.Add(npcMarker);
       }
 
-      
+
       if (Context.IsMultiplayer)
         FarmerMarkers = new Dictionary<long, CharacterMarker>();
     }
@@ -417,7 +418,7 @@ namespace NPCMapLocations
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });
         }
-       
+
         // Check season change (for when it's changed via console)
         if (Config.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
         {
@@ -523,7 +524,7 @@ namespace NPCMapLocations
         Customizations
       );
     }
- 
+
     private void UpdateMarkers(bool forceUpdate = false)
     {
       if (isModMapOpen || forceUpdate)
@@ -568,7 +569,7 @@ namespace NPCMapLocations
           npcMarker.IsOutdoors = false;
         }
 
-      // For show Npcs in player's location option
+        // For show Npcs in player's location option
         var isSameLocation = false;
         if (Config.OnlySameLocation)
         {
@@ -608,16 +609,16 @@ namespace NPCMapLocations
               switch (quest.questType.Value)
               {
                 case 3:
-                  npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 4:
-                  npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 7:
-                  npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 10:
-                  npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
               }
             else
@@ -645,8 +646,8 @@ namespace NPCMapLocations
           if (npcMarker.SyncedLocationName == null)
           {
             // Get center of NPC marker 
-            var x = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
-            var y = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
+            var x = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
+            var y = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
             npcMarker.MapLocation = new Vector2(x, y);
           }
         }
@@ -780,7 +781,7 @@ namespace NPCMapLocations
       }
 
       if (locVectors == null || locationNotFound) return Vector2.Zero;
-      
+
       int x;
       int y;
 
@@ -832,14 +833,14 @@ namespace NPCMapLocations
         if (upper == null)
           upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-        x = (int) MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
-        y = (int) MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
+        x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
+        y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
 
-        if (DEBUG_MODE && isPlayer)
-        {
-          _tileUpper = new Vector2(upper.TileX, upper.TileY);
-          _tileLower = new Vector2(lower.TileX, lower.TileY);
-        }
+        //        if (DEBUG_MODE && isPlayer)
+        //        {
+        //          _tileUpper = new Vector2(upper.TileX, upper.TileY);
+        //          _tileLower = new Vector2(lower.TileX, lower.TileY);
+        //        }
       }
 
       return new Vector2(x, y);
@@ -869,7 +870,7 @@ namespace NPCMapLocations
 
       // Hide minimap in blacklisted locations with special case for Mines as usual
       shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
-       
+
       // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }
@@ -879,11 +880,11 @@ namespace NPCMapLocations
       if (Context.IsWorldReady && Config.ShowMinimap && shouldShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
-      if (DEBUG_MODE && HeldKey == SButton.LeftAlt)
+      if (DEBUG_MODE)
         Game1.spriteBatch.Draw(Game1.mouseCursors,
           new Vector2(
-            Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
-            Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
+            Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
+            Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
           new Rectangle(448, 128, 64, 64), Color.White);
     }
 
@@ -910,37 +911,53 @@ namespace NPCMapLocations
         Color.Black);
 
       // Show map location and tile positions
-      DrawText(
-        locationText,
-        new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-      DrawText(
-        "Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " +
-        Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")",
-        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8),
-        _tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X ||
-                                       Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)
-          ? Color.Red
-          : Color.White);
+      //      DrawText(
+      //        locationText,
+      //        new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+      //      DrawText(
+      //        "Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " +
+      //        Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")",
+      //        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8),
+      //        _tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X ||
+      //                                       Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)
+      //          ? Color.Red
+      //          : Color.White);
 
-      var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu) Game1.activeClickableMenu : null;
+      // Show tile position of tile at cursor
+      DrawText(locationText, new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+      DrawText($"Tile Position: ({Game1.currentCursorTile.X}, {Game1.currentCursorTile.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.White);
+
+
+      var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
 
       // Show lower & upper bound tiles used for calculations
-      if (!(_tileLower == Vector2.Zero && _tileUpper == Vector2.Zero))
+      //      if (!(_tileLower == Vector2.Zero && _tileUpper == Vector2.Zero))
+      //      {
+      //        if (isModMapOpen || Config.ShowMinimap)
+      //        {
+      //          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
+      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
+      //          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3));
+      //        }
+      //        else
+      //        {
+      //          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
+      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
+      //          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
+      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), Color.DimGray);
+      //        }
+      //      }
+
+      // If map is open, show map position at cursor
+      if (isModMapOpen)
       {
-        if (isModMapOpen || Config.ShowMinimap)
-        {
-          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
-          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3));
-        }
-        else
-        {
-          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
-          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), Color.DimGray);
-        }
+        Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(Game1.content.Load<Texture2D>("LooseSprites\\map").Bounds.Width * 4, 720, 0, 0);
+        var mapX = center.X;
+        var mapY = center.Y;
+      
+        DrawText($"Map Position: ({Math.Floor(Game1.getMousePosition().X - mapX)}, {Math.Floor(Game1.getMousePosition().Y - mapY)})",
+          new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.White);
       }
     }
 

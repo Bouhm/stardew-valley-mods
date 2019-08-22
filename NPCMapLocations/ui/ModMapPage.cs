@@ -98,8 +98,8 @@ namespace NPCMapLocations
         }
       }
 
-      // If two tooltip area overlap, the one earlier in the list takes precendence
-      // Reversing order allows custom tooltips to take precendence.
+      // If two tooltip areas overlap, the one earlier in the list takes precendence
+      // Reversing order allows custom tooltips to take precendence
       this.points.Reverse();
     }
 
