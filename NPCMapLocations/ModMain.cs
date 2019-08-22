@@ -427,8 +427,8 @@ namespace NPCMapLocations
           {
             if (npc == null || npc.currentLocation == null) continue;
             message.AddNpcLocation(npc.Name,
-              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(),
-                npc.getTileY()));
+              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X,
+                npc.Position.Y));
           }
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });
@@ -498,10 +498,11 @@ namespace NPCMapLocations
             marker.SyncedLocationName = npcLoc.LocationName;
             if (!marker.IsHidden)
             {
-              var mapLocation = LocationToMap(npcLoc.LocationName, npcLoc.TileX, npcLoc.TileY, Customizations.MapVectors);
+              var mapLocation = LocationToMap(npcLoc.LocationName, (int)Math.Floor(npcLoc.X/Game1.tileSize), (int)Math.Floor(npcLoc.Y/Game1.tileSize), Customizations.MapVectors);
               marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
             }
           }
+         
           else
           {
             marker.MapLocation = Vector2.Zero;
