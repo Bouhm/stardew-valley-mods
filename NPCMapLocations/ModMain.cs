@@ -114,7 +114,8 @@ namespace NPCMapLocations
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 
-      DEBUG_MODE = CustomData.DEBUG_MODE;
+      // Disable for multiplayer for anti-cheat
+      DEBUG_MODE = CustomData.DEBUG_MODE && !Context.IsMultiplayer;
       shouldShowMinimap = Config.ShowMinimap;
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
