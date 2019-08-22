@@ -872,6 +872,7 @@ namespace NPCMapLocations
     private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
+      MouseUtil.Reset();
 
       // Check for resize after mod menu closed
       if (e.OldMenu is ModMenu)
@@ -916,73 +917,43 @@ namespace NPCMapLocations
     {
       if (Game1.player.currentLocation == null) return;
       string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-      string locationText =
-        $"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})";
-
-      // Black background for legible text
-      Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 200 + (int)Game1.smallFont
-                                                                        .MeasureString(locationText).X, 200), new Rectangle(3, 0, 1, 1),
-        Color.Black);
-
-      // Show map location and tile positions
-      //      DrawText(
-      //        locationText,
-      //        new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-      //      DrawText(
-      //        "Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " +
-      //        Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")",
-      //        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8),
-      //        _tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X ||
-      //                                       Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)
-      //          ? Color.Red
-      //          : Color.White);
-
-      // Show tile position of tile at cursor
-      var tilePos = MouseUtil.GetTilePositionAtCursor();
-      DrawText(locationText, new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-      DrawText($"Tile Position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8), Color.White);
-
+      var textHeight = (int)Game1.dialogueFont
+        .MeasureString("()").Y-6;
+     
 
       var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
-
-      // Show lower & upper bound tiles used for calculations
-      //      if (!(_tileLower == Vector2.Zero && _tileUpper == Vector2.Zero))
-      //      {
-      //        if (isModMapOpen || Config.ShowMinimap)
-      //        {
-      //          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
-      //          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3));
-      //        }
-      //        else
-      //        {
-      //          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
-      //          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-      //            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), Color.DimGray);
-      //        }
-      //      }
-
+     
       // If map is open, show map position at cursor
       if (isModMapOpen)
       {
         int borderWidth = 4;
         float borderOpacity = 0.65f;
         Vector2 mapPos = MouseUtil.GetMapPositionAtCursor();
+        Rectangle bounds = MouseUtil.GetDragAndDropArea();
 
         var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
         tex.SetData(new Color[] { Color.Red });
+
+        // Draw point at cursor on map
+        Game1.spriteBatch.Draw(tex,
+          new Rectangle(Game1.getMouseX() - borderWidth / 2, Game1.getMouseY() - borderWidth / 2, borderWidth * 2, borderWidth * 2),
+          Rectangle.Empty, Color.White);
+
+        // Show map pixel position at cursor
+        DrawText($"Map position: ({mapPos.X}, {mapPos.Y})",
+          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 
         // Draw drag and drop area
         if (MouseUtil.IsMouseHeldDown)
         {
           // Draw dragging box
           DrawBorder(tex,
-            MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
+          MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
         }
         else
         {
+          if (MouseUtil.BeginMousePosition.X < 0 && MouseUtil.EndMousePosition.X < 0) return;
+
           // Draw drag and drop box
           DrawBorder(tex,
             MouseUtil.GetDragAndDropArea(),
@@ -996,21 +967,45 @@ namespace NPCMapLocations
           Game1.spriteBatch.Draw(tex,
             new Rectangle((int)MouseUtil.EndMousePosition.X - borderWidth*3/2, (int)MouseUtil.EndMousePosition.Y - borderWidth*3/2, borderWidth*2, borderWidth * 2),
             Rectangle.Empty, Color.White);
+
+          // Show first point of DnD box
+          DrawText($"Lower bound: ({bounds.X}, {bounds.Y})",
+            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+
+          // Show second point of DnD box
+          DrawText($"Upper bound: ({bounds.X + bounds.Width}, {bounds.Y + bounds.Height})",
+            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
+
+          // Show width of DnD box
+          DrawText($"Width: {bounds.Width}",
+            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
+
+          // Show height of DnD box
+          DrawText($"Height: {bounds.Height}",
+            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
         }
-
-        // Draw point at cursor on map
-        Game1.spriteBatch.Draw(tex,
-          new Rectangle(Game1.getMouseX() - borderWidth/2, Game1.getMouseY() - borderWidth/2, borderWidth * 2, borderWidth * 2),
-          Rectangle.Empty, Color.White);
-
-        DrawText($"Map Position: ({mapPos.X}, {mapPos.Y})",
-          new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.White);
+      }
+      else
+      {
+        // Show tile position of tile at cursor
+        var tilePos = MouseUtil.GetTilePositionAtCursor();
+        DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 ), Color.White);
+        DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize /4 +textHeight), Color.White);
       }
     }
 
     // Draw outlined text
     private static void DrawText(string text, Vector2 pos, Color? color = null)
     {
+      var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
+      tex.SetData(new Color[] { Color.Black * 0.75f });
+
+      // Dark background for clearer text
+      Game1.spriteBatch.Draw(tex, new Rectangle((int)pos.X, (int)pos.Y, (int)Game1.dialogueFont
+                                                                        .MeasureString(text).X, (int)Game1.dialogueFont
+          .MeasureString("()").Y-6), Rectangle.Empty,
+        Color.Black);
+
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);

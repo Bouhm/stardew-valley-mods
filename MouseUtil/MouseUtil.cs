@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NPCMapLocations;
 using StardewValley;
 using System;
+using Newtonsoft.Json.Schema;
 
 // Library for methods that get tile position, map position, drag and drop position
 // based on the location of the cursor
@@ -11,6 +12,13 @@ internal class MouseUtil
   public static Vector2 BeginMousePosition { get; set; }
   public static Vector2 EndMousePosition { get; set; }
   public static bool IsMouseHeldDown { get; set; }
+
+  public static void Reset()
+  {
+    BeginMousePosition = new Vector2(-1000, -1000);
+    EndMousePosition = new Vector2(-1000, -1000);
+    IsMouseHeldDown = false;
+  }
 
   // Return Vector2 position of tile at cursor
   public static Vector2 GetTilePositionAtCursor()
