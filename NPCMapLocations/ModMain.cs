@@ -969,11 +969,11 @@ namespace NPCMapLocations
             Rectangle.Empty, Color.White);
 
           // Show first point of DnD box
-          DrawText($"Lower bound: ({bounds.X}, {bounds.Y})",
+          DrawText($"Top-left: ({bounds.X}, {bounds.Y})",
             new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
 
           // Show second point of DnD box
-          DrawText($"Upper bound: ({bounds.X + bounds.Width}, {bounds.Y + bounds.Height})",
+          DrawText($"Bot-right: ({bounds.X + bounds.Width}, {bounds.Y + bounds.Height})",
             new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
 
           // Show width of DnD box
