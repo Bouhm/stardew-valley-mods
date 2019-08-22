@@ -18,12 +18,8 @@
   "MinimapBlacklist": [],
   "MenuKey": "Tab",
   "TooltipKey": "Space",
-  "MinimapDragKey": "LeftAlt",
+  "MinimapDragKey": "LeftControl",
   "MinimapToggleKey": "OemPipe",
   "CustomNpcMarkerOffsets": {},
-  "ShowFarmBuildings": true,
-  "CustomMapLocations": {},
-  "CustomMapTextures": {},
-  "CustomMapTooltips": {},
-  "DEBUG_MODE": false
+  "ShowFarmBuildings": true
 }

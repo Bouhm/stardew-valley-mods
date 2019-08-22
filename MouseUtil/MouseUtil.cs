@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NPCMapLocations;
 using StardewValley;
 using System;
 
@@ -10,7 +11,6 @@ internal class MouseUtil
   public static Vector2 BeginMousePosition { get; set; }
   public static Vector2 EndMousePosition { get; set; }
   public static bool IsMouseHeldDown { get; set; }
-  public static Texture2D Map { get; set; }
 
   // Return Vector2 position of tile at cursor
   public static Vector2 GetTilePositionAtCursor()
@@ -21,7 +21,7 @@ internal class MouseUtil
   // Return Vector2 position of pixel position on the map at cursor
   public static Vector2 GetMapPositionAtCursor()
   {
-    Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(Map.Bounds.Width * 4, 720, 0, 0);
+    Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
     return new Vector2((int)Game1.getMousePosition().X - mapPos.X, (int)Game1.getMousePosition().Y - mapPos.Y);
   }
 
@@ -29,6 +29,7 @@ internal class MouseUtil
   // Accepts a callback function as an argument
   public static void HandleMouseDown(Action fn = null)
   {
+    EndMousePosition = Vector2.Zero;
     IsMouseHeldDown = true;
     BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
     fn();

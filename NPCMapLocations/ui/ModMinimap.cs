@@ -16,7 +16,6 @@ namespace NPCMapLocations
 	  private readonly Dictionary<long, CharacterMarker> FarmerMarkers;
 	  private readonly ModCustomizations Customizations;
 
-    public bool isBeingDragged;
 	  private Vector2 prevCenter;
 	  private Vector2 center; // Center position of minimap
 	  private float cropX; // Top-left position of crop on ModMain.Map
@@ -200,6 +199,7 @@ namespace NPCMapLocations
       // b.spriteBatch.End()
       // b.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
 
+		  if (ModMain.Map == null) return;
 		  b.Draw(ModMain.Map, new Vector2(offsetMmX, mmY),
 				new Rectangle((int) Math.Floor(cropX / Game1.pixelZoom),
 					(int) Math.Floor(cropY / Game1.pixelZoom), mmWidth / Game1.pixelZoom + 2,
@@ -207,7 +207,7 @@ namespace NPCMapLocations
 				4f, SpriteEffects.None, 0.86f);
 
       // Don't draw markers while being dragged
-		  if (!isBeingDragged)
+		  if (!MouseUtil.IsMouseHeldDown)
 		  {
 		    // When minimap is moved, redraw markers after recalculating & repositioning
 		    if (drawDelay == 0)

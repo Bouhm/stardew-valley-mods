@@ -70,7 +70,6 @@ namespace NPCMapLocations
       if (useRecolor)
         Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
-      Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
       return map;
     }
 
@@ -113,6 +112,7 @@ namespace NPCMapLocations
       };
       Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
+      Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 
       DEBUG_MODE = CustomData.DEBUG_MODE;
       shouldShowMinimap = Config.ShowMinimap;
@@ -250,8 +250,8 @@ namespace NPCMapLocations
                  (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
                  Game1.activeClickableMenu == null)
         {
-          MouseUtil.HandleMouseDown(Minimap.HandleMouseDown);
-          if (Minimap.isBeingDragged)
+          MouseUtil.HandleMouseDown(() => Minimap.HandleMouseDown());
+          if (MouseUtil.IsMouseHeldDown)
             Helper.Input.Suppress(e.Button);
         }
       }
@@ -267,9 +267,9 @@ namespace NPCMapLocations
       if (Game1.activeClickableMenu is GameMenu)
         HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
-      if (DEBUG_MODE && e.Button == SButton.LeftAlt) HeldKey = e.Button;
+      if (DEBUG_MODE && e.Button == SButton.LeftControl) HeldKey = e.Button;
 
-      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftAlt && e.Button.Equals(SButton.MouseRight))
+      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftControl && e.Button.Equals(SButton.MouseRight))
         Game1.player.setTileLocation(Game1.currentCursorTile);
     }
 
@@ -277,13 +277,13 @@ namespace NPCMapLocations
     {
       if (!Context.IsWorldReady) return;
       if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey) ||
-          HeldKey == SButton.LeftAlt && e.Button != SButton.MouseRight)
+          HeldKey == SButton.LeftControl && e.Button != SButton.MouseRight)
         HeldKey = SButton.None;
 
       if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
       {
         if (Game1.activeClickableMenu == null)
-          MouseUtil.HandleMouseDown(Minimap.HandleMouseRelease);
+          MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
         else if (Game1.activeClickableMenu is ModMenu)
           Minimap.Resize();
       }
@@ -957,7 +957,7 @@ namespace NPCMapLocations
         Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(Game1.content.Load<Texture2D>("LooseSprites\\map").Bounds.Width * 4, 720, 0, 0);
         var mapX = center.X;
         var mapY = center.Y;
-      
+
         DrawText($"Map Position: ({Math.Floor(Game1.getMousePosition().X - mapX)}, {Math.Floor(Game1.getMousePosition().Y - mapY)})",
           new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.White);
       }
