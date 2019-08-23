@@ -928,8 +928,8 @@ namespace NPCMapLocations
       // If map is open, show map position at cursor
       if (isModMapOpen)
       {
-        int borderWidth = 4;
-        float borderOpacity = 0.65f;
+        int borderWidth = 3;
+        float borderOpacity = 0.75f;
         Vector2 mapPos = MouseUtil.GetMapPositionAtCursor();
         Rectangle bounds = MouseUtil.GetDragAndDropArea();
 
@@ -938,7 +938,7 @@ namespace NPCMapLocations
 
         // Draw point at cursor on map
         Game1.spriteBatch.Draw(tex,
-          new Rectangle(Game1.getMouseX() - borderWidth / 2, Game1.getMouseY() - borderWidth / 2, borderWidth * 2, borderWidth * 2),
+          new Rectangle(Game1.getMouseX() - (int)(borderWidth/2), Game1.getMouseY() - (int)(borderWidth/2), borderWidth, borderWidth),
           Rectangle.Empty, Color.White);
 
         // Show map pixel position at cursor
@@ -950,7 +950,7 @@ namespace NPCMapLocations
         {
           // Draw dragging box
           DrawBorder(tex,
-          MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
+           MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
         }
         else
         {
@@ -958,33 +958,44 @@ namespace NPCMapLocations
 
           // Draw drag and drop box
           DrawBorder(tex,
-            MouseUtil.GetDragAndDropArea(),
+            bounds,
             borderWidth, Color.White * borderOpacity);
 
           // Make points more distinct
-          Game1.spriteBatch.Draw(tex,
-            new Rectangle((int)MouseUtil.BeginMousePosition.X - borderWidth / 2, (int)MouseUtil.BeginMousePosition.Y - borderWidth / 2, borderWidth * 2, borderWidth * 2),
-            Rectangle.Empty, Color.White);
+//          Game1.spriteBatch.Draw(tex,
+//            new Rectangle((int)MouseUtil.BeginMousePosition.X, (int)MouseUtil.BeginMousePosition.Y, borderWidth, borderWidth),
+//            Rectangle.Empty, Color.White);
+//
+//          Game1.spriteBatch.Draw(tex,
+//            new Rectangle((int)MouseUtil.EndMousePosition.X, (int)MouseUtil.EndMousePosition.Y, borderWidth, borderWidth),
+//            Rectangle.Empty, Color.White);
 
-          Game1.spriteBatch.Draw(tex,
-            new Rectangle((int)MouseUtil.EndMousePosition.X - borderWidth*3/2, (int)MouseUtil.EndMousePosition.Y - borderWidth*3/2, borderWidth*2, borderWidth * 2),
-            Rectangle.Empty, Color.White);
+          var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
 
-          // Show first point of DnD box
-          DrawText($"Top-left: ({bounds.X}, {bounds.Y})",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+          if (mapBounds.Width == 0 && mapBounds.Height == 0)
+          {
+            // Show point
+            DrawText($"Point: ({mapBounds.X}, {mapBounds.Y})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+          }
+          else
+          {
+            // Show first point of DnD box
+            DrawText($"Top-left: ({mapBounds.X}, {mapBounds.Y})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
 
-          // Show second point of DnD box
-          DrawText($"Bot-right: ({bounds.X + bounds.Width}, {bounds.Y + bounds.Height})",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
+            // Show second point of DnD box
+            DrawText($"Bot-right: ({mapBounds.X + mapBounds.Width}, {mapBounds.Y + mapBounds.Height})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
 
-          // Show width of DnD box
-          DrawText($"Width: {bounds.Width}",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
+            // Show width of DnD box
+            DrawText($"Width: {mapBounds.Width}",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
 
-          // Show height of DnD box
-          DrawText($"Height: {bounds.Height}",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
+            // Show height of DnD box
+            DrawText($"Height: {mapBounds.Height}",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
+          }
         }
       }
       else
@@ -1003,10 +1014,16 @@ namespace NPCMapLocations
       tex.SetData(new Color[] { Color.Black * 0.75f });
 
       // Dark background for clearer text
-      Game1.spriteBatch.Draw(tex, new Rectangle((int)pos.X, (int)pos.Y, (int)Game1.dialogueFont
-                                                                        .MeasureString(text).X, (int)Game1.dialogueFont
-          .MeasureString("()").Y-6), Rectangle.Empty,
-        Color.Black);
+      Game1.spriteBatch.Draw(
+        tex,
+        new Rectangle(
+          (int)pos.X,
+          (int)pos.Y,
+          (int)Game1.dialogueFont.MeasureString(text).X,
+          (int)Game1.dialogueFont.MeasureString("()").Y-6),
+        Rectangle.Empty,
+        Color.Black
+       );
 
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
@@ -1019,21 +1036,21 @@ namespace NPCMapLocations
     private static void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
     {
       // Draw top line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X, rect.Y, rect.Width, borderWidth), color);
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, rect.Width+3, borderWidth), color);
 
       // Draw left line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X, rect.Y, borderWidth, rect.Height), color);
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, borderWidth, rect.Height+3), color);
 
       // Draw right line
-      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth),
-        rect.Y,
+      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth+2),
+        rect.Y-1,
         borderWidth,
-        rect.Height), color);
+        rect.Height+3), color);
 
       // Draw bottom line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X,
-        rect.Y + rect.Height - borderWidth,
-        rect.Width,
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1,
+        rect.Y + rect.Height - borderWidth+2,
+        rect.Width+3,
         borderWidth), color);
     }
   }

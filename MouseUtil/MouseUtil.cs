@@ -30,7 +30,7 @@ internal class MouseUtil
   public static Vector2 GetMapPositionAtCursor()
   {
     Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
-    return new Vector2((int)Game1.getMousePosition().X - mapPos.X, (int)Game1.getMousePosition().Y - mapPos.Y);
+    return new Vector2((int)(Math.Ceiling(Game1.getMousePosition().X - mapPos.X)), (int)(Math.Ceiling(Game1.getMousePosition().Y - mapPos.Y)));
   }
 
   // Handle mouse down for beginning of drag and drop action
@@ -47,19 +47,26 @@ internal class MouseUtil
   public static void HandleMouseRelease(Action fn = null)
   {
     IsMouseHeldDown = false;
-    EndMousePosition = new Vector2(Game1.getMouseX()+4, Game1.getMouseY()+4);
+    EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
     fn?.Invoke();
   }
 
   // Return Rectangle of current dragging area
   public static Rectangle GetCurrentDraggingArea()
   {
-    return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() + 4 - BeginMousePosition.X), (int)(Game1.getMouseY() + 4 - BeginMousePosition.Y));
+    return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
   }
 
   // Return Rectangle of drag and drop area
   public static Rectangle GetDragAndDropArea()
   {
     return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+  }
+
+  // Convert absolute positions to map positions
+  public static Rectangle GetRectangleOnMap(Rectangle rect)
+  {
+    Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
+    return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
   }
 }
