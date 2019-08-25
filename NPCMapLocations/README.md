@@ -15,6 +15,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 - [Adding location markers](#adding-location-markers)
 - [Adding location tooltips](#adding-location-tooltips)
 - [See also](#see-also)
+- [Get additional help](#get-additional-help)
 
 ## How tracking works
 
@@ -28,7 +29,16 @@ Creating a custom map is recommended if you are looking to add/modify a lot of a
 
 In order to most effectively make tracking accurate for the custom location, the recommended method for drawing on the map is by using the actual tilemap of the custom location and drawing it to scale. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a screenshot of the whole tilemap of the location. Using this as a reference, you can be resize and overlay the tilemap to accurately trace it onto the map.
 
-Here is a video guide on how this can be done.
+Here are the steps I take to create accurate modifications:
+
+1. Get a screenshot of the tilemap using Map Image Export.
+2. Open up a graphic editing software fit for pixel art ([Paint.NET](https://www.getpaint.net/) is great for Windows).
+3. Open a NPC Map Locations map, from `"NPCMapLocations\assets\maps\_default\spring_map.png"` for example.
+4. Open the tilemap from Map Image Export. Scale it down until it is approximately the size it should be on the map.
+5. Overlay the resized tilemap onto the map, and then redraw that portion of the map accordingly. You will be essentially "tracing" the tilemap onto the map to ensure accuracy.
+6. Repeat steps 1-5 for any other custom locations.
+
+[Here is a quick video guide on the process.](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
 
 ## Loading the custom map
 
@@ -75,23 +85,34 @@ LocationName: [
 
 Where `LocationName` is the name of the location. Each field between the curly brackets represents one point that maps the tile position to the pixel position on the map.
 
+![Map](https://i.imgur.com/YgTyxKE.png)
+![Two-Points](https://i.imgur.com/J8Btvdj.png)
+![Four-Points](https://i.imgur.com/kEkgn1A.png)
+
 ### Testing and validating
 
 By turning on the `DEBUG_MODE` in the config by setting the value to true, additional information about the current locaton will be displayed in the game, including the exact name of the location and the dimensions of its tilemap. It will also give the player more freedom to move around by teleporting the player to the cursor (Alt+Right Click) to test the tracking.
 
-After making the changes to the config, make sure to use the [JSON validator](https://json.smapi.io/) to make sure the JSON is valid to prevent errors.
+After making the changes to the config, make sure to use the [JSON validator](https://json.smapi.io/) (select 'None' for JSON format) to make sure the JSON does not contain any errors.
 
 ## Adding location markers
 
 Users can also add markers for buildings that will display on the existing map instead of creating a custom map for them.
 
-Here is a video guide on doing this part.
+![Custom-Textures](https://i.imgur.com/j6DQRQR.png)
+![Texture-Overlay](https://i.imgur.com/0ADDJsb.png)
 
 ## Adding location tooltips
 
 Users can add location tooltips when the player hovers the custom location if they choose to. The format includes the name of the location, the pixel position representng the top-left corner, the width and height of the bouding box where the tooltip hover should trigger, and the primary and secondary text that should display in the tooltip.
 
+![Tooltips](https://i.imgur.com/XU4ljAR.png)
+
 ## See also
 
 - [Config that adds support for Stardew Valle Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/config/sve_config.json)
 - [My other mod that inherently supports all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
+
+## Get additional help
+
+You can reach me on [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/239) and leave a comment there, or you can ping me `@Bouhm` on the [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#modding` channel.
