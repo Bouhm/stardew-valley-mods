@@ -85,7 +85,7 @@ namespace NPCMapLocations
 
 	  public void UpdateMapForSeason()
 	  {
-	    ModMain.Map = Game1.content.Load<Texture2D>("LooseSprites\\ModMain.Map");
+	    ModMain.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
     }
 
 	  public void CheckOffsetForMap()
