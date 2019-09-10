@@ -16,10 +16,10 @@
     <None Update="assets\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="config\customdata_sve.json">
+    <None Update="config\data\customdata_sve.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="config\customdata.json">
+    <None Update="config\data\customdata.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="config\default.json">

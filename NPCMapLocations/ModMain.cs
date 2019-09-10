@@ -86,7 +86,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
-      CustomData = Helper.Data.ReadJsonFile<CustomData>("config/customdata.json") ?? new CustomData();
+      CustomData = Helper.Data.ReadJsonFile<CustomData>("config/data/customdata.json") ?? new CustomData();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
@@ -255,13 +255,15 @@ namespace NPCMapLocations
           if (MouseUtil.IsMouseHeldDown)
             Helper.Input.Suppress(e.Button);
         }
-        else if
-          (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
-        {
-          MouseUtil.HandleMouseDown();
-          if (MouseUtil.IsMouseHeldDown)
-            Helper.Input.Suppress(e.Button);
-        }
+      }
+
+      // Debug DnD
+      if
+        (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      {
+        MouseUtil.HandleMouseDown();
+        if (MouseUtil.IsMouseHeldDown)
+          Helper.Input.Suppress(e.Button);
       }
 
       // Minimap toggle
