@@ -18,11 +18,11 @@ namespace NPCMapLocations
 
 	  private Vector2 prevCenter;
 	  private Vector2 center; // Center position of minimap
-	  private float cropX; // Top-left position of crop on ModMain.Map
-	  private float cropY; // Top-left position of crop on ModMain.Map
+	  private float cropX; // Top-left position of crop on map
+	  private float cropY; // Top-left position of crop on map
     private int mmWidth; // minimap width
     private int mmHeight; // minimap height
-	  private Vector2 mmLoc; // minimap location relative to ModMain.Map location
+	  private Vector2 mmLoc; // minimap location relative to map location
     private int mmX; // top-left position of minimap relative to viewport
 		private int mmY; // top-left position of minimap relative to viewport
 	  private int offset = 0; // offset for minimap if viewport changed
@@ -106,7 +106,7 @@ namespace NPCMapLocations
     public void Update()
 		{
       // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
-      // Positions relative to the ModMain.Map (the ModMain.Map image) are not.
+      // Positions relative to the map are not.
 
 		  center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
 				Game1.player.getTileY(), Customizations.MapVectors, true);
@@ -126,12 +126,12 @@ namespace NPCMapLocations
 				new Vector2(mmX - center.X + (float) Math.Floor(mmWidth / 2.0),
 					mmY - center.Y + (float) Math.Floor(mmHeight / 2.0));
 
-			// Top-left corner of minimap cropped from the whole ModMain.Map
-			// Centered around the player's location on the ModMain.Map
+			// Top-left corner of minimap cropped from the whole map
+			// Centered around the player's location on the map
 			cropX = center.X - (float) Math.Floor(mmWidth / 2.0);
 			cropY = center.Y - (float) Math.Floor(mmHeight / 2.0);
 
-			// Handle cases when reaching edge of ModMain.Map 
+			// Handle cases when reaching edge of map 
 			// Change offsets accordingly when player is no longer centered
 			if (cropX < 0)
 			{
@@ -152,7 +152,7 @@ namespace NPCMapLocations
 				mmLoc.Y = mmY;
 				cropY = 0;
 			}
-			// Actual ModMain.Map is 1200x720 but ModMain.Map.Height includes the farms
+			// Actual map is 1200x720 but map.Height includes the farms
 			else if (cropY + mmHeight > 720)
 			{
 				center.Y = 720 - mmHeight / 2;
@@ -161,7 +161,7 @@ namespace NPCMapLocations
 			}
 		}
 
-		// Center or the player's position is used as reference; player is not center when reaching edge of ModMain.Map
+		// Center or the player's position is used as reference; player is not center when reaching edge of map
 		public void DrawMiniMap()
 		{
 		  var b = Game1.spriteBatch;
@@ -263,7 +263,7 @@ namespace NPCMapLocations
       //
       // ===== Farm types =====
       //
-      // The farms are always overlayed at (0, 43) on the ModMain.Map
+      // The farms are always overlayed at (0, 43) on the map
       // The crop position, dimensions, and overlay position must all be adjusted accordingly
       // When any part of the cropped farm is outside of the minimap as player moves
       var farmWidth = 131;
@@ -494,14 +494,14 @@ namespace NPCMapLocations
       }
 		}
 
-		// Normalize offset differences caused by ModMain.Map being 4x less precise than ModMain.Map markers 
-		// Makes the ModMain.Map and markers move together instead of markers moving more precisely (moving when minimap does not shift)
+		// Normalize offset differences caused by map being 4x less precise than ModMain.Map markers 
+		// Makes the map and markers move together instead of markers moving more precisely (moving when minimap does not shift)
 		private int NormalizeToMap(float n)
 		{
 			return (int) Math.Floor(n / Game1.pixelZoom) * Game1.pixelZoom;
 		}
 
-		// Check if within ModMain.Map
+		// Check if within map
 		private bool IsWithinMapArea(float x, float y)
 		{
 			return x > center.X - mmWidth / 2 - (Game1.tileSize / 4 + 2)
