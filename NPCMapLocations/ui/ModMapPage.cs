@@ -33,7 +33,7 @@ namespace NPCMapLocations
 		private Vector2 indoorIconVector;
 		private bool drawPamHouseUpgrade;
 
-    // Map menu that uses modified ModMain.Map page and modified component locations for hover
+    // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
       HashSet<CharacterMarker> npcMarkers,
 			Dictionary<string, bool> conditionalNpcs,
@@ -274,7 +274,7 @@ namespace NPCMapLocations
 					Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
 		}
 
-		// Draw ModMain.Map to cover base rendering 
+		// Draw map to cover base rendering 
 		public void DrawMap(SpriteBatch b)
 		{
 			int boxY = mapY - 96;
@@ -524,7 +524,7 @@ namespace NPCMapLocations
       }
 		}
 
-		// Draw NPC name tooltips ModMain.Map page
+		// Draw NPC name tooltips map page
 		public void DrawNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
 		{
 			if (hoveredNames.Equals("")) return;
@@ -607,8 +607,8 @@ namespace NPCMapLocations
 				0f);
 		}
 
-		/// <summary>Get the ModMain.Map points to display on a ModMain.Map.</summary>
-		/// vanilla locations that have to be tweaked to match modified ModMain.Map
+		/// <summary>Get the ModMain.Map points to display on a map.</summary>
+		/// vanilla locations that have to be tweaked to match modified map
 		private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
 		{
 			{"Desert_Region", new Rectangle(-1, -1, 261, 175)},

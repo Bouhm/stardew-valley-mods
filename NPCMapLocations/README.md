@@ -14,12 +14,13 @@ This documentation is for adding support for custom locations with **NPC Map Loc
   - [Testing and validating](#testing-and-validating)
 - [Adding location markers](#adding-location-markers)
 - [Adding location tooltips](#adding-location-tooltips)
+- [Example](#example)
 - [See also](#see-also)
 - [Get additional help](#get-additional-help)
 
 ## How tracking works
 
-For an outdoor location in the game, the mod needs at least two points of correspondence. The points will link the tile position in the location to the pixel position of the location on the map. Two points are required to create a bounding box (top-left corner and bottom-right corner) with which we can calculate the pixel position on the map from the current tile position within the bounding box.
+For any outdoor location in the game, the mod needs at least two pairs of points to calculate the map location. The. Two points are required to create a bounding box (top-left corner and bottom-right corner) with which we can calculate the pixel position on the map from the current tile position within the bounding box.
 
 Ideally, if the custom location is drawn accurately in proportion onto the map, only two points would be needed, for the tile position (0, 0) and (width, height) of the location tilemap. This is often not the case and more points will have to be added in order to increase accuracy. Splitting up the location into parts will be the most effective strategy to achieve this, instead of adding arbitrary points.
 
@@ -54,6 +55,7 @@ When the game is launched, NPC Map Locations automatically chooses one folder to
 | `A ~ B` | Requires mod ID `A` _or_ `B`. |
 | `A, B`  | Requires _both_ `A` and `B`.  |
 
+i
 `~` is meant for alternative IDs, so it has precedence. For example, `A ~ B, C ~ D` means
 `(A or B) and (C or D)`.
 
@@ -67,7 +69,7 @@ Refer to the [the map assets](https://github.com/Bouhm/stardew-valley-mods/tree/
 Any custom locations that need tracking need to be included in the config. The format is as shown:
 
 ```js
-LocationName: [
+"LocationName": [
   {
     MapX: 0,
     MapY: 0,
@@ -87,6 +89,7 @@ Where `LocationName` is the name of the location. Each field between the curly b
 
 ![Map](https://i.imgur.com/YgTyxKE.png)
 ![Two-Points](https://i.imgur.com/J8Btvdj.png)
+
 ![Four-Points](https://i.imgur.com/kEkgn1A.png)
 
 ### Testing and validating
@@ -108,10 +111,99 @@ Users can add location tooltips when the player hovers the custom location if th
 
 ![Tooltips](https://i.imgur.com/XU4ljAR.png)
 
+## Example
+
+Let's look at an example using the custom location "TownEast" added on by the Stardew Valley Expanded mod.
+
+The first step would be to physically go to the location in-game with debug mode on to gather information.
+
+![location-info](https://i.imgur.com/nNSyPZi.png)
+
+Then we can use the drag-and-drop tools to create the bounding box for tracking for that location on the map.
+
+![map-info](https://i.imgur.com/Z42LauO.png)
+
+From these two actions we have the following information: the LocationName "TownEast", the size of the tilemap (40 x 30), and the coordinates of the bounding box (557, 516) and (678, 580).
+
+For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input the two points for the top-left corner of the bounding box and the bottom-right corner of the bounding box.
+
+```js
+"CustomMapLocations": {
+  "TownEast": [
+    {
+      MapX: 557,
+      MapY: 516,
+      TileX: 0,
+      TileY: 0
+    },
+    {
+      MapX: 678,
+      MapY: 580,
+      TileX: 40,
+      TileY: 30
+    }
+  ]
+},
+```
+
+The first point between the curly brackets represents the top-left corner, and then following point represents the bottom-right corner.
+
+Then we may also want to add tooltips for when we hover over the location on the map. For this we need the top-left corner and the width and height of the bounding box.
+
+```js
+"CustomMapTooltips": {
+  "TownEast": {
+    "X": 960,
+    "Y": 337,
+    "Width": 100,
+    "Height": 76,
+    "PrimaryText": "East of Town"
+  }
+}
+```
+
+For adding just this one location, our final JSON file will look like this:
+
+```js
+{
+  "CustomNpcMarkerOffsets": {},
+  "CustomMapLocations": {
+    "TownEast": [
+      {
+        MapX: 557,
+        MapY: 516,
+        TileX: 0,
+        TileY: 0
+      },
+      {
+        MapX: 678,
+        MapY: 580,
+        TileX: 40,
+        TileY: 30
+      }
+    ]
+  },
+  "CustomMapTooltips": {
+    "TownEast": {
+      "X": 960,
+      "Y": 337,
+      "Width": 100,
+      "Height": 76,
+      "PrimaryText": "East of Town"
+    }
+  },
+  "CustomMapTextures": {}
+}
+```
+
+Using the JSON validator, we can see that this is valid json.
+
+![json-validator](https://i.imgur.com/jofId5l.png)
+
 ## See also
 
 - [Config that adds support for Stardew Valle Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/config/sve_config.json)
-- [My other mod that inherently supports all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
+- [My other mod that also shows characters while inherently supporting all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
 
 ## Get additional help
 
