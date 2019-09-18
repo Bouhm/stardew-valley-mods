@@ -78,7 +78,9 @@ The folder should include the following files:
 - fall_map.png (if adding seasonal maps)
 - summer_map.png (if adding seasonal maps)
 - winter_map.png (if adding seasonal maps)
-- buildings.png (copy the one provided in `_default`)
+- buildings.png (use the provided and modify if desired)
+
+You can use the template [with seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template) or [without seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template_no_seasonal) to get started.
 
 Refer to the [the map assets](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps) for some examples on the naming convention.
 

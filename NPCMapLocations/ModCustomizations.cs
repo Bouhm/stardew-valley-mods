@@ -173,11 +173,6 @@ namespace NPCMapLocations
         MapVectors.Add(mapVectors.Key, mapVectorArr);
       }
 
-      foreach (var location in ModMain.CustomData.CustomMapTextures)
-      {
-        Locations.Add(location.Key, new CustomLocation(location.Value));
-      }
-
       // Automatically adjust tracking for modded maps that are sized differently from vanilla map
       foreach (var location in Game1.locations)
       {
@@ -274,7 +269,6 @@ namespace NPCMapLocations
   public class CustomData
   {
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
-    public Dictionary<string, JObject> CustomMapTextures { get; set; } = new Dictionary<string, JObject>();
     public Dictionary<string, JObject> CustomMapTooltips { get; set; } = new Dictionary<string, JObject>();
   }
 }
