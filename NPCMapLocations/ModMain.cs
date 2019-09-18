@@ -57,14 +57,21 @@ namespace NPCMapLocations
     {
       T map;
 
+      // Replace map page
+      string filename = $"{this.Season}_map.png";
+
       if (Season == null)
       {
         Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
         Season = "spring";
       }
 
-      // Replace map page
-      string filename = $"{this.Season}_map.png";
+      if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename)))
+      {
+        Monitor.Log("Unable to find seasonal maps. Defaulted to spring.", LogLevel.Debug);
+        Season = "spring";
+      }
+
       bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
         ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
