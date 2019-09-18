@@ -403,7 +403,7 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
-			if (ModMain.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
+			if (ModMain.Globals.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));

@@ -26,7 +26,6 @@ namespace NPCMapLocations
     public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapsPath { get; set; }
-    private ModConfig SVEConfig;
 
     public ModCustomizations(IMonitor monitor)
     {
@@ -232,7 +231,7 @@ namespace NPCMapLocations
         else
         {
           Names.Add(npc.Name, npc.displayName);
-          if (!npc.Name.Equals(npc.displayName) || ModMain.CustomData.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
+          if (!npc.Name.Equals(npc.displayName) || ModMain.Globals.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
             NpcCustomizations.Add(npc.Name);
         }
       }
@@ -241,7 +240,7 @@ namespace NPCMapLocations
     // Load user-specified NPC crops for custom sprites
     private void LoadNpcCrop(NPC npc)
     {
-      var CustomNpcMarkerOffsets = ModMain.CustomData.CustomNpcMarkerOffsets;
+      var CustomNpcMarkerOffsets = ModMain.Globals.CustomNpcMarkerOffsets;
 
       if (CustomNpcMarkerOffsets != null && CustomNpcMarkerOffsets.Count > 0)
         foreach (var villager in CustomNpcMarkerOffsets)
@@ -274,10 +273,8 @@ namespace NPCMapLocations
 
   public class CustomData
   {
-    public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
     public Dictionary<string, JObject> CustomMapTextures { get; set; } = new Dictionary<string, JObject>();
     public Dictionary<string, JObject> CustomMapTooltips { get; set; } = new Dictionary<string, JObject>();
-    public bool DEBUG_MODE { get; set; } = false;
   }
 }

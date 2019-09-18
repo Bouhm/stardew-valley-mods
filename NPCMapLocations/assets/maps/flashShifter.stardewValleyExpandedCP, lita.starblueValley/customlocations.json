@@ -1,9 +1,4 @@
 {
-  "CustomNpcMarkerOffsets": {
-  	"Andy": 1,
-  	"Olivia": 1,
-    "Victor": 0
-  },
   "CustomMapLocations": {
     "Farm": [
       {
@@ -265,6 +260,5 @@
       "Height": 21,
       "PrimaryText": "Andy's House"
     }
-  },
-  "DEBUG_MODE": true
+  }
 }

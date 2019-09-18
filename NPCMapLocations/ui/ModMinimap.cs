@@ -174,7 +174,7 @@ namespace NPCMapLocations
 			{
         IsHoveringMinimap = true;
 
-        if (ModMain.HeldKey.ToString().Equals(ModMain.Config.MinimapDragKey))
+        if (ModMain.HeldKey.ToString().Equals(ModMain.Globals.MinimapDragKey))
 			    Game1.mouseCursor = 2;
 
         if (MouseUtil.IsMouseHeldDown)
@@ -328,7 +328,7 @@ namespace NPCMapLocations
       //
       // ===== Farm buildings =====
       //
-      if (ModMain.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
+      if (ModMain.Globals.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));

@@ -182,7 +182,7 @@ namespace NPCMapLocations
 				return;
 			}
 
-			if (key.ToString().Equals(ModMain.Config.MenuKey) && readyToClose() && canClose)
+			if (key.ToString().Equals(ModMain.Globals.MenuKey) && readyToClose() && canClose)
 			{
 				Game1.exitActiveMenu();
 				Game1.activeClickableMenu = new GameMenu();

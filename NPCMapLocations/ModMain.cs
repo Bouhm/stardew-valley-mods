@@ -15,7 +15,8 @@ namespace NPCMapLocations
 {
   public class ModMain : Mod, IAssetLoader
   {
-    public static ModConfig Config;
+    public static PlayerConfig Config;
+    public static GlobalConfig Globals; 
     public static CustomData CustomData;
     public static IModHelper Helper;
     public static SButton HeldKey;
@@ -76,7 +77,6 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
-      Config = Helper.Data.ReadJsonFile<ModConfig>("config/default.json") ?? new ModConfig();
       // Load farm buildings
       try
       {
@@ -86,6 +86,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
+      Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
       CustomData = Helper.Data.ReadJsonFile<CustomData>("config/data/customdata.json") ?? new CustomData();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
@@ -105,17 +106,17 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
+      Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
       Customizations = new ModCustomizations(Monitor)
       {
         LocationTextures = File.Exists(@"assets/customlocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customlocations.png") : null
       };
-      Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
+      Season = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 
       // Disable for multiplayer for anti-cheat
-      DEBUG_MODE = CustomData.DEBUG_MODE && !Context.IsMultiplayer;
+      DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
       shouldShowMinimap = Config.ShowMinimap;
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
@@ -243,11 +244,11 @@ namespace NPCMapLocations
       // Minimap dragging
       if (Config.ShowMinimap && Minimap != null)
       {
-        if (e.Button.ToString().Equals(Config.MinimapDragKey))
+        if (e.Button.ToString().Equals(Globals.MinimapDragKey))
         {
           HeldKey = e.Button;
         }
-        else if (HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+        else if (HeldKey.ToString().Equals(Globals.MinimapDragKey) &&
                  (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
                  Game1.activeClickableMenu == null)
         {
@@ -267,7 +268,7 @@ namespace NPCMapLocations
       }
 
       // Minimap toggle
-      if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
+      if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
@@ -286,7 +287,7 @@ namespace NPCMapLocations
     private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
-      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey) ||
+      if (HeldKey.ToString().Equals(Globals.MinimapDragKey) && e.Button.ToString().Equals(Globals.MinimapDragKey) ||
           HeldKey == SButton.LeftControl && e.Button != SButton.MouseRight)
         HeldKey = SButton.None;
 
@@ -308,15 +309,15 @@ namespace NPCMapLocations
     private void HandleInput(GameMenu menu, SButton input)
     {
       if (menu.currentTab != GameMenu.mapTab) return;
-      if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
+      if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
           ConditionalNpcs,
           Customizations
         );
 
-      if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
+      if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
         ChangeTooltipConfig();
-      else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.LeftShoulder) ChangeTooltipConfig(false);
+      else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder) ChangeTooltipConfig(false);
     }
 
     private void ChangeTooltipConfig(bool incre = true)
@@ -381,8 +382,8 @@ namespace NPCMapLocations
 
     private bool IsLocationBlacklisted(string location)
     {
-      return Config.ShowMinimap && Config.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-               ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
+      return Config.ShowMinimap && Globals.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
+               ((Globals.MinimapBlacklist.Contains("Mine") || Globals.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
     }
 
     private void ResetMarkers(List<NPC> villagers)
@@ -437,7 +438,7 @@ namespace NPCMapLocations
         }
 
         // Check season change (for when it's changed via console)
-        if (Config.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
+        if (Globals.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
         {
           Season = Game1.currentSeason;
 
