@@ -359,55 +359,6 @@ namespace NPCMapLocations
 			}
 
       //
-      // ===== Custom locations =====
-      //
-		  foreach (var location in Customizations.Locations)
-		  {
-		    if (Customizations.MapVectors.TryGetValue(location.Key, out var locationVector))
-		    {
-          // If only one Vector specified, treat it as a marker
-          // Markers are centered based on width/height
-          if (locationVector.Length == 1)
-		      {
-		        b.Draw(
-		          Customizations.LocationTextures,
-		          new Vector2(offsetMmLoc.X + location.Value.LocVector.X, offsetMmLoc.Y + location.Value.LocVector.Y),
-		          location.Value.SrcRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-		        );
-
-		      }
-		      // If more than one Vector, treat it as a region with lower & upper bound
-		      // Regions are draw by the top-left corner
-		      else if (locationVector.Length > 1)
-          {
-		        var regionWidth = location.Value.SrcRect.Width;
-		        var regionHeight = location.Value.SrcRect.Height;
-		        var regionX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + location.Value.LocVector.X, offsetMmX, offsetMmX + mmWidth));
-		        var regionY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + location.Value.LocVector.Y, mmY, mmY + mmHeight) + 2);
-		        var regionCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - location.Value.LocVector.X) / Game1.pixelZoom, 0, farmWidth);
-		        var regionCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - location.Value.LocVector.Y) / Game1.pixelZoom, 0, farmHeight);
-
-		        // Check if region crop extends outside of minimap
-		        var regionCropWidth = (regionX / Game1.pixelZoom + regionWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - regionX) / Game1.pixelZoom) : regionWidth - regionCropX;
-		        var regionCropHeight = (regionY / Game1.pixelZoom + regionHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - regionY) / Game1.pixelZoom) : regionHeight - regionCropY;
-
-		        // Check if region crop extends beyond region size
-		        if (regionCropX + regionCropWidth > regionWidth)
-		          regionCropWidth = regionWidth - regionCropX;
-
-		        if (regionCropY + regionCropHeight > regionHeight)
-		          regionCropHeight = regionHeight - regionCropY;
-
-		        b.Draw(Customizations.LocationTextures, new Vector2(regionX, regionY),
-		          new Rectangle(location.Value.SrcRect.X + regionCropX, location.Value.SrcRect.Y + regionCropY, regionCropWidth, regionCropHeight), color,
-		          0f,
-		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-		      }
-		    }
-      }
-		  
-
-      //
       // ===== Traveling Merchant =====
       //
       if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])

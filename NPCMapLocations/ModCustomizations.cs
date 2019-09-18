@@ -20,7 +20,6 @@ namespace NPCMapLocations
 
     public Dictionary<string, MapVector[]> MapVectors { get; set; }
     public Dictionary<string, string> Names { get; set; }
-    public Texture2D LocationTextures { get; set; }
     public Dictionary<string, CustomLocation> Locations { get; set; }
     public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }

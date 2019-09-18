@@ -429,15 +429,6 @@ namespace NPCMapLocations
 				}
 			}
 
-      // ===== Custom locations =====
-      foreach (var location in Customizations.Locations)
-      {   
-        b.Draw(Customizations.LocationTextures, new Vector2(mapX + location.Value.LocVector.X, mapY + location.Value.LocVector.Y),
-          location.Value.SrcRect, Color.White,
-          0f,
-          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-      }
-
       // Traveling Merchant
       if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
 			{

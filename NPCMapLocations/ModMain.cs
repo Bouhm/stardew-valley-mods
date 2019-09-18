@@ -103,9 +103,6 @@ namespace NPCMapLocations
       // Load customizations
       Customizations = new ModCustomizations();
       CustomData = Helper.Data.ReadJsonFile<CustomData>(Path.Combine(Customizations.MapsPath, "customlocations.json")) ?? new CustomData();
-      Customizations.LocationTextures = File.Exists(Path.Combine(Customizations.MapsPath, "custom_map_textures.png"))
-        ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsPath, "custom_map_textures.png"))
-        : null;
       Customizations.LoadCustomData();
 
       // Load farm buildings
