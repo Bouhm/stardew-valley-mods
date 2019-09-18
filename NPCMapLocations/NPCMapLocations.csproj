@@ -13,163 +13,190 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="assets\maps\acerbicon.recolor\buildings.png">
+    <None Update="maps\acerbicon.recolor\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\acerbicon.recolor\fall_map.png">
+    <None Update="maps\acerbicon.recolor\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\acerbicon.recolor\spring_map.png">
+    <None Update="maps\acerbicon.recolor\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\acerbicon.recolor\summer_map.png">
+    <None Update="maps\acerbicon.recolor\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\acerbicon.recolor\winter_map.png">
+    <None Update="maps\acerbicon.recolor\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\elle.dirtCliffRecolor\buildings.png">
+    <None Update="maps\elle.dirtCliffRecolor\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\elle.dirtCliffRecolor\fall_map.png">
+    <None Update="maps\elle.dirtCliffRecolor\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\elle.dirtCliffRecolor\spring_map.png">
+    <None Update="maps\elle.dirtCliffRecolor\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\elle.dirtCliffRecolor\summer_map.png">
+    <None Update="maps\elle.dirtCliffRecolor\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\elle.dirtCliffRecolor\winter_map.png">
+    <None Update="maps\elle.dirtCliffRecolor\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\buildings.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\customlocations.json">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\customlocations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\fall_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\spring_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\summer_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\winter_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, lita.starblueValley\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\buildings.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\customlocations.json">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\customlocations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\fall_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\spring_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\summer_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\winter_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP, minervamaga.cp.eemieMapRecolour\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\buildings.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\customlocations.json">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\customlocations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\fall_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\spring_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\summer_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\flashShifter.stardewValleyExpandedCP\winter_map.png">
+    <None Update="maps\flashShifter.stardewValleyExpandedCP\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\forkmaster.extendedFarm\buildings.png">
+    <None Update="maps\forkmaster.extendedFarm\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\forkmaster.extendedFarm\fall_map.png">
+    <None Update="maps\forkmaster.extendedFarm\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\forkmaster.extendedFarm\spring_map.png">
+    <None Update="maps\forkmaster.extendedFarm\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\forkmaster.extendedFarm\summer_map.png">
+    <None Update="maps\forkmaster.extendedFarm\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\forkmaster.extendedFarm\winter_map.png">
+    <None Update="maps\forkmaster.extendedFarm\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\buildings.png">
+    <None Update="maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\fall_map.png">
+    <None Update="maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\spring_map.png">
+    <None Update="maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\summer_map.png">
+    <None Update="maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\winter_map.png">
+    <None Update="maps\lavender.tonedDownSDV ~ minervamaga.cp.atdsv\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lita.starblueValley\buildings.png">
+    <None Update="maps\lita.starblueValley\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lita.starblueValley\fall_map.png">
+    <None Update="maps\lita.starblueValley\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lita.starblueValley\spring_map.png">
+    <None Update="maps\lita.starblueValley\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lita.starblueValley\summer_map.png">
+    <None Update="maps\lita.starblueValley\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\lita.starblueValley\winter_map.png">
+    <None Update="maps\lita.starblueValley\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\minervamaga.cp.eemieMapRecolour\buildings.png">
+    <None Update="maps\minervamaga.cp.eemieMapRecolour\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\minervamaga.cp.eemieMapRecolour\fall_map.png">
+    <None Update="maps\minervamaga.cp.eemieMapRecolour\fall_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\minervamaga.cp.eemieMapRecolour\spring_map.png">
+    <None Update="maps\minervamaga.cp.eemieMapRecolour\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\minervamaga.cp.eemieMapRecolour\summer_map.png">
+    <None Update="maps\minervamaga.cp.eemieMapRecolour\summer_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\minervamaga.cp.eemieMapRecolour\winter_map.png">
+    <None Update="maps\minervamaga.cp.eemieMapRecolour\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\_default\buildings.png">
+    <None Update="maps\_template_no_seasonal\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\_default\fall_map.png">
+    <None Update="maps\_template_no_seasonal\customlocations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\_default\spring_map.png">
+    <None Update="maps\_template_no_seasonal\spring_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\_default\summer_map.png">
+    <None Update="maps\_template\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\maps\_default\winter_map.png">
+    <None Update="maps\_template\customlocations.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_template\fall_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_template\spring_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_template\summer_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_template\winter_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_default\buildings.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_default\fall_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_default\spring_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_default\summer_map.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="maps\_default\winter_map.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="config\globals.json">

@@ -37,7 +37,7 @@ namespace NPCMapLocations
     private Dictionary<long, CharacterMarker> FarmerMarkers;
 
     // Customizations/Custom mods
-    private string Season;
+    private string MapSeason;
     private ModCustomizations Customizations;
 
     // Debugging
@@ -57,25 +57,26 @@ namespace NPCMapLocations
     {
       T map;
 
-      // Replace map page
-      string filename = $"{this.Season}_map.png";
-
-      if (Season == null)
+      if (MapSeason == null)
       {
         Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-        Season = "spring";
+        MapSeason = "spring";
       }
 
-      if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename)))
+      if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{this.MapSeason}_map.png")))
       {
-        Monitor.Log("Unable to find seasonal maps. Defaulted to spring.", LogLevel.Debug);
-        Season = "spring";
+        Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+        MapSeason = null; // Set to null so that cache is not invalidate when game season changes
       }
+
+      // Replace map page
+      string filename = this.MapSeason == null ? "spring_map.png" : $"{this.MapSeason}_map.png";
 
       bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
         ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
         : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
+
       if (useRecolor)
         Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
@@ -121,7 +122,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
-      Season = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
+      MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 
@@ -448,9 +449,9 @@ namespace NPCMapLocations
         }
 
         // Check season change (for when it's changed via console)
-        if (Globals.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
+        if (Globals.UseSeasonalMaps && (MapSeason != null && MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
         {
-          Season = Game1.currentSeason;
+          MapSeason = Game1.currentSeason;
 
           // Force reload of map for season changes
           try
