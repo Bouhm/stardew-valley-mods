@@ -165,7 +165,7 @@ For this we need the top-left corner and the width and height of the bounding bo
     "Y": 337,
     "Width": 100,
     "Height": 76,
-    "PrimaryText": "East of Town"
+    "PrimaryText": "Town East"
   }
 }
 ```
@@ -196,7 +196,7 @@ For adding just this one location, our final JSON file will look like this:
       "Y": 337,
       "Width": 100,
       "Height": 76,
-      "PrimaryText": "East of Town"
+      "PrimaryText": "Town East"
     }
   }
 }
