@@ -77,15 +77,6 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
-      // Load farm buildings
-      try
-      {
-        BuildingMarkers = Helper.Content.Load<Texture2D>(@"assets/buildings.png");
-      }
-      catch
-      {
-        BuildingMarkers = null;
-      }
       Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
       CustomData = Helper.Data.ReadJsonFile<CustomData>("config/data/customdata.json") ?? new CustomData();
 
@@ -109,8 +100,17 @@ namespace NPCMapLocations
       Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
       Customizations = new ModCustomizations(Monitor)
       {
-        LocationTextures = File.Exists(@"assets/customlocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customlocations.png") : null
+        LocationTextures = File.Exists(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png")) ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png")) : null
       };
+      // Load farm buildings
+      try
+      {
+        BuildingMarkers = Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "buildings.png"));
+      }
+      catch
+      {
+        BuildingMarkers = null;
+      }
       Season = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
