@@ -1,5 +1,57 @@
 {
   "CustomMapLocations": {
+    "AdventureGuild": [
+      {
+        "MapX": 694,
+        "MapY": 470
+      }
+    ],
+    "AndyHouse": [
+      {
+        "MapX": 410,
+        "MapY": 561
+      }
+    ],
+    "AuroraVineyard": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "BlueMoonVineyard": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 547,
+        "MapY": 470
+      },
+      {
+        "TileX": 75,
+        "TileY": 55,
+        "MapX": 715,
+        "MapY": 604
+      }
+    ],
+    "Cellar": [
+      {
+        "MapX": 445,
+        "MapY": 262
+      }
+    ],
+    "Desert": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 0,
+        "MapY": 26
+      },
+      {
+        "TileX": 170,
+        "TileY": 90,
+        "MapX": 355,
+        "MapY": 213
+      }
+    ],
     "Farm": [
       {
         "TileX": 0,
@@ -44,38 +96,78 @@
         "MapY": 262
       }
     ],
-    "Cellar": [
+    "ForestWest": [
       {
-        "MapX": 445,
-        "MapY": 262
+        "MapX": 21,
+        "MapY": 579
       }
     ],
-    "Desert": [
+    "Greenhouse": [
       {
-        "TileX": 0,
-        "TileY": 0,
-        "MapX": 0,
-        "MapY": 26
-      },
-      {
-        "TileX": 170,
-        "TileY": 90,
-        "MapX": 355,
-        "MapY": 213
+        "MapX": 403,
+        "MapY": 335
       }
     ],
-    "BlueMoonVineyard": [
+    "JenkinsHouse": [
       {
-        "TileX": 0,
-        "TileY": 0,
-        "MapX": 547,
-        "MapY": 470
-      },
+        "MapX": 776,
+        "MapY": 303
+      }
+    ],
+    "LostWoods": [
       {
-        "TileX": 75,
-        "TileY": 55,
-        "MapX": 715,
-        "MapY": 604
+        "MapX": 156,
+        "MapY": 698
+      }
+    ],
+    "MarnieBarn": [
+      {
+        "MapX": 499,
+        "MapY": 413
+      }
+    ],
+    "MarnieShed": [
+      {
+        "MapX": 473,
+        "MapY": 400
+      }
+    ],
+    "OliviaCellar": [
+      {
+        "MapX": 776,
+        "MapY": 303
+      }
+    ],
+    "SandyHouse": [
+      {
+        "MapX": 49,
+        "MapY": 100
+      }
+    ],
+    "ShearwaterBridge": [
+    ],
+    "SophiaCellar": [
+      {
+        "MapX": 619,
+        "MapY": 498
+      }
+    ],
+    "SophiaHouse": [
+      {
+        "MapX": 619,
+        "MapY": 498
+      }
+    ],
+    "SpriteSpring": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "SusanHouse": [
+      {
+        "MapX": 712,
+        "MapY": 35
       }
     ],
     "TownEast": [
@@ -91,124 +183,15 @@
         "MapX": 1060,
         "MapY": 413
       }
-    ],
-    "JenkinsHouse": [
-      {
-        "MapX": 776,
-        "MapY": 303
-      }
-    ],
-    "OliviaCellar": [
-      {
-        "MapX": 776,
-        "MapY": 303
-      }
-    ],
-    "SusanHouse": [
-      {
-        "MapX": 712,
-        "MapY": 35
-      }
-    ],
-    "SophiaHouse": [
-      {
-        "MapX": 619,
-        "MapY": 498
-      }
-    ],
-    "SophiaCellar": [
-      {
-        "MapX": 619,
-        "MapY": 498
-      }
-    ],
-    "AndyHouse": [
-      {
-        "MapX": 410,
-        "MapY": 561
-      }
-    ],
-    "MarnieShed": [
-      {
-        "MapX": 473,
-        "MapY": 400
-      }
-    ],
-    "MarnieBarn": [
-      {
-        "MapX": 499,
-        "MapY": 413
-      }
-    ],
-    "AdventureGuild": [
-      {
-        "MapX": 694,
-        "MapY": 470
-      }
-    ],
-    "Greenhouse": [
-      {
-        "MapX": 403,
-        "MapY": 335
-      }
-    ],
-    "ForestWest": [
-      {
-        "MapX": 21,
-        "MapY": 579
-      }
-    ],
-    "AuroraVineyard": [
-      {
-        "MapX": 21,
-        "MapY": 579
-      }
-    ],
-    "SpriteSpring": [
-      {
-        "MapX": 21,
-        "MapY": 579
-      }
-    ],
-    "LostWoods": [
-    	{
-        "MapX": 156,
-        "MapY": 698
-      }
-    ],
-    "Desert": [
-      {
-        "TileX": 0,
-        "TileY": 0,
-        "MapX": 0,
-        "MapY": 38
-      },
-      {
-        "TileX": 170,
-        "TileY": 90,
-        "MapX": 242,
-        "MapY": 159
-      }
-    ],
-    "SandyHouse": [{
-      "MapX": 49,
-      "MapY": 100
-    }],
+    ]
   },
   "CustomMapTooltips": {
-    "JenkinsHouse": {
-      "X": 755,
-      "Y": 291,
-      "Width": 38,
-      "Height": 25,
-      "PrimaryText": "Jenkins' Residence"
-    },
-    "TownEast": {
-      "X": 968,
-      "Y": 335,
-      "Width": 81,
-      "Height": 71,
-      "PrimaryText": "Town East"
+    "AndysHouse": {
+      "X": 400,
+      "Y": 552,
+      "Width": 21,
+      "Height": 21,
+      "PrimaryText": "Andy's House"
     },
     "BlueMoonVineyard": {
       "X": 561,
@@ -217,33 +200,12 @@
       "Height": 64,
       "PrimaryText": "Blue Moon Vineyard"
     },
-    "SophiaHouse": {
-      "X": 600,
-      "Y": 488,
-      "Width": 36,
-      "Height": 28,
-      "PrimaryText": "Sophia's House"
-    },
     "EmeraldFarm": {
       "X": 707,
       "Y": 58,
       "Width": 80,
       "Height": 23,
       "PrimaryText": "Emerald Farm"
-    },
-    "SusansHouse": {
-      "X": 690,
-      "Y": 31,
-      "Width": 44,
-      "Height": 21,
-      "PrimaryText": "Susan's House"
-    },
-    "Summit": {
-      "X": 795,
-      "Y": 21,
-      "Width": 46,
-      "Height": 36,
-      "PrimaryText": "Summit"
     },
     "FairhavenFarm": {
       "X": 429,
@@ -252,12 +214,40 @@
       "Height": 36,
       "PrimaryText": "Fairhaven Farm"
     },
-    "AndysHouse": {
-      "X": 400,
-      "Y": 552,
-      "Width": 21,
+    "JenkinsHouse": {
+      "X": 755,
+      "Y": 291,
+      "Width": 38,
+      "Height": 25,
+      "PrimaryText": "Jenkins' Residence"
+    },
+    "SophiaHouse": {
+      "X": 600,
+      "Y": 488,
+      "Width": 36,
+      "Height": 28,
+      "PrimaryText": "Sophia's House"
+    },
+    "Summit": {
+      "X": 795,
+      "Y": 21,
+      "Width": 46,
+      "Height": 36,
+      "PrimaryText": "Summit"
+    },
+    "SusansHouse": {
+      "X": 690,
+      "Y": 31,
+      "Width": 44,
       "Height": 21,
-      "PrimaryText": "Andy's House"
+      "PrimaryText": "Susan's House"
+    },
+    "TownEast": {
+      "X": 968,
+      "Y": 335,
+      "Width": 81,
+      "Height": 71,
+      "PrimaryText": "Town East"
     }
   }
 }
