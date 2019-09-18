@@ -80,7 +80,6 @@ namespace NPCMapLocations
       Helper = helper;
       IMonitor = Monitor;
       Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
-      CustomData = Helper.Data.ReadJsonFile<CustomData>("config/data/customdata.json") ?? new CustomData();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
@@ -100,15 +99,19 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
+
+      // Load customizations
       Customizations = new ModCustomizations();
-      Customizations.LocationTextures = File.Exists(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png"))
-        ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png"))
+      CustomData = Helper.Data.ReadJsonFile<CustomData>(Path.Combine(Customizations.MapsPath, "customlocations.json")) ?? new CustomData();
+      Customizations.LocationTextures = File.Exists(Path.Combine(Customizations.MapsPath, "custom_map_textures.png"))
+        ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsPath, "custom_map_textures.png"))
         : null;
+      Customizations.LoadCustomData();
 
       // Load farm buildings
       try
       {
-        BuildingMarkers = Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "buildings.png"));
+        BuildingMarkers = Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsPath, "buildings.png"));
       }
       catch
       {

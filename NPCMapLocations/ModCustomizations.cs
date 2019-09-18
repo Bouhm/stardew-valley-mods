@@ -36,11 +36,6 @@ namespace NPCMapLocations
       MapsPath = GetCustomMapFolderName();
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
-
-      LoadTooltips();
-      LoadMarkerCropOffsets();
-      LoadCustomNpcs();
-      LoadCustomMapLocations();
     }
 
     // Handles customizations for NPCs
@@ -113,6 +108,14 @@ namespace NPCMapLocations
       }
 
       return folderName;
+    }
+
+    public void LoadCustomData()
+    {
+      LoadTooltips();
+      LoadMarkerCropOffsets();
+      LoadCustomNpcs();
+      LoadCustomMapLocations();
     }
 
     private void LoadTooltips()
