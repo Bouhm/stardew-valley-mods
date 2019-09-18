@@ -8,6 +8,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 
 - [How tracking works](#how-tracking-works)
 - [Creating an accurate map](#creating-an-accurate-map)
+  - [Video tutorial](#video-tutorial)
   - [Seasonal maps](#seasonal-maps)
 - [Loading the custom map](#loading-the-custom-map)
   - [Folder selection](#folder-selection)
@@ -43,6 +44,8 @@ Here are the steps I take to create accurate modifications:
 4. Open the tilemap from Map Image Export. Scale it down until it is approximately the size it should be on the map.
 5. Overlay the resized tilemap onto the map, and then redraw that portion of the map accordingly. You will be essentially "tracing" the tilemap onto the map to ensure accuracy.
 6. Repeat steps 1-5 for any other custom locations.
+
+### Video tutorial
 
 [Here is a quick video guide on the process.](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
 
@@ -227,7 +230,7 @@ If the character does not show up in the map in the custom locations, there are 
 
 ## See also
 
-- [Config that adds support for Stardew Valley Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/maps/flashShifter.stardewValleyExpandedCP/customlocations.json)
+- [Data file that adds support for Stardew Valley Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/maps/flashShifter.stardewValleyExpandedCP/customlocations.json)
 - [My other mod that also shows characters while inherently supporting all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
 
 ## Get additional help
