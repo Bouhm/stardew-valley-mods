@@ -19,6 +19,7 @@ namespace NPCMapLocations
     public static GlobalConfig Globals; 
     public static CustomData CustomData;
     public static IModHelper Helper;
+    public static IMonitor IMonitor;
     public static SButton HeldKey;
     public static Texture2D Map;
 
@@ -77,6 +78,7 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
+      IMonitor = Monitor;
       Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
       CustomData = Helper.Data.ReadJsonFile<CustomData>("config/data/customdata.json") ?? new CustomData();
 
@@ -98,10 +100,11 @@ namespace NPCMapLocations
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
       Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
-      Customizations = new ModCustomizations(Monitor)
-      {
-        LocationTextures = File.Exists(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png")) ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png")) : null
-      };
+      Customizations = new ModCustomizations();
+      Customizations.LocationTextures = File.Exists(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png"))
+        ? Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsRootPath, "CustomMapTextures.png"))
+        : null;
+
       // Load farm buildings
       try
       {

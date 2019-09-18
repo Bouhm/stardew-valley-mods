@@ -15,7 +15,6 @@ namespace NPCMapLocations
   // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
   public class ModCustomizations
   {
-    private readonly IMonitor Monitor;
     private readonly HashSet<string> NpcCustomizations;
     public readonly string MapsRootPath = Path.Combine("assets", "maps");
 
@@ -27,9 +26,8 @@ namespace NPCMapLocations
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapsPath { get; set; }
 
-    public ModCustomizations(IMonitor monitor)
+    public ModCustomizations()
     {
-      Monitor = monitor;
       MapVectors = new Dictionary<string, MapVector[]>();
       Names = new Dictionary<string, string>();
       NpcCustomizations = new HashSet<string>();
@@ -65,7 +63,7 @@ namespace NPCMapLocations
         var names = "Adjusted markers for ";
         foreach (var name in NpcCustomizations) names += name + ", ";
 
-        Monitor.Log(names.Substring(0, names.Length - 2), LogLevel.Debug);
+        ModMain.IMonitor.Log(names.Substring(0, names.Length - 2), LogLevel.Debug);
       }
 
       ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
@@ -205,7 +203,7 @@ namespace NPCMapLocations
       {
         if (customLocations.Length == 1)
         {
-          Monitor.Log($"Handled tracking for custom location: {customLocations[0]}.", LogLevel.Debug);
+          ModMain.IMonitor.Log($"Handled tracking for custom location: {customLocations[0]}.", LogLevel.Debug);
         }
         else
         {
@@ -213,7 +211,7 @@ namespace NPCMapLocations
           for (var i = 0; i < customLocations.Length; i++)
             locationList += customLocations[i] + (i + 1 == customLocations.Length ? "" : ", ");
 
-          Monitor.Log($"Handled tracking for custom locations: {locationList}.", LogLevel.Debug);
+          ModMain.IMonitor.Log($"Handled tracking for custom locations: {locationList}.", LogLevel.Debug);
         }
       }
     }
