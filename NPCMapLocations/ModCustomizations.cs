@@ -16,7 +16,7 @@ namespace NPCMapLocations
   public class ModCustomizations
   {
     private readonly HashSet<string> NpcCustomizations;
-    public readonly string MapsRootPath = Path.Combine("assets", "maps");
+    public readonly string MapsRootPath = "maps";
 
     public Dictionary<string, MapVector[]> MapVectors { get; set; }
     public Dictionary<string, string> Names { get; set; }
