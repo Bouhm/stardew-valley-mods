@@ -50,13 +50,13 @@ public static class ModConstants
   // NPCs with no schedules 
   public static List<string> ExcludedVillagers => new List<string>()
     {
-        "Dwarf",
-        "Mister Qi",
-        "Bouncer",
-        "Henchman",
-        "Gunther",
-        "Krobus",
-    "Dusty"
+      "Dwarf",
+      "Mister Qi",
+      "Bouncer",
+      "Henchman",
+      "Gunther",
+      "Krobus",
+      "Dusty"
     };
 
   // tileX and TileY (the first two values) are tile positions in the game for that location
@@ -64,173 +64,173 @@ public static class ModConstants
   // MapModMain handles all the calculations to make sure the positions are center-based.
   public static Dictionary<string, MapVector[]> MapVectors => new Dictionary<string, MapVector[]>
     {
-    // Outdoor
-		{
-            "Backwoods", new MapVector[]
-            {
-                new MapVector(385, 122, 0, 0),
-                new MapVector(529, 238, 50, 40),
-            }
-        },
-        {
-            "Backwoods_Region", new MapVector[]
-            {
-                new MapVector(460, 190)
-            }
-        },
-        {
-            "Farm", new MapVector[]
-            {
-                new MapVector(330, 237, 0, 0),
-                new MapVector(514, 386, 80, 65)
-            }
-        },
-        {
-            "Farm_Region", new MapVector[]
-            {
-                new MapVector(423, 321)
-            }
-        },
-        {
-            "BusStop", new MapVector[]
-            {
-                new MapVector(517, 182, 0, 0),
-                new MapVector(594, 300, 35, 30)
-            }
-        },
-        {
-            "BusStop_Region", new MapVector[]
-            {
-                new MapVector(555, 229)
-            }
-        },
-        {
-            "Merchant", new MapVector[]
-            {
-                new MapVector(320, 410),
-            }
-        },
-        {
-            "Forest", new MapVector[]
-            {
-                new MapVector(250, 383, 0, 0),
-                new MapVector(554, 687, 120, 120)
-            }
-        },
-        {
-            "Woods", new MapVector[]
-            {
-                new MapVector(136, 346, 0, 0),
-                new MapVector(230, 395, 60, 32)
-            }
-        },
-        {
-            "DeepWoods", new MapVector[]
-            {
+      // Outdoor
+		  {
+          "Backwoods", new MapVector[]
+          {
+              new MapVector(385, 122, 0, 0),
+              new MapVector(529, 238, 50, 40),
+          }
+      },
+      {
+          "Backwoods_Region", new MapVector[]
+          {
+              new MapVector(460, 190)
+          }
+      },
+      {
+          "Farm", new MapVector[]
+          {
+              new MapVector(330, 237, 0, 0),
+              new MapVector(514, 386, 80, 65)
+          }
+      },
+      {
+          "Farm_Region", new MapVector[]
+          {
+              new MapVector(423, 321)
+          }
+      },
+      {
+          "BusStop", new MapVector[]
+          {
+              new MapVector(517, 182, 0, 0),
+              new MapVector(594, 300, 35, 30)
+          }
+      },
+      {
+          "BusStop_Region", new MapVector[]
+          {
+              new MapVector(555, 229)
+          }
+      },
+      {
+          "Merchant", new MapVector[]
+          {
+              new MapVector(320, 410),
+          }
+      },
+      {
+          "Forest", new MapVector[]
+          {
+              new MapVector(250, 383, 0, 0),
+              new MapVector(554, 687, 120, 120)
+          }
+      },
+      {
+          "Woods", new MapVector[]
+          {
               new MapVector(136, 346, 0, 0),
               new MapVector(230, 395, 60, 32)
-            }
-        },
-        {
-            "RuinedHouse", new MapVector[]
-            {
-                new MapVector(333, 622)
-            }
-        },
-        {
-            "Town", new MapVector[]
-            {
-				        // Top half of town
-				        new MapVector(593, 173, 0, 0),
-                new MapVector(940, 275, 120, 40),
-
-				        // Bottom half of town
-				        new MapVector(602, 268, 0, 41),
-                new MapVector(958, 513, 120, 110),
-            }
-        },
-        {
-            "TownSquare", new MapVector[]
-            {
-                new MapVector(686, 366)
-            }
-        },
-
-        {
-            "Graveyard", new MapVector[]
-            {
-                new MapVector(738, 438)
-            }
-        },
-
-        {
-            "Beach", new MapVector[]
-            {
-                new MapVector(726, 541, 0, 0),
-                new MapVector(997, 688, 104, 50)
-            }
-        },
-        {
-          "BeachNightMarket", new MapVector[]
-          {
-            new MapVector(726, 541, 0, 0),
-            new MapVector(997, 688, 104, 50)
           }
-        },
-        {
-            "LonelyStone", new MapVector[]
-            {
-                new MapVector(714, 636)
-            }
-        },
+      },
+      {
+          "DeepWoods", new MapVector[]
+          {
+            new MapVector(136, 346, 0, 0),
+            new MapVector(230, 395, 60, 32)
+          }
+      },
+      {
+          "RuinedHouse", new MapVector[]
+          {
+              new MapVector(333, 622)
+          }
+      },
+      {
+          "Town", new MapVector[]
+          {
+				      // Top half of town
+				      new MapVector(593, 173, 0, 0),
+              new MapVector(940, 275, 120, 40),
 
-        {
-            "Railroad", new MapVector[]
-            {
-                new MapVector(589, 0, 0, 34),
-                new MapVector(794, 81, 70, 62)
-            }
-        },
-        {
-            "Railroad_Region", new MapVector[]
-            {
-                new MapVector(696, 47),
-            }
-        },
+				      // Bottom half of town
+				      new MapVector(602, 268, 0, 41),
+              new MapVector(958, 513, 120, 110),
+          }
+      },
+      {
+          "TownSquare", new MapVector[]
+          {
+              new MapVector(686, 366)
+          }
+      },
 
-        {
-            "Summit", new MapVector[]
-            {
-                new MapVector(819, 36)
-            }
-        },
-        {
-            "Mountain", new MapVector[]
-            {
-                new MapVector(718, 81, 0, 0),
-                new MapVector(1074, 186, 135, 41),
-            }
-        },
+      {
+          "Graveyard", new MapVector[]
+          {
+              new MapVector(738, 438)
+          }
+      },
 
+      {
+          "Beach", new MapVector[]
+          {
+              new MapVector(726, 541, 0, 0),
+              new MapVector(997, 688, 104, 50)
+          }
+      },
+      {
+        "BeachNightMarket", new MapVector[]
         {
-            "Quarry", new MapVector[]
-            {
-                new MapVector(1032, 139)
-            }
-        },
-        {
-            "Desert", new MapVector[]
-            {
-                new MapVector(64, 2, 0, 0),
-                new MapVector(216, 166, 50, 60),
-            }
-        },
-        {
-            "Desert_Region", new MapVector[]
-            {
-                new MapVector(130, 96),
-            }
-        },
+          new MapVector(726, 541, 0, 0),
+          new MapVector(997, 688, 104, 50)
+        }
+      },
+      {
+          "LonelyStone", new MapVector[]
+          {
+              new MapVector(714, 636)
+          }
+      },
+
+      {
+          "Railroad", new MapVector[]
+          {
+              new MapVector(589, 0, 0, 34),
+              new MapVector(794, 81, 70, 62)
+          }
+      },
+      {
+          "Railroad_Region", new MapVector[]
+          {
+              new MapVector(696, 47),
+          }
+      },
+
+      {
+          "Summit", new MapVector[]
+          {
+              new MapVector(819, 36)
+          }
+      },
+      {
+          "Mountain", new MapVector[]
+          {
+              new MapVector(718, 81, 0, 0),
+              new MapVector(1074, 186, 135, 41),
+          }
+      },
+
+      {
+          "Quarry", new MapVector[]
+          {
+              new MapVector(1032, 139)
+          }
+      },
+      {
+          "Desert", new MapVector[]
+          {
+              new MapVector(64, 2, 0, 0),
+              new MapVector(216, 166, 50, 60),
+          }
+      },
+      {
+          "Desert_Region", new MapVector[]
+          {
+              new MapVector(130, 96),
+          }
+      },
 	
 
     // Indoor
