@@ -364,23 +364,29 @@ namespace NPCMapLocations
       foreach (var npc in npcEntries)
       {
         var name = npc.Key;
-        switch (name)
+        try
         {
-          case "Kent":
-            ConditionalNpcs[name] = Game1.year >= 2;
-            break;
-          case "Marlon":
-            ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(100162);
-            break;
-          case "Merchant":
-            ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
-            break;
-          case "Sandy":
-            ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
-            break;
-          case "Wizard":
-            ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(112);
-            break;
+          switch (name)
+          {
+            case "Kent":
+              ConditionalNpcs[name] = Game1.year >= 2;
+              break;
+            case "Marlon":
+              break;
+            case "Merchant":
+              ConditionalNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+              break;
+            case "Sandy":
+              ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
+              break;
+            case "Wizard":
+              ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(112);
+              break;
+          }
+        }
+        catch
+        {
+          ConditionalNpcs[name] = false;
         }
       }
 
