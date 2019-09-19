@@ -129,7 +129,7 @@ Then we can use the drag-and-drop tools to create the bounding box for tracking 
 
 ![map-info](https://i.imgur.com/Z42LauO.png)
 
-From these two actions we have the following information: the LocationName "TownEast", the size of the tilemap (40 x 30), and the coordinates of the bounding box (557, 516) and (678, 580).
+From these two actions we have the following information: the LocationName "TownEast", the size of the tilemap (40 x 30), and the coordinates of the bounding box (960, 337) and (1060, 413).
 
 For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input the two points for the top-left corner of the bounding box and the bottom-right corner of the bounding box.
 
@@ -137,14 +137,14 @@ For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input t
 "CustomMapLocations": {
   "TownEast": [
     {
-      MapX: 557,
-      MapY: 516,
+      MapX: 960,
+      MapY: 337,
       TileX: 0,
       TileY: 0
     },
     {
-      MapX: 678,
-      MapY: 580,
+      MapX: 1060,
+      MapY: 413,
       TileX: 40,
       TileY: 30
     }
