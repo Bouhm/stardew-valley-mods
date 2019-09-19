@@ -48,7 +48,7 @@ Here are the steps I take to create accurate modifications:
 
 ### Video tutorial
 
-[Here is a quick video guide on the process.](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
+[Here is a short video guide on the process](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
 
 ### Seasonal maps
 
@@ -86,7 +86,7 @@ The folder should include the following files:
 
 You can use the template [with seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template) or [without seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template_no_seasonal) to get started.
 
-Refer to the [the map assets](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps) for some examples on the naming convention.
+Refer to the [maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps) for some examples on the naming convention.
 
 ## Adding points
 
@@ -131,7 +131,7 @@ Then we can use the drag-and-drop tools to create the bounding box for tracking 
 
 From these two actions we have the following information: the LocationName "TownEast", the size of the tilemap (40 x 30), and the coordinates of the bounding box (960, 337) and (1060, 413).
 
-For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input the two points for the top-left corner of the bounding box and the bottom-right corner of the bounding box.
+For tracking, we add an entry for `"TownEast"` in `"CustomMapLocations"`. We input the two points for the top-left corner of the bounding box and the bottom-right corner of the bounding box.
 
 ```js
 "CustomMapLocations": {
@@ -151,9 +151,6 @@ For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input t
   ]
 },
 ```
-
-The first point between the curly brackets represents the top-left corner, and then following point represents the bottom-right corner.
-
 ### Single points
 
 Instead of an area with tracking, if you want to display the character in a location in a single point on the map, you only need to specify the `MapX` and `MapY` like so:
