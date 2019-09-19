@@ -1,23 +1,5 @@
 {
   "CustomMapLocations": {
-    "AdventureGuild": [
-      {
-        "MapX": 694,
-        "MapY": 470
-      }
-    ],
-    "AndyHouse": [
-      {
-        "MapX": 410,
-        "MapY": 561
-      }
-    ],
-    "AuroraVineyard": [
-      {
-        "MapX": 21,
-        "MapY": 579
-      }
-    ],
     "BlueMoonVineyard": [
       {
         "TileX": 0,
@@ -30,12 +12,6 @@
         "TileY": 55,
         "MapX": 715,
         "MapY": 604
-      }
-    ],
-    "Cellar": [
-      {
-        "MapX": 445,
-        "MapY": 262
       }
     ],
     "Desert": [
@@ -102,16 +78,10 @@
         "MapY": 579
       }
     ],
-    "Greenhouse": [
+    "GrampletonFields":  [
       {
-        "MapX": 403,
-        "MapY": 335
-      }
-    ],
-    "JenkinsHouse": [
-      {
-        "MapX": 776,
-        "MapY": 303
+        "MapX": 1190,
+        "MapY": 393
       }
     ],
     "LostWoods": [
@@ -120,54 +90,24 @@
         "MapY": 698
       }
     ],
-    "MarnieBarn": [
-      {
-        "MapX": 499,
-        "MapY": 413
-      }
-    ],
-    "MarnieShed": [
-      {
-        "MapX": 473,
-        "MapY": 400
-      }
-    ],
-    "OliviaCellar": [
-      {
-        "MapX": 776,
-        "MapY": 303
-      }
-    ],
-    "SandyHouse": [
-      {
-        "MapX": 49,
-        "MapY": 100
-      }
-    ],
     "ShearwaterBridge": [
-    ],
-    "SophiaCellar": [
       {
-        "MapX": 619,
-        "MapY": 498
-      }
-    ],
-    "SophiaHouse": [
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 1050,
+        "MapY": 363
+      },
       {
-        "MapX": 619,
-        "MapY": 498
+        "TileX": 80,
+        "TileY": 40,
+        "MapX": 1165,
+        "MapY": 414 
       }
     ],
     "SpriteSpring": [
       {
         "MapX": 21,
         "MapY": 579
-      }
-    ],
-    "SusanHouse": [
-      {
-        "MapX": 712,
-        "MapY": 35
       }
     ],
     "TownEast": [
@@ -180,15 +120,15 @@
       {
         "TileX": 40,
         "TileY": 30,
-        "MapX": 1060,
+        "MapX": 1050,
         "MapY": 413
       }
     ]
   },
   "CustomMapTooltips": {
     "AndysHouse": {
-      "X": 400,
-      "Y": 552,
+      "X": 386,
+      "Y": 542,
       "Width": 21,
       "Height": 21,
       "PrimaryText": "Andy's House"
@@ -213,6 +153,13 @@
       "Width": 35,
       "Height": 36,
       "PrimaryText": "Fairhaven Farm"
+    },
+    "ForestWest": {
+      "X": 6,
+      "Y": 567,
+      "Width": 107,
+      "Height": 64,
+      "PrimaryText": "Forest West"
     },
     "JenkinsHouse": {
       "X": 755,
