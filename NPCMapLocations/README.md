@@ -1,6 +1,6 @@
 ## Adding support for custom locations
 
-This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended for use on a PC.
+This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended to be followed on a PC.
 
 **For more information on other features and usage of the mod, check the [Nexus Mods page](https://www.nexusmods.com/stardewvalley/mods/239).**
 
@@ -14,6 +14,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
   - [Folder selection](#folder-selection)
 - [Adding points](#adding-points)
   - [Example](#example)
+  - [Single points](#single-points)
   - [Adding location tooltips](#adding-location-tooltips)
   - [Testing and validating](#testing-and-validating)
   - [Common issues](#common-issues)
@@ -152,6 +153,25 @@ For tracking, we an entry for `"TownEast"` in `"CustomMapLocations"`. We input t
 ```
 
 The first point between the curly brackets represents the top-left corner, and then following point represents the bottom-right corner.
+
+### Single points
+
+Instead of an area with tracking, if you want to display the character in a location in a single point on the map, you only need to specify the `MapX` and `MapY` like so:
+
+```js
+"CustomMapLocations": {
+  "PointOfInterest": [
+    {
+      MapX: 36,
+      MapY: 469
+    },
+  ]
+},
+```
+
+Other points are not needed because we're simply showing the character at (36, 469) on the map in that location without needing to do any calcualtions.
+
+**Note that you do NOT need to add any indoor locations. NPC Map Locations will automatically find indoor locations on the map, given that the tracking for its outdoor location is accurate and there exists a valid warp into the indoor location.**
 
 ### Adding location tooltips
 
