@@ -23,7 +23,6 @@ namespace NPCMapLocations
 		private readonly MapModButton immersionButton1;
 		private readonly MapModButton immersionButton2;
 		private readonly MapModButton immersionButton3;
-		private readonly Texture2D map;
 		private readonly int mapX;
 		private readonly int mapY;
 		private readonly ClickableTextureComponent okButton;
@@ -42,9 +41,8 @@ namespace NPCMapLocations
 			ModCustomizations customizations
 		) : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
     {
-			map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			var topLeftPositionForCenteringOnScreen =
-				Utility.getTopLeftPositionForCenteringOnScreen(map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
+				Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
 					0, 0);
 			mapX = (int) topLeftPositionForCenteringOnScreen.X;
 			mapY = (int) topLeftPositionForCenteringOnScreen.Y;
@@ -184,7 +182,7 @@ namespace NPCMapLocations
 				return;
 			}
 
-			if (key.ToString().Equals(ModMain.Config.MenuKey) && readyToClose() && canClose)
+			if (key.ToString().Equals(ModMain.Globals.MenuKey) && readyToClose() && canClose)
 			{
 				Game1.exitActiveMenu();
 				Game1.activeClickableMenu = new GameMenu();
@@ -338,8 +336,8 @@ namespace NPCMapLocations
 			if (Game1.options.showMenuBackground) drawBackground(b);
 
 		  Game1.drawDialogueBox(mapX - Game1.pixelZoom * 8, mapY - Game1.pixelZoom * 24,
-		    (map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
-		  b.Draw(map, new Vector2(mapX, mapY), new Rectangle(0, 0, 300, 180),
+		    (ModMain.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
+		  b.Draw(ModMain.Map, new Vector2(mapX, mapY), new Rectangle(0, 0, 300, 180),
 		    Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
 		  b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
 		  Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen, width, height, false, true, null,

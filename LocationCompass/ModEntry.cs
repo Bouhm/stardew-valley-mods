@@ -229,13 +229,13 @@ namespace LocationCompass
         if (npc == null || npc.currentLocation == null) continue;
         if (syncedLocationData.SyncedLocations.TryGetValue(npc.Name, out var locationData))
         {
-          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, (int)npc.getTileX(), (int)npc.getTileY());
+          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
         }
         else
         {
 
           syncedLocationData.AddNpcLocation(npc.Name,
-            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(), npc.getTileY()));
+            new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y));
         }
       }
     }
@@ -346,7 +346,7 @@ namespace LocationCompass
         } 
         else
         {
-          charPosition = new Vector2(npcLoc.TileX * Game1.tileSize, npcLoc.TileY * Game1.tileSize);
+          charPosition = new Vector2(npcLoc.X, npcLoc.Y);
           charSpriteHeight = character.Sprite.SpriteHeight;
         }
 

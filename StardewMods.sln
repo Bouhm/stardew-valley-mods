@@ -17,8 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLo
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocationUtil", "LocationUtil\LocationUtil.shproj", "{B5722EEF-6C91-400D-B644-9FAC63FE2777}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MouseUtil", "MouseUtil\MouseUtil.shproj", "{07F48E86-0BAD-4DCE-A967-7F42A8BD3D13}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		MouseUtil\MouseUtil.projitems*{07f48e86-0bad-4dce-a967-7f42a8bd3d13}*SharedItemsImports = 13
 		LocationUtil\LocationUtil.projitems*{b5722eef-6c91-400d-b644-9fac63fe2777}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,7 +39,6 @@ Global
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.ActiveCfg = Release|x86
 		{8DBA97C7-8E77-4FBF-A717-5AD30B4DF50D}.Release|x86.Build.0 = Release|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|Any CPU.Build.0 = Debug|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.ActiveCfg = Debug|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Debug|x86.Build.0 = Debug|x86
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|Any CPU.ActiveCfg = Release|x86

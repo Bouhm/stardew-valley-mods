@@ -15,10 +15,13 @@ namespace NPCMapLocations
 {
   public class ModMain : Mod, IAssetLoader
   {
-    public static ModConfig Config;
+    public static PlayerConfig Config;
+    public static GlobalConfig Globals; 
+    public static CustomData CustomData;
     public static IModHelper Helper;
+    public static IMonitor IMonitor;
     public static SButton HeldKey;
-    public static bool IsSVE;
+    public static Texture2D Map;
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -34,7 +37,7 @@ namespace NPCMapLocations
     private Dictionary<long, CharacterMarker> FarmerMarkers;
 
     // Customizations/Custom mods
-    private string Season;
+    private string MapSeason;
     private ModCustomizations Customizations;
 
     // Debugging
@@ -54,18 +57,26 @@ namespace NPCMapLocations
     {
       T map;
 
-      if (Season == null)
+      if (MapSeason == null)
       {
         Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-        Season = "spring";
+        MapSeason = "spring";
+      }
+
+      if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{this.MapSeason}_map.png")))
+      {
+        Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+        MapSeason = null; // Set to null so that cache is not invalidate when game season changes
       }
 
       // Replace map page
-      string filename = $"{this.Season}_map.png";
+      string filename = this.MapSeason == null ? "spring_map.png" : $"{this.MapSeason}_map.png";
+
       bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
       map = useRecolor
         ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
         : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
+
       if (useRecolor)
         Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
@@ -75,16 +86,8 @@ namespace NPCMapLocations
     public override void Entry(IModHelper helper)
     {
       Helper = helper;
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/default.json") ?? new ModConfig();
-      // Load farm buildings
-      try
-      {
-        BuildingMarkers = Helper.Content.Load<Texture2D>(@"assets/buildings.png");
-      }
-      catch
-      {
-        BuildingMarkers = null;
-      }
+      IMonitor = Monitor;
+      Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
@@ -103,20 +106,33 @@ namespace NPCMapLocations
     // Load config and other one-off data
     private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-      Config = Helper.Data.ReadJsonFile<ModConfig>($"config/{Constants.SaveFolderName}.json") ?? Config;
-      IsSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
-      Customizations = new ModCustomizations(Monitor)
-      {
-        LocationTextures = File.Exists(@"assets/customLocations.png") ? Helper.Content.Load<Texture2D>(@"assets/customLocations.png") : null
-      };
-      Season = Config.UseSeasonalMaps ? Game1.currentSeason : "spring";
-      Helper.Content.InvalidateCache("LooseSprites/Map");
+      Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
-      DEBUG_MODE = Config.DEBUG_MODE;
+      // Load customizations
+      Customizations = new ModCustomizations();
+      CustomData = Helper.Data.ReadJsonFile<CustomData>(Path.Combine(Customizations.MapsPath, "customlocations.json")) ?? new CustomData();
+      Customizations.LoadCustomData();
+
+      // Load farm buildings
+      try
+      {
+        BuildingMarkers = Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsPath, "buildings.png"));
+      }
+      catch
+      {
+        BuildingMarkers = null;
+      }
+      MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
+      Helper.Content.InvalidateCache("LooseSprites/Map");
+      Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+
+      // Disable for multiplayer for anti-cheat
+      DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
       shouldShowMinimap = Config.ShowMinimap;
 
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations) { 
+      foreach (var location in Game1.locations)
+      {
         LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
       }
 
@@ -239,22 +255,31 @@ namespace NPCMapLocations
       // Minimap dragging
       if (Config.ShowMinimap && Minimap != null)
       {
-        if (e.Button.ToString().Equals(Config.MinimapDragKey))
+        if (e.Button.ToString().Equals(Globals.MinimapDragKey))
         {
           HeldKey = e.Button;
         }
-        else if (HeldKey.ToString().Equals(Config.MinimapDragKey) &&
+        else if (HeldKey.ToString().Equals(Globals.MinimapDragKey) &&
                  (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
                  Game1.activeClickableMenu == null)
         {
-          Minimap.HandleMouseDown();
-          if (Minimap.isBeingDragged)
+          MouseUtil.HandleMouseDown(() => Minimap.HandleMouseDown());
+          if (MouseUtil.IsMouseHeldDown)
             Helper.Input.Suppress(e.Button);
         }
       }
 
+      // Debug DnD
+      if
+        (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      {
+        MouseUtil.HandleMouseDown();
+        if (MouseUtil.IsMouseHeldDown)
+          Helper.Input.Suppress(e.Button);
+      }
+
       // Minimap toggle
-      if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
+      if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
@@ -262,27 +287,32 @@ namespace NPCMapLocations
 
       // ModMenu
       if (Game1.activeClickableMenu is GameMenu)
-        HandleInput((GameMenu) Game1.activeClickableMenu, e.Button);
+        HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
-      if (DEBUG_MODE && e.Button == SButton.LeftAlt) HeldKey = e.Button;
+      if (DEBUG_MODE && e.Button == SButton.LeftControl) HeldKey = e.Button;
 
-      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftAlt && e.Button.Equals(SButton.MouseRight))
+      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftControl && e.Button.Equals(SButton.MouseRight))
         Game1.player.setTileLocation(Game1.currentCursorTile);
     }
 
     private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
-      if (HeldKey.ToString().Equals(Config.MinimapDragKey) && e.Button.ToString().Equals(Config.MinimapDragKey) ||
-          HeldKey == SButton.LeftAlt && e.Button != SButton.MouseRight)
+      if (HeldKey.ToString().Equals(Globals.MinimapDragKey) && e.Button.ToString().Equals(Globals.MinimapDragKey) ||
+          HeldKey == SButton.LeftControl && e.Button != SButton.MouseRight)
         HeldKey = SButton.None;
 
       if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
       {
         if (Game1.activeClickableMenu == null)
-          Minimap.HandleMouseRelease();
+          MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
         else if (Game1.activeClickableMenu is ModMenu)
           Minimap.Resize();
+      }
+      else if
+        (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      {
+        MouseUtil.HandleMouseRelease();
       }
     }
 
@@ -290,15 +320,15 @@ namespace NPCMapLocations
     private void HandleInput(GameMenu menu, SButton input)
     {
       if (menu.currentTab != GameMenu.mapTab) return;
-      if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
+      if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
           ConditionalNpcs,
           Customizations
         );
 
-      if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
+      if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
         ChangeTooltipConfig();
-      else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.LeftShoulder) ChangeTooltipConfig(false);
+      else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder) ChangeTooltipConfig(false);
     }
 
     private void ChangeTooltipConfig(bool incre = true)
@@ -343,7 +373,7 @@ namespace NPCMapLocations
             ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(100162);
             break;
           case "Merchant":
-            ConditionalNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+            ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
             break;
           case "Sandy":
             ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
@@ -371,8 +401,8 @@ namespace NPCMapLocations
 
     private bool IsLocationBlacklisted(string location)
     {
-      return Config.ShowMinimap && Config.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-               ((Config.MinimapBlacklist.Contains("Mine") || Config.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
+      return Config.ShowMinimap && Globals.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
+               ((Globals.MinimapBlacklist.Contains("Mine") || Globals.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
     }
 
     private void ResetMarkers(List<NPC> villagers)
@@ -398,7 +428,7 @@ namespace NPCMapLocations
         NpcMarkers.Add(npcMarker);
       }
 
-      
+
       if (Context.IsMultiplayer)
         FarmerMarkers = new Dictionary<long, CharacterMarker>();
     }
@@ -419,17 +449,17 @@ namespace NPCMapLocations
           {
             if (npc == null || npc.currentLocation == null) continue;
             message.AddNpcLocation(npc.Name,
-              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.getTileX(),
-                npc.getTileY()));
+              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X,
+                npc.Position.Y));
           }
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });
         }
-       
+
         // Check season change (for when it's changed via console)
-        if (Config.UseSeasonalMaps && Season != Game1.currentSeason && Game1.currentSeason != null)
+        if (Globals.UseSeasonalMaps && (MapSeason != null && MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
         {
-          Season = Game1.currentSeason;
+          MapSeason = Game1.currentSeason;
 
           // Force reload of map for season changes
           try
@@ -490,10 +520,11 @@ namespace NPCMapLocations
             marker.SyncedLocationName = npcLoc.LocationName;
             if (!marker.IsHidden)
             {
-              var mapLocation = LocationToMap(npcLoc.LocationName, npcLoc.TileX, npcLoc.TileY, Customizations.MapVectors);
+              var mapLocation = LocationToMap(npcLoc.LocationName, (int)Math.Floor(npcLoc.X/Game1.tileSize), (int)Math.Floor(npcLoc.Y/Game1.tileSize), Customizations.MapVectors);
               marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
             }
           }
+         
           else
           {
             marker.MapLocation = Vector2.Zero;
@@ -531,7 +562,7 @@ namespace NPCMapLocations
         Customizations
       );
     }
- 
+
     private void UpdateMarkers(bool forceUpdate = false)
     {
       if (isModMapOpen || forceUpdate)
@@ -576,7 +607,7 @@ namespace NPCMapLocations
           npcMarker.IsOutdoors = false;
         }
 
-      // For show Npcs in player's location option
+        // For show Npcs in player's location option
         var isSameLocation = false;
         if (Config.OnlySameLocation)
         {
@@ -616,16 +647,16 @@ namespace NPCMapLocations
               switch (quest.questType.Value)
               {
                 case 3:
-                  npcMarker.HasQuest = ((ItemDeliveryQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 4:
-                  npcMarker.HasQuest = ((SlayMonsterQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 7:
-                  npcMarker.HasQuest = ((FishingQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
                 case 10:
-                  npcMarker.HasQuest = ((ResourceCollectionQuest) quest).target.Value == npcMarker.Npc.Name;
+                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Npc.Name;
                   break;
               }
             else
@@ -653,8 +684,8 @@ namespace NPCMapLocations
           if (npcMarker.SyncedLocationName == null)
           {
             // Get center of NPC marker 
-            var x = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
-            var y = (int) LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
+            var x = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
+            var y = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
             npcMarker.MapLocation = new Vector2(x, y);
           }
         }
@@ -723,7 +754,7 @@ namespace NPCMapLocations
 
     // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
     // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
-    // Requires MapModConstants and modified map page in ./assets
+    // Requires MapModConstants and modified map page in /maps
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
       Dictionary<string, MapVector[]> CustomMapVectors = null, bool isPlayer = false)
     {
@@ -788,7 +819,7 @@ namespace NPCMapLocations
       }
 
       if (locVectors == null || locationNotFound) return Vector2.Zero;
-      
+
       int x;
       int y;
 
@@ -840,14 +871,14 @@ namespace NPCMapLocations
         if (upper == null)
           upper = lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-        x = (int) MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double) (upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
-        y = (int) MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double) (upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
+        x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
+        y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
 
-        if (DEBUG_MODE && isPlayer)
-        {
-          _tileUpper = new Vector2(upper.TileX, upper.TileY);
-          _tileLower = new Vector2(lower.TileX, lower.TileY);
-        }
+        //        if (DEBUG_MODE && isPlayer)
+        //        {
+        //          _tileUpper = new Vector2(upper.TileX, upper.TileY);
+        //          _tileLower = new Vector2(lower.TileX, lower.TileY);
+        //        }
       }
 
       return new Vector2(x, y);
@@ -865,6 +896,7 @@ namespace NPCMapLocations
     private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
+      MouseUtil.Reset();
 
       // Check for resize after mod menu closed
       if (e.OldMenu is ModMenu)
@@ -877,7 +909,7 @@ namespace NPCMapLocations
 
       // Hide minimap in blacklisted locations with special case for Mines as usual
       shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
-       
+
       // Check if map does not fill screen and adjust for black bars (ex. BusStop)
       Minimap?.CheckOffsetForMap();
     }
@@ -887,11 +919,11 @@ namespace NPCMapLocations
       if (Context.IsWorldReady && Config.ShowMinimap && shouldShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
-      if (DEBUG_MODE && HeldKey == SButton.LeftAlt)
+      if (DEBUG_MODE)
         Game1.spriteBatch.Draw(Game1.mouseCursors,
           new Vector2(
-            Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
-            Game1.tileSize * (int) Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
+            Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
+            Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
           new Rectangle(448, 128, 64, 64), Color.White);
     }
 
@@ -909,57 +941,139 @@ namespace NPCMapLocations
     {
       if (Game1.player.currentLocation == null) return;
       string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-      string locationText =
-        $"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})";
+      var textHeight = (int)Game1.dialogueFont
+        .MeasureString("()").Y-6;
+     
 
-      // Black background for legible text
-      Game1.spriteBatch.Draw(Game1.shadowTexture, new Rectangle(0, 0, 200 + (int)Game1.smallFont
-                                                                        .MeasureString(locationText).X, 200), new Rectangle(3, 0, 1, 1),
-        Color.Black);
-
-      // Show map location and tile positions
-      DrawText(
-        locationText,
-        new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-      DrawText(
-        "Position: (" + Math.Ceiling(Game1.player.Position.X / Game1.tileSize) + ", " +
-        Math.Ceiling(Game1.player.Position.Y / Game1.tileSize) + ")",
-        new Vector2(Game1.tileSize / 4, Game1.tileSize * 3 / 4 + 8),
-        _tileUpper != Vector2.Zero && (Game1.player.Position.X / Game1.tileSize > _tileUpper.X ||
-                                       Game1.player.Position.Y / Game1.tileSize > _tileUpper.Y)
-          ? Color.Red
-          : Color.White);
-
-      var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu) Game1.activeClickableMenu : null;
-
-      // Show lower & upper bound tiles used for calculations
-      if (!(_tileLower == Vector2.Zero && _tileUpper == Vector2.Zero))
+      var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
+     
+      // If map is open, show map position at cursor
+      if (isModMapOpen)
       {
-        if (isModMapOpen || Config.ShowMinimap)
+        int borderWidth = 3;
+        float borderOpacity = 0.75f;
+        Vector2 mapPos = MouseUtil.GetMapPositionAtCursor();
+        Rectangle bounds = MouseUtil.GetDragAndDropArea();
+
+        var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
+        tex.SetData(new Color[] { Color.Red });
+
+        // Draw point at cursor on map
+        Game1.spriteBatch.Draw(tex,
+          new Rectangle(Game1.getMouseX() - (int)(borderWidth/2), Game1.getMouseY() - (int)(borderWidth/2), borderWidth, borderWidth),
+          Rectangle.Empty, Color.White);
+
+        // Show map pixel position at cursor
+        DrawText($"Map position: ({mapPos.X}, {mapPos.Y})",
+          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+
+        // Draw drag and drop area
+        if (MouseUtil.IsMouseHeldDown)
         {
-          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2));
-          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3));
+          // Draw dragging box
+          DrawBorder(tex,
+           MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
         }
         else
         {
-          DrawText("Lower bound: (" + _tileLower.X + ", " + _tileLower.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 5 / 4 + 8 * 2), Color.DimGray);
-          DrawText("Upper bound: (" + _tileUpper.X + ", " + _tileUpper.Y + ")",
-            new Vector2(Game1.tileSize / 4, Game1.tileSize * 7 / 4 + 8 * 3), Color.DimGray);
+          if (MouseUtil.BeginMousePosition.X < 0 && MouseUtil.EndMousePosition.X < 0) return;
+
+          // Draw drag and drop box
+          DrawBorder(tex,
+            bounds,
+            borderWidth, Color.White * borderOpacity);
+
+          // Make points more distinct
+//          Game1.spriteBatch.Draw(tex,
+//            new Rectangle((int)MouseUtil.BeginMousePosition.X, (int)MouseUtil.BeginMousePosition.Y, borderWidth, borderWidth),
+//            Rectangle.Empty, Color.White);
+//
+//          Game1.spriteBatch.Draw(tex,
+//            new Rectangle((int)MouseUtil.EndMousePosition.X, (int)MouseUtil.EndMousePosition.Y, borderWidth, borderWidth),
+//            Rectangle.Empty, Color.White);
+
+          var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
+
+          if (mapBounds.Width == 0 && mapBounds.Height == 0)
+          {
+            // Show point
+            DrawText($"Point: ({mapBounds.X}, {mapBounds.Y})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+          }
+          else
+          {
+            // Show first point of DnD box
+            DrawText($"Top-left: ({mapBounds.X}, {mapBounds.Y})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+
+            // Show second point of DnD box
+            DrawText($"Bot-right: ({mapBounds.X + mapBounds.Width}, {mapBounds.Y + mapBounds.Height})",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
+
+            // Show width of DnD box
+            DrawText($"Width: {mapBounds.Width}",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
+
+            // Show height of DnD box
+            DrawText($"Height: {mapBounds.Height}",
+              new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
+          }
         }
+      }
+      else
+      {
+        // Show tile position of tile at cursor
+        var tilePos = MouseUtil.GetTilePositionAtCursor();
+        DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 ), Color.White);
+        DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize /4 +textHeight), Color.White);
       }
     }
 
     // Draw outlined text
     private static void DrawText(string text, Vector2 pos, Color? color = null)
     {
+      var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
+      tex.SetData(new Color[] { Color.Black * 0.75f });
+
+      // Dark background for clearer text
+      Game1.spriteBatch.Draw(
+        tex,
+        new Rectangle(
+          (int)pos.X,
+          (int)pos.Y,
+          (int)Game1.dialogueFont.MeasureString(text).X,
+          (int)Game1.dialogueFont.MeasureString("()").Y-6),
+        Rectangle.Empty,
+        Color.Black
+       );
+
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
       Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
+    }
+
+    // Draw rectangle border
+    private static void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
+    {
+      // Draw top line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, rect.Width+3, borderWidth), color);
+
+      // Draw left line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, borderWidth, rect.Height+3), color);
+
+      // Draw right line
+      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth+2),
+        rect.Y-1,
+        borderWidth,
+        rect.Height+3), color);
+
+      // Draw bottom line
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1,
+        rect.Y + rect.Height - borderWidth+2,
+        rect.Width+3,
+        borderWidth), color);
     }
   }
 

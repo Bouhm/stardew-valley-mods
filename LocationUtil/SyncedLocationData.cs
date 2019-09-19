@@ -27,13 +27,13 @@ internal class SyncedLocationData
 internal class LocationData
 {
   public string LocationName { get; set; }
-  public int TileX { get; set; }
-  public int TileY { get; set; }
+  public float X { get; set; }
+  public float Y { get; set; }
 
-  public LocationData(string locationName, int tileX, int tileY)
+  public LocationData(string locationName, float X, float Y)
   {
     this.LocationName = locationName;
-    this.TileX = tileX;
-    this.TileY = tileY;
+    this.X = X;
+    this.Y = Y;
   }
 }

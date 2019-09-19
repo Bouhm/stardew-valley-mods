@@ -27,7 +27,6 @@ namespace NPCMapLocations
 	  private readonly ModCustomizations Customizations;
 		private string hoveredNames = "";
 		private string hoveredLocationText = "";
-		private Texture2D map;
 		private int mapX;
 		private int mapY;
 		private bool hasIndoorCharacter;
@@ -53,74 +52,53 @@ namespace NPCMapLocations
 			this.BuildingMarkers = buildingMarkers;
 		  this.Customizations = customizations;
 
-      map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(map.Bounds.Width * 4, 720, 0, 0);
+			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
 			mapX = (int) center.X;
 			mapY = (int) center.Y;
 
 			var regionRects = RegionRects().ToList();
-      var customTooltips = Customizations.Tooltips.ToList();
 
-			for (int i = 0; i < regionRects.Count; i++)
-			{
-			  var rect = regionRects.ElementAtOrDefault(i);
+      for (int i = 0; i < regionRects.Count; i++)
+      {
+        var rect = regionRects.ElementAtOrDefault(i);
 
-			  this.points[i].bounds = new Rectangle(
-			    // Snaps the cursor to the center instead of bottom right (default)
-			    (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
-			    (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
-			    rect.Value.Width,
-			    rect.Value.Height
-			  );
-
-			  if (ModMain.IsSVE)
-			  {
-			    // Adventure's Guild is in a different location in SVE
-			    if (this.points[i].myID == 1025)
-			    {
-			      this.points[i].bounds = new Rectangle(mapX + 682, mapY + 451, 22, 30);
-			    }
-			    // Remove sewer which gets replaced by Adventure Guild
-			    else if (this.points[i].myID == 1018)
-			    {
-			      this.points[i].bounds.Width = 0;
-			      this.points[i].bounds.Height = 0;
-			    }
-			    // So it doesn't cover up the other new points in the railroad
-			    else if (this.points[i].myID == 1034)
-			    {
-			      this.points[i].bounds.Width /= 2;
-			    }
-			  }
+        this.points[i].bounds = new Rectangle(
+          // Snaps the cursor to the center instead of bottom right (default)
+          (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
+          (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
+          rect.Value.Width,
+          rect.Value.Height
+        );
       }
 
-      int idx = 0;
+      var customTooltips = Customizations.Tooltips.ToList();
 
-      // Add custom tooltips
-      for(int i = regionRects.Count; i < regionRects.Count + customTooltips.Count; i++)
+      foreach (var tooltip in customTooltips)
       {
-        var tooltip = customTooltips.ElementAtOrDefault(idx);
-        if (tooltip == null) break;
-
-        var point = new ClickableComponent(new Rectangle(
-          tooltip.bounds.X + mapX,
-          tooltip.bounds.Y + mapY,
+        var vanillaTooltip = this.points.Find(x => x.name == tooltip.name);
+        var customTooltip = new ClickableComponent(new Rectangle(
+          mapX + tooltip.bounds.X,
+          mapY + tooltip.bounds.Y,
           tooltip.bounds.Width,
           tooltip.bounds.Height
         ), tooltip.name);
 
-        if (this.points.Count <= i)
+        // Replace vanilla with custom
+        if (vanillaTooltip != null)
         {
-          this.points.Add(point);
+          vanillaTooltip = customTooltip;
         }
         else
+        // If new custom location, add it
         {
-          this.points[i] = point;
+          this.points.Add(customTooltip);
         }
-
-        idx++;
       }
+
+      // If two tooltip areas overlap, the one earlier in the list takes precendence
+      // Reversing order allows custom tooltips to take precendence
+      this.points.Reverse();
     }
 
 		public override void performHoverAction(int x, int y)
@@ -301,26 +279,27 @@ namespace NPCMapLocations
 		{
 			int boxY = mapY - 96;
 			int mY = mapY;
-			Game1.drawDialogueBox(mapX - 32, boxY, (map.Bounds.Width + 16) * 4, 848, false, true, null, false);
-			b.Draw(map, new Vector2((float) mapX, (float) mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
+
+			Game1.drawDialogueBox(mapX - 32, boxY, (ModMain.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
+			b.Draw(ModMain.Map, new Vector2((float) mapX, (float) mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
 			switch (Game1.whichFarm)
 			{
 				case 1:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 2:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 3:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 				case 4:
-					b.Draw(map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f,
+					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f,
 						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 					break;
 			}
@@ -328,7 +307,7 @@ namespace NPCMapLocations
 			if (drawPamHouseUpgrade)
 			{
 			  var houseLoc = ModMain.LocationToMap("Trailer_Big");
-				b.Draw(map,
+				b.Draw(ModMain.Map,
 					new Vector2((float) (mapX + houseLoc.X - 13),
 						(float) (mapY + houseLoc.Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
@@ -424,7 +403,7 @@ namespace NPCMapLocations
 		// Subtractions within location vectors are to set the origin to the center of the sprite
 		public void DrawMarkers(SpriteBatch b)
 		{
-			if (ModMain.Config.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
+			if (ModMain.Globals.ShowFarmBuildings && FarmBuildings != null && BuildingMarkers != null)
 			{
 				var sortedBuildings = FarmBuildings.ToList();
 				sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -449,15 +428,6 @@ namespace NPCMapLocations
 				  }
 				}
 			}
-
-      // ===== Custom locations =====
-      foreach (var location in Customizations.Locations)
-      {   
-        b.Draw(Customizations.LocationTextures, new Vector2(mapX + location.Value.LocVector.X, mapY + location.Value.LocVector.Y),
-          location.Value.SrcRect, Color.White,
-          0f,
-          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-      }
 
       // Traveling Merchant
       if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
@@ -628,7 +598,8 @@ namespace NPCMapLocations
 				0f);
 		}
 
-		/// <summary>Get the map points to display on a map.</summary>
+		/// <summary>Get the ModMain.Map points to display on a map.</summary>
+		/// vanilla locations that have to be tweaked to match modified map
 		private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
 		{
 			{"Desert_Region", new Rectangle(-1, -1, 261, 175)},

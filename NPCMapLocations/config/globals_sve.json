@@ -1,0 +1,16 @@
+{
+  "UseSeasonalMaps": true,
+  "MinimapBlacklist": [],
+  "MenuKey": "Tab",
+  "TooltipKey": "Space",
+  "MinimapDragKey": "LeftControl",
+  "MinimapToggleKey": "OemPipe",
+  "ShowFarmBuildings": true,
+  "CustomNpcMarkerOffsets": {
+    "Andy": 1,
+    "Olivia": 1,
+    "Victor": 0,
+    "Susan":  0
+  },
+  "DEBUG_MODE":  false
+}
