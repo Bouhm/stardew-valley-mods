@@ -35,6 +35,8 @@ namespace NPCMapLocations
       MapsPath = GetCustomMapFolderName();
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
+      else
+        MapsPath = Path.Combine(MapsRootPath, "_default");
     }
 
     // Handles customizations for NPCs
@@ -142,8 +144,6 @@ namespace NPCMapLocations
       NpcMarkerOffsets = ModConstants.NpcMarkerOffsets;
     }
 
-    // { "customLocation": [{x, y}] } where x, y are relative to map (for a custom location ex. a new house)
-    // { "customRegion": [{x1, y1}, {x2, y2}] where x, y are relative to map (for a custom region ex. a new farm)
     // Any custom locations with given location on the map
     private void LoadCustomMapLocations()
     {

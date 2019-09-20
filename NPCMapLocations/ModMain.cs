@@ -122,6 +122,7 @@ namespace NPCMapLocations
       {
         BuildingMarkers = null;
       }
+
       MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
