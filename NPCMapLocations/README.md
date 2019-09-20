@@ -68,7 +68,7 @@ When the game is launched, NPC Map Locations automatically chooses one folder to
 | `A ~ B` | Requires mod ID `A` _or_ `B`. |
 | `A, B`  | Requires _both_ `A` and `B`.  |
 
-i
+The mod ID is the `UniqueID` for the mod's `manifest.json`.
 `~` is meant for alternative IDs, so it has precedence. For example, `A ~ B, C ~ D` means
 `(A or B) and (C or D)`.
 
@@ -77,7 +77,7 @@ If multiple folders match, the first one alphabetically which matches more mods 
 
 The folder should include the following files:
 
-- customlocations.json
+- customlocations.json (only if there are custom locations)
 - spring_map.png
 - fall_map.png (if adding seasonal maps)
 - summer_map.png (if adding seasonal maps)
