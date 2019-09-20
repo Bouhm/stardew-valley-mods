@@ -68,7 +68,8 @@ When the game is launched, NPC Map Locations automatically chooses one folder to
 | `A ~ B` | Requires mod ID `A` _or_ `B`. |
 | `A, B`  | Requires _both_ `A` and `B`.  |
 
-The mod ID is the `UniqueID` for the mod's `manifest.json`.
+Where the mod ID is the `UniqueID` for the mod's `manifest.json`.
+
 `~` is meant for alternative IDs, so it has precedence. For example, `A ~ B, C ~ D` means
 `(A or B) and (C or D)`.
 
