@@ -16,9 +16,10 @@ Locates characters on the screen indicating direction and distance from player's
 Replaces pet dog with a Shiba Inu, Shepherd, or Husky.
 Requires [Content Patcher]("https://www.nexusmods.com/stardewvalley/mods/1915").
 
+## Compiling
+To compile a SMAPI mod for testing, use the following instructions:
 
-
-
-
-
-
+1. Make sure to have the appropriate versions of the game and [SMAPI](https://smapi.io) installed.
+2. Open the solution with Visual Studio or MonoDevelop.
+3. Add the package [Stardew.ModBuildConfig](https://www.nuget.org/packages/Pathoschild.Stardew.ModBuildConfig) by Pathoschild to enable cross-platform compatibility.
+4. Re-build the solution and run the debugger to launch the project with SMAPI.
