@@ -8,8 +8,7 @@ A collection of Stardew Valley mods that improve player experience, quality of l
 
 ### [NPC Map Locations Mod](https://www.nexusmods.com/stardewvalley/mods/239)
 Shows character locations on the map. Uses a modified map page much more accurate to the game.
-
-#### [Adding custom locations](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations) 
+*[Adding custom locations](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations)*
 
 ### [Location Compass](https://www.nexusmods.com/stardewvalley/mods/3045)
 Locates characters on the screen indicating direction and distance from player's current position.
