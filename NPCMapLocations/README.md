@@ -1,4 +1,4 @@
-## Adding support for custom locations
+## Adding custom locations
 
 This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended to be followed on a PC.
 
@@ -14,6 +14,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
   - [Folder selection](#folder-selection)
 - [Adding points](#adding-points)
   - [Example](#example)
+    - [Farm types](#farm-types)
   - [Single points](#single-points)
   - [Adding location tooltips](#adding-location-tooltips)
   - [Testing and validating](#testing-and-validating)
@@ -68,7 +69,8 @@ When the game is launched, NPC Map Locations automatically chooses one folder to
 | `A ~ B` | Requires mod ID `A` _or_ `B`. |
 | `A, B`  | Requires _both_ `A` and `B`.  |
 
-i
+Where the mod ID is the `UniqueID` for the mod's `manifest.json`.
+
 `~` is meant for alternative IDs, so it has precedence. For example, `A ~ B, C ~ D` means
 `(A or B) and (C or D)`.
 
@@ -77,7 +79,7 @@ If multiple folders match, the first one alphabetically which matches more mods 
 
 The folder should include the following files:
 
-- customlocations.json
+- customlocations.json (only if there are custom locations)
 - spring_map.png
 - fall_map.png (if adding seasonal maps)
 - summer_map.png (if adding seasonal maps)
@@ -151,6 +153,16 @@ For tracking, we add an entry for `"TownEast"` in `"CustomMapLocations"`. We inp
   ]
 },
 ```
+
+#### Farm types
+
+Sometimes a mod will change a farm only based on the farm type. If you want to specify points for any farm, you can leave the location name as "Farm" but for specific farm types, you will need to use the following:
+- "Farm_Default"
+- "Farm_Riverland"
+- "Farm_Forest"
+- "Farm_Hills"
+- "Farm_Wilderness"
+
 ### Single points
 
 Instead of an area with tracking, if you want to display the character in a location in a single point on the map, you only need to specify the `MapX` and `MapY` like so:
