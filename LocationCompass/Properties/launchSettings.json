@@ -2,8 +2,8 @@
   "profiles": {
     "LocationCompass": {
       "commandName": "Executable",
-      "executablePath": "E:\\Steam\\steamapps\\common\\Stardew Valley\\StardewModdingAPI.exe",
-      "workingDirectory": "E:\\Steam\\steamapps\\common\\Stardew Valley"
+      "executablePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley\\StardewModdingAPI.exe",
+      "workingDirectory": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley"
     }
   }
 }
