@@ -43,8 +43,6 @@ namespace NPCMapLocations
     // Debugging
     private static bool DEBUG_MODE;
     private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
-    private static Vector2 _tileLower;
-    private static Vector2 _tileUpper;
     private static List<string> alertFlags;
 
     // Replace game map with modified map
