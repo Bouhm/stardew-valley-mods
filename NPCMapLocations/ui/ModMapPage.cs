@@ -31,7 +31,9 @@ namespace NPCMapLocations
 		private int mapY;
 		private bool hasIndoorCharacter;
 		private Vector2 indoorIconVector;
-		private bool drawPamHouseUpgrade;
+    private bool drawPamHouseUpgrade;
+    private bool drawMovieTheaterJoja;
+    private bool drawMovieTheater;
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
@@ -52,12 +54,14 @@ namespace NPCMapLocations
 			this.BuildingMarkers = buildingMarkers;
 		  this.Customizations = customizations;
 
-			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-			Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
-			mapX = (int) center.X;
-			mapY = (int) center.Y;
+      Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720);
+      drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
+      drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
+      drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
+      mapX = (int)center.X;
+      mapY = (int)center.Y;
 
-			var regionRects = RegionRects().ToList();
+      var regionRects = RegionRects().ToList();
 
       for (int i = 0; i < regionRects.Count; i++)
       {
@@ -205,7 +209,7 @@ namespace NPCMapLocations
           -1, -1, 1f, null);
         int textLength = (int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2;
         width = Math.Max((int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2, textLength);
-        height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + Game1.tileSize / 2);
+        height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + 5*Game1.tileSize/8);
         if (x + width > Game1.viewport.Width)
         {
           x = Game1.viewport.Width - width;

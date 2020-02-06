@@ -2,8 +2,8 @@
   "profiles": {
     "NPCMapLocations": {
       "commandName": "Executable",
-      "executablePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley\\StardewModdingAPI.exe",
-      "workingDirectory": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley"
+      "executablePath": "E:\\Steam\\steamapps\\common\\Stardew Valley\\StardewModdingAPI.exe",
+      "workingDirectory": "E:\\Steam\\steamapps\\common\\Stardew Valley"
     }
   }
 }
