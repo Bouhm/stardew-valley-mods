@@ -292,36 +292,50 @@ namespace NPCMapLocations
 			b.Draw(ModMain.Map, new Vector2((float) mapX, (float) mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
 				4f, SpriteEffects.None, 0.86f);
 
-			switch (Game1.whichFarm)
-			{
-				case 1:
-					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 180, 131, 61), Color.White, 0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 2:
-					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 180, 131, 61), Color.White, 0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 3:
-					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(0, 241, 131, 61), Color.White, 0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-				case 4:
-					b.Draw(ModMain.Map, new Vector2((float) mapX, (float) (mY + 172)), new Rectangle(131, 241, 131, 61), Color.White, 0f,
-						Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-					break;
-			}
+      float scroll_draw_y = yPositionOnScreen + height + 32 + 16;
+      float scroll_draw_bottom = scroll_draw_y + 80f;
+      if (scroll_draw_bottom > (float)Game1.viewport.Height)
+      {
+        scroll_draw_y -= scroll_draw_bottom - (float)Game1.viewport.Height;
+      }
 
-			if (drawPamHouseUpgrade)
-			{
-			  var houseLoc = ModMain.LocationToMap("Trailer_Big");
-				b.Draw(ModMain.Map,
-					new Vector2((float) (mapX + houseLoc.X - 13),
-						(float) (mapY + houseLoc.Y - 16)), new Rectangle(263, 181, 8, 8), Color.White,
-					0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-			}
+      Game1.drawDialogueBox(mapX - 32, boxY, (ModMain.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
+      b.Draw(ModMain.Map, new Vector2(mapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+      switch (Game1.whichFarm)
+      {
+        case 1:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+        case 2:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+        case 3:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+        case 4:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+        case 5:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+      }
+      //if (drawPamHouseUpgrade)
+      //{
+        var houseLoc = new Vector2(ModConstants.MapVectors["Trailer_Big"][0].MapX, ModConstants.MapVectors["Trailer_Big"][0].MapY);
+        b.Draw(ModMain.Map, new Vector2(mapX + houseLoc.X, mapY + houseLoc.Y), new Rectangle(263, 181, 8, 8), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      //}
+      //if (drawMovieTheater)
+      //{
+        var movieLoc = new Vector2(ModConstants.MapVectors["JojaMart"][0].MapX, ModConstants.MapVectors["JojaMart"][0].MapY);
+        b.Draw(ModMain.Map, new Vector2(mapX + movieLoc.X, mapY + movieLoc.Y), new Rectangle(271, 181, 29, 13), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      //}
+      //if (drawMovieTheaterJoja)
+      //{
+        var jojaLoc = new Vector2(ModConstants.MapVectors["JojaMart"][0].MapX, ModConstants.MapVectors["JojaMart"][0].MapY);
+        b.Draw(ModMain.Map, new Vector2(mapX + jojaLoc.X, mapY + jojaLoc.Y), new Rectangle(276, 181, 13, 13), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      //}
 
-			var player = Game1.player;
+      var player = Game1.player;
 			int x = player.getTileX();
 			int y = player.getTileY();
 			string playerLocationName = null;
