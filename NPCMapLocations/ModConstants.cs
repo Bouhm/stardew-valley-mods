@@ -347,12 +347,12 @@ public static class ModConstants
 //          new MapVector(878, 405)
 //        }
 //      },
-      {
-        "JojaMart", new MapVector[]
-        {
-          new MapVector(885, 302)
-        }
-      },
+//     {
+//        "JojaMart", new MapVector[]
+//        {
+//          new MapVector(885, 302)
+//        }
+//      },
 //      {
 //        "SamHouse", new MapVector[]
 //        {
@@ -365,12 +365,12 @@ public static class ModConstants
 //          new MapVector(813, 365)
 //        }
 //      },
-        {
-          "Trailer_Big", new MapVector[]
-          {
-            new MapVector(810, 365)
-          }
-        },
+//        {
+//          "Trailer_Big", new MapVector[]
+//          {
+//            new MapVector(810, 365)
+//          }
+//        },
 //      {
 //        "ManorHouse", new MapVector[]
 //        {

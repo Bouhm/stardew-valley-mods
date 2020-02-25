@@ -319,21 +319,14 @@ namespace NPCMapLocations
           b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
       }
-      //if (drawPamHouseUpgrade)
-      //{
-        var houseLoc = new Vector2(ModConstants.MapVectors["Trailer_Big"][0].MapX, ModConstants.MapVectors["Trailer_Big"][0].MapY);
-        b.Draw(ModMain.Map, new Vector2(mapX + houseLoc.X, mapY + houseLoc.Y), new Rectangle(263, 181, 8, 8), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-      //}
-      //if (drawMovieTheater)
-      //{
-        var movieLoc = new Vector2(ModConstants.MapVectors["JojaMart"][0].MapX, ModConstants.MapVectors["JojaMart"][0].MapY);
-        b.Draw(ModMain.Map, new Vector2(mapX + movieLoc.X, mapY + movieLoc.Y), new Rectangle(271, 181, 29, 13), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-      //}
-      //if (drawMovieTheaterJoja)
-      //{
-        var jojaLoc = new Vector2(ModConstants.MapVectors["JojaMart"][0].MapX, ModConstants.MapVectors["JojaMart"][0].MapY);
-        b.Draw(ModMain.Map, new Vector2(mapX + jojaLoc.X, mapY + jojaLoc.Y), new Rectangle(276, 181, 13, 13), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-      //}
+      if (drawPamHouseUpgrade)
+      {
+        b.Draw(ModMain.Map, new Vector2(200 * Game1.pixelZoom, 88 * Game1.pixelZoom), new Rectangle(263, 181, 8, 8), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      }
+      if (drawMovieTheater || drawMovieTheaterJoja)
+      {
+        b.Draw(ModMain.Map, new Vector2(216 * Game1.pixelZoom, 70 * Game1.pixelZoom), new Rectangle(275, 181, 15, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      }
 
       var player = Game1.player;
 			int x = player.getTileX();
