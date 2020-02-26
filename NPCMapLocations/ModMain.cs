@@ -318,7 +318,7 @@ namespace NPCMapLocations
     // Handle keyboard/controller inputs
     private void HandleInput(GameMenu menu, SButton input)
     {
-      if (menu.currentTab != GameMenu.mapTab) return;
+      if (menu.currentTab != ModConstants.MapTabIndex) return;
       if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
           ConditionalNpcs,
@@ -504,7 +504,7 @@ namespace NPCMapLocations
       }
 
       hasOpenedMap =
-        gameMenu.currentTab == GameMenu.mapTab; // When map accessed by switching GameMenu tab or pressing M
+        gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
@@ -545,7 +545,7 @@ namespace NPCMapLocations
       var pages = Helper.Reflection
         .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
-      var mapTab = GameMenu.mapTab;
+      var mapTab = ModConstants.MapTabIndex;
 
       // Find index of MapPage since it's a different value for SDV mobile
       foreach (var page in pages)

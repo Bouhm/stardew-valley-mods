@@ -6,9 +6,14 @@ Do NOT modify anything here other than MapVectors
 using NPCMapLocations;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using StardewModdingAPI;
+using StardewValley.Menus;
 
 public static class ModConstants
 {
+  // The page index of mapTab
+  public static int MapTabIndex => Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
+
   // Cropping heads for NPC markers
   // Values shift the head up (negative) or down (positive)
   public static Dictionary<string, int> NpcMarkerOffsets => new Dictionary<string, int>
