@@ -90,13 +90,21 @@ namespace NPCMapLocations
 
 	  public void CheckOffsetForMap()
 	  {
-	    // When ModMain.Map is smaller than viewport (ex. Bus Stop)
-	    if (Game1.isOutdoorMapSmallerThanViewport())
-	      offset = (int)(Game1.viewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
-	    else
-	      offset = 0;
-    }
+      // When ModMain.Map is smaller than viewport (ex. Bus Stop)
+      if (Game1.isOutdoorMapSmallerThanViewport())
+      {
+        offset = (int)(Game1.viewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
 
+        if (mmX > Math.Max(12, offset))
+        {
+          offset = 0;
+        }
+      }
+      else
+      {
+        offset = 0;
+      }
+    }
 		public void Resize()
 		{
 			mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
