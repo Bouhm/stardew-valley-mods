@@ -6,7 +6,13 @@
   "MinimapDragKey": "LeftControl",
   "MinimapToggleKey": "OemPipe",
   "ShowFarmBuildings": true,
-  "CustomNpcMarkerOffsets": {},
-  "NpcBlackList": [],
+  "CustomNpcMarkerOffsets": {
+    "Andy": 1,
+    "Olivia": 1,
+    "Victor": 0,
+    "Susan": 1,
+    "Sophia": 3
+  },
+  "NpcBlackList": [ "Marlon", "Morris" ],
   "DEBUG_MODE": false
 }
