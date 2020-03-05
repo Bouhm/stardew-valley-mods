@@ -345,7 +345,7 @@ namespace NPCMapLocations
 
       if (drawMovieTheater || drawMovieTheaterJoja)
       {
-        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 226 * Game1.pixelZoom), NormalizeToMap(offsetMmLoc.Y + 70 * Game1.pixelZoom),
+        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 226 * Game1.pixelZoom), NormalizeToMap(offsetMmLoc.Y + 70 * Game1.pixelZoom)),
         new Rectangle(275, 181, 15, 11), color,
         0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
