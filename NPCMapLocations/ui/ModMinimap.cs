@@ -13,7 +13,9 @@ namespace NPCMapLocations
 	  private readonly Texture2D BuildingMarkers;
 	  private readonly int borderWidth = 12;
 	  private readonly bool drawPamHouseUpgrade;
-	  private readonly Dictionary<long, CharacterMarker> FarmerMarkers;
+    private readonly bool drawMovieTheaterJoja;
+    private readonly bool drawMovieTheater;
+    private readonly Dictionary<long, CharacterMarker> FarmerMarkers;
 	  private readonly ModCustomizations Customizations;
 
 	  private Vector2 prevCenter;
@@ -51,8 +53,10 @@ namespace NPCMapLocations
 		  this.Customizations = customizations;
 
 			drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
+      drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
+      drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
 
-			mmX = ModMain.Config.MinimapX;
+      mmX = ModMain.Config.MinimapX;
 			mmY = ModMain.Config.MinimapY;
 			mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
 			mmHeight = ModMain.Config.MinimapHeight * Game1.pixelZoom;
@@ -319,7 +323,13 @@ namespace NPCMapLocations
 		          0f,
 		          Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 		        break;
-		    }
+          case 5:
+            b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+               new Rectangle(0 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color,
+               0f,
+              Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
+      }
 
       //
       // ===== Pam house upgrade =====
@@ -332,6 +342,13 @@ namespace NPCMapLocations
 						new Rectangle(263, 181, 8, 8), color,
 						0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 			}
+
+      if (drawMovieTheater || drawMovieTheaterJoja)
+      {
+        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 226 * Game1.pixelZoom), NormalizeToMap(offsetMmLoc.Y + 70 * Game1.pixelZoom),
+        new Rectangle(275, 181, 15, 11), color,
+        0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+      }
 
       //
       // ===== Farm buildings =====
