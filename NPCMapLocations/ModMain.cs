@@ -214,6 +214,7 @@ namespace NPCMapLocations
           building.tileY.Value,
           Customizations.MapVectors
         );
+
         // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
         // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
         var commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
@@ -229,11 +230,16 @@ namespace NPCMapLocations
       // Greenhouse unlocked after pantry bundles completed
       if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
       {
-        var locVector = LocationToMap("Greenhouse", -1, -1, Customizations.MapVectors);
-        locVector.X -= 5 / 2 * 3;
-        locVector.Y -= 7 / 2 * 3;
-        FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", locVector);
+        var greehouseLoc = LocationToMap("Greenhouse", -1, -1, Customizations.MapVectors);
+        greehouseLoc.X -= 5 / 2 * 3;
+        greehouseLoc.Y -= 7 / 2 * 3;
+        FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greehouseLoc);
       }
+
+      // Add FarmHouse
+      var farmhouseLoc = LocationToMap("FarmHouse", -1, -1, Customizations.MapVectors);
+      farmhouseLoc.X -= 6;
+      FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
     }
 
     private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
