@@ -40,6 +40,7 @@ namespace NPCMapLocations
 
     public bool UseSeasonalMaps { get; set; } = true;
     public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
+    public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
     public bool DEBUG_MODE { get; set; } = false;
   }
 }

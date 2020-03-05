@@ -7,5 +7,6 @@
   "MinimapToggleKey": "OemPipe",
   "ShowFarmBuildings": true,
   "CustomNpcMarkerOffsets": {},
+  "NpcBlackList": [],
   "DEBUG_MODE": false
 }
