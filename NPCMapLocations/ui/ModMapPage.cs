@@ -325,7 +325,7 @@ namespace NPCMapLocations
       }
       if (drawMovieTheater || drawMovieTheaterJoja)
       {
-        b.Draw(ModMain.Map, new Vector2(216 * Game1.pixelZoom, 70 * Game1.pixelZoom), new Rectangle(275, 181, 15, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        b.Draw(ModMain.Map, new Vector2(226 * Game1.pixelZoom, 70 * Game1.pixelZoom), new Rectangle(275, 181, 15, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var player = Game1.player;
