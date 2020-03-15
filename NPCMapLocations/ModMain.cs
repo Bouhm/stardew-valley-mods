@@ -22,6 +22,7 @@ namespace NPCMapLocations
     public static IMonitor IMonitor;
     public static SButton HeldKey;
     public static Texture2D Map;
+    public static int mapTab;
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -121,6 +122,7 @@ namespace NPCMapLocations
         BuildingMarkers = null;
       }
 
+      // Get season for map
       MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
       Helper.Content.InvalidateCache("LooseSprites/Map");
       Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
@@ -129,12 +131,14 @@ namespace NPCMapLocations
       DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
       shouldShowMinimap = Config.ShowMinimap;
 
+      // Get context of all locations (indoor, outdoor, relativity)
       LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
       foreach (var location in Game1.locations)
       {
         LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
       }
 
+      // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
       {
         {"Kent", false},
@@ -146,6 +150,7 @@ namespace NPCMapLocations
 
       MapVectors = ModConstants.MapVectors;
 
+      // Add custom map vectors from customlocations.json
       foreach (var locVectors in Customizations.MapVectors)
       {
         if (MapVectors.TryGetValue(locVectors.Key, out var mapVectors))
@@ -156,6 +161,17 @@ namespace NPCMapLocations
 
       UpdateFarmBuildingLocs();
       alertFlags = new List<string>();
+
+      // Find index of MapPage since it's a different value for SDV mobile
+      var pages = Helper.Reflection.GetField<List<IClickableMenu>>(new GameMenu(false), "pages").GetValue();
+
+      foreach (var page in pages)
+      {
+        if (page is MapPage)
+        {
+          mapTab = pages.IndexOf(page);
+        }
+      }
 
       // Log warning if host does not have mod installed
       if (Context.IsMultiplayer)
@@ -324,7 +340,7 @@ namespace NPCMapLocations
     // Handle keyboard/controller inputs
     private void HandleInput(GameMenu menu, SButton input)
     {
-      if (menu.currentTab != GameMenu.mapTab) return;
+      if (menu.currentTab != mapTab) return;
       if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
           ConditionalNpcs,
@@ -510,7 +526,7 @@ namespace NPCMapLocations
       }
 
       hasOpenedMap =
-        gameMenu.currentTab == GameMenu.mapTab; // When map accessed by switching GameMenu tab or pressing M
+        gameMenu.currentTab == mapTab; // When map accessed by switching GameMenu tab or pressing M
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
@@ -550,17 +566,6 @@ namespace NPCMapLocations
       UpdateNpcs(true);
       var pages = Helper.Reflection
         .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
-
-      var mapTab = GameMenu.mapTab;
-
-      // Find index of MapPage since it's a different value for SDV mobile
-      foreach (var page in pages)
-      {
-        if (page is MapPage)
-        {
-          mapTab = pages.IndexOf(page);
-        }
-      }
 
       // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
       // allows for better compatibility with other mods that use MapPage
