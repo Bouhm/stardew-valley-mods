@@ -162,6 +162,7 @@ Sometimes a mod will change a farm only based on the farm type. If you want to s
 - "Farm_Forest"
 - "Farm_Hills"
 - "Farm_Wilderness"
+- "Farm_FourCorners"
 
 ### Single points
 
