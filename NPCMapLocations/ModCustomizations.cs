@@ -47,7 +47,7 @@ namespace NPCMapLocations
       {
         if (npc == null) continue;
 
-        if (!ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
+        if (!ModConstants.ExcludedNpcs.Contains(npc.Name) && npc.isVillager())
         {
           LoadNpcCrop(npc);
           LoadCustomNames(npc);
@@ -207,7 +207,9 @@ namespace NPCMapLocations
         {
           var locationList = "";
           for (var i = 0; i < customLocations.Length; i++)
+          {
             locationList += customLocations[i] + (i + 1 == customLocations.Length ? "" : ", ");
+          }
 
           ModMain.IMonitor.Log($"Handled tracking for custom locations: {locationList}.", LogLevel.Debug);
         }
@@ -228,7 +230,9 @@ namespace NPCMapLocations
         {
           Names.Add(npc.Name, npc.displayName);
           if (!npc.Name.Equals(npc.displayName) || ModMain.Globals.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
+          {
             NpcCustomizations.Add(npc.Name);
+          }
         }
       }
     }

@@ -10,13 +10,14 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using StardewValley.Characters;
 
 namespace NPCMapLocations
 {
   public class ModMain : Mod, IAssetLoader
   {
     public static PlayerConfig Config;
-    public static GlobalConfig Globals; 
+    public static GlobalConfig Globals;
     public static CustomData CustomData;
     public static IModHelper Helper;
     public static IMonitor IMonitor;
@@ -202,8 +203,14 @@ namespace NPCMapLocations
         foreach (var npc in location.characters)
         {
           if (npc == null) continue;
-          if (!villagers.Contains(npc) && !ModConstants.ExcludedVillagers.Contains(npc.Name) && npc.isVillager())
+          if (
+            !villagers.Contains(npc)
+            && !ModConstants.ExcludedNpcs.Contains(npc.Name)
+            && (npc.isVillager() | npc.isMarried() | npc is Horse | npc is Child)
+          )
+          {
             villagers.Add(npc);
+          }
         }
       }
 
@@ -395,7 +402,7 @@ namespace NPCMapLocations
             case "Marlon":
               break;
             case "Merchant":
-              ConditionalNpcs[name] = ((Forest) Game1.getLocationFromName("Forest")).travelingMerchantDay;
+              ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
               break;
             case "Sandy":
               ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
@@ -542,16 +549,17 @@ namespace NPCMapLocations
         var message = e.ReadAs<SyncedLocationData>();
         foreach (var marker in NpcMarkers)
         {
+          Monitor.Log(marker.Name);
           if (message.SyncedLocations.TryGetValue(marker.Npc.Name, out var npcLoc))
           {
             marker.SyncedLocationName = npcLoc.LocationName;
             if (!marker.IsHidden)
             {
-              var mapLocation = LocationToMap(npcLoc.LocationName, (int)Math.Floor(npcLoc.X/Game1.tileSize), (int)Math.Floor(npcLoc.Y/Game1.tileSize), Customizations.MapVectors);
+              var mapLocation = LocationToMap(npcLoc.LocationName, (int)Math.Floor(npcLoc.X / Game1.tileSize), (int)Math.Floor(npcLoc.Y / Game1.tileSize), Customizations.MapVectors);
               marker.MapLocation = new Vector2(mapLocation.X - 16, mapLocation.Y - 15);
             }
           }
-         
+
           else
           {
             marker.MapLocation = Vector2.Zero;
@@ -654,35 +662,46 @@ namespace NPCMapLocations
         {
           // Check if gifted for birthday
           if (npcMarker.IsBirthday)
+          {
             npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Npc.Name) &&
                                    Game1.player.friendshipData[npcMarker.Npc.Name].GiftsToday == 0;
 
-          // Check for daily quests
-          foreach (var quest in Game1.player.questLog)
-            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-              switch (quest.questType.Value)
-              {
-                case 3:
-                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Npc.Name;
-                  break;
-                case 4:
-                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Npc.Name;
-                  break;
-                case 7:
-                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Npc.Name;
-                  break;
-                case 10:
-                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Npc.Name;
-                  break;
-              }
-            else
-              npcMarker.HasQuest = false;
+            // Check for daily quests
+            foreach (var quest in Game1.player.questLog)
+              if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+                switch (quest.questType.Value)
+                {
+                  case 3:
+                    npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Npc.Name;
+                    break;
+                  case 4:
+                    npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Npc.Name;
+                    break;
+                  case 7:
+                    npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Npc.Name;
+                    break;
+                  case 10:
+                    npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Npc.Name;
+                    break;
+                }
+          }
+          else
+          {
+            npcMarker.HasQuest = false;
+          }
 
           // Establish draw order, higher number infront
           // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
           // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
-          if (npcMarker.IsHidden) npcMarker.Layer -= 2;
+          if (npcMarker.Npc is Horse | npcMarker.Npc is Child)
+          {
+            npcMarker.Layer = 0;
+          }
+          else
+          {
+            npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
+            if (npcMarker.IsHidden) npcMarker.Layer -= 2;
+          }
 
           if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
 
@@ -958,11 +977,11 @@ namespace NPCMapLocations
       if (Game1.player.currentLocation == null) return;
       string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
       var textHeight = (int)Game1.dialogueFont
-        .MeasureString("()").Y-6;
-     
+        .MeasureString("()").Y - 6;
+
 
       var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
-     
+
       // If map is open, show map position at cursor
       if (isModMapOpen)
       {
@@ -976,7 +995,7 @@ namespace NPCMapLocations
 
         // Draw point at cursor on map
         Game1.spriteBatch.Draw(tex,
-          new Rectangle(Game1.getMouseX() - (int)(borderWidth/2), Game1.getMouseY() - (int)(borderWidth/2), borderWidth, borderWidth),
+          new Rectangle(Game1.getMouseX() - (int)(borderWidth / 2), Game1.getMouseY() - (int)(borderWidth / 2), borderWidth, borderWidth),
           Rectangle.Empty, Color.White);
 
         // Show map pixel position at cursor
@@ -1000,13 +1019,13 @@ namespace NPCMapLocations
             borderWidth, Color.White * borderOpacity);
 
           // Make points more distinct
-//          Game1.spriteBatch.Draw(tex,
-//            new Rectangle((int)MouseUtil.BeginMousePosition.X, (int)MouseUtil.BeginMousePosition.Y, borderWidth, borderWidth),
-//            Rectangle.Empty, Color.White);
-//
-//          Game1.spriteBatch.Draw(tex,
-//            new Rectangle((int)MouseUtil.EndMousePosition.X, (int)MouseUtil.EndMousePosition.Y, borderWidth, borderWidth),
-//            Rectangle.Empty, Color.White);
+          //          Game1.spriteBatch.Draw(tex,
+          //            new Rectangle((int)MouseUtil.BeginMousePosition.X, (int)MouseUtil.BeginMousePosition.Y, borderWidth, borderWidth),
+          //            Rectangle.Empty, Color.White);
+          //
+          //          Game1.spriteBatch.Draw(tex,
+          //            new Rectangle((int)MouseUtil.EndMousePosition.X, (int)MouseUtil.EndMousePosition.Y, borderWidth, borderWidth),
+          //            Rectangle.Empty, Color.White);
 
           var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
 
@@ -1040,8 +1059,8 @@ namespace NPCMapLocations
       {
         // Show tile position of tile at cursor
         var tilePos = MouseUtil.GetTilePositionAtCursor();
-        DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 ), Color.White);
-        DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize /4 +textHeight), Color.White);
+        DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+        DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
       }
     }
 
@@ -1058,7 +1077,7 @@ namespace NPCMapLocations
           (int)pos.X,
           (int)pos.Y,
           (int)Game1.dialogueFont.MeasureString(text).X,
-          (int)Game1.dialogueFont.MeasureString("()").Y-6),
+          (int)Game1.dialogueFont.MeasureString("()").Y - 6),
         Rectangle.Empty,
         Color.Black
        );
@@ -1074,21 +1093,21 @@ namespace NPCMapLocations
     private static void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
     {
       // Draw top line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, rect.Width+3, borderWidth), color);
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1, rect.Y - 1, rect.Width + 3, borderWidth), color);
 
       // Draw left line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1, rect.Y-1, borderWidth, rect.Height+3), color);
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1, rect.Y - 1, borderWidth, rect.Height + 3), color);
 
       // Draw right line
-      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth+2),
-        rect.Y-1,
+      Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth + 2),
+        rect.Y - 1,
         borderWidth,
-        rect.Height+3), color);
+        rect.Height + 3), color);
 
       // Draw bottom line
-      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X-1,
-        rect.Y + rect.Height - borderWidth+2,
-        rect.Width+3,
+      Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1,
+        rect.Y + rect.Height - borderWidth + 2,
+        rect.Width + 3,
         borderWidth), color);
     }
   }

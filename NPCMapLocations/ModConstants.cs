@@ -48,15 +48,15 @@ public static class ModConstants
     };
 
   // NPCs with no schedules 
-  public static List<string> ExcludedVillagers => new List<string>()
+  public static List<string> ExcludedNpcs => new List<string>()
     {
-      "Dwarf",
+      // "Dwarf",
       "Mister Qi",
       "Bouncer",
       "Henchman",
-      "Gunther",
+      // "Gunther",
       "Krobus",
-      "Dusty"
+      // "Dusty"
     };
 
   // tileX and TileY (the first two values) are tile positions in the game for that location
