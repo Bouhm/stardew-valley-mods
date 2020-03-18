@@ -30,7 +30,7 @@ public static class ModConstants
         {"Jas", 7},
         {"Jodi", 3},
         {"Kent", -1},
-        {"Krobus", 1},
+        {"Krobus", 0},
         {"Leah", 2},
         {"Lewis", 1},
         {"Linus", 6},
@@ -58,7 +58,7 @@ public static class ModConstants
       "Bouncer",
       "Henchman",
       // "Gunther",
-      "Krobus",
+      // "Krobus",
       // "Dusty"
     };
 

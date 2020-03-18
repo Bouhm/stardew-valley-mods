@@ -405,24 +405,31 @@ namespace NPCMapLocations
           switch (name)
           {
             case "Dwarf":
+              // Marlon cutscene when first entering mines
               ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
               break;
             case "Kent":
+              // Kent returns year 2
               ConditionalNpcs[name] = Game1.year >= 2;
               break;
             case "Krobus":
+              // Rusty Key which unlocks sewer
               ConditionalNpcs[name] = Game1.MasterPlayer.hasRustyKey;
               break;
             case "Marlon":
+              // Marlon cutscene when first entering mines
               ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
               break;
             case "Merchant":
+              // Merchant schedule
               ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
               break;
             case "Sandy":
+              // When player meets Sandy for the first time
               ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(67);
               break;
             case "Wizard":
+              // Scene for unlocking wizard
               ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(112);
               break;
           }
