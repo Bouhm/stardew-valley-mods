@@ -45,7 +45,7 @@ namespace NPCMapLocations
     {
       foreach (var npc in Utility.getAllCharacters())
       {
-        if (npc == null) continue;
+        if (npc == null || npc is StardewValley.Characters.Horse) continue;
 
         if (!ModConstants.ExcludedNpcs.Contains(npc.Name) && npc.isVillager())
         {

@@ -142,7 +142,9 @@ namespace NPCMapLocations
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
       {
+        {"Dwarf", false},
         {"Kent", false},
+        {"Krobus", false},
         {"Marlon", false},
         {"Merchant", false},
         {"Sandy", false},
@@ -389,7 +391,9 @@ namespace NPCMapLocations
 
       var npcEntries = ConditionalNpcs != null ? new Dictionary<string, bool>(ConditionalNpcs) : new Dictionary<string, bool>(new Dictionary<string, bool>
       {
+        {"Dwarf", false},
         {"Kent", false},
+        {"Krobus", false},
         {"Marlon", false},
         {"Merchant", false},
         {"Sandy", false},
@@ -404,19 +408,26 @@ namespace NPCMapLocations
         {
           switch (name)
           {
+            case "Dwarf":
+              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
+              break;
             case "Kent":
               ConditionalNpcs[name] = Game1.year >= 2;
               break;
+            case "Krobus":
+              ConditionalNpcs[name] = Game1.MasterPlayer.hasRustyKey;
+              break;
             case "Marlon":
+              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
               break;
             case "Merchant":
               ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
               break;
             case "Sandy":
-              ConditionalNpcs[name] = Game1.player.mailReceived.Contains("ccVault");
+              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(67);
               break;
             case "Wizard":
-              ConditionalNpcs[name] = Game1.player.eventsSeen.Contains(112);
+              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(112);
               break;
           }
         }

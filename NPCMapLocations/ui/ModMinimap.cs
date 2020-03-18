@@ -414,7 +414,7 @@ namespace NPCMapLocations
 
           var markerColor = npcMarker.IsHidden ? Color.DimGray * 0.7f : Color.White;
 
-          var offset = 0;
+          var offset = 1;
           Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Npc.Name, out offset);
 
           // Draw NPC marker

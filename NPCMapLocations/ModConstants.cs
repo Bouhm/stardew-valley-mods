@@ -23,6 +23,7 @@ public static class ModConstants
         {"Evelyn", 4},
         {"George", 4},
         {"Gus", 2},
+        {"Gunther", 2},
         {"Haley", 2},
         {"Harvey", -1},
         {"Jas", 7},

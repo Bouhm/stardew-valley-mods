@@ -119,14 +119,16 @@ namespace NPCMapLocations
 			var orderedNames = customizations.Names.Keys.ToList();
 			orderedNames.Sort();
 			var idx = 7;
-			foreach (var name in orderedNames)
-				if (conditionalNpcs.ContainsKey(name))
-					if (conditionalNpcs[name])
-						options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
-					else
-						idx++;
-				else
-					options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
+      foreach (var name in orderedNames)
+      {
+        if (conditionalNpcs.ContainsKey(name))
+          if (conditionalNpcs[name])
+            options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
+          else
+            idx++;
+        else
+          options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
+      }
 		}
 
 		// Override snappy controls on controller
