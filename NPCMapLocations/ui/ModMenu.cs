@@ -475,7 +475,7 @@ namespace NPCMapLocations
 
 				if (whichOption > 6 && whichOption < 49)
 				{
-					isChecked = !ModMain.Config.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
+					isChecked = !ModMain.Globals.NpcBlacklist.Contains(orderedNames[whichOption - 7]);
 					return;
 				}
 			}
@@ -521,9 +521,9 @@ namespace NPCMapLocations
 			if (whichOption > 6 && whichOption < 49)
 			{
 				if (isChecked)
-				  ModMain.Config.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
+          ModMain.Globals.NpcBlacklist.Remove(orderedNames[whichOption - 7]);
 				else
-				  ModMain.Config.NpcBlacklist.Add(orderedNames[whichOption - 7]);
+          ModMain.Globals.NpcBlacklist.Add(orderedNames[whichOption - 7]);
 			}
 			else
 			{
@@ -553,7 +553,8 @@ namespace NPCMapLocations
 			}
 
 		  ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
-		}
+      ModMain.Helper.Data.WriteJsonFile("config/globals.json", ModMain.Globals);
+    }
 
 		public override void draw(SpriteBatch b, int slotX, int slotY)
 		{

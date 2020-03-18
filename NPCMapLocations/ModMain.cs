@@ -657,7 +657,7 @@ namespace NPCMapLocations
                                   <= Config.HeartLevelMax);
 
         // NPCs that will be drawn onto the map
-        if ((!Config.NpcBlacklist.Contains(npcMarker.Npc.Name) && !ModMain.Globals.NpcBlacklist.Contains(npcMarker.Npc.Name)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+        if ((!ModMain.Globals.NpcBlacklist.Contains(npcMarker.Npc.Name)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
         {
           // Check if gifted for birthday
           if (npcMarker.IsBirthday)

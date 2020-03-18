@@ -24,8 +24,6 @@ namespace NPCMapLocations
 	  public int MinimapY { get; set; } = 12;
 	  public int MinimapWidth { get; set; } = 75;
 	  public int MinimapHeight { get; set; } = 45;
-
-    public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() {};
   }
 
   public class GlobalConfig
@@ -39,6 +37,8 @@ namespace NPCMapLocations
     public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() { };
 
     public bool UseSeasonalMaps { get; set; } = true;
+    public bool ShowChildren { get; set; } = true;
+    public bool ShowHorse { get; set; } = true;
     public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };
     public bool DEBUG_MODE { get; set; } = false;
