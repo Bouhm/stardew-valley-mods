@@ -468,7 +468,7 @@ namespace NPCMapLocations
       {
         // Handle case where Kent appears even though he shouldn't
         if (npc.Name.Equals("Kent") && !ConditionalNpcs["Kent"]) continue;
-        if (!Customizations.Names.TryGetValue(npc.Name, out var npcName))
+        if (!Customizations.Names.TryGetValue(npc.Name, out var npcName) && !(npc is Horse))
         {
           npcName = npc.displayName ?? npc.Name;
           Customizations.Names.Add(npc.Name, npcName);

@@ -122,12 +122,16 @@ namespace NPCMapLocations
       foreach (var name in orderedNames)
       {
         if (conditionalNpcs.ContainsKey(name))
+        {
           if (conditionalNpcs[name])
             options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
           else
             idx++;
+        }
         else
+        {
           options.Add(new ModCheckbox(name, idx++, -1, -1, customizations));
+        }
       }
 		}
 
