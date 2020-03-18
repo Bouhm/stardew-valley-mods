@@ -549,7 +549,6 @@ namespace NPCMapLocations
         var message = e.ReadAs<SyncedLocationData>();
         foreach (var marker in NpcMarkers)
         {
-          Monitor.Log(marker.Name);
           if (message.SyncedLocations.TryGetValue(marker.Npc.Name, out var npcLoc))
           {
             marker.SyncedLocationName = npcLoc.LocationName;

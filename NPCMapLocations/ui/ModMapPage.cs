@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Characters;
+using StardewValley.Locations;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
@@ -330,85 +331,7 @@ namespace NPCMapLocations
         b.Draw(ModMain.Map, new Vector2(226 * Game1.pixelZoom, 70 * Game1.pixelZoom), new Rectangle(275, 181, 15, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
-      var player = Game1.player;
-      int x = player.getTileX();
-      int y = player.getTileY();
-      string playerLocationName = null;
-      switch (player.currentLocation.Name)
-      {
-        case "Saloon":
-          playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11172");
-          break;
-        case "Beach":
-          playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11174");
-          break;
-        case "Mountain":
-          if (x < 38)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11176");
-          else if (x < 96)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11177");
-          else
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11178");
-          break;
-        case "Tunnel":
-        case "Backwoods":
-          playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11180");
-          break;
-        case "FarmHouse":
-        case "Barn":
-        case "Big Barn":
-        case "Deluxe Barn":
-        case "Coop":
-        case "Big Coop":
-        case "Deluxe Coop":
-        case "Cabin":
-        case "Slime Hutch":
-        case "Greenhouse":
-        case "FarmCave":
-        case "Shed":
-        case "Farm":
-          playerLocationName =
-            Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", player.farmName.Value);
-          break;
-        case "Forest":
-          if (y > 51)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
-          else if (x < 58)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
-          else
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11188");
-          break;
-        case "Town":
-          if (x > 84 && y < 68)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          else if (x > 80 && y >= 68)
-
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          else if (y <= 42)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          else if (y > 42 && y < 76)
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          else
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          break;
-        case "Temp":
-          if (player.currentLocation.Map.Id.Contains("Town"))
-          {
-            if (x > 84 && y < 68)
-              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-            else if (x > 80 && y >= 68)
-              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-            else if (y <= 42)
-              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-            else if (y > 42 && y < 76)
-              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-            else
-              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
-          }
-
-          break;
-      }
-
+      var playerLocationName = getPlayerLocationNameForMap();
       if (playerLocationName != null)
       {
         SpriteText.drawStringWithScrollCenteredAt(b, playerLocationName, base.xPositionOnScreen + base.width / 2,
@@ -622,6 +545,276 @@ namespace NPCMapLocations
         0f);
     }
 
+    // The text to display below the map for the current location
+    private string getPlayerLocationNameForMap()
+    {
+      var player = Game1.player;
+      string playerLocationName = null;
+      var replacedName = player.currentLocation.Name;
+
+      if (replacedName.StartsWith("UndergroundMine") || replacedName == "Mine")
+      {
+        replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098");
+        if (player.currentLocation is MineShaft && (player.currentLocation as MineShaft).mineLevel > 120 && (player.currentLocation as MineShaft).mineLevel != 77377)
+        {
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062");
+        }
+      }
+      switch (player.currentLocation.Name)
+      {
+        case "Woods":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11114");
+          break;
+        case "FishShop":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11107");
+          break;
+        case "Desert":
+        case "SkullCave":
+        case "Club":
+        case "SandyHouse":
+        case "SandyShop":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062");
+          break;
+        case "AnimalShop":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11068");
+          break;
+        case "HarveyRoom":
+        case "Hospital":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11076") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11077");
+          break;
+        case "SeedShop":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11078") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11079") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11080");
+          break;
+        case "ManorHouse":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11085");
+          break;
+        case "WizardHouse":
+        case "WizardHouseBasement":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11067");
+          break;
+        case "BathHouse_Pool":
+        case "BathHouse_Entry":
+        case "BathHouse_MensLocker":
+        case "BathHouse_WomensLocker":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11110") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11111");
+          break;
+        case "AdventureGuild":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11099");
+          break;
+        case "SebastianRoom":
+        case "ScienceHouse":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11094") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11095");
+          break;
+        case "JoshHouse":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11092") + Environment.NewLine + Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11093");
+          break;
+        case "ElliottHouse":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11088");
+          break;
+        case "ArchaeologyHouse":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11086");
+          break;
+        case "WitchWarpCave":
+        case "Railroad":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11119");
+          break;
+        case "CommunityCenter":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11117");
+          break;
+        case "Trailer_Big":
+          replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.PamHouse");
+          break;
+        case "Temp":
+          if (player.currentLocation.Map.Id.Contains("Town"))
+          {
+            replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+          }
+          break;
+      }
+      foreach (ClickableComponent c in points)
+      {
+        string cNameNoSpaces = c.name.Replace(" ", "");
+        int indexOfNewLine = c.name.IndexOf(Environment.NewLine);
+        int indexOfNewLineNoSpaces = cNameNoSpaces.IndexOf(Environment.NewLine);
+        string replacedNameSubstring = replacedName.Substring(0, replacedName.Contains(Environment.NewLine) ? replacedName.IndexOf(Environment.NewLine) : replacedName.Length);
+        if (c.name.Equals(replacedName) || cNameNoSpaces.Equals(replacedName) || (c.name.Contains(Environment.NewLine) && (c.name.Substring(0, indexOfNewLine).Equals(replacedNameSubstring) || cNameNoSpaces.Substring(0, indexOfNewLineNoSpaces).Equals(replacedNameSubstring))))
+        {
+          if (player.IsLocalPlayer)
+          {
+            playerLocationName = (c.name.Contains(Environment.NewLine) ? c.name.Substring(0, c.name.IndexOf(Environment.NewLine)) : c.name);
+          }
+        }
+      }
+
+      int x = player.getTileX();
+      int y = player.getTileY();
+      switch (player.currentLocation.Name)
+      {
+        case "Saloon":
+          if (player.IsLocalPlayer)
+          {
+            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11172");
+          }
+          break;
+        case "Beach":
+          if (player.IsLocalPlayer)
+          {
+            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11174");
+          }
+          break;
+        case "Mountain":
+          if (x < 38)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11176");
+            }
+          }
+          else if (x < 96)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11177");
+            }
+          }
+          else
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11178");
+            }
+          }
+          break;
+        case "Tunnel":
+        case "Backwoods":
+          if (player.IsLocalPlayer)
+          {
+            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11180");
+          }
+          break;
+        case "FarmHouse":
+        case "Barn":
+        case "Big Barn":
+        case "Deluxe Barn":
+        case "Coop":
+        case "Big Coop":
+        case "Deluxe Coop":
+        case "Cabin":
+        case "Slime Hutch":
+        case "Greenhouse":
+        case "FarmCave":
+        case "Shed":
+        case "Big Shed":
+        case "Farm":
+          if (player.IsLocalPlayer)
+          {
+            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", player.farmName);
+          }
+          break;
+        case "Forest":
+          if (y > 51)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
+            }
+          }
+          else if (x < 58)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11186");
+            }
+          }
+          else
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11188");
+            }
+          }
+          break;
+        case "Town":
+          if (x > 84 && y < 68)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (x > 80 && y >= 68)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (y <= 42)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (y > 42 && y < 76)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          break;
+        case "Temp":
+          if (!player.currentLocation.Map.Id.Contains("Town"))
+          {
+            break;
+          }
+          if (x > 84 && y < 68)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (x > 80 && y >= 68)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (y <= 42)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else if (y > 42 && y < 76)
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          else
+          {
+            if (player.IsLocalPlayer)
+            {
+              playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
+            }
+          }
+          break;
+      }
+      return playerLocationName;
+    }
     /// <summary>Get the ModMain.Map points to display on a map.</summary>
     /// vanilla locations that have to be tweaked to match modified map
     private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
