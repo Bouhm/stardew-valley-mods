@@ -133,12 +133,8 @@ namespace NPCMapLocations
       shouldShowMinimap = Config.ShowMinimap;
 
       // Get context of all locations (indoor, outdoor, relativity)
-      LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations)
-      {
-        LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
-      }
-
+      LocationUtil.GetLocationContexts();
+      var a = LocationUtil.LocationContexts;
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
       {
@@ -556,7 +552,7 @@ namespace NPCMapLocations
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
-        OpenModMap(gameMenu);
+        OpenModMap();
     }
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
@@ -586,8 +582,10 @@ namespace NPCMapLocations
       }
     }
 
-    private void OpenModMap(GameMenu gameMenu)
+    private void OpenModMap()
     {
+      if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
+
       isModMapOpen = true;
       UpdateNpcs(true);
       var pages = Helper.Reflection
@@ -843,6 +841,8 @@ namespace NPCMapLocations
         }
       }
 
+      // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
+
       MapVector[] locVectors = null;
       bool locationNotFound = false;
 
@@ -944,6 +944,11 @@ namespace NPCMapLocations
       UpdateMarkers(true);
       UpdateFarmBuildingLocs();
       Minimap?.CheckOffsetForMap();
+
+      if (isModMapOpen)
+      {
+        OpenModMap();
+      }
     }
 
     private void Display_MenuChanged(object sender, MenuChangedEventArgs e)

@@ -68,11 +68,26 @@ namespace NPCMapLocations
       for (int i = 0; i < regionRects.Count; i++)
       {
         var rect = regionRects.ElementAtOrDefault(i);
+        var locationName = rect.Key;
+
+        // Special cases where the name is not an ingame location
+        switch (locationName) {
+          case "Spa":
+            locationName = "BathHouse_Entry";
+            break;
+          case "SewerPipe":
+            locationName = "Sewer";
+            break;
+          default:
+            break;
+        }
+
+        var locVector = ModMain.LocationToMap(locationName);
 
         this.points[i].bounds = new Rectangle(
           // Snaps the cursor to the center instead of bottom right (default)
-          (int)(mapX + ModMain.LocationToMap(rect.Key).X - rect.Value.Width / 2),
-          (int)(mapY + ModMain.LocationToMap(rect.Key).Y - rect.Value.Height / 2),
+          (int)(mapX + locVector.X - rect.Value.Width / 2),
+          (int)(mapY + locVector.Y - rect.Value.Height / 2),
           rect.Value.Width,
           rect.Value.Height
         );
@@ -839,7 +854,7 @@ namespace NPCMapLocations
       {"Sewer", new Rectangle(-1, -1, 24, 20)},
       {"Graveyard", new Rectangle(-1, -1, 40, 32)},
       {"Trailer", new Rectangle(-1, -1, 20, 12)},
-      {"AlexHouse", new Rectangle(-1, -1, 36, 36)},
+      {"JoshHouse", new Rectangle(-1, -1, 36, 36)},
       {"ScienceHouse", new Rectangle(-1, -1, 48, 32)},
       {"Tent", new Rectangle(-1, -1, 12, 16)},
       {"Mine", new Rectangle(-1, -1, 16, 24)},
@@ -852,7 +867,7 @@ namespace NPCMapLocations
       {"RuinedHouse", new Rectangle(-1, -1, 20, 20)},
       {"CommunityCenter", new Rectangle(-1, -1, 44, 36)},
       {"SewerPipe", new Rectangle(-1, -1, 24, 32)},
-      {"Railroad_Region", new Rectangle(-1, -1, 200, 69)},
+      {"Railroad_Region", new Rectangle(-1, -1, 180, 69)},
       {"LonelyStone", new Rectangle(-1, -1, 28, 28)},
     };
   }

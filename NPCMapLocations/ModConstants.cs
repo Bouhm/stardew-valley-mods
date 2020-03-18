@@ -18,17 +18,19 @@ public static class ModConstants
         {"Caroline", 2},
         {"Clint", -1},
         {"Demetrius", -2},
+        {"Dwarf", 1},
         {"Elliott", -1},
         {"Emily", 1},
         {"Evelyn", 4},
         {"George", 4},
         {"Gus", 2},
-        {"Gunther", 2},
+        {"Gunther", 3},
         {"Haley", 2},
         {"Harvey", -1},
         {"Jas", 7},
         {"Jodi", 3},
         {"Kent", -1},
+        {"Krobus", 1},
         {"Leah", 2},
         {"Lewis", 1},
         {"Linus", 6},
@@ -195,7 +197,7 @@ public static class ModConstants
       {
           "Railroad_Region", new MapVector[]
           {
-              new MapVector(696, 47),
+              new MapVector(730, 47),
           }
       },
 
