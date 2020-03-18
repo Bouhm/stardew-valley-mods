@@ -203,11 +203,7 @@ namespace NPCMapLocations
         foreach (var npc in location.characters)
         {
           if (npc == null) continue;
-          if (
-            !villagers.Contains(npc)
-            && !ModConstants.ExcludedNpcs.Contains(npc.Name)
-            && (npc.isVillager() | npc.isMarried() | npc is Horse | npc is Child)
-          )
+          if (!villagers.Contains(npc) && shouldTrackNpc(npc))
           {
             villagers.Add(npc);
           }
@@ -215,6 +211,18 @@ namespace NPCMapLocations
       }
 
       return villagers;
+    }
+
+    private bool shouldTrackNpc(NPC npc)
+    {
+      return
+        !ModConstants.ExcludedNpcs.Contains(npc.Name)
+        && (
+          npc.isVillager()
+          | npc.isMarried()
+          | (Globals.ShowHorse && npc is Horse)
+          | (Globals.ShowChildren && npc is Child)
+        );
     }
 
     // For drawing farm buildings on the map 
