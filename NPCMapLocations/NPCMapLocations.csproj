@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>NPCMapLocations</AssemblyName>
     <RootNamespace>NPCMapLocations</RootNamespace>
-    <Version>2.4.2</Version>
+    <Version>2.5.5</Version>
     <TargetFramework>net452</TargetFramework>
   </PropertyGroup>
 
@@ -217,5 +217,9 @@
   <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
 
   <Import Project="..\MouseUtil\MouseUtil.projitems" Label="Shared" />
+
+  <Import Project="..\ModUtils\ModUtil.projitems" Label="Shared" />
+
+  <Import Project="..\ModUtils\ModUtils.projitems" Label="Shared" />
 
 </Project>

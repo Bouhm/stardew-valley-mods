@@ -237,7 +237,7 @@ namespace NPCMapLocations
             || building.nameOfIndoors == null
             || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
           continue;
-
+       )
         var locVector = LocationToMap(
           "Farm", // Get building position in farm
           building.tileX.Value,
@@ -277,9 +277,7 @@ namespace NPCMapLocations
       if (e.Location.IsFarm)
         UpdateFarmBuildingLocs();
 
-      LocationUtil.LocationContexts = new Dictionary<string, LocationContext>();
-      foreach (var location in Game1.locations)
-        LocationUtil.MapRootLocations(location, null, null, false, Vector2.Zero);
+      LocationUtil.GetLocationContexts();
     }
 
     // Handle opening mod menu and changing tooltip options
