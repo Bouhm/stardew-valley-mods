@@ -237,7 +237,7 @@ namespace NPCMapLocations
             || building.nameOfIndoors == null
             || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
           continue;
-       )
+       
         var locVector = LocationToMap(
           "Farm", // Get building position in farm
           building.tileX.Value,

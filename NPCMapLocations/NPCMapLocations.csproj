@@ -218,8 +218,4 @@
 
   <Import Project="..\MouseUtil\MouseUtil.projitems" Label="Shared" />
 
-  <Import Project="..\ModUtils\ModUtil.projitems" Label="Shared" />
-
-  <Import Project="..\ModUtils\ModUtils.projitems" Label="Shared" />
-
 </Project>
