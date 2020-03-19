@@ -134,7 +134,7 @@ namespace NPCMapLocations
 
       // Get context of all locations (indoor, outdoor, relativity)
       LocationUtil.GetLocationContexts();
-      var a = LocationUtil.LocationContexts;
+
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
       {
@@ -190,9 +190,19 @@ namespace NPCMapLocations
           Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
       }
     }
+    private static bool ShouldTrackNpc(NPC npc)
+    {
+      return
+        !ModConstants.ExcludedNpcs.Contains(npc.Name)
+        && (
+          npc.isVillager()
+          | npc.isMarried()
+          | (Globals.ShowHorse && npc is Horse)
+        );
+    }
 
     // Get only relevant villagers for map
-    private List<NPC> GetVillagers()
+    public static List<NPC> GetVillagers()
     {
       var villagers = new List<NPC>();
 
@@ -201,7 +211,10 @@ namespace NPCMapLocations
         foreach (var npc in location.characters)
         {
           if (npc == null) continue;
-          if (!villagers.Contains(npc) && shouldTrackNpc(npc))
+          if (
+            !villagers.Contains(npc)
+            && ShouldTrackNpc(npc)
+          )
           {
             villagers.Add(npc);
           }
@@ -209,18 +222,6 @@ namespace NPCMapLocations
       }
 
       return villagers;
-    }
-
-    private bool shouldTrackNpc(NPC npc)
-    {
-      return
-        !ModConstants.ExcludedNpcs.Contains(npc.Name)
-        && (
-          npc.isVillager()
-          | npc.isMarried()
-          | (Globals.ShowHorse && npc is Horse)
-          // | (Globals.ShowChildren && npc is Child)
-        );
     }
 
     // For drawing farm buildings on the map 
@@ -504,9 +505,18 @@ namespace NPCMapLocations
           foreach (var npc in GetVillagers())
           {
             if (npc == null || npc.currentLocation == null) continue;
-            message.AddNpcLocation(npc.Name,
-              new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X,
-                npc.Position.Y));
+
+            try
+            {
+              message.AddNpcLocation(npc.Name,
+                new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X,
+                  npc.Position.Y));
+            }
+            catch
+            {
+              IMonitor.Log("Failed to send synced location data.", LogLevel.Error);
+            }
+
           }
 
           Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });

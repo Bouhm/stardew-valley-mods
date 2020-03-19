@@ -1,14 +1,13 @@
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json.Linq;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Characters;
+using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json.Linq;
-using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Menus;
 
 namespace NPCMapLocations
 {
@@ -43,14 +42,27 @@ namespace NPCMapLocations
     // Custom NPCs and custom names or sprites for existing NPCs
     private void LoadCustomNpcs()
     {
-      foreach (var npc in Utility.getAllCharacters())
+      foreach (var npc in ModMain.GetVillagers())
       {
-        if (npc == null) continue;
+        LoadNpcCrop(npc);
+        LoadCustomName(npc);
+      }
 
-        if (!ModConstants.ExcludedNpcs.Contains(npc.Name) && npc.isVillager())
+      // Handle duplicate displayName -- custom NPCs that replaces villagers
+      Dictionary<string, string> dupes = Names
+        .Where(n1 => Names.Any(n2 => n2.Key != n1.Key && n2.Value == n1.Value))
+        .ToDictionary(n => n.Key, n => n.Value);
+
+      // Properly replace the villager with custom NPC
+      foreach (var dupe in dupes)
+      {
+        if (dupe.Key != dupe.Value)
         {
-          LoadNpcCrop(npc);
-          LoadCustomNames(npc);
+          Names[dupe.Key] = dupe.Value;
+        }
+        else
+        {
+          Names.Remove(dupe.Key);
         }
       }
 
@@ -218,8 +230,10 @@ namespace NPCMapLocations
 
     // Handle any modified NPC names 
     // Specifically mods that change names in dialogue files (displayName)
-    private void LoadCustomNames(NPC npc)
+    private void LoadCustomName(NPC npc)
     {
+      if (npc is Horse) return;
+
       if (!Names.TryGetValue(npc.Name, out var customName))
       {
         if (npc.displayName == null)

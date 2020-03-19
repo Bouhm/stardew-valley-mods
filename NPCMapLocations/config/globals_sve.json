@@ -14,6 +14,6 @@
     "Susan": 1,
     "Sophia": 3
   },
-  "NpcBlackList": [ "Marlon", "Morris" ],
+  "NpcBlackList": [],
   "DEBUG_MODE": false
 }
