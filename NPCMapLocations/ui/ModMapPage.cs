@@ -339,11 +339,19 @@ namespace NPCMapLocations
 
       if (drawPamHouseUpgrade)
       {
-        b.Draw(ModMain.Map, new Vector2(200 * Game1.pixelZoom, 88 * Game1.pixelZoom), new Rectangle(263, 181, 8, 8), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        var houseLoc = ModMain.LocationToMap("Trailer_Big");
+        b.Draw(ModMain.Map, new Vector2(houseLoc.X + 24, houseLoc.Y - 11),
+          new Rectangle(263, 181, 8, 8), Color.White,
+          0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
+
       if (drawMovieTheater || drawMovieTheaterJoja)
       {
-        b.Draw(ModMain.Map, new Vector2(226 * Game1.pixelZoom, 70 * Game1.pixelZoom), new Rectangle(275, 181, 15, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        var theaterLoc = ModMain.LocationToMap("JojaMart");
+        b.Draw(ModMain.Map, new Vector2(theaterLoc.X + 20, theaterLoc.Y - 11),
+          new Rectangle(275, 181, 15, 11), Color.White,
+          0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
