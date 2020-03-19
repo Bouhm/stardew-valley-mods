@@ -319,8 +319,7 @@ namespace NPCMapLocations
           break;
         case 4:
           b.Draw(ModMain.Map, new Vector2(farmX, farmY),
-            new Rectangle(131 + farmCropX,
-              241 + farmCropY, farmCropWidth, farmCropHeight), color,
+            new Rectangle(131 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
             0f,
             Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
@@ -346,9 +345,13 @@ namespace NPCMapLocations
 
       if (drawMovieTheater || drawMovieTheaterJoja)
       {
-        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 226 * Game1.pixelZoom), NormalizeToMap(offsetMmLoc.Y + 70 * Game1.pixelZoom)),
-        new Rectangle(275, 181, 15, 11), color,
-        0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        var theaterLoc = ModMain.LocationToMap("JojaMart");
+        if (IsWithinMapArea(theaterLoc.X, theaterLoc.Y))
+        {
+          b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 26), NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 22)),
+            new Rectangle(275, 181, 15, 11), color,
+            0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        }
       }
 
       //
@@ -497,10 +500,10 @@ namespace NPCMapLocations
     // Check if within map
     private bool IsWithinMapArea(float x, float y)
     {
-      return x > center.X - mmWidth / 2 - (Game1.tileSize / 4 + 2)
-             && x < center.X + mmWidth / 2 - (Game1.tileSize / 4 + 2)
-             && y > center.Y - mmHeight / 2 - (Game1.tileSize / 4 + 2)
-             && y < center.Y + mmHeight / 2 - (Game1.tileSize / 4 + 2);
+      return x > center.X - mmWidth / 2 - (Game1.tileSize / 4)
+             && x < center.X + mmWidth / 2 - (Game1.tileSize / 4)
+             && y > center.Y - mmHeight / 2 - (Game1.tileSize / 4)
+             && y < center.Y + mmHeight / 2 - (Game1.tileSize / 4);
     }
 
     // For borders
