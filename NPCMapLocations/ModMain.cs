@@ -766,7 +766,7 @@ namespace NPCMapLocations
         if (locationName.Contains("UndergroundMine"))
           locationName = LocationUtil.GetMinesLocationName(locationName);
 
-        if ((!locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
+        if ((!locationName.Equals("FarmHouse") && !locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
             !MapVectors.TryGetValue(locationName, out var loc))
         {
           if (!alertFlags.Contains("UnknownLocation:" + locationName))
