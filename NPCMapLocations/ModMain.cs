@@ -47,7 +47,7 @@ namespace NPCMapLocations
     private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
     private static List<string> alertFlags;
 
-    // Replace game map with modified map
+    // Replace game map with modified mapinit
     public bool CanLoad<T>(IAssetInfo asset)
     {
       return asset.AssetNameEquals(@"LooseSprites\Map") && Customizations != null;
@@ -439,7 +439,7 @@ namespace NPCMapLocations
         }
       }
 
-      ResetMarkers(GetVillagers());
+      ResetMarkers();
       UpdateMarkers(true);
 
       Minimap = new ModMinimap(
@@ -460,32 +460,25 @@ namespace NPCMapLocations
                ((Globals.MinimapBlacklist.Contains("Mine") || Globals.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
     }
 
-    private void ResetMarkers(List<NPC> villagers)
+    private void ResetMarkers()
     {
       NpcMarkers = new HashSet<CharacterMarker>();
-      foreach (var npc in villagers)
-      {
-        // Handle case where Kent appears even though he shouldn't
-        if (npc.Name.Equals("Kent") && !ConditionalNpcs["Kent"]) continue;
-        if (!Customizations.Names.TryGetValue(npc.Name, out var npcName) && !(npc is Horse))
-        {
-          npcName = npc.displayName ?? npc.Name;
-          Customizations.Names.Add(npc.Name, npcName);
-        }
 
-        var npcMarker = new CharacterMarker
+      foreach (var npc in GetVillagers())
+      {
+        if (Customizations.Names.TryGetValue(npc.Name, out var npcName))
         {
-          Npc = npc,
-          Name = npcName,
-          Marker = npc.Sprite.Texture,
-          IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
-        };
-        NpcMarkers.Add(npcMarker);
+          NpcMarkers.Add(new CharacterMarker
+          {
+            Npc = npc,
+            Name = npcName,
+            Marker = npc.Sprite.Texture,
+            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+          });
+        }
       }
 
-
-      if (Context.IsMultiplayer)
-        FarmerMarkers = new Dictionary<long, CharacterMarker>();
+      if (Context.IsMultiplayer) FarmerMarkers = new Dictionary<long, CharacterMarker>();
     }
 
     // To initialize ModMap quicker for smoother rendering when opening map

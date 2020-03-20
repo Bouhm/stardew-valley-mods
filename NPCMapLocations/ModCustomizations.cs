@@ -44,8 +44,8 @@ namespace NPCMapLocations
     {
       foreach (var npc in ModMain.GetVillagers())
       {
-        LoadNpcCrop(npc);
-        LoadCustomName(npc);
+        GetNpcCrop(npc);
+        GetCustomName(npc);
       }
 
       // Handle duplicate displayName -- custom NPCs that replaces villagers
@@ -230,7 +230,7 @@ namespace NPCMapLocations
 
     // Handle any modified NPC names 
     // Specifically mods that change names in dialogue files (displayName)
-    private void LoadCustomName(NPC npc)
+    public void GetCustomName(NPC npc)
     {
       if (npc is Horse) return;
 
@@ -252,7 +252,7 @@ namespace NPCMapLocations
     }
 
     // Load user-specified NPC crops for custom sprites
-    private void LoadNpcCrop(NPC npc)
+    private void GetNpcCrop(NPC npc)
     {
       var CustomNpcMarkerOffsets = ModMain.Globals.CustomNpcMarkerOffsets;
 
