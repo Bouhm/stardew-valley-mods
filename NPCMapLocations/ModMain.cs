@@ -24,6 +24,7 @@ namespace NPCMapLocations
     public static SButton HeldKey;
     public static Texture2D Map;
     public static int mapTab;
+    public static Vector2 UNKNOWN = new Vector2(-9999, -9999); 
 
     private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
@@ -134,6 +135,7 @@ namespace NPCMapLocations
 
       // Get context of all locations (indoor, outdoor, relativity)
       LocationUtil.GetLocationContexts();
+      var a = LocationUtil.LocationContexts;
 
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
@@ -198,6 +200,7 @@ namespace NPCMapLocations
           npc.isVillager()
           | npc.isMarried()
           | (Globals.ShowHorse && npc is Horse)
+          | (Globals.ShowChildren && npc is Child && npc.Schedule != null)
         );
     }
 
@@ -584,7 +587,7 @@ namespace NPCMapLocations
 
           else
           {
-            marker.MapLocation = Vector2.Zero;
+            marker.MapLocation = UNKNOWN;
           }
         }
       }
@@ -751,7 +754,7 @@ namespace NPCMapLocations
         else
         {
           // Set no location so they don't get drawn
-          npcMarker.MapLocation = Vector2.Zero;
+          npcMarker.MapLocation = UNKNOWN;
         }
       }
     }
@@ -879,7 +882,7 @@ namespace NPCMapLocations
         locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
       }
 
-      if (locVectors == null || locationNotFound) return Vector2.Zero;
+      if (locVectors == null || locationNotFound) return UNKNOWN;
 
       int x;
       int y;

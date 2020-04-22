@@ -125,7 +125,7 @@ namespace NPCMapLocations
         Game1.player.getTileY(), Customizations.MapVectors, true);
 
       // Player in unknown location, use previous location as center
-      if (center.Equals(Vector2.Zero) && prevCenter != null)
+      if (center.Equals(ModMain.UNKNOWN) && prevCenter != null)
         center = prevCenter;
       else
         prevCenter = center;
@@ -407,7 +407,7 @@ namespace NPCMapLocations
         foreach (var npcMarker in sortedMarkers)
         {
           // Skip if no specified location
-          if (npcMarker.MapLocation.Equals(Vector2.Zero) || npcMarker.Marker == null ||
+          if (npcMarker.Marker == null ||
               !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Npc.Name) ||
               !IsWithinMapArea(npcMarker.MapLocation.X, npcMarker.MapLocation.Y))
             continue;
@@ -479,11 +479,10 @@ namespace NPCMapLocations
       }
       else
       {
-        if (!playerLoc.Equals(Vector2.Zero))
-          Game1.player.FarmerRenderer.drawMiniPortrat(b,
-            new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
-            2f, 1,
-            Game1.player);
+        Game1.player.FarmerRenderer.drawMiniPortrat(b,
+          new Vector2(NormalizeToMap(offsetMmLoc.X + playerLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + playerLoc.Y - 15)), 0.00011f,
+          2f, 1,
+          Game1.player);
       }
     }
 
