@@ -201,7 +201,7 @@ namespace NPCMapLocations
 
       // Make transparent on hover
       var color = IsHoveringMinimap
-        ? Color.White * 0.5f
+        ? Color.White * 0.25f
         : Color.White;
 
       // Experimental stuff for uniform opacity using render target

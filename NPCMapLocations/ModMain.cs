@@ -133,10 +133,6 @@ namespace NPCMapLocations
       DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
       shouldShowMinimap = Config.ShowMinimap;
 
-      // Get context of all locations (indoor, outdoor, relativity)
-      LocationUtil.GetLocationContexts();
-      var a = LocationUtil.LocationContexts;
-
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
       {
@@ -158,6 +154,29 @@ namespace NPCMapLocations
           MapVectors[locVectors.Key] = locVectors.Value;
         else
           MapVectors.Add(locVectors.Key, locVectors.Value);
+      }
+
+      // Get context of all locations (indoor, outdoor, relativity)
+      LocationUtil.GetLocationContexts();
+
+      // Log any custom locations not in customlocations.json
+      foreach (var locCtx in LocationUtil.LocationContexts)
+      {
+        var locationName = locCtx.Key;
+        if (
+          locCtx.Value.Type == "outdoors"
+          && (!locationName.Equals("FarmHouse")
+          && !locationName.Contains("Cabin")
+          && !locationName.Contains("UndergroundMine"))
+          && !MapVectors.TryGetValue(locationName, out var loc)
+        )
+        {
+          if (!alertFlags.Contains("UnknownLocation:" + locationName))
+          {
+            Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
+            alertFlags.Add("UnknownLocation:" + locationName);
+          }
+        }
       }
 
       UpdateFarmBuildingLocs();
@@ -768,16 +787,6 @@ namespace NPCMapLocations
 
         if (locationName.Contains("UndergroundMine"))
           locationName = LocationUtil.GetMinesLocationName(locationName);
-
-        if ((!locationName.Equals("FarmHouse") && !locationName.Contains("Cabin") && !locationName.Contains("UndergroundMine")) &&
-            !MapVectors.TryGetValue(locationName, out var loc))
-        {
-          if (!alertFlags.Contains("UnknownLocation:" + locationName))
-          {
-            Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
-            alertFlags.Add("UnknownLocation:" + locationName);
-          }
-        }
 
         var farmerId = farmer.UniqueMultiplayerID;
         var farmerLocationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
