@@ -218,7 +218,7 @@ namespace NPCMapLocations
           npc.isVillager()
           | npc.isMarried()
           | (Globals.ShowHorse && npc is Horse)
-          // | (Globals.ShowChildren && npc is Child && npc.Schedule != null)
+          | (Globals.ShowChildren && npc is Child && npc.Schedule != null)
         );
     }
 
@@ -738,7 +738,7 @@ namespace NPCMapLocations
           // Establish draw order, higher number infront
           // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
           // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          if (npcMarker.Npc is Horse) // | npcMarker.Npc is Child)
+          if (npcMarker.Npc is Horse || npcMarker.Npc is Child)
           {
             npcMarker.Layer = 0;
           }
