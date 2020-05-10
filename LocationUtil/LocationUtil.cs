@@ -18,7 +18,9 @@ internal class LocationUtil
       if (location.IsOutdoors)
       {
         if (!LocationContexts.ContainsKey(location.Name))
-          LocationContexts.Add(location.Name, new LocationContext());
+        {
+          LocationContexts.Add(location.Name, new LocationContext() { Root = location.Name, Type = "outdoors" });
+        }
 
         foreach (var warp in location.warps)
         {

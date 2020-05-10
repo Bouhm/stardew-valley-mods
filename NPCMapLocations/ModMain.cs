@@ -158,29 +158,28 @@ namespace NPCMapLocations
 
       // Get context of all locations (indoor, outdoor, relativity)
       LocationUtil.GetLocationContexts();
+      alertFlags = new List<string>();
 
       // Log any custom locations not in customlocations.json
       foreach (var locCtx in LocationUtil.LocationContexts)
       {
-        var locationName = locCtx.Key;
         if (
-          locCtx.Value.Type == "outdoors"
-          && (!locationName.Equals("FarmHouse")
-          && !locationName.Contains("Cabin")
-          && !locationName.Contains("UndergroundMine"))
-          && !MapVectors.TryGetValue(locationName, out var loc)
+          locCtx.Value.Root == null
+          || ((!locCtx.Key.Equals("FarmHouse")
+          && !locCtx.Key.Contains("Cabin")
+          && !locCtx.Key.Contains("UndergroundMine"))
+          && !MapVectors.TryGetValue(locCtx.Value.Root, out var loc))
         )
         {
-          if (!alertFlags.Contains("UnknownLocation:" + locationName))
+          if (!alertFlags.Contains("UnknownLocation:" + locCtx.Key))
           {
-            Monitor.Log($"Unknown location: {locationName}.", LogLevel.Debug);
-            alertFlags.Add("UnknownLocation:" + locationName);
+            Monitor.Log($"Unknown location: {locCtx.Key}", LogLevel.Debug);
+            alertFlags.Add("UnknownLocation:" + locCtx.Key);
           }
         }
       }
 
       UpdateFarmBuildingLocs();
-      alertFlags = new List<string>();
 
       // Find index of MapPage since it's a different value for SDV mobile
       var pages = Helper.Reflection.GetField<List<IClickableMenu>>(new GameMenu(false), "pages").GetValue();
