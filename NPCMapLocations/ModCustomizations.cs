@@ -266,6 +266,12 @@ namespace NPCMapLocations
 
       // If custom crop offset is not specified, default to 0
       if (!NpcMarkerOffsets.TryGetValue(npc.Name, out var crop)) NpcMarkerOffsets[npc.Name] = 0;
+
+      // Children spites are short so give them a booster seat
+      if (npc is Child)
+      {
+        NpcMarkerOffsets[npc.Name] += 7;
+      }
     }
 
     public class CustomLocation

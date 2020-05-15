@@ -218,7 +218,7 @@ namespace NPCMapLocations
           npc.isVillager()
           | npc.isMarried()
           | (Globals.ShowHorse && npc is Horse)
-          | (Globals.ShowChildren && npc is Child && npc.Schedule != null)
+          | (Globals.ShowChildren && npc is Child)
         );
     }
 
