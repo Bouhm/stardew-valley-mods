@@ -32,7 +32,6 @@ namespace NPCMapLocations
     public string TooltipKey { get; set; } = "Space";
     public bool ShowFarmBuildings { get; set; } = true;
 
-    public string MinimapDragKey { get; set; } = "LeftControl";
     public string MinimapToggleKey { get; set; } = "OemPipe";
     public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() { };
 

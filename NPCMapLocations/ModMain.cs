@@ -309,17 +309,9 @@ namespace NPCMapLocations
       // Minimap dragging
       if (Config.ShowMinimap && Minimap != null)
       {
-        if (e.Button.ToString().Equals(Globals.MinimapDragKey))
-        {
-          HeldKey = e.Button;
-        }
-        else if (HeldKey.ToString().Equals(Globals.MinimapDragKey) &&
-                 (e.Button == SButton.MouseLeft || e.Button == SButton.ControllerA) &&
-                 Game1.activeClickableMenu == null)
+        if (Minimap.isHoveringDragZone() && e.Button == SButton.MouseRight)
         {
           MouseUtil.HandleMouseDown(() => Minimap.HandleMouseDown());
-          if (MouseUtil.IsMouseHeldDown)
-            Helper.Input.Suppress(e.Button);
         }
       }
 
@@ -328,8 +320,6 @@ namespace NPCMapLocations
         (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
       {
         MouseUtil.HandleMouseDown();
-        if (MouseUtil.IsMouseHeldDown)
-          Helper.Input.Suppress(e.Button);
       }
 
       // Minimap toggle
@@ -352,19 +342,18 @@ namespace NPCMapLocations
     private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
-      if (HeldKey.ToString().Equals(Globals.MinimapDragKey) && e.Button.ToString().Equals(Globals.MinimapDragKey) ||
-          HeldKey == SButton.LeftControl && e.Button != SButton.MouseRight)
-        HeldKey = SButton.None;
 
-      if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseLeft)
+      if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseRight)
       {
-        if (Game1.activeClickableMenu == null)
+        if (MouseUtil.IsMouseHeldDown)
+        {
           MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
-        else if (Game1.activeClickableMenu is ModMenu)
+        }
+        else if (Game1.activeClickableMenu is ModMenu) { 
           Minimap.Resize();
+        }
       }
-      else if
-        (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      else if (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
       {
         MouseUtil.HandleMouseRelease();
       }

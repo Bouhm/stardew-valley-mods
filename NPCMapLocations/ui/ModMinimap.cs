@@ -66,6 +66,12 @@ namespace NPCMapLocations
     private Dictionary<string, bool> ConditionalNpcs { get; }
     private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 
+    // Check if cursor is hovering the drag zone (top of minimap)
+    public bool isHoveringDragZone()
+    {
+      return (Game1.getMouseX() >= mmX - borderWidth && Game1.getMouseX() <= mmX + mmWidth + borderWidth &&
+          Game1.getMouseY() >= mmY - borderWidth && Game1.getMouseY() < mmY + borderWidth);
+    }
     public void HandleMouseDown()
     {
       if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
@@ -187,7 +193,7 @@ namespace NPCMapLocations
       {
         IsHoveringMinimap = true;
 
-        if (ModMain.HeldKey.ToString().Equals(ModMain.Globals.MinimapDragKey))
+        if (isHoveringDragZone())
           Game1.mouseCursor = 2;
 
         if (MouseUtil.IsMouseHeldDown)
