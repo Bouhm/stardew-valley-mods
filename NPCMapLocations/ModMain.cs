@@ -655,11 +655,11 @@ namespace NPCMapLocations
 
         if (npcMarker.SyncedLocationName == null)
         {
-          // Handle null locations at beginning of new day
+          // Skip if no location
           if (npc.currentLocation == null)
-            locationName = npc.DefaultMap;
-          else
-            locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
+            continue;
+
+          locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
         }
         else
         {
