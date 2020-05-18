@@ -309,7 +309,7 @@ namespace NPCMapLocations
       // Minimap dragging
       if (Config.ShowMinimap && Minimap != null)
       {
-        if (Minimap.isHoveringDragZone() && e.Button == SButton.MouseRight)
+        if (Minimap.isHoveringDragZone() && e.Button == SButton.MouseLeft)
         {
           MouseUtil.HandleMouseDown(() => Minimap.HandleMouseDown());
         }
@@ -343,14 +343,14 @@ namespace NPCMapLocations
     {
       if (!Context.IsWorldReady) return;
 
-      if (Minimap != null && Context.IsWorldReady && e.Button == SButton.MouseRight)
+      if (Minimap != null && e.Button == SButton.MouseLeft)
       {
-        if (MouseUtil.IsMouseHeldDown)
+        if (Game1.activeClickableMenu is ModMenu) { 
+          Minimap.Resize();
+        }
+        else if (Game1.activeClickableMenu == null && Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Released)
         {
           MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
-        }
-        else if (Game1.activeClickableMenu is ModMenu) { 
-          Minimap.Resize();
         }
       }
       else if (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
@@ -502,6 +502,7 @@ namespace NPCMapLocations
         // Sync multiplayer data
         if (Context.IsMainPlayer && Context.IsMultiplayer)
         {
+
           var message = new SyncedLocationData();
           foreach (var npc in GetVillagers())
           {
@@ -559,6 +560,13 @@ namespace NPCMapLocations
       }
 
       // Update tick
+      // If minimap is being dragged, suppress mouse behavior
+      if (Config.ShowMinimap && Minimap != null && Minimap.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Held)
+      {
+        Minimap.HandleMouseDrag();
+        Helper.Input.Suppress(SButton.MouseLeft);
+      }
+
       if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
       {
         isModMapOpen = false;
@@ -1034,7 +1042,7 @@ namespace NPCMapLocations
           new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 
         // Draw drag and drop area
-        if (MouseUtil.IsMouseHeldDown)
+        if (Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Held)
         {
           // Draw dragging box
           DrawBorder(tex,

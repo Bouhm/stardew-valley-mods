@@ -34,7 +34,7 @@ namespace NPCMapLocations
     private int prevMmX;
     private int prevMmY;
     private int drawDelay = 0;
-    //private RenderTarget2D renderTarget;
+    private bool dragStarted;
 
     public ModMinimap(
       HashSet<CharacterMarker> npcMarkers,
@@ -70,28 +70,36 @@ namespace NPCMapLocations
     public bool isHoveringDragZone()
     {
       return (Game1.getMouseX() >= mmX - borderWidth && Game1.getMouseX() <= mmX + mmWidth + borderWidth &&
-          Game1.getMouseY() >= mmY - borderWidth && Game1.getMouseY() < mmY + borderWidth);
+          Game1.getMouseY() >= mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth);
     }
     public void HandleMouseDown()
     {
-      if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
-          Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
+      prevMmX = mmX;
+      prevMmY = mmY;
+      dragStarted = true;
+    }
+
+    public void HandleMouseDrag()
+    {
+      if (dragStarted)
       {
-        prevMmX = mmX;
-        prevMmY = mmY;
+        // Move minimap with mouse on drag
+        mmX = NormalizeToMap(MathHelper.Clamp(prevMmX + Game1.getMouseX() - MouseUtil.BeginMousePosition.X, borderWidth,
+          Game1.viewport.Width - mmWidth - borderWidth));
+        mmY = NormalizeToMap(MathHelper.Clamp(prevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, borderWidth,
+          Game1.viewport.Height - mmHeight - borderWidth));
+
+        ModMain.Helper.Input.Suppress(SButton.MouseLeft);
       }
     }
 
     public void HandleMouseRelease()
     {
-      if (Game1.getMouseX() > mmX - borderWidth && Game1.getMouseX() < mmX + mmWidth + borderWidth &&
-          Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
-      {
-        ModMain.Config.MinimapX = mmX;
-        ModMain.Config.MinimapY = mmY;
-        ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
-        drawDelay = 30;
-      }
+      ModMain.Config.MinimapX = mmX;
+      ModMain.Config.MinimapY = mmY;
+      ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+      dragStarted = false;
+      drawDelay = 30;
     }
 
     public void UpdateMapForSeason()
@@ -184,39 +192,18 @@ namespace NPCMapLocations
     public void DrawMiniMap()
     {
       var b = Game1.spriteBatch;
-      var IsHoveringMinimap = false;
+      var IsHoveringMinimap = isHoveringDragZone();
       var offsetMmX = mmX + offset;
-
-      // Move minimap along with mouse when held down
-      if (Game1.getMouseX() > offsetMmX - borderWidth && Game1.getMouseX() < offsetMmX + mmWidth + borderWidth &&
-          Game1.getMouseY() > mmY - borderWidth && Game1.getMouseY() < mmY + mmHeight + borderWidth)
-      {
-        IsHoveringMinimap = true;
-
-        if (isHoveringDragZone())
-          Game1.mouseCursor = 2;
-
-        if (MouseUtil.IsMouseHeldDown)
-        {
-          mmX = NormalizeToMap(MathHelper.Clamp(prevMmX + Game1.getMouseX() - MouseUtil.BeginMousePosition.X, borderWidth,
-            Game1.viewport.Width - mmWidth - borderWidth));
-          mmY = NormalizeToMap(MathHelper.Clamp(prevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, borderWidth,
-            Game1.viewport.Height - mmHeight - borderWidth));
-        }
-      }
 
       // Make transparent on hover
       var color = IsHoveringMinimap
         ? Color.White * 0.25f
         : Color.White;
 
-      // Experimental stuff for uniform opacity using render target
-      // Doesn't seem to work due to dynamic background colors and
-      // An issue with doing this in PreRenderHud
-      // Game1.graphics.GraphicsDevice.SetRenderTarget(renderTarget);
-      // Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
-      // b.spriteBatch.End()
-      // b.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
+      if (IsHoveringMinimap)
+      {
+        Game1.mouseCursor = 2;
+      }
 
       if (ModMain.Map == null) return;
       b.Draw(ModMain.Map, new Vector2(offsetMmX, mmY),
@@ -226,7 +213,7 @@ namespace NPCMapLocations
         4f, SpriteEffects.None, 0.86f);
 
       // Don't draw markers while being dragged
-      if (!MouseUtil.IsMouseHeldDown)
+      if (ModMain.Helper.Input.GetState(SButton.MouseLeft) != SButtonState.Held)
       {
         // When minimap is moved, redraw markers after recalculating & repositioning
         if (drawDelay == 0)
@@ -261,15 +248,6 @@ namespace NPCMapLocations
         new Rectangle(48, 304, borderWidth, borderWidth), color * 1.5f);
       b.Draw(Game1.menuTexture, new Rectangle(offsetMmX - borderWidth, mmY + mmHeight, borderWidth, borderWidth),
         new Rectangle(0, 304, borderWidth, borderWidth), color * 1.5f);
-
-      // b.End();
-      // Game1.graphics.GraphicsDevice.SetRenderTarget(null);
-      // Game1.graphics.GraphicsDevice.Clear(Color.Transparent);
-      // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
-      // b.Draw(renderTarget, new Rectangle(0, 0, 400, 240), Color.White * opacity);
-
-      // b.End();
-      // b.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullNone);
     }
 
     private void DrawMarkers()

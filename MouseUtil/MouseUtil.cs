@@ -11,13 +11,11 @@ internal class MouseUtil
 {
   public static Vector2 BeginMousePosition { get; set; }
   public static Vector2 EndMousePosition { get; set; }
-  public static bool IsMouseHeldDown { get; set; }
 
   public static void Reset()
   {
     BeginMousePosition = new Vector2(-1000, -1000);
     EndMousePosition = new Vector2(-1000, -1000);
-    IsMouseHeldDown = false;
   }
 
   // Return Vector2 position of tile at cursor
@@ -37,7 +35,6 @@ internal class MouseUtil
   // Accepts a callback function as an argument
   public static void HandleMouseDown(Action fn = null)
   {
-    IsMouseHeldDown = true;
     BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
     fn?.Invoke();
   }
@@ -46,7 +43,6 @@ internal class MouseUtil
   // Accepts a callback function as an argument
   public static void HandleMouseRelease(Action fn = null)
   {
-    IsMouseHeldDown = false;
     EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
     fn?.Invoke();
   }
