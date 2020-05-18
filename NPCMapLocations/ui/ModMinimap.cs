@@ -88,8 +88,6 @@ namespace NPCMapLocations
           Game1.viewport.Width - mmWidth - borderWidth));
         mmY = NormalizeToMap(MathHelper.Clamp(prevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, borderWidth,
           Game1.viewport.Height - mmHeight - borderWidth));
-
-        ModMain.Helper.Input.Suppress(SButton.MouseLeft);
       }
     }
 

@@ -309,7 +309,7 @@ namespace NPCMapLocations
       // Minimap dragging
       if (Config.ShowMinimap && Minimap != null)
       {
-        if (Minimap.isHoveringDragZone() && e.Button == SButton.MouseLeft)
+        if (Minimap.isHoveringDragZone() && e.Button == SButton.MouseRight)
         {
           MouseUtil.HandleMouseDown(() => Minimap.HandleMouseDown());
         }
@@ -343,12 +343,12 @@ namespace NPCMapLocations
     {
       if (!Context.IsWorldReady) return;
 
-      if (Minimap != null && e.Button == SButton.MouseLeft)
+      if (Minimap != null)
       {
-        if (Game1.activeClickableMenu is ModMenu) { 
+        if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft) { 
           Minimap.Resize();
         }
-        else if (Game1.activeClickableMenu == null && Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Released)
+        else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
         {
           MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
         }
@@ -561,10 +561,9 @@ namespace NPCMapLocations
 
       // Update tick
       // If minimap is being dragged, suppress mouse behavior
-      if (Config.ShowMinimap && Minimap != null && Minimap.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Held)
+      if (Config.ShowMinimap && Minimap != null && Minimap.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
       {
         Minimap.HandleMouseDrag();
-        Helper.Input.Suppress(SButton.MouseLeft);
       }
 
       if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
