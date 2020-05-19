@@ -317,7 +317,7 @@ namespace NPCMapLocations
       {
         var houseLoc = ModMain.LocationToMap("Trailer_Big");
         if (IsWithinMapArea(houseLoc.X, houseLoc.Y))
-          b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + houseLoc.X - 14), NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 14)),
+          b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16), NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11)),
             new Rectangle(263, 181, 8, 8), color,
             0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
@@ -327,7 +327,7 @@ namespace NPCMapLocations
         var theaterLoc = ModMain.LocationToMap("JojaMart");
         if (IsWithinMapArea(theaterLoc.X, theaterLoc.Y))
         {
-          b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20), NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 16)),
+          b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20), NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11)),
             new Rectangle(275, 181, 15, 11), color,
             0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         }

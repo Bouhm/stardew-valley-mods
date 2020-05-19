@@ -759,9 +759,10 @@ namespace NPCMapLocations
 
           if (npcMarker.SyncedLocationName == null)
           {
-            // Get center of NPC marker 
-            var x = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).X - 16;
-            var y = (int)LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors).Y - 15;
+            // Get center of NPC marker
+            var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors);
+            var x = (int)npcLocation.X - 16;
+            var y = (int)npcLocation.Y - 15;
             npcMarker.MapLocation = new Vector2(x, y);
           }
         }
