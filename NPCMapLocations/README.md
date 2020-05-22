@@ -21,6 +21,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
   - [Common issues](#common-issues)
 - [See also](#see-also)
 - [Get additional help](#get-additional-help)
+- [Excluding Custom NPCs (For Developers)](#exclude-custom-npcs)
 
 ## How tracking works
 
@@ -34,7 +35,7 @@ Ideally, the custom location is drawn accurately in proportion onto the map such
 
 ## Creating an accurate map
 
-Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. If you are looking to add just a few buildings or a small area, consider creating a [Content Pack for Content Patcher](https://github.com/Pathoschild/StardewMods/tree/develop/ContentPatcher#edit-part-of-an-image) instead with `"PatchMode": "Overlay"`. Do not **`"Replace"`** the map as it will cause a conflict with NPC Map Locations.
+Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. If you are looking to add just a few buildings or a small area, consider creating a [Content Pack for Content Patcher](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/docs/author-guide.md#editimage) instead with `"PatchMode": "Overlay"`. Do not **`"Replace"`** the map as it will cause a conflict with NPC Map Locations.
 
 In order to draw a custom location accurately, the recommended method is to use the actual tilemap of the custom location and tracing it. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a render of the whole tilemap of the location. Using this as a reference, you can resize and overlay the tilemap to accurately trace it onto the map.
 
@@ -252,11 +253,6 @@ If the character does not show up in the map in the custom locations, there are 
 - The folder containing the custom map is not named correctly
   - You can confirm this by checking the SMAPI console or the [logs](log.smapi.io) and looking for the message that indicates which map NPC Map Locations has loaded.
 - The location is not properly added in `customlocations.json`. It must be added in properly by its exact location name, provided with `DEBUG_MODE` info.
-- The provided points are invalid.
-  - "MapX" should be a value between 0 and 1200.
-  - "MapY" should be a value between 0 and 720.
-  - "TileX" should be a value between 0 and the width of the tilemap.
-  - "TileY" should be a value between 0 and the height of the tilemap.
 
 ## See also
 
@@ -266,3 +262,19 @@ If the character does not show up in the map in the custom locations, there are 
 ## Get additional help
 
 You can reach me on [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/239) and leave a comment there, or you can ping me `@Bouhm` on the [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#modding` channel.
+
+## Excluding Custom NPCs from the map (For Developers)
+
+If you are a developer for a Custom NPC mod, you can choose to always exclude your NPC from showing up in NPC Map Locations by adding a custom field in NPCDispositions.
+The easiest way to do this is by adding to NPCDispositions through [Content Patcher](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/docs/author-guide.md#editdata). The field to add is `ExludeFromMap`.
+This is an example of what the patch would look like:
+```
+{
+  "Action": "EditData",
+  "Target": "Data/NPCDispositions",
+  "Entries": {
+    "ExcludeFromMap": "true"
+  }
+}
+```
+(Shoutout to @kdau for this suggestion.)
