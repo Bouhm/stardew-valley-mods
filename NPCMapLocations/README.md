@@ -268,6 +268,7 @@ You can reach me on [Nexus Mods](https://www.nexusmods.com/stardewvalley/mods/23
 If you are a developer for a Custom NPC mod, you can choose to always exclude your NPC from showing up in NPC Map Locations by adding a custom field in NPCDispositions.
 The easiest way to do this is by adding to NPCDispositions through [Content Patcher](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/docs/author-guide.md#editdata). The field to add is `ExludeFromMap`.
 This is an example of what the patch would look like:
+
 ```
 {
   "Action": "EditData",
@@ -277,4 +278,5 @@ This is an example of what the patch would look like:
   }
 }
 ```
+
 (Shoutout to @kdau for this suggestion.)

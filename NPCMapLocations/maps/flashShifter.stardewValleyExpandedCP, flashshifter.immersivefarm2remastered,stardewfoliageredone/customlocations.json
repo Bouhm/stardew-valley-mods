@@ -1,0 +1,194 @@
+{
+  "CustomMapLocations": {
+    "BlueMoonVineyard": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 547,
+        "MapY": 470
+      },
+      {
+        "TileX": 75,
+        "TileY": 55,
+        "MapX": 715,
+        "MapY": 604
+      }
+    ],
+    "Desert": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 0,
+        "MapY": 26
+      },
+      {
+        "TileX": 170,
+        "TileY": 90,
+        "MapX": 355,
+        "MapY": 213
+      }
+    ],
+    "Farm": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 311,
+        "MapY": 242
+      },
+      {
+        "TileX": 24,
+        "TileY": 78,
+        "MapX": 352,
+        "MapY": 378
+      },
+      {
+        "TileX": 25,
+        "TileY": 0,
+        "MapX": 380,
+        "MapY": 241
+      },
+      {
+        "TileX": 162,
+        "TileY": 78,
+        "MapX": 606,
+        "MapY": 380
+      },
+      {
+        "TileX": 24,
+        "TileY": 78,
+        "MapX": 318,
+        "MapY": 380
+      },
+      {
+        "TileX": 163,
+        "TileY": 156,
+        "MapX": 607,
+        "MapY": 403
+      }
+    ],
+    "ForestWest": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "GrampletonFields":  [
+      {
+        "MapX": 1190,
+        "MapY": 393
+      }
+    ],
+    "LostWoods": [
+      {
+        "MapX": 156,
+        "MapY": 698
+      }
+    ],
+    "ShearwaterBridge": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 1050,
+        "MapY": 363
+      },
+      {
+        "TileX": 80,
+        "TileY": 40,
+        "MapX": 1165,
+        "MapY": 414 
+      }
+    ],
+    "SpriteSpring": [
+      {
+        "MapX": 21,
+        "MapY": 579
+      }
+    ],
+    "TownEast": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 960,
+        "MapY": 337
+      },
+      {
+        "TileX": 40,
+        "TileY": 30,
+        "MapX": 1050,
+        "MapY": 413
+      }
+    ]
+  },
+  "CustomMapTooltips": {
+    "AndysHouse": {
+      "X": 386,
+      "Y": 542,
+      "Width": 21,
+      "Height": 21,
+      "PrimaryText": "Andy's House"
+    },
+    "BlueMoonVineyard": {
+      "X": 561,
+      "Y": 510,
+      "Width": 110,
+      "Height": 64,
+      "PrimaryText": "Blue Moon Vineyard"
+    },
+    "EmeraldFarm": {
+      "X": 707,
+      "Y": 58,
+      "Width": 80,
+      "Height": 23,
+      "PrimaryText": "Emerald Farm"
+    },
+    "FairhavenFarm": {
+      "X": 429,
+      "Y": 550,
+      "Width": 35,
+      "Height": 36,
+      "PrimaryText": "Fairhaven Farm"
+    },
+    "ForestWest": {
+      "X": 6,
+      "Y": 567,
+      "Width": 107,
+      "Height": 64,
+      "PrimaryText": "Forest West"
+    },
+    "JenkinsHouse": {
+      "X": 755,
+      "Y": 291,
+      "Width": 38,
+      "Height": 25,
+      "PrimaryText": "Jenkins' Residence"
+    },
+    "SophiaHouse": {
+      "X": 600,
+      "Y": 488,
+      "Width": 36,
+      "Height": 28,
+      "PrimaryText": "Sophia's House"
+    },
+    "Summit": {
+      "X": 795,
+      "Y": 21,
+      "Width": 46,
+      "Height": 36,
+      "PrimaryText": "Summit"
+    },
+    "SusansHouse": {
+      "X": 690,
+      "Y": 31,
+      "Width": 44,
+      "Height": 21,
+      "PrimaryText": "Susan's House"
+    },
+    "TownEast": {
+      "X": 968,
+      "Y": 335,
+      "Width": 81,
+      "Height": 71,
+      "PrimaryText": "Town East"
+    }
+  }
+}
