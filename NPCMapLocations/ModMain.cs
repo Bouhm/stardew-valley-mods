@@ -214,7 +214,7 @@ namespace NPCMapLocations
     {
       return
         !ModConstants.ExcludedNpcs.Contains(npc.Name)
-        && npc.GetType().GetProperty("ExcludeFromMap") != null // For other developers to always exclude an npc
+        && npc.GetType().GetProperty("ExcludeFromMap") == null // For other developers to always exclude an npc
         && (
           npc.isVillager()
           | npc.isMarried()
