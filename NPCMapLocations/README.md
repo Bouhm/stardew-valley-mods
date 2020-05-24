@@ -12,6 +12,7 @@ This documentation is for adding support for custom locations with **NPC Map Loc
   - [Seasonal maps](#seasonal-maps)
 - [Loading the custom map](#loading-the-custom-map)
   - [Folder selection](#folder-selection)
+- [Unknown locations](#unknown-locations)
 - [Adding points](#adding-points)
   - [Example](#example)
     - [Farm types](#farm-types)
@@ -22,18 +23,6 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 - [See also](#see-also)
 - [Get additional help](#get-additional-help)
 - [Excluding Custom NPCs (For Developers)](#exclude-custom-npcs)
-
-## Unknown locations
-
-NPC Map Locations will try to do its best to figure out where unknown locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations, and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so as long as there is tracking for the outdoor location, all indoor locations within will be located. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
-
-```
-[NPC Map Locations] Unknown location: WizardHouseBasement
-[NPC Map Locations] Unknown location: CrimsonBadlands
-[NPC Map Locations] Unknown location: DesertRailway
-[NPC Map Locations] Unknown location: IridiumQuarry
-[NPC Map Locations] Unknown location: TreasureCave
-```
 
 ## How tracking works
 
@@ -102,6 +91,18 @@ The folder should include the following files:
 You can use the template [with seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template) or [without seasonal maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps/_template_no_seasonal) to get started.
 
 Refer to the [maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations/maps) for some examples on the naming convention.
+
+## Unknown locations
+
+NPC Map Locations will try to do its best to figure out where unknown locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations, and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so as long as there is tracking for the outdoor location, all indoor locations within will be located. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
+
+```
+[NPC Map Locations] Unknown location: WizardHouseBasement
+[NPC Map Locations] Unknown location: CrimsonBadlands
+[NPC Map Locations] Unknown location: DesertRailway
+[NPC Map Locations] Unknown location: IridiumQuarry
+[NPC Map Locations] Unknown location: TreasureCave
+```
 
 ## Adding points
 
