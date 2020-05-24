@@ -19,7 +19,7 @@ internal class LocationUtil
       {
         if (!LocationContexts.ContainsKey(location.Name))
         {
-          LocationContexts.Add(location.Name, new LocationContext() { Root = location.Name, Type = "outdoors" });
+          LocationContexts.Add(location.Name, new LocationContext() { Root = location.Name, Type = LocationType.Outdoors });
         }
 
         foreach (var warp in location.warps)
@@ -81,7 +81,7 @@ internal class LocationUtil
     // Root location found, set as root and return
     if (location.IsOutdoors)
     {
-      LocationContexts[currLocationName].Type = "outdoors";
+      LocationContexts[currLocationName].Type = LocationType.Outdoors;
       LocationContexts[currLocationName].Root = currLocationName;
 
       if (prevLocation != null)
@@ -111,7 +111,7 @@ internal class LocationUtil
       }
 
       // If all warps are indoors, then the current location is a room
-      LocationContexts[currLocationName].Type = hasOutdoorWarp ? "building" : "room";
+      LocationContexts[currLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
 
       if (prevLocation != null)
       {
@@ -154,7 +154,7 @@ internal class LocationUtil
   public static string GetBuilding(string loc)
   {
     if (loc.Contains("UndergroundMine")) return GetMinesLocationName(loc);
-    if (LocationContexts[loc].Type == "building") return loc;
+    if (LocationContexts[loc].Type == LocationType.Building) return loc;
 
     var building = LocationContexts[loc].Parent;
     if (building == null) return null;

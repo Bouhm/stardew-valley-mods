@@ -670,7 +670,7 @@ namespace NPCMapLocations
         // For layering indoor/outdoor NPCs and indoor indicator
         if (LocationUtil.LocationContexts.TryGetValue(locationName, out var locCtx))
         {
-          npcMarker.IsOutdoors = locCtx.Type == "outdoors";
+          npcMarker.IsOutdoors = locCtx.Type == LocationType.Outdoors;
         }
         else
         {
@@ -847,7 +847,7 @@ namespace NPCMapLocations
       }
 
       // Get location of indoor location by its warp position in the outdoor location
-      if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc) && loc.Type != "outdoors" && loc.Root != null)
+      if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc) && loc.Type != LocationType.Outdoors && loc.Root != null)
       {
         var building = LocationUtil.GetBuilding(locationName);
 
