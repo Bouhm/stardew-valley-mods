@@ -94,7 +94,7 @@ Refer to the [maps](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPC
 
 ## Unknown locations
 
-NPC Map Locations will try its best to figure out where custom locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so indoor locations within can be automatically located as long as the outdoor location has tracking. Tracking refers to the existence of multiple reference points on the map with which we can calculate where a character is within the outdoor map (explained below). Indoor locations are single points on the map, and thus do not require tracking. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
+NPC Map Locations will try its best to figure out where custom locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so indoor locations within can be automatically located as long as the outdoor location has tracking (explained below). Indoor locations are single points on the map and do not require tracking. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
 
 ```
 [NPC Map Locations] Unknown location: WizardHouseBasement
@@ -103,6 +103,8 @@ NPC Map Locations will try its best to figure out where custom locations are. Ea
 [NPC Map Locations] Unknown location: IridiumQuarry
 [NPC Map Locations] Unknown location: TreasureCave
 ```
+
+A video tutorial is available for how I add tracking for these SVE custom locations below.
 
 ## Adding points
 
