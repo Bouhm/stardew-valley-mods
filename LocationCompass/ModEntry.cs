@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using Netcode;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Quests;
@@ -227,14 +226,14 @@ namespace LocationCompass
       foreach (var npc in GetVillagers())
       {
         if (npc == null || npc.currentLocation == null) continue;
-        if (syncedLocationData.SyncedLocations.TryGetValue(npc.Name, out var locationData))
+        if (syncedLocationData.Locations.TryGetValue(npc.Name, out var locationData))
         {
-          syncedLocationData.SyncedLocations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
+          syncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
         }
         else
         {
 
-          syncedLocationData.AddNpcLocation(npc.Name,
+          syncedLocationData.AddLocation(npc.Name,
             new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y));
         }
       }
@@ -261,7 +260,7 @@ namespace LocationCompass
       {
         if (character.currentLocation == null) continue;
         if (!config.ShowHorses && character is Horse || config.ShowFarmersOnly && (character is NPC && !(character is Horse))) continue;
-        if (!syncedLocationData.SyncedLocations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
+        if (!syncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
         if (character is NPC npc && config.ShowQuestsAndBirthdaysOnly) {
           var isBirthday = false;
           var hasQuest = false;
@@ -376,7 +375,7 @@ namespace LocationCompass
             if (indoor == null) continue;
             if (playerLocName != characterLocCtx.Root && playerLocName != indoor) continue;
           }
-          charLocName = (isPlayerLocOutdoors || characterLocCtx.Type != "room") ? indoor : charLocName;
+          charLocName = (isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room) ? indoor : charLocName;
 
 
           // Neighboring outdoor warps
