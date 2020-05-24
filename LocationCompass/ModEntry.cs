@@ -60,8 +60,6 @@ namespace LocationCompass
       UpdateLocators();
     }
 
-   
-
     private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
     {
       if (!Context.IsWorldReady) return;
@@ -190,8 +188,8 @@ namespace LocationCompass
       if (!Context.IsWorldReady)
         return;
 
-      // One-second tick
-      if (e.IsOneSecond)
+      // Quarter-second tick
+      if (e.IsMultipleOf(15))
       {
         if (characters != null && Context.IsMultiplayer)
         {
@@ -232,7 +230,6 @@ namespace LocationCompass
         }
         else
         {
-
           syncedLocationData.AddLocation(npc.Name,
             new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y));
         }
