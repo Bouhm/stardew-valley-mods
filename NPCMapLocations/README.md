@@ -23,6 +23,18 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 - [Get additional help](#get-additional-help)
 - [Excluding Custom NPCs (For Developers)](#exclude-custom-npcs)
 
+## Unknown locations
+
+NPC Map Locations will try to do its best to figure out where unknown locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations, and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so as long as there is tracking for the outdoor location, all indoor locations within will be located. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
+
+```
+[NPC Map Locations] Unknown location: WizardHouseBasement
+[NPC Map Locations] Unknown location: CrimsonBadlands
+[NPC Map Locations] Unknown location: DesertRailway
+[NPC Map Locations] Unknown location: IridiumQuarry
+[NPC Map Locations] Unknown location: TreasureCave
+```
+
 ## How tracking works
 
 For any outdoor location in the game, the mod needs at least two pairs of points to calculate the map location. The two pairs of points are required to create a bounding box (top-left corner and bottom-right corner) with which we can calculate the pixel position on the map from the current tile position in the location. One pair is the top-left and bottom-right pixel points on the map. The second pair are the top-left and bottom-right tile positions in the location.
