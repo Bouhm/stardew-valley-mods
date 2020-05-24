@@ -97,7 +97,12 @@ namespace NPCMapLocations
       ModMain.Config.MinimapY = mmY;
       ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
       dragStarted = false;
-      drawDelay = 30;
+
+      // Delay drawing on minimap after it's moved
+      if (isHoveringDragZone())
+      {
+        drawDelay = 30;
+      }
     }
 
     public void UpdateMapForSeason()
@@ -204,6 +209,7 @@ namespace NPCMapLocations
       }
 
       if (ModMain.Map == null) return;
+
       b.Draw(ModMain.Map, new Vector2(offsetMmX, mmY),
         new Rectangle((int)Math.Floor(cropX / Game1.pixelZoom),
           (int)Math.Floor(cropY / Game1.pixelZoom), mmWidth / Game1.pixelZoom + 2,
@@ -211,7 +217,7 @@ namespace NPCMapLocations
         4f, SpriteEffects.None, 0.86f);
 
       // Don't draw markers while being dragged
-      if (ModMain.Helper.Input.GetState(SButton.MouseLeft) != SButtonState.Held)
+      if (!(isHoveringDragZone() && ModMain.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
       {
         // When minimap is moved, redraw markers after recalculating & repositioning
         if (drawDelay == 0)
