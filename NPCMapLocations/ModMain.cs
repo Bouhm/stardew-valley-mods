@@ -26,11 +26,10 @@ namespace NPCMapLocations
     public static int mapTab;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
 
-    private const int DRAW_DELAY = 3;
     private Texture2D BuildingMarkers;
     private Dictionary<string, MapVector[]> MapVectors;
     private ModMinimap Minimap;
-    private HashSet<CharacterMarker> NpcMarkers;
+    private Dictionary<string, CharacterMarker> NpcMarkers;
     private Dictionary<string, bool> ConditionalNpcs;
     private bool hasOpenedMap;
     private bool isModMapOpen;
@@ -477,15 +476,14 @@ namespace NPCMapLocations
 
     private void ResetMarkers()
     {
-      NpcMarkers = new HashSet<CharacterMarker>();
+      NpcMarkers = new Dictionary<string, CharacterMarker>();
 
       foreach (var npc in GetVillagers())
       {
         if (Customizations.Names.TryGetValue(npc.Name, out var npcName))
         {
-          NpcMarkers.Add(new CharacterMarker
+          NpcMarkers.Add(npcName, new CharacterMarker
           {
-            Name = npcName,
             Marker = npc.Sprite.Texture,
             IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
           });
@@ -500,32 +498,35 @@ namespace NPCMapLocations
     {
       if (!Context.IsWorldReady) return;
 
+      // Half-second tick
+      if (e.IsMultipleOf(30))
+      {
+        // Map page updates
+        var updateForMinimap = false || shouldShowMinimap;
+
+        if (Config.ShowMinimap)
+          if (Minimap != null)
+          {
+            Minimap.Update();
+            updateForMinimap = true;
+          }
+
+        UpdateMarkers(updateForMinimap);
+      }
+
       // One-second tick
       if (e.IsOneSecond)
       {
         // Sync multiplayer data
         if (Context.IsMainPlayer && Context.IsMultiplayer)
         {
-
-          var message = new SyncedLocationData();
-          foreach (var npc in GetVillagers())
+          var message = new Dictionary<string, CharacterMarker>();
+          foreach (var marker in NpcMarkers)
           {
-            if (npc == null || npc.currentLocation == null) continue;
-
-            try
-            {
-              message.AddNpcLocation(npc.Name,
-                new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X,
-                  npc.Position.Y));
-            }
-            catch
-            {
-              IMonitor.Log("Failed to send synced location data.", LogLevel.Error);
-            }
-
+            message.Add(marker.Key, marker.Value);
           }
 
-          Helper.Multiplayer.SendMessage(message, "SyncedLocationData", modIDs: new string[] { ModManifest.UniqueID });
+          Helper.Multiplayer.SendMessage(message, "SyncedNpcMapLocationData", modIDs: new string[] { ModManifest.UniqueID });
         }
 
         // Check season change (for when it's changed via console)
@@ -545,22 +546,6 @@ namespace NPCMapLocations
 
           Minimap?.UpdateMapForSeason();
         }
-      }
-
-      // Half-second tick
-      if (e.IsMultipleOf(30))
-      {
-        // Map page updates
-        var updateForMinimap = false || shouldShowMinimap;
-
-        if (Config.ShowMinimap)
-          if (Minimap != null)
-          {
-            Minimap.Update();
-            updateForMinimap = true;
-          }
-
-        UpdateMarkers(updateForMinimap);
       }
 
       // Update tick
@@ -588,27 +573,13 @@ namespace NPCMapLocations
     {
       if (NpcMarkers == null) return;
 
-      if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedLocationData")
+      if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedNpcMapLocationData")
       {
-        var message = e.ReadAs<SyncedLocationData>();
+        var message = e.ReadAs<Dictionary<string, CharacterMarker>>();
 
-        foreach (var locData in message.SyncedLocations)
+        foreach (var locData in message.MapLocations)
         {
-          var mapLocation = LocationToMap(
-            locData.Value.LocationName,
-            (int)Math.Floor(locData.Value.X / Game1.tileSize),
-            (int)Math.Floor(locData.Value.Y / Game1.tileSize),
-            Customizations.MapVectors
-          );
 
-          if (NpcMarkers.Any(marker => marker.Name == locData.Key))
-          {
-
-          }
-          else
-          {
-
-          }
         }
       }
     }
@@ -650,32 +621,16 @@ namespace NPCMapLocations
     {
       if (NpcMarkers == null) return;
 
-      foreach (var npcMarker in NpcMarkers)
+      foreach (var npc in GetVillagers())
       {
         string locationName;
 
-        if (npcMarker.SyncedLocationName == null)
+        if (!NpcMarkers.Contains(npc.Name) || npc.currentLocation == null)
         {
-          // Skip if no location
-          if (npc.currentLocation == null)
-            continue;
-
-          locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
-        }
-        else
-        {
-          locationName = npcMarker.SyncedLocationName;
+          continue;
         }
 
-        // For layering indoor/outdoor NPCs and indoor indicator
-        if (LocationUtil.LocationContexts.TryGetValue(locationName, out var locCtx))
-        {
-          npcMarker.IsOutdoors = locCtx.Type == LocationType.Outdoors;
-        }
-        else
-        {
-          npcMarker.IsOutdoors = false;
-        }
+        locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
 
         // For show Npcs in player's location option
         var isSameLocation = false;
