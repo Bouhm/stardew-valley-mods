@@ -794,19 +794,7 @@ namespace NPCMapLocations
         var farmerLoc = LocationToMap(farmerLocationName,
           farmer.getTileX(), farmer.getTileY(), Customizations.MapVectors);
 
-        if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
-        {
-          var deltaX = farmerLoc.X - farMarker.PrevMapLocation.X;
-          var deltaY = farmerLoc.Y - farMarker.PrevMapLocation.Y;
-
-          // Location changes before tile position, causing farmhands to blink
-          // to the wrong position upon entering new location. Handle this in draw.
-          if (farmerLocationName == farMarker.PrevLocationName && MathHelper.Distance(deltaX, deltaY) > 15)
-            FarmerMarkers[farmerId].DrawDelay = DRAW_DELAY;
-          else if (farMarker.DrawDelay > 0)
-            FarmerMarkers[farmerId].DrawDelay--;
-        }
-        else
+        if (!FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
         {
           var newMarker = new CharacterMarker
           {
@@ -818,9 +806,6 @@ namespace NPCMapLocations
         }
 
         FarmerMarkers[farmerId].MapLocation = farmerLoc;
-        FarmerMarkers[farmerId].PrevMapLocation = farmerLoc;
-        FarmerMarkers[farmerId].PrevLocationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
-        FarmerMarkers[farmerId].IsOutdoors = farmer.currentLocation.IsOutdoors;
       }
     }
 

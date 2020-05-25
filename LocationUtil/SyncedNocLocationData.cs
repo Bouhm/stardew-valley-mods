@@ -1,11 +1,11 @@
 // Synced NPC positions for multiplayer
 using System.Collections.Generic;
 
-internal class SyncedLocationData
+internal class SyncedNpcLocationData
 {
   public Dictionary<string, LocationData> Locations { get; set; }
 
-  public SyncedLocationData()
+  public SyncedNpcLocationData()
   {
     Locations = new Dictionary<string, LocationData>();
   }
