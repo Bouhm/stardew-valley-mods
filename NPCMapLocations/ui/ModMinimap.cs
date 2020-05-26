@@ -396,31 +396,31 @@ namespace NPCMapLocations
         {
           // Skip if no specified location
           if (npcMarker.Marker == null ||
-              !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Npc.Name) ||
-              !IsWithinMapArea(npcMarker.MapLocation.X, npcMarker.MapLocation.Y))
+              !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Name) ||
+              !IsWithinMapArea(npcMarker.MapX, npcMarker.MapY))
             continue;
 
           var markerColor = npcMarker.IsHidden ? Color.DimGray * 0.7f : Color.White;
 
           var offset = 1;
-          Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Npc.Name, out offset);
+          Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Name, out offset);
 
           // Draw NPC marker
-          var spriteRect = npcMarker.Npc is Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, offset, 16, 15);
+          var spriteRect = npcMarker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, offset, 16, 15);
 
-          if (npcMarker.Npc is Horse)
+          if (npcMarker.Type == Character.Horse)
           {
             b.Draw(npcMarker.Marker,
-              new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X),
-                NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y),
+              new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapX),
+                NormalizeToMap(offsetMmLoc.Y + npcMarker.MapY),
                 30, 32),
                 spriteRect, markerColor);
           }
           else
           {
             b.Draw(npcMarker.Marker,
-              new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X),
-                NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y),
+              new Rectangle(NormalizeToMap(offsetMmLoc.X + npcMarker.MapX),
+                NormalizeToMap(offsetMmLoc.Y + npcMarker.MapY),
                 30, 32),
                 spriteRect, markerColor);
           }
@@ -430,16 +430,16 @@ namespace NPCMapLocations
           {
             if (npcMarker.IsBirthday)
               b.Draw(Game1.mouseCursors,
-                new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 20),
-                  NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y)),
+                new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapX + 20),
+                  NormalizeToMap(offsetMmLoc.Y + npcMarker.MapY)),
                 new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                 SpriteEffects.None,
                 0f);
 
             if (npcMarker.HasQuest)
               b.Draw(Game1.mouseCursors,
-                new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapLocation.X + 22),
-                  NormalizeToMap(offsetMmLoc.Y + npcMarker.MapLocation.Y - 3)),
+                new Vector2(NormalizeToMap(offsetMmLoc.X + npcMarker.MapX + 22),
+                  NormalizeToMap(offsetMmLoc.Y + npcMarker.MapY - 3)),
                 new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None,
                 0f);
           }
@@ -453,13 +453,11 @@ namespace NPCMapLocations
           // Temporary solution to handle desync of farmhand location/tile position when changing location
           if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
           {
-            if (farMarker.MapLocation.Equals(Vector2.Zero)) continue;
-            if (farMarker.DrawDelay == 0 &&
-                IsWithinMapArea(farMarker.MapLocation.X - 16, farMarker.MapLocation.Y - 15))
+            if (IsWithinMapArea(farMarker.MapX - 16, farMarker.MapY - 15))
             {
               farmer.FarmerRenderer.drawMiniPortrat(b,
-                new Vector2(NormalizeToMap(offsetMmLoc.X + farMarker.MapLocation.X - 16),
-                  NormalizeToMap(offsetMmLoc.Y + farMarker.MapLocation.Y - 15)),
+                new Vector2(NormalizeToMap(offsetMmLoc.X + farMarker.MapX - 16),
+                  NormalizeToMap(offsetMmLoc.Y + farMarker.MapY - 15)),
                 0.00011f, 2f, 1, farmer);
             }
           }
