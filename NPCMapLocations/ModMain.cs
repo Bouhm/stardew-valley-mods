@@ -533,13 +533,21 @@ namespace NPCMapLocations
         // Sync multiplayer data
         if (Context.IsMainPlayer && Context.IsMultiplayer)
         {
-          var message = new Dictionary<string, CharacterMarker>();
-          foreach (var marker in NpcMarkers)
+          var syncedMarkers = new Dictionary<string, SyncedNpcMarkers>();
+
+          foreach (var npcMarker in NpcMarkers.Values)
           {
-            message.Add(marker.Key, marker.Value);
+            syncedMarkers.Add(npcMarker.Name, new SyncedNpcMarkers() {
+              Name = npcMarker.Name,
+              LocationName = npcMarker.LocationName,
+              MapX = npcMarker.MapX,
+              MapY = npcMarker.MapY,
+              IsBirthday = npcMarker.IsBirthday,
+              Type = npcMarker.Type
+            });
           }
 
-          Helper.Multiplayer.SendMessage(message, "SyncedNpcMapLocationData", modIDs: new string[] { ModManifest.UniqueID });
+          Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMapLocationData", modIDs: new string[] { ModManifest.UniqueID });
         }
 
         // Check season change (for when it's changed via console)
@@ -588,7 +596,7 @@ namespace NPCMapLocations
 
       if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedNpcMapLocationData")
       {
-        var syncedNpcMarkers = e.ReadAs<Dictionary<string, CharacterMarker>>();
+        var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarkers>>();
 
         foreach (var syncedMarker in syncedNpcMarkers)
         {
@@ -601,10 +609,25 @@ namespace NPCMapLocations
             // Only have to be reset once a day
             if (shouldResetDaily)
             {
+              npcMarker.Name = syncedMarker.Key;
               npcMarker.Marker = new AnimatedSprite($"Characters\\{syncedMarker.Key}", 0, 16, 32).Texture;
+              npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
               npcMarker.Type = syncedMarker.Value.Type;
               shouldResetDaily = false;
             }
+          }
+          else
+          {
+            NpcMarkers.Add(syncedMarker.Key, new CharacterMarker {
+              Name = syncedMarker.Key,
+              LocationName = syncedMarker.Value.LocationName,
+              MapX = syncedMarker.Value.MapX,
+              MapY = syncedMarker.Value.MapY,
+              Marker = new AnimatedSprite($"Characters\\{syncedMarker.Key}", 0, 16, 32).Texture,
+              IsBirthday = syncedMarker.Value.IsBirthday,
+              Type = syncedMarker.Value.Type
+            });
+            shouldResetDaily = false;
           }
         }
       }

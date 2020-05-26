@@ -180,6 +180,8 @@ internal class LocationUtil
 
   public static bool IsOutdoors(string locationName)
   {
+    if (locationName == null) return false;
+
     if (LocationContexts.TryGetValue(locationName, out var locCtx))
     {
       return locCtx.Type == LocationType.Outdoors;
