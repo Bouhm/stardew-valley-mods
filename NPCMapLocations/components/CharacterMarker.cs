@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 public class CharacterMarker
 {
+  public string Name { get; set; }
   public string LocationName { get; set; }
   public Texture2D Marker { get; set; }
   public int MapX { get; set; }
@@ -15,13 +16,14 @@ public class CharacterMarker
 
   public CharacterMarker()
   {
-    LocationName = "";
+    Name = null;
+    LocationName = null;
     Marker = null;
     MapX = -9999;
     MapY = -9999;
     IsBirthday = false;
     HasQuest = false;
     IsHidden = false;
-    Layer = 1;
+    Layer = 4;
   }
 }

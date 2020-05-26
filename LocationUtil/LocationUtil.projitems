@@ -9,8 +9,8 @@
     <Import_RootNamespace>LocationUtil</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)SyncedNpcLocationData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocationContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LocationUtil.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SyncedLocationData.cs" />
   </ItemGroup>
 </Project>

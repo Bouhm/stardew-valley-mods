@@ -484,6 +484,7 @@ namespace NPCMapLocations
         {
           NpcMarkers.Add(npcName, new CharacterMarker
           {
+            Name = npcName,
             Marker = npc.Sprite.Texture,
             IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
           });
@@ -623,14 +624,12 @@ namespace NPCMapLocations
 
       foreach (var npc in GetVillagers())
       {
-        string locationName;
-
-        if (!NpcMarkers.Contains(npc.Name) || npc.currentLocation == null)
+        if (!NpcMarkers.TryGetValue(npc.Name, out var npcMarker) || npc.currentLocation == null)
         {
           continue;
         }
 
-        locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
+        string locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
 
         // For show Npcs in player's location option
         var isSameLocation = false;
@@ -650,22 +649,22 @@ namespace NPCMapLocations
         }
 
         // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npcMarker.Name)
-                             || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npcMarker.Name)
+        npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
+                             || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
                              || Config.OnlySameLocation && !isSameLocation
                              || Config.ByHeartLevel
-                             && !(Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
-                                  >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
+                             && !(Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
+                                  >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
                                   <= Config.HeartLevelMax);
 
         // NPCs that will be drawn onto the map
-        if ((!ModMain.Globals.NpcBlacklist.Contains(npcMarker.Name)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+        if ((!ModMain.Globals.NpcBlacklist.Contains(npc.Name)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
         {
           // Check if gifted for birthday
           if (npcMarker.IsBirthday)
           {
-            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Name) &&
-                                   Game1.player.friendshipData[npcMarker.Name].GiftsToday == 0;
+            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) &&
+                                   Game1.player.friendshipData[npc.Name].GiftsToday == 0;
 
             // Check for daily quests
             foreach (var quest in Game1.player.questLog)
@@ -673,16 +672,16 @@ namespace NPCMapLocations
                 switch (quest.questType.Value)
                 {
                   case 3:
-                    npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Name;
+                    npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
                     break;
                   case 4:
-                    npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Name;
+                    npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
                     break;
                   case 7:
-                    npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Name;
+                    npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npc.Name;
                     break;
                   case 10:
-                    npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Name;
+                    npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
                     break;
                 }
           }
@@ -694,42 +693,31 @@ namespace NPCMapLocations
           // Establish draw order, higher number infront
           // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
           // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          if (npcMarker.Npc is Horse || npcMarker.Npc is Child)
+          if (npc is Horse || npc is Child)
           {
             npcMarker.Layer = 0;
           }
           else
           {
-            npcMarker.Layer = npcMarker.IsOutdoors ? 6 : 2;
+            npcMarker.Layer = LocationUtil.LocationContexts[locationName].Type == LocationType.Outdoors ? 6 : 2;
             if (npcMarker.IsHidden) npcMarker.Layer -= 2;
           }
 
           if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
 
-          /*
-          // Only do calculations if NPCs are moving
-          if (!forceUpdate 
-              && (npcMarker.Location != Rectangle.Empty
-              && (!npcLocation.IsOutdoors // Indoors
-              || !npcMarker.Npc.isMoving()))) // Not moving
-          {
-              continue;
-          }
-          */
-
-          if (npcMarker.SyncedLocationName == null)
+          if (locationName != null)
           {
             // Get center of NPC marker
             var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors);
-            var x = (int)npcLocation.X - 16;
-            var y = (int)npcLocation.Y - 15;
-            npcMarker.MapLocation = new Vector2(x, y);
+            npcMarker.MapX = (int)npcLocation.X - 16;
+            npcMarker.MapY = (int)npcLocation.Y - 15;
           }
         }
         else
         {
           // Set no location so they don't get drawn
-          npcMarker.MapLocation = UNKNOWN;
+          npcMarker.MapX = (int)UNKNOWN.X;
+          npcMarker.MapY = (int)UNKNOWN.Y;
         }
       }
     }
@@ -753,14 +741,14 @@ namespace NPCMapLocations
         {
           var newMarker = new CharacterMarker
           {
-            Name = farmer.Name,
-            DrawDelay = 0
+            Name = farmer.Name
           };
 
           FarmerMarkers.Add(farmerId, newMarker);
         }
 
-        FarmerMarkers[farmerId].MapLocation = farmerLoc;
+        FarmerMarkers[farmerId].MapX = (int)farmerLoc.X;
+        FarmerMarkers[farmerId].MapY = (int)farmerLoc.X;
       }
     }
 
