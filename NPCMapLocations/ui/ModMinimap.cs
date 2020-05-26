@@ -29,7 +29,7 @@ namespace NPCMapLocations
     private int mmX; // top-left position of minimap relative to viewport
     private int mmY; // top-left position of minimap relative to viewport
     private int offset = 0; // offset for minimap if viewport changed
-    private readonly HashSet<CharacterMarker> NpcMarkers;
+    private readonly Dictionary<string, CharacterMarker> NpcMarkers;
     private Vector2 playerLoc;
     private int prevMmX;
     private int prevMmY;
@@ -37,7 +37,7 @@ namespace NPCMapLocations
     private bool dragStarted;
 
     public ModMinimap(
-      HashSet<CharacterMarker> npcMarkers,
+      Dictionary<string, CharacterMarker> npcMarkers,
       Dictionary<string, bool> conditionalNpcs,
       Dictionary<long, CharacterMarker> farmerMarkers,
       Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
@@ -389,7 +389,7 @@ namespace NPCMapLocations
       // Sort by drawing order
       if (NpcMarkers != null)
       {
-        var sortedMarkers = NpcMarkers.ToList();
+        var sortedMarkers = NpcMarkers.Values.ToList();
         sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
         foreach (var npcMarker in sortedMarkers)

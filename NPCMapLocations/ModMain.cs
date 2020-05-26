@@ -25,6 +25,7 @@ namespace NPCMapLocations
     public static Texture2D Map;
     public static int mapTab;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
+    private static bool shouldResetDaily;
 
     private Texture2D BuildingMarkers;
     private Dictionary<string, MapVector[]> MapVectors;
@@ -397,7 +398,6 @@ namespace NPCMapLocations
     // Handle any checks that need to be made per day
     private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
     {
-
       var npcEntries = ConditionalNpcs != null ? new Dictionary<string, bool>(ConditionalNpcs) : new Dictionary<string, bool>(new Dictionary<string, bool>
       {
         {"Dwarf", false},
@@ -466,6 +466,7 @@ namespace NPCMapLocations
       );
 
       shouldShowMinimap = !IsLocationBlacklisted(Game1.player.currentLocation.Name);
+      shouldResetDaily = true;
     }
 
     private bool IsLocationBlacklisted(string location)
@@ -587,11 +588,24 @@ namespace NPCMapLocations
 
       if (e.FromModID == ModManifest.UniqueID && e.Type == "SyncedNpcMapLocationData")
       {
-        var message = e.ReadAs<Dictionary<string, CharacterMarker>>();
+        var syncedNpcMarkers = e.ReadAs<Dictionary<string, CharacterMarker>>();
 
-        foreach (var locData in message.MapLocations)
+        foreach (var syncedMarker in syncedNpcMarkers)
         {
+          if (NpcMarkers.TryGetValue(syncedMarker.Key, out var npcMarker))
+          {
+            npcMarker.LocationName = syncedMarker.Value.LocationName;
+            npcMarker.MapX = syncedMarker.Value.MapX;
+            npcMarker.MapY = syncedMarker.Value.MapY;
 
+            // Only have to be reset once a day
+            if (shouldResetDaily)
+            {
+              npcMarker.Marker = new AnimatedSprite($"Characters\\{syncedMarker.Key}", 0, 16, 32).Texture;
+              npcMarker.Type = syncedMarker.Value.Type;
+              shouldResetDaily = false;
+            }
+          }
         }
       }
     }
@@ -710,7 +724,7 @@ namespace NPCMapLocations
           }
           else
           {
-            npcMarker.Layer = LocationUtil.LocationContexts[locationName].Type == LocationType.Outdoors ? 6 : 2;
+            npcMarker.Layer = LocationUtil.IsOutdoors(locationName) ? 6 : 2;
             if (npcMarker.IsHidden) npcMarker.Layer -= 2;
           }
 
