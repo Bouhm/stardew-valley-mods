@@ -687,11 +687,12 @@ namespace NPCMapLocations
       foreach (var npc in GetVillagers())
       {
         if (!NpcMarkers.TryGetValue(npc.Name, out var npcMarker)
-          || !Customizations.Names.TryGetValue(npc.Name, out var npcName)
           || npc.currentLocation == null)
         {
           continue;
         }
+
+        Customizations.Names.TryGetValue(npc.Name, out var npcName);
 
         string locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
         npcMarker.LocationName = locationName;
