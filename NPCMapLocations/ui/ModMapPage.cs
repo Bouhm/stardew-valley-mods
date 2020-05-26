@@ -21,7 +21,7 @@ namespace NPCMapLocations
   public class ModMapPage : MapPage
   {
     private Dictionary<string, bool> ConditionalNpcs { get; set; }
-    private HashSet<CharacterMarker> NpcMarkers { get; set; }
+    private Dictionary<string, CharacterMarker> NpcMarkers { get; set; }
     private Dictionary<long, CharacterMarker> FarmerMarkers { get; set; }
     private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 
@@ -39,7 +39,7 @@ namespace NPCMapLocations
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
-      HashSet<CharacterMarker> npcMarkers,
+      Dictionary<string, CharacterMarker> npcMarkers,
       Dictionary<string, bool> conditionalNpcs,
       Dictionary<long, CharacterMarker> farmerMarkers,
       Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
@@ -149,18 +149,16 @@ namespace NPCMapLocations
 
       if (NpcMarkers != null)
       {
-        foreach (CharacterMarker npcMarker in this.NpcMarkers)
+        foreach (var npcMarker in this.NpcMarkers.Values)
         {
-          if (npcMarker.MapLocation == null) continue;
-
-          Vector2 npcLocation = new Vector2(mapX + npcMarker.MapLocation.X, mapY + npcMarker.MapLocation.Y);
+          Vector2 npcLocation = new Vector2(mapX + npcMarker.MapX, mapY + npcMarker.MapY);
           if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
               Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
           {
-            if (!npcMarker.IsHidden && !(npcMarker.Npc is Horse))
+            if (!npcMarker.IsHidden && !(npcMarker.Type == Character.Horse))
               hoveredList.Add(npcMarker.Name);
 
-            if (!npcMarker.IsOutdoors && !hasIndoorCharacter)
+            if (!LocationUtil.IsOutdoors(npcMarker.LocationName) && !hasIndoorCharacter)
               hasIndoorCharacter = true;
           }
         }
@@ -168,11 +166,9 @@ namespace NPCMapLocations
 
       if (Context.IsMultiplayer && FarmerMarkers != null)
       {
-        foreach (CharacterMarker farMarker in FarmerMarkers.Values)
+        foreach (var farMarker in FarmerMarkers.Values)
         {
-          if (farMarker.MapLocation == null) continue;
-
-          Vector2 farmerLocation = new Vector2(mapX + farMarker.MapLocation.X, mapY + farMarker.MapLocation.Y);
+          Vector2 farmerLocation = new Vector2(mapX + farMarker.MapX, mapY + farMarker.MapY);
           if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
            && Game1.getMouseX() <= farmerLocation.X + markerWidth / 2
            && Game1.getMouseY() >= farmerLocation.Y - markerHeight / 2
@@ -180,7 +176,7 @@ namespace NPCMapLocations
           {
             hoveredList.Add(farMarker.Name);
 
-            if (!farMarker.IsOutdoors && !hasIndoorCharacter)
+            if (!LocationUtil.IsOutdoors(farMarker.LocationName) && !hasIndoorCharacter)
               hasIndoorCharacter = true;
           }
         }
@@ -405,7 +401,7 @@ namespace NPCMapLocations
       // Sort by drawing order
       if (NpcMarkers != null)
       {
-        var sortedMarkers = NpcMarkers.ToList();
+        var sortedMarkers = NpcMarkers.Values.ToList();
         sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
         foreach (CharacterMarker npcMarker in sortedMarkers)
@@ -420,13 +416,13 @@ namespace NPCMapLocations
           var markerColor = npcMarker.IsHidden ? Color.DimGray * 0.7f : Color.White;
 
           var offset = 1;
-          Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Npc.Name, out offset);
+          Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Name, out offset);
 
           // Draw NPC marker
-          var spriteRect = npcMarker.Npc is Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, offset, 16, 15);
+          var spriteRect = npcMarker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, offset, 16, 15);
 
           b.Draw(npcMarker.Marker,
-            new Rectangle((int)(mapX + npcMarker.MapLocation.X), (int)(mapY + npcMarker.MapLocation.Y),
+            new Rectangle((int)(mapX + npcMarker.MapX), (int)(mapY + npcMarker.MapY),
               32, 30),
             new Rectangle?(spriteRect), markerColor);
 
@@ -437,7 +433,7 @@ namespace NPCMapLocations
             {
               // Gift icon
               b.Draw(Game1.mouseCursors,
-                new Vector2(mapX + npcMarker.MapLocation.X + 20, mapY + npcMarker.MapLocation.Y),
+                new Vector2(mapX + npcMarker.MapX + 20, mapY + npcMarker.MapY),
                 new Rectangle?(new Rectangle(147, 412, 10, 11)), markerColor, 0f, Vector2.Zero, 1.8f,
                 SpriteEffects.None, 0f);
             }
@@ -446,7 +442,7 @@ namespace NPCMapLocations
             {
               // Quest icon
               b.Draw(Game1.mouseCursors,
-                new Vector2(mapX + npcMarker.MapLocation.X + 22, mapY + npcMarker.MapLocation.Y - 3),
+                new Vector2(mapX + npcMarker.MapX + 22, mapY + npcMarker.MapY - 3),
                 new Rectangle?(new Rectangle(403, 496, 5, 14)), markerColor, 0f, Vector2.Zero, 1.8f,
                 SpriteEffects.None, 0f);
             }
@@ -463,10 +459,10 @@ namespace NPCMapLocations
           if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out CharacterMarker farMarker))
             if (farMarker == null)
               continue;
-          if (farMarker != null && farMarker.DrawDelay == 0)
+          if (farMarker != null)
           {
             farmer.FarmerRenderer.drawMiniPortrat(b,
-              new Vector2(mapX + farMarker.MapLocation.X - 16, mapY + farMarker.MapLocation.Y - 15),
+              new Vector2(mapX + farMarker.MapX - 16, mapY + farMarker.MapY - 15),
               0.00011f, 2f, 1, farmer);
           }
         }

@@ -177,4 +177,14 @@ internal class LocationUtil
 
     return null;
   }
+
+  public static bool IsOutdoors(string locationName)
+  {
+    if (LocationContexts.TryGetValue(locationName, out var locCtx))
+    {
+      return locCtx.Type == LocationType.Outdoors;
+    }
+
+    return false;
+  }
 }

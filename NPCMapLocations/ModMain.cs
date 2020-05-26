@@ -482,11 +482,22 @@ namespace NPCMapLocations
       {
         if (Customizations.Names.TryGetValue(npc.Name, out var npcName))
         {
+          var type = Character.Villager;
+          if (npc is Horse)
+          {
+            type = Character.Horse;
+          }
+          else if (npc is Child)
+          {
+            type = Character.Child;
+          }
+
           NpcMarkers.Add(npcName, new CharacterMarker
           {
             Name = npcName,
             Marker = npc.Sprite.Texture,
-            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth)
+            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
+            Type = type
           });
         }
       }

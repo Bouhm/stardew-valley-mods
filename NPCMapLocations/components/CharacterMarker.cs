@@ -10,6 +10,7 @@ public class CharacterMarker
   public int MapX { get; set; }
   public int MapY { get; set; }
   public bool IsBirthday { get; set; }
+  public Character Type { get; set; }
   public bool HasQuest { get; set; }
   public bool IsHidden { get; set; }
   public int Layer { get; set; }
@@ -25,5 +26,14 @@ public class CharacterMarker
     HasQuest = false;
     IsHidden = false;
     Layer = 4;
+    Type = Character.Villager;
   }
+}
+
+public enum Character
+{
+  Farmer,
+  Villager,
+  Child,
+  Horse
 }
