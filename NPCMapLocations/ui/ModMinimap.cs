@@ -16,7 +16,7 @@ namespace NPCMapLocations
     private readonly bool drawPamHouseUpgrade;
     private readonly bool drawMovieTheaterJoja;
     private readonly bool drawMovieTheater;
-    private readonly Dictionary<long, CharacterMarker> FarmerMarkers;
+    private readonly Dictionary<long, FarmerMarker> FarmerMarkers;
     private readonly ModCustomizations Customizations;
 
     private Vector2 prevCenter;
@@ -29,7 +29,7 @@ namespace NPCMapLocations
     private int mmX; // top-left position of minimap relative to viewport
     private int mmY; // top-left position of minimap relative to viewport
     private int offset = 0; // offset for minimap if viewport changed
-    private readonly Dictionary<string, CharacterMarker> NpcMarkers;
+    private readonly Dictionary<string, NpcMarker> NpcMarkers;
     private Vector2 playerLoc;
     private int prevMmX;
     private int prevMmY;
@@ -37,9 +37,9 @@ namespace NPCMapLocations
     private bool dragStarted;
 
     public ModMinimap(
-      Dictionary<string, CharacterMarker> npcMarkers,
+      Dictionary<string, NpcMarker> npcMarkers,
       Dictionary<string, bool> conditionalNpcs,
-      Dictionary<long, CharacterMarker> farmerMarkers,
+      Dictionary<long, FarmerMarker> farmerMarkers,
       Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
       Texture2D buildingMarkers,
       ModCustomizations customizations
@@ -453,7 +453,7 @@ namespace NPCMapLocations
           // Temporary solution to handle desync of farmhand location/tile position when changing location
           if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
           {
-            if (IsWithinMapArea(farMarker.MapX - 16, farMarker.MapY - 15))
+            if (IsWithinMapArea(farMarker.MapX - 16, farMarker.MapY - 15) && farMarker.DrawDelay == 0)
             {
               farmer.FarmerRenderer.drawMiniPortrat(b,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + farMarker.MapX - 16),

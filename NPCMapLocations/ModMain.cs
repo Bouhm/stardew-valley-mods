@@ -29,14 +29,14 @@ namespace NPCMapLocations
     private Texture2D BuildingMarkers;
     private Dictionary<string, MapVector[]> MapVectors;
     private ModMinimap Minimap;
-    private Dictionary<string, CharacterMarker> NpcMarkers;
+    private Dictionary<string, NpcMarker> NpcMarkers;
     private Dictionary<string, bool> ConditionalNpcs;
     private bool hasOpenedMap;
     private bool isModMapOpen;
     private bool shouldShowMinimap;
 
     // Multiplayer
-    private Dictionary<long, CharacterMarker> FarmerMarkers;
+    private Dictionary<long, FarmerMarker> FarmerMarkers;
 
     // Customizations/Custom mods
     private string MapSeason;
@@ -478,8 +478,8 @@ namespace NPCMapLocations
 
     private void ResetMarkers()
     {
-      NpcMarkers = new Dictionary<string, CharacterMarker>();
-      if (Context.IsMultiplayer) FarmerMarkers = new Dictionary<long, CharacterMarker>();
+      NpcMarkers = new Dictionary<string, NpcMarker>();
+      if (Context.IsMultiplayer) FarmerMarkers = new Dictionary<long, FarmerMarker>();
 
       if (!Context.IsMultiplayer || Context.IsMainPlayer)
       {
@@ -497,7 +497,7 @@ namespace NPCMapLocations
               type = Character.Child;
             }
 
-            NpcMarkers.Add(npcName, new CharacterMarker
+            NpcMarkers.Add(npcName, new NpcMarker
             {
               Name = npcName,
               Marker = npc.Sprite.Texture,
@@ -621,7 +621,7 @@ namespace NPCMapLocations
               }
               else
               {
-                NpcMarkers.Add(syncedMarker.Name, new CharacterMarker
+                NpcMarkers.Add(syncedMarker.Name, new NpcMarker
                 {
                   LocationName = syncedMarker.LocationName,
                   MapX = syncedMarker.MapX,
@@ -881,18 +881,43 @@ namespace NPCMapLocations
         var locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
         if (locationName.Contains("UndergroundMine"))
-          locationName = LocationUtil.GetMinesLocationName(locationName);
-
-        var farmerId = farmer.UniqueMultiplayerID;
-        var farmerLocationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
-        var farmerLoc = LocationToMap(farmerLocationName,
-          farmer.getTileX(), farmer.getTileY(), Customizations.MapVectors);
-
-        if (!FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
         {
-          FarmerMarkers.Add(farmerId, new CharacterMarker { Name = farmer.Name });
+          locationName = LocationUtil.GetMinesLocationName(locationName);
         }
 
+        var farmerId = farmer.UniqueMultiplayerID;
+        var farmerLoc = LocationToMap(locationName,
+          farmer.getTileX(), farmer.getTileY(), Customizations.MapVectors);
+
+        if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
+        {
+          var deltaX = farmerLoc.X - farMarker.PrevMapX;
+          var deltaY = farmerLoc.Y - farMarker.PrevMapY;
+
+          // Location changes before tile position, causing farmhands to blink
+          // to the wrong position upon entering new location. Handle this in draw.
+          if (locationName == farMarker.LocationName && MathHelper.Distance(deltaX, deltaY) > 15)
+            FarmerMarkers[farmerId].DrawDelay = 3;
+          else if (farMarker.DrawDelay > 0)
+            FarmerMarkers[farmerId].DrawDelay--;
+        }
+        else
+        {
+          var newMarker = new FarmerMarker
+          {
+            Name = farmer.Name,
+            DrawDelay = 0
+          };
+
+          FarmerMarkers.Add(farmerId, newMarker);
+        }
+
+
+        FarmerMarkers[farmerId].MapX = (int)farmerLoc.X;
+        FarmerMarkers[farmerId].MapY = (int)farmerLoc.Y;
+        FarmerMarkers[farmerId].PrevMapX = (int)farmerLoc.X;
+        FarmerMarkers[farmerId].PrevMapY = (int)farmerLoc.Y;
+        FarmerMarkers[farmerId].LocationName = locationName;
         FarmerMarkers[farmerId].MapX = (int)farmerLoc.X;
         FarmerMarkers[farmerId].MapY = (int)farmerLoc.Y;
       }
@@ -1021,12 +1046,6 @@ namespace NPCMapLocations
 
         x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
         y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
-
-        //        if (DEBUG_MODE && isPlayer)
-        //        {
-        //          _tileUpper = new Vector2(upper.TileX, upper.TileY);
-        //          _tileLower = new Vector2(lower.TileX, lower.TileY);
-        //        }
       }
 
       return new Vector2(x, y);
@@ -1058,13 +1077,14 @@ namespace NPCMapLocations
 
     private void Player_Warped(object sender, WarpedEventArgs e)
     {
-      if (!e.IsLocalPlayer) return;
+      if (e.IsLocalPlayer)
+      {
+        // Hide minimap in blacklisted locations with special case for Mines as usual
+        shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
 
-      // Hide minimap in blacklisted locations with special case for Mines as usual
-      shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
-
-      // Check if map does not fill screen and adjust for black bars (ex. BusStop)
-      Minimap?.CheckOffsetForMap();
+        // Check if map does not fill screen and adjust for black bars (ex. BusStop)
+        Minimap?.CheckOffsetForMap();
+      }
     }
 
     private void Display_RenderingHud(object sender, RenderingHudEventArgs e)

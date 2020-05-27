@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-public class CharacterMarker
+public class NpcMarker
 {
   public string Name { get; set; }
   public string LocationName { get; set; }
@@ -15,7 +15,7 @@ public class CharacterMarker
   public bool IsHidden { get; set; }
   public int Layer { get; set; }
 
-  public CharacterMarker()
+  public NpcMarker()
   {
     Name = null;
     LocationName = null;
@@ -32,7 +32,6 @@ public class CharacterMarker
 
 public enum Character
 {
-  Farmer,
   Villager,
   Child,
   Horse

@@ -20,8 +20,8 @@ namespace NPCMapLocations
   public class ModMapPage : MapPage
   {
     private Dictionary<string, bool> ConditionalNpcs { get; set; }
-    private Dictionary<string, CharacterMarker> NpcMarkers { get; set; }
-    private Dictionary<long, CharacterMarker> FarmerMarkers { get; set; }
+    private Dictionary<string, NpcMarker> NpcMarkers { get; set; }
+    private Dictionary<long, FarmerMarker> FarmerMarkers { get; set; }
     private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 
     private readonly Texture2D BuildingMarkers;
@@ -38,9 +38,9 @@ namespace NPCMapLocations
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
-      Dictionary<string, CharacterMarker> npcMarkers,
+      Dictionary<string, NpcMarker> npcMarkers,
       Dictionary<string, bool> conditionalNpcs,
-      Dictionary<long, CharacterMarker> farmerMarkers,
+      Dictionary<long, FarmerMarker> farmerMarkers,
       Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
       Texture2D buildingMarkers,
       ModCustomizations customizations
@@ -403,7 +403,7 @@ namespace NPCMapLocations
         var sortedMarkers = NpcMarkers.Values.ToList();
         sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
 
-        foreach (CharacterMarker npcMarker in sortedMarkers)
+        foreach (NpcMarker npcMarker in sortedMarkers)
         {
           // Skip if no specified location
           if (npcMarker.Marker == null)
@@ -455,10 +455,10 @@ namespace NPCMapLocations
         foreach (Farmer farmer in Game1.getOnlineFarmers())
         {
           // Temporary solution to handle desync of farmhand location/tile position when changing location
-          if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out CharacterMarker farMarker))
+          if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
             if (farMarker == null)
               continue;
-          if (farMarker != null)
+          if (farMarker != null && farMarker.DrawDelay == 0)
           {
             farmer.FarmerRenderer.drawMiniPortrat(b,
               new Vector2(mapX + farMarker.MapX - 16, mapY + farMarker.MapY - 15),
