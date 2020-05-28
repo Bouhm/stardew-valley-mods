@@ -724,67 +724,57 @@ namespace NPCMapLocations
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcName)
                                   <= Config.HeartLevelMax);
 
-        // NPCs that will be drawn onto the map
-        if ((!ModMain.Globals.NpcBlacklist.Contains(npcName)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+        // Check if gifted for birthday
+        if (npcMarker.IsBirthday)
         {
-          // Check if gifted for birthday
-          if (npcMarker.IsBirthday)
-          {
-            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcName) &&
-                                   Game1.player.friendshipData[npcName].GiftsToday == 0;
+          npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcName) &&
+                                  Game1.player.friendshipData[npcName].GiftsToday == 0;
 
-            // Check for daily quests
-            foreach (var quest in Game1.player.questLog)
-              if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-                switch (quest.questType.Value)
-                {
-                  case 3:
-                    npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcName;
-                    break;
-                  case 4:
-                    npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcName;
-                    break;
-                  case 7:
-                    npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcName;
-                    break;
-                  case 10:
-                    npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcName;
-                    break;
-                }
-          }
-          else
-          {
-            npcMarker.HasQuest = false;
-          }
-
-          // Establish draw order, higher number infront
-          // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          if (npc is Horse || npc is Child)
-          {
-            npcMarker.Layer = 0;
-          }
-          else
-          {
-            npcMarker.Layer = LocationUtil.IsOutdoors(locationName) ? 6 : 2;
-            if (npcMarker.IsHidden) npcMarker.Layer -= 2;
-          }
-
-          if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
-
-          if (locationName != null)
-          {
-            // Get center of NPC marker
-            var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors);
-            npcMarker.MapX = (int)npcLocation.X - 16;
-            npcMarker.MapY = (int)npcLocation.Y - 15;
-          }
+          // Check for daily quests
+          foreach (var quest in Game1.player.questLog)
+            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+              switch (quest.questType.Value)
+              {
+                case 3:
+                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcName;
+                  break;
+                case 4:
+                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcName;
+                  break;
+                case 7:
+                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcName;
+                  break;
+                case 10:
+                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcName;
+                  break;
+              }
         }
         else
         {
-          // Set no location so they don't get drawn
-          npcMarker.MapX = (int)UNKNOWN.X;
-          npcMarker.MapY = (int)UNKNOWN.Y;
+          npcMarker.HasQuest = false;
+        }
+
+        // Establish draw order, higher number infront
+        // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+        // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+        if (npc is Horse || npc is Child)
+        {
+          npcMarker.Layer = 0;
+        }
+        else
+        {
+          npcMarker.Layer = LocationUtil.IsOutdoors(locationName) ? 6 : 2;
+          if (npcMarker.IsHidden) npcMarker.Layer -= 2;
+        }
+
+        if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
+
+        if (locationName != null)
+        {
+          // Get center of NPC marker
+          var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors);
+          npcMarker.MapX = (int)npcLocation.X - 16;
+          npcMarker.MapY = (int)npcLocation.Y - 15;
         }
       }
     }
@@ -822,54 +812,50 @@ namespace NPCMapLocations
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npcMarker.Name)
                                   <= Config.HeartLevelMax);
 
-        // NPCs that will be drawn onto the map
-        if ((!ModMain.Globals.NpcBlacklist.Contains(npcMarker.Name)) && (Config.ShowHiddenVillagers || !npcMarker.IsHidden))
+        // Check if gifted for birthday
+        if (npcMarker.IsBirthday)
         {
-          // Check if gifted for birthday
-          if (npcMarker.IsBirthday)
-          {
-            npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Name) &&
-                                   Game1.player.friendshipData[npcMarker.Name].GiftsToday == 0;
+          npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npcMarker.Name) &&
+                                  Game1.player.friendshipData[npcMarker.Name].GiftsToday == 0;
 
-            // Check for daily quests
-            foreach (var quest in Game1.player.questLog)
-              if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-                switch (quest.questType.Value)
-                {
-                  case 3:
-                    npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Name;
-                    break;
-                  case 4:
-                    npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Name;
-                    break;
-                  case 7:
-                    npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Name;
-                    break;
-                  case 10:
-                    npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Name;
-                    break;
-                }
-          }
-          else
-          {
-            npcMarker.HasQuest = false;
-          }
-
-          // Establish draw order, higher number infront
-          // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-          if (npcMarker.Type == Character.Horse || npcMarker.Type == Character.Child)
-          {
-            npcMarker.Layer = 0;
-          }
-          else
-          {
-            npcMarker.Layer = LocationUtil.IsOutdoors(npcMarker.LocationName) ? 6 : 2;
-            if (npcMarker.IsHidden) npcMarker.Layer -= 2;
-          }
-
-          if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
+          // Check for daily quests
+          foreach (var quest in Game1.player.questLog)
+            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+              switch (quest.questType.Value)
+              {
+                case 3:
+                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npcMarker.Name;
+                  break;
+                case 4:
+                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npcMarker.Name;
+                  break;
+                case 7:
+                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npcMarker.Name;
+                  break;
+                case 10:
+                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npcMarker.Name;
+                  break;
+              }
         }
+        else
+        {
+          npcMarker.HasQuest = false;
+        }
+
+        // Establish draw order, higher number infront
+        // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+        // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
+        if (npcMarker.Type == Character.Horse || npcMarker.Type == Character.Child)
+        {
+          npcMarker.Layer = 0;
+        }
+        else
+        {
+          npcMarker.Layer = LocationUtil.IsOutdoors(npcMarker.LocationName) ? 6 : 2;
+          if (npcMarker.IsHidden) npcMarker.Layer -= 2;
+        }
+
+        if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
       }
     }
 
@@ -1117,7 +1103,6 @@ namespace NPCMapLocations
       var textHeight = (int)Game1.dialogueFont
         .MeasureString("()").Y - 6;
 
-
       var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
 
       // If map is open, show map position at cursor
@@ -1155,15 +1140,6 @@ namespace NPCMapLocations
           DrawBorder(tex,
             bounds,
             borderWidth, Color.White * borderOpacity);
-
-          // Make points more distinct
-          //          Game1.spriteBatch.Draw(tex,
-          //            new Rectangle((int)MouseUtil.BeginMousePosition.X, (int)MouseUtil.BeginMousePosition.Y, borderWidth, borderWidth),
-          //            Rectangle.Empty, Color.White);
-          //
-          //          Game1.spriteBatch.Draw(tex,
-          //            new Rectangle((int)MouseUtil.EndMousePosition.X, (int)MouseUtil.EndMousePosition.Y, borderWidth, borderWidth),
-          //            Rectangle.Empty, Color.White);
 
           var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
 

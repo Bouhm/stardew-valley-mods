@@ -405,8 +405,8 @@ namespace NPCMapLocations
 
         foreach (NpcMarker npcMarker in sortedMarkers)
         {
-          // Skip if no specified location
-          if (npcMarker.Marker == null)
+          // Skip if no specified location or should be hidden
+          if (npcMarker.Marker == null || ModMain.Globals.NpcBlacklist.Contains(npcMarker.Name) || (!ModMain.Config.ShowHiddenVillagers && npcMarker.IsHidden))
           {
             continue;
           }

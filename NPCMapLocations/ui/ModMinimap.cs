@@ -395,9 +395,11 @@ namespace NPCMapLocations
         foreach (var npcMarker in sortedMarkers)
         {
           // Skip if no specified location
-          if (npcMarker.Marker == null ||
-              !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Name) ||
-              !IsWithinMapArea(npcMarker.MapX, npcMarker.MapY))
+          if (npcMarker.Marker == null 
+              || !Customizations.NpcMarkerOffsets.ContainsKey(npcMarker.Name) 
+              || !IsWithinMapArea(npcMarker.MapX, npcMarker.MapY)
+              || ModMain.Globals.NpcBlacklist.Contains(npcMarker.Name) || (!ModMain.Config.ShowHiddenVillagers && npcMarker.IsHidden)
+          )
             continue;
 
           var markerColor = npcMarker.IsHidden ? Color.DimGray * 0.7f : Color.White;
