@@ -495,9 +495,6 @@ namespace NPCMapLocations
 				case 7:
 					isChecked = ModMain.Config.ByHeartLevel;
 					return;
-        case 8:
-          isChecked = ModMain.Config.ShowMinimap;
-          return;
         case 10:
 					isChecked = ModMain.Config.MarkQuests;
 					return;
@@ -541,9 +538,6 @@ namespace NPCMapLocations
 					case 7:
 					  ModMain.Config.ByHeartLevel = isChecked;
 						break;
-          case 8:
-            ModMain.Config.ShowMinimap = isChecked;
-            break;
           case 10:
 					  ModMain.Config.MarkQuests = isChecked;
 						break;

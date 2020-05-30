@@ -370,11 +370,6 @@ namespace NPCMapLocations
         {
           if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
           {
-            //	  if (Customizations.MapName == "starblue_map")
-            //	    buildingRect.Y = 7;
-            //	  else if (Customizations.MapName == "eemie_recolour_map")
-            //	    buildingRect.Y = 14;
-
             b.Draw(
               BuildingMarkers,
               new Vector2(
