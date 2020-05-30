@@ -18,7 +18,6 @@ namespace NPCMapLocations
   {
     public static PlayerConfig Config;
     public static GlobalConfig Globals;
-    public static CustomData CustomData;
     public static IModHelper Helper;
     public static IMonitor IMonitor;
     public static SButton HeldKey;
@@ -100,7 +99,6 @@ namespace NPCMapLocations
       Helper.Events.Display.RenderingHud += Display_RenderingHud;
       Helper.Events.Display.Rendered += Display_Rendered;
       Helper.Events.Display.WindowResized += Display_WindowResized;
-      Helper.Events.Multiplayer.PeerContextReceived += Multiplayer_PeerContextReceived;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
     }
 
@@ -110,9 +108,16 @@ namespace NPCMapLocations
       Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
       // Load customizations
+      // Initialize these early for multiplayer sync
+      NpcMarkers = new Dictionary<string, NpcMarker>();
       Customizations = new ModCustomizations();
-      CustomData = Helper.Data.ReadJsonFile<CustomData>(Path.Combine(Customizations.MapsPath, "customlocations.json")) ?? new CustomData();
       Customizations.LoadCustomData();
+
+      // Let host know farmhand is ready to receive updates
+      if (Context.IsMultiplayer && !Context.IsMainPlayer)
+      {
+        Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { ModManifest.UniqueID });
+      }
 
       // Load farm buildings
       try
@@ -392,11 +397,7 @@ namespace NPCMapLocations
     }
     private void Multiplayer_PeerContextReceived(object sender, PeerContextReceivedEventArgs e)
     {
-      // Initial multiplayer sync
-      if (Context.IsMultiplayer && Context.IsMainPlayer)
-      {
-        Helper.Multiplayer.SendMessage(Customizations.Names, "SyncedNpcNames", modIDs: new string[] { ModManifest.UniqueID });
-      }
+
     }
 
     // Handle any checks that need to be made per day
@@ -595,17 +596,26 @@ namespace NPCMapLocations
 
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
-      if (NpcMarkers == null) return;
-
       if (e.FromModID == ModManifest.UniqueID)
       {
         switch (e.Type)
         {
-          case "SyncedNpcNames":
-            var syncedNames = e.ReadAs<Dictionary<string, string>>();
-            Customizations.Names = syncedNames;
+          case "PlayerReady":
+            if (Context.IsMainPlayer)
+            {
+              Helper.Multiplayer.SendMessage(Customizations.Names, "SyncedNames", modIDs: new string[] { ModManifest.UniqueID });
+            }
+            break;
+          case "SyncedNames":
+            if (Customizations != null)
+            {
+              var syncedNames = e.ReadAs<Dictionary<string, string>>();
+              Customizations.Names = syncedNames;
+            }
             break;
           case "SyncedNpcMarkers":
+            if (NpcMarkers == null) return;
+
             var syncedNpcMarkers = e.ReadAs<List<SyncedNpcMarkers>>();
             foreach (var syncedMarker in syncedNpcMarkers)
             {

@@ -15,6 +15,7 @@ namespace NPCMapLocations
   public class ModCustomizations
   {
     private readonly HashSet<string> NpcCustomizations;
+    private readonly CustomData CustomData;
     public readonly string MapsRootPath = "maps";
 
     public Dictionary<string, MapVector[]> MapVectors { get; set; }
@@ -26,16 +27,18 @@ namespace NPCMapLocations
 
     public ModCustomizations()
     {
-      MapVectors = new Dictionary<string, MapVector[]>();
-      Names = new Dictionary<string, string>();
-      NpcCustomizations = new HashSet<string>();
-      Locations = new Dictionary<string, CustomLocation>();
-      Tooltips = new List<ClickableComponent>();
       MapsPath = GetCustomMapFolderName();
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
       else
         MapsPath = Path.Combine(MapsRootPath, "_default");
+
+      CustomData = ModMain.Helper.Data.ReadJsonFile<CustomData>(Path.Combine(MapsPath, "customlocations.json")) ?? new CustomData();
+      MapVectors = new Dictionary<string, MapVector[]>();
+      Names = new Dictionary<string, string>();
+      NpcCustomizations = new HashSet<string>();
+      Locations = new Dictionary<string, CustomLocation>();
+      Tooltips = new List<ClickableComponent>();
     }
 
     // Handles customizations for NPCs
@@ -133,7 +136,7 @@ namespace NPCMapLocations
 
     private void LoadTooltips()
     {
-      foreach (var tooltip in ModMain.CustomData.CustomMapTooltips)
+      foreach (var tooltip in CustomData.CustomMapTooltips)
       {
         string text = tooltip.Value.GetValue("SecondaryText") != null
           ? (string) tooltip.Value.GetValue("PrimaryText") + Environment.NewLine + tooltip.Value.GetValue("SecondaryText")
@@ -159,7 +162,7 @@ namespace NPCMapLocations
     // Any custom locations with given location on the map
     private void LoadCustomMapLocations()
     {
-      foreach (var mapVectors in ModMain.CustomData.CustomMapLocations)
+      foreach (var mapVectors in CustomData.CustomMapLocations)
       {
         var mapVectorArr = new MapVector[mapVectors.Value.Length];
         for (var i = 0; i < mapVectors.Value.Length; i++)
@@ -278,7 +281,6 @@ namespace NPCMapLocations
     {
       public Vector2 LocVector;
       public Rectangle SrcRect;
-
       public CustomLocation(JObject locationRects)
       {
         var fromAreaRect = locationRects.GetValue("FromArea");
