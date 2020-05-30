@@ -51,6 +51,19 @@ namespace NPCMapLocations
         GetCustomName(npc);
       }
 
+      // For farmhands, custom NPCs can't be found so rely on config
+      if (Context.IsMultiplayer && !Context.IsMainPlayer)
+      {
+        var CustomNpcMarkerOffsets = ModMain.Globals.CustomNpcMarkerOffsets;
+
+        if (CustomNpcMarkerOffsets != null && CustomNpcMarkerOffsets.Count > 0) { 
+          foreach (var villager in CustomNpcMarkerOffsets)
+          {
+            NpcMarkerOffsets[villager.Key] = villager.Value;
+          }
+        }
+      }
+
       // Handle duplicate displayName -- custom NPCs that replaces villagers
       Dictionary<string, string> dupes = Names
         .Where(n1 => Names.Any(n2 => n2.Key != n1.Key && n2.Value == n1.Value))
@@ -261,16 +274,18 @@ namespace NPCMapLocations
 
       if (CustomNpcMarkerOffsets != null && CustomNpcMarkerOffsets.Count > 0)
         foreach (var villager in CustomNpcMarkerOffsets)
+        {
           if (npc.Name.Equals(villager.Key))
           {
             NpcMarkerOffsets[npc.Name] = villager.Value;
             NpcCustomizations.Add(npc.Name);
           }
+        }
 
       // If custom crop offset is not specified, default to 0
       if (!NpcMarkerOffsets.TryGetValue(npc.Name, out var crop)) NpcMarkerOffsets[npc.Name] = 0;
 
-      // Children spites are short so give them a booster seat
+      // Children sprites are short so give them a booster seat
       if (npc is Child)
       {
         NpcMarkerOffsets[npc.Name] += 7;

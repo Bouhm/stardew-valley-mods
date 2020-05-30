@@ -31,7 +31,7 @@ namespace NPCMapLocations
 		private readonly ClickableTextureComponent scrollBar;
 		private readonly Rectangle scrollBarRunner;
 		private readonly ClickableTextureComponent upArrow;
-		private bool canClose;
+    private bool canClose;
 		private int currentItemIndex;
 		private int optionsSlotHeld = -1;
 		private bool scrolling;
@@ -52,26 +52,33 @@ namespace NPCMapLocations
 				new Rectangle(xPositionOnScreen + width - Game1.tileSize * 2,
 					yPositionOnScreen + height - 7 * Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null,
 				Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
+
 			upArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width + Game1.tileSize / 4,
 					yPositionOnScreen + Game1.tileSize,
 					11 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(421, 459, 11, 12),
 				Game1.pixelZoom);
+
 			downArrow = new ClickableTextureComponent(
 				new Rectangle(xPositionOnScreen + width + Game1.tileSize / 4,
 					yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom),
 				Game1.mouseCursors, new Rectangle(421, 472, 11, 12), Game1.pixelZoom);
+
 			scrollBar = new ClickableTextureComponent(
 				new Rectangle(upArrow.bounds.X + Game1.pixelZoom * 3,
 					upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom,
 					10 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(435, 463, 6, 10), Game1.pixelZoom);
+
 			scrollBarRunner = new Rectangle(scrollBar.bounds.X,
 				upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, scrollBar.bounds.Width,
 				height - Game1.tileSize * 2 - upArrow.bounds.Height - Game1.pixelZoom * 2);
-			for (var i = 0; i < 7; i++)
-				optionSlots.Add(new ClickableComponent(
-					new Rectangle(xPositionOnScreen + Game1.tileSize / 4,
-						yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7),
-						width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
+
+      for (var i = 0; i < 7; i++)
+      {
+        optionSlots.Add(new ClickableComponent(
+          new Rectangle(xPositionOnScreen + Game1.tileSize / 4,
+            yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7),
+            width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
+      }
 
 			options.Add(new OptionsElement("NPC Map Locations"));
 
@@ -564,16 +571,21 @@ namespace NPCMapLocations
 				0.4f);
 			if (whichOption > 12)
 			{
-				var npc = Game1.getCharacterFromName(label);
-				if (npc == null || (npc != null && !Customizations.NpcMarkerOffsets.ContainsKey(npc.Name))) return;
+				if (!Customizations.Names.TryGetValue(label, out var name)) return;
 
-				if (isChecked)
-					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + bounds.X + 50, slotY),
-						new Rectangle(0, Customizations.NpcMarkerOffsets[npc.Name], 16, 15), Color.White, 0f, Vector2.Zero,
+        var sprite = new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
+        if (!Customizations.NpcMarkerOffsets.TryGetValue(label, out var markerOffset))
+        {
+          markerOffset = 0;
+        }
+
+        if (isChecked)
+					Game1.spriteBatch.Draw(sprite, new Vector2((float) slotX + bounds.X + 50, slotY),
+						new Rectangle(0, markerOffset, 16, 15), Color.White, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				else
-					Game1.spriteBatch.Draw(npc.Sprite.Texture, new Vector2((float) slotX + bounds.X + 50, slotY),
-						new Rectangle(0, Customizations.NpcMarkerOffsets[npc.Name], 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
+					Game1.spriteBatch.Draw(sprite, new Vector2((float) slotX + bounds.X + 50, slotY),
+						new Rectangle(0, markerOffset, 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 
 				// Draw names
@@ -582,7 +594,7 @@ namespace NPCMapLocations
 					SpriteText.drawString(b, label, slotX + bounds.X, slotY + bounds.Y + 12, 999, -1, 999, 1f,
 						0.1f, false, -1, "", -1);
 				else
-					Utility.drawTextWithShadow(b, Customizations.Names[label], Game1.dialogueFont,
+					Utility.drawTextWithShadow(b, name, Game1.dialogueFont,
 						new Vector2(slotX + bounds.X + bounds.Width + 8, slotY + bounds.Y),
 						greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
 			}
