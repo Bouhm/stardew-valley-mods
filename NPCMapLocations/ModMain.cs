@@ -20,7 +20,6 @@ namespace NPCMapLocations
     public static GlobalConfig Globals;
     public static IModHelper Helper;
     public static IMonitor IMonitor;
-    public static SButton HeldKey;
     public static Texture2D Map;
     public static int mapTab;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
@@ -339,9 +338,7 @@ namespace NPCMapLocations
       if (Game1.activeClickableMenu is GameMenu)
         HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
-      if (DEBUG_MODE && e.Button == SButton.LeftControl) HeldKey = e.Button;
-
-      if (DEBUG_MODE && !Context.IsMultiplayer && HeldKey == SButton.LeftControl && e.Button.Equals(SButton.MouseRight))
+      if (DEBUG_MODE && !Context.IsMultiplayer && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held && e.Button.Equals(SButton.MouseRight))
         Game1.player.setTileLocation(Game1.currentCursorTile);
     }
 
@@ -349,7 +346,11 @@ namespace NPCMapLocations
     {
       if (!Context.IsWorldReady) return;
 
-      if (Minimap != null)
+      if (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
+      {
+        MouseUtil.HandleMouseRelease();
+      }
+      else if (Minimap != null)
       {
         if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft) {
           Minimap.Resize();
@@ -358,10 +359,6 @@ namespace NPCMapLocations
         {
           MouseUtil.HandleMouseRelease(() => Minimap.HandleMouseRelease());
         }
-      }
-      else if (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen)
-      {
-        MouseUtil.HandleMouseRelease();
       }
     }
 
@@ -574,7 +571,6 @@ namespace NPCMapLocations
       }
 
       // Update tick
-      // If minimap is being dragged, suppress mouse behavior
       if (Config.ShowMinimap && Minimap != null && Minimap.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
       {
         Minimap.HandleMouseDrag();
@@ -1088,7 +1084,7 @@ namespace NPCMapLocations
       if (Context.IsWorldReady && Config.ShowMinimap && shouldShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
-      if (DEBUG_MODE)
+      if (DEBUG_MODE && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held)
         Game1.spriteBatch.Draw(Game1.mouseCursors,
           new Vector2(
             Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
@@ -1136,7 +1132,7 @@ namespace NPCMapLocations
           new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 
         // Draw drag and drop area
-        if (Helper.Input.GetState(SButton.MouseLeft) == SButtonState.Held)
+        if (Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
         {
           // Draw dragging box
           DrawBorder(tex,
