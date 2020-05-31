@@ -31,7 +31,6 @@ namespace NPCMapLocations
     private Dictionary<string, bool> ConditionalNpcs;
     private bool hasOpenedMap;
     private bool isModMapOpen;
-    private bool shouldShowMinimap;
 
     // Multiplayer
     private Dictionary<long, FarmerMarker> FarmerMarkers;
@@ -135,7 +134,6 @@ namespace NPCMapLocations
 
       // Disable for multiplayer for anti-cheat
       DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
-      shouldShowMinimap = Config.ShowMinimap;
 
       // NPCs should be unlocked before showing
       ConditionalNpcs = new Dictionary<string, bool>
@@ -327,7 +325,6 @@ namespace NPCMapLocations
       if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
-        shouldShowMinimap = Config.ShowMinimap;
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
@@ -512,16 +509,11 @@ namespace NPCMapLocations
       // Half-second tick
       if (e.IsMultipleOf(30))
       {
-        // Map page updates
-        var updateForMinimap = shouldShowMinimap;
-
         if (Config.ShowMinimap && Minimap != null)
         {
           Minimap.Update();
-          updateForMinimap = true;
+          UpdateMarkers(true);
         }
-
-        UpdateMarkers(updateForMinimap);
       }
 
       // One-second tick
@@ -1068,7 +1060,7 @@ namespace NPCMapLocations
       if (e.IsLocalPlayer)
       {
         // Hide minimap in blacklisted locations with special case for Mines as usual
-        shouldShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
+        Config.ShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
 
         // Check if map does not fill screen and adjust for black bars (ex. BusStop)
         Minimap?.CheckOffsetForMap();
@@ -1077,7 +1069,7 @@ namespace NPCMapLocations
 
     private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
     {
-      if (Context.IsWorldReady && Config.ShowMinimap && shouldShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
+      if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
       if (DEBUG_MODE && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held)
