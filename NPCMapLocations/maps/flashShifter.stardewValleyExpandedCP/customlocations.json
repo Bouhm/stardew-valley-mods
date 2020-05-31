@@ -60,6 +60,12 @@
         "MapY": 393
       }
     ],
+    "IridiumQuarry": [
+    	{
+        "MapX": 4,
+        "MapY": 4
+      }
+    ],
     "LostWoods": [
       {
         "MapX": 156,
@@ -111,8 +117,7 @@
         "MapX": 264,
         "MapY": 427
       }
-    ],
-
+    ]
   },
   "CustomMapTooltips": {
     "AndysHouse": {

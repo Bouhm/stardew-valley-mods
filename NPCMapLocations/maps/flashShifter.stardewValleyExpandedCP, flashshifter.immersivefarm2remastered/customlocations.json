@@ -14,6 +14,20 @@
         "MapY": 604
       }
     ],
+    "CrimsonBadlands": [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 4,
+        "MapY": 4
+      },
+      {
+        "TileX": 232,
+        "TileY": 156,
+        "MapX": 92,
+        "MapY": 40
+      }
+    ],
     "Desert": [
       {
         "TileX": 0,
@@ -26,6 +40,12 @@
         "TileY": 90,
         "MapX": 355,
         "MapY": 213
+      }
+    ],
+    "DesertRailway": [
+      {
+        "MapX": 104,
+        "MapY": 34
       }
     ],
     "Farm": [
@@ -72,10 +92,16 @@
         "MapY": 579
       }
     ],
-    "GrampletonFields":  [
+    "GrampletonFields": [
       {
         "MapX": 1190,
         "MapY": 393
+      }
+    ],
+    "IridiumQuarry": [
+      {
+        "MapX": 4,
+        "MapY": 4
       }
     ],
     "LostWoods": [
@@ -95,7 +121,7 @@
         "TileX": 80,
         "TileY": 40,
         "MapX": 1165,
-        "MapY": 414 
+        "MapY": 414
       }
     ],
     "SpriteSpring": [
@@ -116,6 +142,18 @@
         "TileY": 30,
         "MapX": 1050,
         "MapY": 413
+      }
+    ],
+    "TreasureCave": [
+      {
+        "MapX": 10,
+        "MapY": 34
+      }
+    ],
+    "WizardHouseBasement": [
+      {
+        "MapX": 264,
+        "MapY": 427
       }
     ]
   },
