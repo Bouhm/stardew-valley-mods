@@ -327,6 +327,7 @@ namespace NPCMapLocations
       if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
         Config.ShowMinimap = !Config.ShowMinimap;
+        shouldShowMinimap = Config.ShowMinimap;
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
@@ -512,14 +513,13 @@ namespace NPCMapLocations
       if (e.IsMultipleOf(30))
       {
         // Map page updates
-        var updateForMinimap = false || shouldShowMinimap;
+        var updateForMinimap = shouldShowMinimap;
 
-        if (Config.ShowMinimap)
-          if (Minimap != null)
-          {
-            Minimap.Update();
-            updateForMinimap = true;
-          }
+        if (Config.ShowMinimap && Minimap != null)
+        {
+          Minimap.Update();
+          updateForMinimap = true;
+        }
 
         UpdateMarkers(updateForMinimap);
       }
