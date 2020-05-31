@@ -14,6 +14,20 @@
         "MapY": 604
       }
     ],
+    "CrimsonBadlands":  [
+      {
+        "TileX": 0,
+        "TileY": 0,
+        "MapX": 4,
+        "MapY": 4
+      },
+      {
+        "TileX": 232,
+        "TileY": 156,
+        "MapX": 92,
+        "MapY": 40
+      }
+    ],
     "Desert": [
       {
         "TileX": 0,
@@ -26,6 +40,12 @@
         "TileY": 90,
         "MapX": 355,
         "MapY": 213
+      }
+    ],
+    "DesertRailway": [
+    	{
+        "MapX": 104,
+        "MapY": 34
       }
     ],
     "ForestWest": [
@@ -79,7 +99,20 @@
         "MapX": 1050,
         "MapY": 413
       }
-    ]
+    ],
+    "TreasureCave": [
+      {
+        "MapX": 10,
+        "MapY": 34
+      }
+    ],
+    "WizardHouseBasement": [
+    	{
+        "MapX": 264,
+        "MapY": 427
+      }
+    ],
+
   },
   "CustomMapTooltips": {
     "AndysHouse": {

@@ -7,21 +7,7 @@
   "MinimapToggleKey": "OemPipe",
   "ShowFarmBuildings": true,
   "ShowHorse": true,
-  "CustomNpcMarkerOffsets": {
-    "Alesia": 2,
-    "Andy": 0,
-    "Apples": 16,
-    "Camilla": 2,
-    "Claire_Joja": 3,
-    "Isaac": 0,
-    "MarlonFay": 2,
-    "Morgan": 8,
-    "Olivia": 1,
-    "Victor": 0,
-    "Scarlett": 4,
-    "Sophia": 3,
-    "Susan": 1
-  },
+  "CustomNpcMarkerOffsets": {},
   "NpcBlackList": [],
   "DEBUG_MODE": false
 }
