@@ -1072,7 +1072,7 @@ namespace NPCMapLocations
       if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD) Minimap?.DrawMiniMap();
 
       // Highlight tile for debug mode
-      if (DEBUG_MODE && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held)
+      if (DEBUG_MODE)
         Game1.spriteBatch.Draw(Game1.mouseCursors,
           new Vector2(
             Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
