@@ -36,7 +36,7 @@ namespace NPCMapLocations
     public HashSet<string> MinimapBlacklist { get; set; } = new HashSet<string>() { };
 
     public bool UseSeasonalMaps { get; set; } = true;
-    public bool ShowChildren { get; set; } = true;
+    public bool ShowChildren { get; set; } = false;
     public bool ShowHorse { get; set; } = true;
     public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public HashSet<string> NpcBlacklist { get; set; } = new HashSet<string>() { };

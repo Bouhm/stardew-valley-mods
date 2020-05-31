@@ -6,6 +6,7 @@
   "MinimapDragKey": "LeftControl",
   "MinimapToggleKey": "OemPipe",
   "ShowFarmBuildings": true,
+  "ShowChildren": false,
   "ShowHorse": true,
   "CustomNpcMarkerOffsets": {},
   "NpcBlackList": [],
