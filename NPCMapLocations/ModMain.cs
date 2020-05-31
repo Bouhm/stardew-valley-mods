@@ -730,34 +730,25 @@ namespace NPCMapLocations
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
                                   <= Config.HeartLevelMax);
 
-        // Check if gifted for birthday
-        if (npcMarker.IsBirthday)
+        // Check for daily quests
+        foreach (var quest in Game1.player.questLog)
         {
-          npcMarker.IsBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) &&
-                                  Game1.player.friendshipData[npc.Name].GiftsToday == 0;
-
-          // Check for daily quests
-          foreach (var quest in Game1.player.questLog)
-            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-              switch (quest.questType.Value)
-              {
-                case 3:
-                  npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
-                  break;
-                case 4:
-                  npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
-                  break;
-                case 7:
-                  npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npc.Name;
-                  break;
-                case 10:
-                  npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
-                  break;
-              }
-        }
-        else
-        {
-          npcMarker.HasQuest = false;
+          if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+            switch (quest.questType.Value)
+            {
+              case 3:
+                npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
+                break;
+              case 4:
+                npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
+                break;
+              case 7:
+                npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npc.Name;
+                break;
+              case 10:
+                npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
+                break;
+            }
         }
 
         // Establish draw order, higher number infront
@@ -821,34 +812,24 @@ namespace NPCMapLocations
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(name)
                                   <= Config.HeartLevelMax);
 
-        // Check if gifted for birthday
-        if (marker.IsBirthday)
-        {
-          marker.IsBirthday = Game1.player.friendshipData.ContainsKey(name) &&
-                                  Game1.player.friendshipData[name].GiftsToday == 0;
-
-          // Check for daily quests
-          foreach (var quest in Game1.player.questLog)
-            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-              switch (quest.questType.Value)
-              {
-                case 3:
-                  marker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == name;
-                  break;
-                case 4:
-                  marker.HasQuest = ((SlayMonsterQuest)quest).target.Value == name;
-                  break;
-                case 7:
-                  marker.HasQuest = ((FishingQuest)quest).target.Value == name;
-                  break;
-                case 10:
-                  marker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == name;
-                  break;
-              }
-        }
-        else
-        {
-          marker.HasQuest = false;
+        // Check for daily quests
+        foreach (var quest in Game1.player.questLog) { 
+          if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+            switch (quest.questType.Value)
+            {
+              case 3:
+                marker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == name;
+                break;
+              case 4:
+                marker.HasQuest = ((SlayMonsterQuest)quest).target.Value == name;
+                break;
+              case 7:
+                marker.HasQuest = ((FishingQuest)quest).target.Value == name;
+                break;
+              case 10:
+                marker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == name;
+                break;
+            }
         }
 
         // Establish draw order, higher number infront

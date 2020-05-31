@@ -429,7 +429,7 @@ namespace NPCMapLocations
           // Icons for birthday/quest
           if (ModMain.Config.MarkQuests)
           {
-            if (marker.IsBirthday)
+            if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
               b.Draw(Game1.mouseCursors,
                 new Vector2(NormalizeToMap(offsetMmLoc.X + marker.MapX + 20),
                   NormalizeToMap(offsetMmLoc.Y + marker.MapY)),

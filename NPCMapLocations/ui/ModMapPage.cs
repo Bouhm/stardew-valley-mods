@@ -430,7 +430,7 @@ namespace NPCMapLocations
           // Draw icons for quests/birthday
           if (ModMain.Config.MarkQuests)
           {
-            if (marker.IsBirthday)
+            if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
             {
               // Gift icon
               b.Draw(Game1.mouseCursors,
