@@ -148,16 +148,21 @@ namespace NPCMapLocations
 
       if (NpcMarkers != null)
       {
-        foreach (var npcMarker in this.NpcMarkers.Values)
+        foreach (var npcMarker in this.NpcMarkers)
         {
-          Vector2 npcLocation = new Vector2(mapX + npcMarker.MapX, mapY + npcMarker.MapY);
+          Vector2 npcLocation = new Vector2(mapX + npcMarker.Value.MapX, mapY + npcMarker.Value.MapY);
           if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
               Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
           {
-            if (!npcMarker.IsHidden && !(npcMarker.Type == Character.Horse))
-              hoveredList.Add(npcMarker.Name);
+            if (!npcMarker.Value.IsHidden && !(npcMarker.Value.Type == Character.Horse))
+            {
+              if (Customizations.Names.TryGetValue(npcMarker.Key, out var name))
+              {
+                hoveredList.Add(name);
+              }
+            }
 
-            if (!LocationUtil.IsOutdoors(npcMarker.LocationName) && !hasIndoorCharacter)
+            if (!LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !hasIndoorCharacter)
               hasIndoorCharacter = true;
           }
         }
@@ -395,48 +400,50 @@ namespace NPCMapLocations
       // Sort by drawing order
       if (NpcMarkers != null)
       {
-        var sortedMarkers = NpcMarkers.Values.ToList();
-        sortedMarkers.Sort((x, y) => x.Layer.CompareTo(y.Layer));
+        var sortedMarkers = NpcMarkers.ToList();
+        sortedMarkers.Sort((x, y) => x.Value.Layer.CompareTo(y.Value.Layer));
 
-        foreach (NpcMarker npcMarker in sortedMarkers)
+        foreach (var npcMarker in sortedMarkers)
         {
+          var name = npcMarker.Key;
+          var marker = npcMarker.Value;
+
           // Skip if no specified location or should be hidden
-          if (npcMarker.Marker == null || ModMain.Globals.NpcBlacklist.Contains(npcMarker.Name) || (!ModMain.Config.ShowHiddenVillagers && npcMarker.IsHidden))
+          if (ModMain.Globals.NpcBlacklist.Contains(name)
+            || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
+          )
           {
             continue;
           }
 
           // Dim marker for hidden markers
-          var markerColor = npcMarker.IsHidden ? Color.DimGray * 0.7f : Color.White;
-
-          var offset = 1;
-          Customizations.NpcMarkerOffsets.TryGetValue(npcMarker.Name, out offset);
+          var markerColor = marker.IsHidden ? Color.DimGray * 0.7f : Color.White;
 
           // Draw NPC marker
-          var spriteRect = npcMarker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, offset, 16, 15);
+          var spriteRect = marker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
-          b.Draw(npcMarker.Marker,
-            new Rectangle((int)(mapX + npcMarker.MapX), (int)(mapY + npcMarker.MapY),
+          b.Draw(marker.Marker,
+            new Rectangle((int)(mapX + marker.MapX), (int)(mapY + marker.MapY),
               32, 30),
             new Rectangle?(spriteRect), markerColor);
 
           // Draw icons for quests/birthday
           if (ModMain.Config.MarkQuests)
           {
-            if (npcMarker.IsBirthday)
+            if (marker.IsBirthday)
             {
               // Gift icon
               b.Draw(Game1.mouseCursors,
-                new Vector2(mapX + npcMarker.MapX + 20, mapY + npcMarker.MapY),
+                new Vector2(mapX + marker.MapX + 20, mapY + marker.MapY),
                 new Rectangle?(new Rectangle(147, 412, 10, 11)), markerColor, 0f, Vector2.Zero, 1.8f,
                 SpriteEffects.None, 0f);
             }
 
-            if (npcMarker.HasQuest)
+            if (marker.HasQuest)
             {
               // Quest icon
               b.Draw(Game1.mouseCursors,
-                new Vector2(mapX + npcMarker.MapX + 22, mapY + npcMarker.MapY - 3),
+                new Vector2(mapX + marker.MapX + 22, mapY + marker.MapY - 3),
                 new Rectangle?(new Rectangle(403, 496, 5, 14)), markerColor, 0f, Vector2.Zero, 1.8f,
                 SpriteEffects.None, 0f);
             }

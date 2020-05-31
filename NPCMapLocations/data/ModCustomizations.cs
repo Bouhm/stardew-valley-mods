@@ -252,17 +252,11 @@ namespace NPCMapLocations
 
       if (!Names.TryGetValue(npc.Name, out var customName))
       {
-        if (npc.displayName == null)
+        Names.Add(npc.Name, npc.displayName ?? npc.Name);
+        // Handle custom NPCs meant to replace existing NPCs
+        if (!npc.Name.Equals(npc.displayName) || ModMain.Globals.CustomNpcMarkerOffsets.ContainsKey(npc.displayName))
         {
-          Names.Add(npc.Name, npc.Name);
-        }
-        else
-        {
-          Names.Add(npc.Name, npc.displayName);
-          if (!npc.Name.Equals(npc.displayName) || ModMain.Globals.CustomNpcMarkerOffsets.ContainsKey(npc.Name))
-          {
-            NpcCustomizations.Add(npc.Name);
-          }
+          NpcCustomizations.Add(npc.Name);
         }
       }
     }

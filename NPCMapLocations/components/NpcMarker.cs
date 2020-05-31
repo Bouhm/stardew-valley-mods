@@ -4,9 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 public class NpcMarker
 {
-  public string Name { get; set; }
+  public string DisplayName { get; set; }
   public string LocationName { get; set; }
   public Texture2D Marker { get; set; }
+  public int CropOffset { get; set; }
   public int MapX { get; set; }
   public int MapY { get; set; }
   public bool IsBirthday { get; set; }
@@ -17,9 +18,10 @@ public class NpcMarker
 
   public NpcMarker()
   {
-    Name = null;
+    DisplayName = null;
     LocationName = null;
     Marker = null;
+    CropOffset = 0;
     MapX = -9999;
     MapY = -9999;
     IsBirthday = false;
