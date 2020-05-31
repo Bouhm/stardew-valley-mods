@@ -411,7 +411,7 @@ namespace NPCMapLocations
 
           if (marker.Type == Character.Horse)
           {
-            b.Draw(marker.Marker,
+            b.Draw(marker.Sprite,
               new Rectangle(NormalizeToMap(offsetMmLoc.X + marker.MapX),
                 NormalizeToMap(offsetMmLoc.Y + marker.MapY),
                 30, 32),
@@ -419,7 +419,7 @@ namespace NPCMapLocations
           }
           else
           {
-            b.Draw(marker.Marker,
+            b.Draw(marker.Sprite,
               new Rectangle(NormalizeToMap(offsetMmLoc.X + marker.MapX),
                 NormalizeToMap(offsetMmLoc.Y + marker.MapY),
                 30, 32),

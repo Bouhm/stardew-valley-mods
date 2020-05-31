@@ -422,7 +422,7 @@ namespace NPCMapLocations
           // Draw NPC marker
           var spriteRect = marker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
-          b.Draw(marker.Marker,
+          b.Draw(marker.Sprite,
             new Rectangle((int)(mapX + marker.MapX), (int)(mapY + marker.MapY),
               32, 30),
             new Rectangle?(spriteRect), markerColor);

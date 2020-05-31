@@ -6,7 +6,7 @@ public class NpcMarker
 {
   public string DisplayName { get; set; }
   public string LocationName { get; set; }
-  public Texture2D Marker { get; set; }
+  public Texture2D Sprite { get; set; }
   public int CropOffset { get; set; }
   public int MapX { get; set; }
   public int MapY { get; set; }
@@ -20,7 +20,7 @@ public class NpcMarker
   {
     DisplayName = null;
     LocationName = null;
-    Marker = null;
+    Sprite = null;
     CropOffset = 0;
     MapX = -9999;
     MapY = -9999;

@@ -572,11 +572,11 @@ namespace NPCMapLocations
         var marker = npcMarkers.ElementAt(whichOption - 13).Value;
 
         if (isChecked)
-					Game1.spriteBatch.Draw(marker.Marker, new Vector2((float) slotX + bounds.X + 50, slotY),
+					Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float) slotX + bounds.X + 50, slotY),
 						new Rectangle(0, marker.CropOffset, 16, 15), Color.White, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 				else
-					Game1.spriteBatch.Draw(marker.Marker, new Vector2((float) slotX + bounds.X + 50, slotY),
+					Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float) slotX + bounds.X + 50, slotY),
 						new Rectangle(0, marker.CropOffset, 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
 						Game1.pixelZoom, SpriteEffects.None, 0.4f);
 
