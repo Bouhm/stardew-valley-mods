@@ -9,5 +9,5 @@
   "ShowHorse": true,
   "CustomNpcMarkerOffsets": {},
   "NpcBlackList": [],
-  "DEBUG_MODE": true
+  "DEBUG_MODE": false
 }

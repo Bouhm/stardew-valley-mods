@@ -167,12 +167,8 @@ namespace NPCMapLocations
       // Log any custom locations not in customlocations.json
       foreach (var locCtx in LocationUtil.LocationContexts)
       {
-        if (
-          locCtx.Value.Root == null
-          || ((!locCtx.Key.Equals("FarmHouse")
-          && !locCtx.Key.Contains("Cabin")
-          && !locCtx.Key.Contains("UndergroundMine"))
-          && !MapVectors.TryGetValue(locCtx.Value.Root, out var loc))
+        if ((locCtx.Value.Root == null && !MapVectors.ContainsKey(locCtx.Key))
+          || (locCtx.Value.Root != null && !MapVectors.ContainsKey(locCtx.Value.Root))
         )
         {
           if (!alertFlags.Contains("UnknownLocation:" + locCtx.Key))
