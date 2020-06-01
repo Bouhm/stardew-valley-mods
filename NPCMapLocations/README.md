@@ -8,13 +8,12 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 
 - [How tracking works](#how-tracking-works)
 - [Creating an accurate map](#creating-an-accurate-map)
-  - [Video tutorial](#video-tutorial1)
+  - [Video tutorial](#video-tutorial)
   - [Seasonal maps](#seasonal-maps)
 - [Loading the custom map](#loading-the-custom-map)
   - [Folder selection](#folder-selection)
 - [Unknown locations](#unknown-locations)
 - [Adding points](#adding-points)
-  - [Video tutorial](#video-tutorial2)
   - [Example](#example)
     - [Farm types](#farm-types)
   - [Single points](#single-points)
@@ -169,8 +168,7 @@ For tracking, we add an entry for `"TownEast"` in `"CustomMapLocations"`. We inp
 },
 ```
 
-### Video tutotorial
-A video tutorial is available here:
+### A video tutorial is available here:
 https://streamable.com/x439m5
 
 Tips:
