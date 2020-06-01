@@ -25,3 +25,11 @@ To compile a SMAPI mod for testing, use the following instructions:
 2. Open the solution with Visual Studio or MonoDevelop.
 3. Add the package [Stardew.ModBuildConfig](https://www.nuget.org/packages/Pathoschild.Stardew.ModBuildConfig) by Pathoschild to enable cross-platform compatibility.
 4. Re-build the solution and run the debugger to launch the project with SMAPI.
+
+## Contributing
+
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process of submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
