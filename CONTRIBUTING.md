@@ -5,9 +5,8 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Pull Request Process
 
-1. Create an issue detailing the problem the changes are meant to solve.
 2. Work on a new branch for the changes.
-3. Create a pull-request for the changes, tag the PR in the issue. Merges will be handled by the project maintainer.
+3. Create a pull-request for the changes. Add a detailed summary of what the changes are for. Merges will be handled by the project maintainer.
    
 ## Rules
 
