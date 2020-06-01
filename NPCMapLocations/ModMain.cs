@@ -724,6 +724,29 @@ namespace NPCMapLocations
           continue;
         }
 
+        // Hide horse if being ridden
+        if (npc is Horse)
+        {
+          var isRiding = false;
+
+          // If horse is being ridden, hide it
+          foreach (var farmer in Game1.getOnlineFarmers())
+          {
+            if (farmer.isRidingHorse())
+            {
+              isRiding = true;
+              break;
+            }
+          }
+
+          if (isRiding)
+          {
+            npcMarker.MapX = -9999;
+            npcMarker.MapY = -9999;
+            continue;
+          }
+        }
+
         string locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
         npcMarker.LocationName = locationName;
 
