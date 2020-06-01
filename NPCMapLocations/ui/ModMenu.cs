@@ -121,7 +121,9 @@ namespace NPCMapLocations
       string villagersLabel = ModMain.Helper.Translation.Get("villagers.label");
 			options.Add(new OptionsElement(villagersLabel));
 
-      var orderedMarkers = npcMarkers.ToList().OrderBy(x => x.Value.DisplayName);
+      var orderedMarkers = npcMarkers.ToList()
+        .Where(x => x.Value.Sprite != null && x.Value.Type == Character.Villager)
+        .OrderBy(x => x.Value.DisplayName);
 
       var idx = 13;
       foreach (var npcMarker in orderedMarkers)

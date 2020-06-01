@@ -616,29 +616,53 @@ namespace NPCMapLocations
                 offset = 0;
               }
 
+              if (syncedMarker.Key == "Hermes")
+              {
+                var a = 3;
+              }
               if (NpcMarkers.TryGetValue(syncedMarker.Key, out var npcMarker))
               {
                 npcMarker.LocationName = syncedMarker.Value.LocationName;
                 npcMarker.MapX = syncedMarker.Value.MapX;
                 npcMarker.MapY = syncedMarker.Value.MapY;
                 npcMarker.DisplayName = syncedMarker.Value.DisplayName;
-                npcMarker.Sprite = new AnimatedSprite($"Characters\\{syncedMarker.Value.DisplayName}", 0, 16, 32).Texture;
                 npcMarker.CropOffset = offset;
                 npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
                 npcMarker.Type = syncedMarker.Value.Type;
+
+                if (syncedMarker.Value.Type == Character.Villager)
+                {
+                  npcMarker.Sprite = new AnimatedSprite($"Characters\\{syncedMarker.Value.DisplayName}", 0, 16, 32).Texture;
+                }
+                else
+                {
+                  var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
+                  npcMarker.Sprite = sprite;
+                };
               }
-              else
+              else 
               {
-                NpcMarkers.Add(syncedMarker.Key, new NpcMarker
+                var newMarker = new NpcMarker
                 {
                   LocationName = syncedMarker.Value.LocationName,
                   MapX = syncedMarker.Value.MapX,
                   MapY = syncedMarker.Value.MapY,
                   DisplayName = syncedMarker.Value.DisplayName,
-                  Sprite = new AnimatedSprite($"Characters\\{syncedMarker.Value.DisplayName}", 0, 16, 32).Texture,
                   IsBirthday = syncedMarker.Value.IsBirthday,
                   Type = syncedMarker.Value.Type
-                });
+                };
+
+                if (syncedMarker.Value.Type == Character.Villager)
+                {
+                  newMarker.Sprite = new AnimatedSprite($"Characters\\{syncedMarker.Value.DisplayName}", 0, 16, 32).Texture;
+                }
+                else
+                {
+                  var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
+                  newMarker.Sprite = sprite;
+                };
+
+                NpcMarkers.Add(syncedMarker.Key, newMarker);
               }
             }
             break;

@@ -409,7 +409,8 @@ namespace NPCMapLocations
           var marker = npcMarker.Value;
 
           // Skip if no specified location or should be hidden
-          if (ModMain.Globals.NpcBlacklist.Contains(name)
+          if (marker.Sprite == null
+            || ModMain.Globals.NpcBlacklist.Contains(name)
             || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
           )
           {
