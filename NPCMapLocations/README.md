@@ -8,12 +8,13 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 
 - [How tracking works](#how-tracking-works)
 - [Creating an accurate map](#creating-an-accurate-map)
-  - [Video tutorial](#video-tutorial)
+  - [Video tutorial](#video-tutorial1)
   - [Seasonal maps](#seasonal-maps)
 - [Loading the custom map](#loading-the-custom-map)
   - [Folder selection](#folder-selection)
 - [Unknown locations](#unknown-locations)
 - [Adding points](#adding-points)
+  - [Video tutorial](#video-tutorial2)
   - [Example](#example)
     - [Farm types](#farm-types)
   - [Single points](#single-points)
@@ -104,14 +105,6 @@ NPC Map Locations will try its best to figure out where custom locations are. Ea
 [NPC Map Locations] Unknown location: TreasureCave
 ```
 
-A video tutorial is available here:
-https://streamable.com/x439m5
-
-Tips:
-- In config/globals.json, set "DEBUG_MODE" to true.
-- In the SMAPI console, use `debug warp [locationname] to quickly move to the map.
-- Use control + right click to move the player around the map in debug mode.
-
 ## Adding points
 
 Any custom locations that need tracking need to be included in `maps\customlocations.json`. The format for adding one location is as shown:
@@ -175,6 +168,15 @@ For tracking, we add an entry for `"TownEast"` in `"CustomMapLocations"`. We inp
   ]
 },
 ```
+
+### Video tutotorial
+A video tutorial is available here:
+https://streamable.com/x439m5
+
+Tips:
+- In config/globals.json, set "DEBUG_MODE" to true.
+- In the SMAPI console, use `debug warp [locationname] to quickly move to the map.
+- Use control + right click to move the player around the map in debug mode.
 
 #### Farm types
 
