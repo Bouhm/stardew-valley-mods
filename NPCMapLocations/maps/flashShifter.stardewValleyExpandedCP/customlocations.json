@@ -111,12 +111,6 @@
         "MapX": 10,
         "MapY": 34
       }
-    ],
-    "WizardHouseBasement": [
-    	{
-        "MapX": 264,
-        "MapY": 427
-      }
     ]
   },
   "CustomMapTooltips": {
