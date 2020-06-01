@@ -86,7 +86,6 @@ namespace NPCMapLocations
       IMonitor = Monitor;
       Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
 
-      Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
       Helper.Events.World.BuildingListChanged += World_BuildingListChanged;
@@ -99,21 +98,6 @@ namespace NPCMapLocations
       Helper.Events.Display.Rendered += Display_Rendered;
       Helper.Events.Display.WindowResized += Display_WindowResized;
       Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
-    }
-
-    private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
-    {
-      // Find index of MapPage since it's a different value for SDV mobile
-      var pages = Helper.Reflection.GetField<List<IClickableMenu>>(new GameMenu(false), "pages").GetValue();
-
-      foreach (var page in pages)
-      {
-        if (page is MapPage)
-        {
-          mapTab = pages.IndexOf(page);
-          break;
-        }
-      }
     }
 
     // Load config and other one-off data
@@ -194,6 +178,17 @@ namespace NPCMapLocations
       }
 
       UpdateFarmBuildingLocs();
+
+      // Find index of MapPage since it's a different value for SDV mobile
+      var pages = Helper.Reflection.GetField<List<IClickableMenu>>(new GameMenu(false), "pages").GetValue();
+
+      foreach (var page in pages)
+      {
+        if (page is MapPage)
+        {
+          mapTab = pages.IndexOf(page);
+        }
+      }
 
       // Log warning if host does not have mod installed
       if (Context.IsMultiplayer)
@@ -1108,7 +1103,7 @@ namespace NPCMapLocations
       if (e.IsLocalPlayer)
       {
         // Hide minimap in blacklisted locations with special case for Mines as usual
-        Config.ShowMinimap = !IsLocationBlacklisted(e.NewLocation.Name);
+        Config.ShowMinimap = Config.ShowMinimap && !IsLocationBlacklisted(e.NewLocation.Name);
 
         // Check if map does not fill screen and adjust for black bars (ex. BusStop)
         Minimap?.CheckOffsetForMap();
