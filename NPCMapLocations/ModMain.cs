@@ -920,7 +920,7 @@ namespace NPCMapLocations
           // Location changes before tile position, causing farmhands to blink
           // to the wrong position upon entering new location. Handle this in draw.
           if (locationName == farMarker.LocationName && MathHelper.Distance(deltaX, deltaY) > 15)
-            FarmerMarkers[farmerId].DrawDelay = 3;
+            FarmerMarkers[farmerId].DrawDelay = 1;
           else if (farMarker.DrawDelay > 0)
             FarmerMarkers[farmerId].DrawDelay--;
         }
