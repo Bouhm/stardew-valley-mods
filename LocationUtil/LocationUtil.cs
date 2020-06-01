@@ -106,7 +106,6 @@ internal class LocationUtil
       // If one of the warps is a root location, current location is an indoor building 
       if (warpLocation.IsOutdoors)
       {
-
         hasOutdoorWarp = true;
       }
 

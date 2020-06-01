@@ -968,8 +968,17 @@ namespace NPCMapLocations
         }
       }
 
+      if (locationName == "MovieTheater")
+      {
+        var a = 3;
+      }
+
       // Get location of indoor location by its warp position in the outdoor location
-      if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc) && loc.Type != LocationType.Outdoors && loc.Root != null)
+      if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
+        && loc.Type != LocationType.Outdoors
+        && loc.Root != null
+        && locationName != "MovieTheater" // Weird edge case where the warps are off
+      )
       {
         var building = LocationUtil.GetBuilding(locationName);
 

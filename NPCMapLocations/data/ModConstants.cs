@@ -158,14 +158,12 @@ public static class ModConstants
               new MapVector(686, 366)
           }
       },
-
       {
           "Graveyard", new MapVector[]
           {
               new MapVector(738, 438)
           }
       },
-
       {
           "Beach", new MapVector[]
           {
@@ -186,7 +184,6 @@ public static class ModConstants
               new MapVector(714, 636)
           }
       },
-
       {
           "Railroad", new MapVector[]
           {
@@ -200,7 +197,6 @@ public static class ModConstants
               new MapVector(730, 47),
           }
       },
-
       {
           "Summit", new MapVector[]
           {
@@ -214,7 +210,6 @@ public static class ModConstants
               new MapVector(1074, 186, 135, 41),
           }
       },
-
       {
           "Quarry", new MapVector[]
           {
@@ -243,7 +238,7 @@ public static class ModConstants
       {
           "WizardHouseBasement", new MapVector[]
           {
-              new MapVector(263, 447),
+              new MapVector(263, 424),
           }
       },
     };
