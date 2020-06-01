@@ -977,7 +977,7 @@ namespace NPCMapLocations
       if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
         && loc.Type != LocationType.Outdoors
         && loc.Root != null
-        && locationName != "MovieTheater" // Weird edge case where the warps are off
+        && locationName != "MovieTheater"         // Weird edge cases where the warps are off
       )
       {
         var building = LocationUtil.GetBuilding(locationName);

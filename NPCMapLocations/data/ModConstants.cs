@@ -238,7 +238,7 @@ public static class ModConstants
       {
           "WizardHouseBasement", new MapVector[]
           {
-              new MapVector(263, 424),
+              new MapVector(263, 447),
           }
       },
     };
