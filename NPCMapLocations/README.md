@@ -104,7 +104,8 @@ NPC Map Locations will try its best to figure out where custom locations are. Ea
 [NPC Map Locations] Unknown location: TreasureCave
 ```
 
-A video tutorial is available for how I add tracking for these SVE custom locations below.
+A video tutorial is available here:
+https://streamable.com/x439m5
 
 ## Adding points
 
