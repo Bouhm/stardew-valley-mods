@@ -477,7 +477,7 @@ namespace NPCMapLocations
       {
         foreach (var npc in GetVillagers())
         {
-          if (!Customizations.Names.ContainsKey(npc.Name) && !(npc is Horse || npc is Child)) continue;
+          if (!Customizations.Names.TryGetValue(npc.Name, out var name) && !(npc is Horse || npc is Child)) continue;
 
           var type = Character.Villager;
           if (npc is Horse)
@@ -496,14 +496,24 @@ namespace NPCMapLocations
 
           if (!NpcMarkers.ContainsKey(npc.Name))
           {
-            NpcMarkers.Add(npc.Name, new NpcMarker
+            var newMarker = new NpcMarker()
             {
               DisplayName = npc.displayName ?? npc.Name,
-              Sprite = npc.Sprite.Texture,
               CropOffset = offset,
               IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
               Type = type
-            });
+            };
+
+            try
+            {
+              newMarker.Sprite = new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
+            }
+            catch
+            {
+              newMarker.Sprite = npc.Sprite.Texture;
+            }
+
+            NpcMarkers.Add(npc.Name, newMarker);
           }
         }
       }
