@@ -517,11 +517,14 @@ namespace NPCMapLocations
       // Half-second tick
       if (e.IsMultipleOf(30))
       {
-        if (Config.ShowMinimap && Minimap != null)
+        var updateForMinimap = Config.ShowMinimap && Minimap != null;
+
+        if (updateForMinimap)
         {
           Minimap.Update();
-          UpdateMarkers(true);
         }
+
+        UpdateMarkers(updateForMinimap);
       }
 
       // One-second tick
@@ -616,10 +619,6 @@ namespace NPCMapLocations
                 offset = 0;
               }
 
-              if (syncedMarker.Key == "Hermes")
-              {
-                var a = 3;
-              }
               if (NpcMarkers.TryGetValue(syncedMarker.Key, out var npcMarker))
               {
                 npcMarker.LocationName = syncedMarker.Value.LocationName;
