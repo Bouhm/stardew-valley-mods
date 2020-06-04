@@ -1,0 +1,19 @@
+{
+	"minimap.label": "미니맵",
+	"minimap.option1": "사용하기",
+	"minimap.plusMinus1": "미니맵 가로",
+	"minimap.plusMinus2": "미니맵 세로",
+	"immersion.label": "설정:",
+	"immersion.option1": "주민들을 항상 표시",
+	"immersion.option2": "말해본 주민만 표시",
+	"immersion.option3": "말해본 주민만 제외",
+	"immersion.option4": "같은 장소에 있는 주민만 표시",
+	"immersion.option5": "친밀도가 있는 주민만 표시",
+	"immersion.slider1": "최저 친밀도",
+	"immersion.slider2": "최고 친밀도",
+	"extra.label": "기타 설정:",
+	"extra.option1": "주민 퀘스트나 생일 표시",
+	"extra.option2": "숨어있는 주민 표시",
+	"extra.option3": "행상인마차 표시",
+	"villagers.label": "포함/제외할 주민:"
+}

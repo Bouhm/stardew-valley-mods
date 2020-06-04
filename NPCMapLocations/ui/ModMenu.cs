@@ -478,17 +478,13 @@ namespace NPCMapLocations
 		) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
 		{
       this.npcMarkers = npcMarkers;
-			this.label = label;
+			this.label = ModMain.Helper.Translation.Get(label);
 
       // Villager names
-			if (whichOption > 12 && npcMarkers != null)
+      if (whichOption > 12 && npcMarkers != null)
 			{
         isChecked = !ModMain.Globals.NpcBlacklist.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
         return;
-      }
-      else
-			{
-        this.label = ModMain.Helper.Translation.Get(label);
       }
 
       switch (whichOption)

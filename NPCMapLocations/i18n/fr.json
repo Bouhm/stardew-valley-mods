@@ -1,0 +1,19 @@
+{
+	"minimap.label": "Mini-carte",
+	"minimap.option1": "Activée",
+	"minimap.plusMinus1": "Largeur de la mini-carte",
+	"minimap.plusMinus2": "Hauteur de la mini-carte",
+	"immersion.label": "Paramètres:",
+	"immersion.option1": "Toujours afficher les villageois",
+	"immersion.option2": "Afficher les villageois avec qui le joueur a parlé",
+	"immersion.option3": "Cacher les villageois avec qui le joueur a parlé",
+	"immersion.option4": "Afficher uniquement les villageois à l'emplacement du joueur",
+	"immersion.option5": "Afficher uniquement les villageois selon le niveau de coeur",
+	"immersion.slider1": "Niveau de coeur minimum",
+	"immersion.slider2": "Niveau de coeur maximum",
+	"extra.label": "Paramètres supplémentaires:",
+	"extra.option1": "Afficher les quêtes ou les anniversaires",
+	"extra.option2": "Afficher les villageois cachés",
+	"extra.option3": "Afficher les marchands ambulants",
+	"villagers.label": "Inclure/Exclure les villageois:"
+}

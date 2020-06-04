@@ -1,0 +1,19 @@
+{
+	"minimap.label": "Mini harita",
+	"minimap.option1": "Etkin",
+	"minimap.plusMinus1": "Mini harita genişliği",
+	"minimap.plusMinus2": "Mini harita uzunluğu",
+	"immersion.label": "Ayarlar:",
+	"immersion.option1": "Tüm köylüleri göster",
+	"immersion.option2": "Oyuncunun konuştuğu köylüleri göster",
+	"immersion.option3": "Oyuncunun konuştuğu köylüleri gizle",
+	"immersion.option4": "Sadece oyuncunun bölgesindeki köylüleri göster",
+	"immersion.option5": "Sadece belirli kalp seviyesi içindeki köylüleri göster",
+	"immersion.slider1": "En az kalp seviyesi",
+	"immersion.slider2": "En fazla kalp seviyesi",
+	"extra.label": "Ekstra ayarlar:",
+	"extra.option1": "Görevleri ya da doğum günlerini göster",
+	"extra.option2": "Gizli köylüleri göster",
+	"extra.option3": "Gezgin tüccarı göster",
+	"villagers.label": "Köylüleri ekle/çıkar:"
+}
