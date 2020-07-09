@@ -199,8 +199,8 @@ namespace NPCMapLocations
 			{
 				Game1.exitActiveMenu();
 				Game1.activeClickableMenu = new GameMenu();
-				(Game1.activeClickableMenu as GameMenu).changeTab(ModMain.mapTab);
-				return;
+			  (Game1.activeClickableMenu as GameMenu).changeTab(ModConstants.MapTabIndex);
+        return;
 			}
 
 			canClose = true;

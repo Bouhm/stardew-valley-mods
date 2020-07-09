@@ -3,12 +3,16 @@ Static class that stores constants for map mod.
 Do NOT modify anything here other than MapVectors
 */
 
-using NPCMapLocations;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
+using StardewValley.Menus;
 using System.Collections.Generic;
 
 public static class ModConstants
 {
+  // The page index of mapTab
+  public static int MapTabIndex => StardewModdingAPI.Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
+
   // Cropping heads for NPC markers
   // Values shift the head up (negative) or down (positive)
   public static Dictionary<string, int> NpcMarkerOffsets => new Dictionary<string, int>

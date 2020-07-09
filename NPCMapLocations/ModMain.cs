@@ -21,7 +21,6 @@ namespace NPCMapLocations
     public static IModHelper Helper;
     public static IMonitor IMonitor;
     public static Texture2D Map;
-    public static int mapTab;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
 
     private Texture2D BuildingMarkers;
@@ -178,17 +177,6 @@ namespace NPCMapLocations
       }
 
       UpdateFarmBuildingLocs();
-
-      // Find index of MapPage since it's a different value for SDV mobile
-      var pages = Helper.Reflection.GetField<List<IClickableMenu>>(new GameMenu(false), "pages").GetValue();
-
-      foreach (var page in pages)
-      {
-        if (page is MapPage)
-        {
-          mapTab = pages.IndexOf(page);
-        }
-      }
 
       // Log warning if host does not have mod installed
       if (Context.IsMultiplayer)
@@ -359,7 +347,7 @@ namespace NPCMapLocations
     // Handle keyboard/controller inputs
     private void HandleInput(GameMenu menu, SButton input)
     {
-      if (menu.currentTab != mapTab) return;
+      if (menu.currentTab != ModConstants.MapTabIndex) return;
       if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
         Game1.activeClickableMenu = new ModMenu(
           NpcMarkers,
@@ -592,7 +580,7 @@ namespace NPCMapLocations
       }
 
       hasOpenedMap =
-        gameMenu.currentTab == mapTab; // When map accessed by switching GameMenu tab or pressing M
+        gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
       isModMapOpen = hasOpenedMap ? isModMapOpen : hasOpenedMap; // When vanilla MapPage is replaced by ModMap
 
       if (hasOpenedMap && !isModMapOpen) // Only run once on map open
@@ -718,7 +706,7 @@ namespace NPCMapLocations
 
       // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
       // allows for better compatibility with other mods that use MapPage
-      pages[mapTab] = new ModMapPage(
+      pages[ModConstants.MapTabIndex] = new ModMapPage(
         NpcMarkers,
         ConditionalNpcs,
         FarmerMarkers,
