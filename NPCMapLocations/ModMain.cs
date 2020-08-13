@@ -816,19 +816,19 @@ namespace NPCMapLocations
         foreach (var quest in Game1.player.questLog)
         {
           if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-            switch (quest.questType.Value)
+            switch (quest)
             {
-              case 3:
-                npcMarker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
+              case ItemDeliveryQuest itemDeliveryQuest:
+                npcMarker.HasQuest = itemDeliveryQuest.target.Value == npc.Name;
                 break;
-              case 4:
-                npcMarker.HasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
+              case SlayMonsterQuest slayMonsterQuest:
+                npcMarker.HasQuest = slayMonsterQuest.target.Value == npc.Name;
                 break;
-              case 7:
-                npcMarker.HasQuest = ((FishingQuest)quest).target.Value == npc.Name;
+              case FishingQuest fishingQuest:
+                npcMarker.HasQuest = fishingQuest.target.Value == npc.Name;
                 break;
-              case 10:
-                npcMarker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
+              case ResourceCollectionQuest resourceCollectionQuest:
+                npcMarker.HasQuest = resourceCollectionQuest.target.Value == npc.Name;
                 break;
             }
         }
@@ -897,19 +897,19 @@ namespace NPCMapLocations
         // Check for daily quests
         foreach (var quest in Game1.player.questLog) { 
           if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-            switch (quest.questType.Value)
+            switch (quest)
             {
-              case 3:
-                marker.HasQuest = ((ItemDeliveryQuest)quest).target.Value == name;
+              case ItemDeliveryQuest itemDeliveryQuest:
+                marker.HasQuest = itemDeliveryQuest.target.Value == name;
                 break;
-              case 4:
-                marker.HasQuest = ((SlayMonsterQuest)quest).target.Value == name;
+              case SlayMonsterQuest slayMonsterQuest:
+                marker.HasQuest = slayMonsterQuest.target.Value == name;
                 break;
-              case 7:
-                marker.HasQuest = ((FishingQuest)quest).target.Value == name;
+              case FishingQuest fishingQuest:
+                marker.HasQuest = fishingQuest.target.Value == name;
                 break;
-              case 10:
-                marker.HasQuest = ((ResourceCollectionQuest)quest).target.Value == name;
+              case ResourceCollectionQuest resourceCollectionQuest:
+                marker.HasQuest = resourceCollectionQuest.target.Value == name;
                 break;
             }
         }
