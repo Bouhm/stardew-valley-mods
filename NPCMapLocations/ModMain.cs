@@ -369,10 +369,6 @@ namespace NPCMapLocations
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
     }
-    private void Multiplayer_PeerContextReceived(object sender, PeerContextReceivedEventArgs e)
-    {
-
-    }
 
     // Handle any checks that need to be made per day
     private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
@@ -468,11 +464,7 @@ namespace NPCMapLocations
         }
 
         UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
-      }
 
-      // One-second tick
-      if (e.IsOneSecond)
-      {
         // Sync multiplayer data
         if (Context.IsMainPlayer && Context.IsMultiplayer)
         {
@@ -480,7 +472,8 @@ namespace NPCMapLocations
 
           foreach (var npcMarker in NpcMarkers)
           {
-            syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker() {
+            syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker()
+            {
               DisplayName = npcMarker.Value.DisplayName,
               LocationName = npcMarker.Value.LocationName,
               MapX = npcMarker.Value.MapX,
@@ -492,7 +485,11 @@ namespace NPCMapLocations
 
           Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new string[] { ModManifest.UniqueID });
         }
+      }
 
+      // One-second tick
+      if (e.IsOneSecond)
+      {
         // Check season change (for when it's changed via console)
         if (Globals.UseSeasonalMaps && (MapSeason != null && MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
         {
@@ -653,7 +650,7 @@ namespace NPCMapLocations
       if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
 
       isModMapOpen = true;
-      UpdateNpcs(true);
+
       var pages = Helper.Reflection
         .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
 
@@ -675,7 +672,7 @@ namespace NPCMapLocations
       {
         if (!Context.IsMultiplayer || Context.IsMainPlayer)
         {
-          UpdateNpcs(forceUpdate);
+          UpdateNpcs();
         }
         else
         {
@@ -688,7 +685,7 @@ namespace NPCMapLocations
     }
 
     // Update NPC marker data and names on hover
-    private void UpdateNpcs(bool forceUpdate = false)
+    private void UpdateNpcs()
     {
       if (NpcMarkers == null) return;
 
