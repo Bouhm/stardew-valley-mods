@@ -139,7 +139,7 @@ namespace NPCMapLocations
       // Positions relative to the map are not.
 
       center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-        Game1.player.getTileY(), Customizations.MapVectors, true);
+        Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist, true);
 
       // Player in unknown location, use previous location as center
       if (center.Equals(ModMain.UNKNOWN) && prevCenter != null)

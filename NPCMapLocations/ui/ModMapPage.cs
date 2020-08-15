@@ -473,7 +473,7 @@ namespace NPCMapLocations
       else
       {
         Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-          Game1.player.getTileY(), Customizations.MapVectors, true);
+          Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist, true);
 
         Game1.player.FarmerRenderer.drawMiniPortrat(b,
           new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,

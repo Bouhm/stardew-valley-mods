@@ -222,5 +222,6 @@
       "Height": 71,
       "PrimaryText": "Town East"
     }
-  }
+  },
+  "LocationBlacklist": [ "Claire_WarpRoom" ]
 }

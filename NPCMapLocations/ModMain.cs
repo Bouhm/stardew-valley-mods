@@ -245,7 +245,8 @@ namespace NPCMapLocations
           "Farm", // Get building position in farm
           building.tileX.Value,
           building.tileY.Value,
-          Customizations.MapVectors
+          Customizations.MapVectors,
+          Customizations.LocationBlacklist
         );
 
         // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
@@ -789,7 +790,7 @@ namespace NPCMapLocations
         if (locationName != null)
         {
           // Get center of NPC marker
-          var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors);
+          var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist);
           npcMarker.MapX = (int)npcLocation.X - 16;
           npcMarker.MapY = (int)npcLocation.Y - 15;
         }
@@ -882,8 +883,13 @@ namespace NPCMapLocations
         }
 
         var farmerId = farmer.UniqueMultiplayerID;
-        var farmerLoc = LocationToMap(locationName,
-          farmer.getTileX(), farmer.getTileY(), Customizations.MapVectors);
+        var farmerLoc = LocationToMap(
+          locationName,
+          farmer.getTileX(),
+          farmer.getTileY(),
+          Customizations.MapVectors,
+          Customizations.LocationBlacklist
+        );
 
         if (FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
         {
@@ -923,8 +929,10 @@ namespace NPCMapLocations
     // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
     // Requires MapModConstants and modified map page in /maps
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-      Dictionary<string, MapVector[]> CustomMapVectors = null, bool isPlayer = false)
+      Dictionary<string, MapVector[]> CustomMapVectors = null, List<string> LocationBlacklist = null, bool isPlayer = false)
     {
+      if (LocationBlacklist != null && LocationBlacklist.Contains(locationName)) return UNKNOWN;
+
       if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
 
       if (locationName.StartsWith("UndergroundMine"))
@@ -956,7 +964,7 @@ namespace NPCMapLocations
           var doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
           // Slightly adjust warp location to depict being inside the building 
-          var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, isPlayer);
+          var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, LocationBlacklist, isPlayer);
           return new Vector2(warpPos.X + 1, warpPos.Y - 8);
         }
       }

@@ -21,6 +21,7 @@ namespace NPCMapLocations
     public Dictionary<string, MapVector[]> MapVectors { get; set; }
     public Dictionary<string, string> Names { get; set; }
     public Dictionary<string, CustomLocation> Locations { get; set; }
+    public List<string> LocationBlacklist { get; set; }
     public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapsPath { get; set; }
@@ -145,6 +146,7 @@ namespace NPCMapLocations
       LoadMarkerCropOffsets();
       LoadCustomNpcs();
       LoadCustomMapLocations();
+      LocationBlacklist = CustomData.LocationBlacklist;
     }
 
     private void LoadTooltips()
@@ -306,5 +308,6 @@ namespace NPCMapLocations
   {
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
     public Dictionary<string, JObject> CustomMapTooltips { get; set; } = new Dictionary<string, JObject>();
+    public List<string> LocationBlacklist { get; set; } = new List<string>();
   }
 }
