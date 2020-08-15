@@ -522,7 +522,7 @@ namespace NPCMapLocations
           Minimap.Update();
         }
 
-        UpdateMarkers(updateForMinimap);
+        UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
       }
 
       // One-second tick
