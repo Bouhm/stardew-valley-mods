@@ -412,6 +412,7 @@ namespace NPCMapLocations
           if (marker.Sprite == null
             || ModMain.Globals.NpcBlacklist.Contains(name)
             || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
+            || (ConditionalNpcs.ContainsKey(name) && !ConditionalNpcs[name])
           )
           {
             continue;

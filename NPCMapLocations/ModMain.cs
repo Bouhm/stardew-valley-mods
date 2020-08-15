@@ -134,17 +134,12 @@ namespace NPCMapLocations
       // Disable for multiplayer for anti-cheat
       DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
 
-      // NPCs should be unlocked before showing
-      ConditionalNpcs = new Dictionary<string, bool>
+      // NPCs that player should meet before being shown
+      ConditionalNpcs = new Dictionary<string, bool>();
+      foreach (var npcName in ModConstants.ConditionalNpcs)
       {
-        {"Dwarf", false},
-        {"Kent", false},
-        {"Krobus", false},
-        {"Marlon", false},
-        {"Merchant", false},
-        {"Sandy", false},
-        {"Wizard", false}
-      };
+        ConditionalNpcs[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
+      }
 
       MapVectors = ModConstants.MapVectors;
 
@@ -200,7 +195,7 @@ namespace NPCMapLocations
     {
       return
         !ModConstants.ExcludedNpcs.Contains(npc.Name)
-        && npc.GetType().GetProperty("NPC") == null // For other developers to always exclude an npc"
+        && npc.GetType().GetProperty("ExcludeFromMap") == null // For other developers to always exclude an npc"
         && (
           npc.isVillager()
           | npc.isMarried()
@@ -382,59 +377,9 @@ namespace NPCMapLocations
     // Handle any checks that need to be made per day
     private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
     {
-      var npcEntries = ConditionalNpcs != null ? new Dictionary<string, bool>(ConditionalNpcs) : new Dictionary<string, bool>(new Dictionary<string, bool>
-      {
-        {"Dwarf", false},
-        {"Kent", false},
-        {"Krobus", false},
-        {"Marlon", false},
-        {"Merchant", false},
-        {"Sandy", false},
-        {"Wizard", false}
-      });
-
-      // Characters that are not always available, for avoiding spoilers
-      foreach (var npc in npcEntries)
-      {
-        var name = npc.Key;
-        try
-        {
-          switch (name)
-          {
-            case "Dwarf":
-              // Marlon cutscene when first entering mines
-              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
-              break;
-            case "Kent":
-              // Kent returns year 2
-              ConditionalNpcs[name] = Game1.year >= 2;
-              break;
-            case "Krobus":
-              // Rusty Key which unlocks sewer
-              ConditionalNpcs[name] = Game1.MasterPlayer.hasRustyKey;
-              break;
-            case "Marlon":
-              // Marlon cutscene when first entering mines
-              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(100162);
-              break;
-            case "Merchant":
-              // Merchant schedule
-              ConditionalNpcs[name] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
-              break;
-            case "Sandy":
-              // When player meets Sandy for the first time
-              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(67);
-              break;
-            case "Wizard":
-              // Scene for unlocking wizard
-              ConditionalNpcs[name] = Game1.MasterPlayer.eventsSeen.Contains(112);
-              break;
-          }
-        }
-        catch
-        {
-          ConditionalNpcs[name] = false;
-        }
+      // Check for travelining merchant day
+      if (ConditionalNpcs.ContainsKey("Merchant") && ConditionalNpcs["Merchant"]) {
+        ConditionalNpcs["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
       }
 
       ResetMarkers();
@@ -564,6 +509,14 @@ namespace NPCMapLocations
           }
 
           Minimap?.UpdateMapForSeason();
+        }
+
+        // Check if conditional NPCs have been talked to
+        foreach (var npcName in ModConstants.ConditionalNpcs)
+        {
+          if (ConditionalNpcs[npcName]) continue;
+          
+          ConditionalNpcs[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
         }
       }
 

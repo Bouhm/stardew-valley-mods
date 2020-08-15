@@ -402,6 +402,7 @@ namespace NPCMapLocations
               || !IsWithinMapArea(marker.MapX, marker.MapY)
               || ModMain.Globals.NpcBlacklist.Contains(name)
               || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
+              || (ConditionalNpcs.ContainsKey(name) && !ConditionalNpcs[name])
           )
             continue;
 
