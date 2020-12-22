@@ -22,6 +22,9 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		MouseUtil\MouseUtil.projitems*{07f48e86-0bad-4dce-a967-7f42a8bd3d13}*SharedItemsImports = 13
+		LocationUtil\LocationUtil.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
+		MouseUtil\MouseUtil.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
+		LocationUtil\LocationUtil.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
 		LocationUtil\LocationUtil.projitems*{b5722eef-6c91-400d-b644-9fac63fe2777}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

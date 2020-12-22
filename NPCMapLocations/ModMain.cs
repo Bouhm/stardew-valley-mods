@@ -23,7 +23,7 @@ namespace NPCMapLocations
     public static Texture2D Map;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
 
-    private Texture2D BuildingMarkers;
+    private Texture2D BuildingMarkers;  
     private Dictionary<string, MapVector[]> MapVectors;
     private ModMinimap Minimap;
     private Dictionary<string, NpcMarker> NpcMarkers;
