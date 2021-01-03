@@ -16,6 +16,7 @@ namespace NPCMapLocations
     private readonly bool drawPamHouseUpgrade;
     private readonly bool drawMovieTheaterJoja;
     private readonly bool drawMovieTheater;
+    private readonly bool drawIsland;
     private readonly Dictionary<long, FarmerMarker> FarmerMarkers;
     private readonly ModCustomizations Customizations;
 
@@ -56,6 +57,7 @@ namespace NPCMapLocations
       drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
       drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
       drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
+      drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
 
       mmX = ModMain.Config.MinimapX;
       mmY = ModMain.Config.MinimapY;
@@ -317,8 +319,14 @@ namespace NPCMapLocations
              0f,
             Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
+        case 6:
+          b.Draw(ModMain.Map, new Vector2(farmX, farmY + 172),
+            new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color,
+            0f,
+            Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
       }
-
+        
       if (drawPamHouseUpgrade)
       {
         var houseLoc = ModMain.LocationToMap("Trailer_Big");
@@ -337,6 +345,11 @@ namespace NPCMapLocations
             new Rectangle(275, 181, 15, 11), color,
             0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         }
+      }      
+
+      if (drawIsland)
+      {
+        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 1020), NormalizeToMap(offsetMmLoc.Y + 560)), new Rectangle(208, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       //

@@ -35,6 +35,7 @@ namespace NPCMapLocations
     private bool drawPamHouseUpgrade;
     private bool drawMovieTheaterJoja;
     private bool drawMovieTheater;
+    private bool drawIsland;
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
@@ -59,6 +60,8 @@ namespace NPCMapLocations
       drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
       drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
       drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
+      drawIsland = true;
+      // drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
       mapX = (int)center.X;
       mapY = (int)center.Y;
 
@@ -335,6 +338,9 @@ namespace NPCMapLocations
         case 5:
           b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
+        case 6:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
       }
 
       if (drawPamHouseUpgrade)
@@ -352,6 +358,11 @@ namespace NPCMapLocations
           new Rectangle(275, 181, 15, 11), Color.White,
           0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         
+      }
+
+      if (drawIsland)
+      {
+        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), new Rectangle(208, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
