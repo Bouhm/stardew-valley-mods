@@ -38,8 +38,8 @@ namespace NPCMapLocations
     private static List<long> playerIds;
 
     // Customizations/Custom mods
-    private static string MapSeason;
-    private static ModCustomizations Customizations;
+    private string MapSeason;
+    private ModCustomizations Customizations;
 
     // Debugging
     private static bool DEBUG_MODE;
@@ -110,11 +110,7 @@ namespace NPCMapLocations
     {
       Config = Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
-      if (Context.IsMainPlayer)
-      {
-        playerIds = new List<long>();
-      }
-      else if (!Context.IsMainPlayer)
+      if (!Context.IsMainPlayer)
       {
         // Determine host ID
         foreach (IMultiplayerPeer peer in Helper.Multiplayer.GetConnectedPlayers())
@@ -490,7 +486,7 @@ namespace NPCMapLocations
         UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
         // Sync multiplayer data
-        if (Context.IsMainPlayer && Context.IsMultiplayer)
+        if (Context.IsMainPlayer && Context.IsMultiplayer && playerIds != null)
         {
           var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
 
@@ -561,6 +557,22 @@ namespace NPCMapLocations
         OpenModMap();
     }
 
+    private void Multiplayer_PeerDisconnected(object sender, PeerDisconnectedEventArgs e)
+    {
+      // Remove disconnected peer's ID from list if exists
+      if (Context.IsMainPlayer && Context.IsMultiplayer)
+      {
+        playerIds.Remove(e.Peer.PlayerID);
+
+        if (playerIds.Count == 0)
+        {
+          // Set list to null and stop listening to disconnections
+          playerIds = null;
+          Helper.Events.Multiplayer.PeerDisconnected -= Multiplayer_PeerDisconnected;
+        }
+      }
+    }
+
     private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
       if (e.FromModID == ModManifest.UniqueID)
@@ -572,7 +584,9 @@ namespace NPCMapLocations
             {
               if (playerIds == null)
               {
-                playerIds = new List<long>();
+                // Instantiate list and listen to player disconnects
+                playerIds = new List<long>(3);
+                Helper.Events.Multiplayer.PeerDisconnected += Multiplayer_PeerDisconnected;
               }
               playerIds.Add(e.FromPlayerID);
 
