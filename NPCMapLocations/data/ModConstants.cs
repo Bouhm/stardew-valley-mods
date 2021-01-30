@@ -19,6 +19,7 @@ public static class ModConstants
     {
         {"Abigail", 3},
         {"Alex", 0},
+        {"Birdie", 6},
         {"Caroline", 2},
         {"Clint", -1},
         {"Demetrius", -2},
@@ -36,6 +37,7 @@ public static class ModConstants
         {"Kent", -1},
         {"Krobus", 0},
         {"Leah", 2},
+        {"Leo", 6},
         {"Lewis", 1},
         {"Linus", 6},
         {"Marlon", 2},
@@ -61,6 +63,7 @@ public static class ModConstants
       "Mister Qi",
       "Bouncer",
       "Henchman",
+      "Birdie",
       // "Gunther",
       // "Krobus",
       // "Dusty"
@@ -76,6 +79,7 @@ public static class ModConstants
       "Merchant", 
       "Sandy", 
       "Wizard",
+      "Leo",
   };
 
   // tileX and TileY (the first two values) are tile positions in the game for that location
@@ -188,11 +192,11 @@ public static class ModConstants
           }
       },
       {
-        "BeachNightMarket", new MapVector[]
-        {
-          new MapVector(726, 541, 0, 0),
-          new MapVector(997, 688, 104, 50)
-        }
+          "BeachNightMarket", new MapVector[]
+          {
+            new MapVector(726, 541, 0, 0),
+            new MapVector(997, 688, 104, 50)
+          }
       },
       {
           "LonelyStone", new MapVector[]
@@ -255,6 +259,52 @@ public static class ModConstants
           "WizardHouseBasement", new MapVector[]
           {
               new MapVector(263, 447),
+          }
+      },
+      {
+          "IslandSouth", new MapVector[]
+          {
+              new MapVector(1114, 676, 0, 10),
+              new MapVector(1140, 696, 42, 30),
+          }
+      },
+      {
+          "IslandSouthEast", new MapVector[]
+          {
+              new MapVector(1142, 678, 0, 0),
+              new MapVector(1167, 706, 34, 34),
+          }
+      },
+      {
+          "IslandEast", new MapVector[]
+          {
+              new MapVector(1166, 662),
+          }
+      },
+      {
+          "IslandShrine", new MapVector[]
+          {
+              new MapVector(1182, 652),
+          }
+      },
+      {
+          "IslandWest", new MapVector[]
+          {
+              new MapVector(1030, 660, 14, 4),
+              new MapVector(1105, 700, 108, 89),
+          }
+      },
+      {
+          "IslandNorth", new MapVector[]
+          {
+              new MapVector(1090, 615, 0, 0),
+              new MapVector(1156, 670, 69, 89),
+          }
+      },
+      {
+          "GingerIsland", new MapVector[]
+          {
+              new MapVector(1110, 640),
           }
       },
     };
