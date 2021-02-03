@@ -127,6 +127,7 @@ namespace NPCMapLocations
       // Load customizations
       // Initialize these early for multiplayer sync
       NpcMarkers.Value = new Dictionary<string, NpcMarker>();
+      FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
       Customizations = new ModCustomizations();
       Customizations.LoadCustomData();
 
