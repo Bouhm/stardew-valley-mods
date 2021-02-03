@@ -23,6 +23,8 @@ namespace NPCMapLocations
     public static IMonitor IMonitor;
     public static Texture2D Map;
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
+    private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+
 
     private readonly PerScreen<Texture2D> BuildingMarkers = new PerScreen<Texture2D>();
     private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new PerScreen<Dictionary<string, MapVector[]>>();
@@ -43,7 +45,6 @@ namespace NPCMapLocations
 
     // Debugging
     private static bool DEBUG_MODE;
-    private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
     private static List<string> alertFlags;
 
     // Replace game map with modified mapinit
@@ -674,11 +675,11 @@ namespace NPCMapLocations
                   {
                     if (name == "Leo")
                     {
-                      npcMarker.Sprite = new AnimatedSprite($"Characters\\ParrotBoy", 0, 16, 32).Texture;
+                      newMarker.Sprite = new AnimatedSprite($"Characters\\ParrotBoy", 0, 16, 32).Texture;
                     }
                     else
                     {
-                      npcMarker.Sprite = new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
+                      newMarker.Sprite = new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
                     }
                   }
                   else
@@ -691,7 +692,6 @@ namespace NPCMapLocations
                 {
                   newMarker.Sprite = null;
                 }
-
 
                 NpcMarkers.Value.Add(syncedMarker.Key, newMarker);
               }
