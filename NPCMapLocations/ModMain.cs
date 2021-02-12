@@ -447,9 +447,10 @@ namespace NPCMapLocations
 
           if (!NpcMarkers.Value.ContainsKey(npc.Name))
           {
+            var displayName = (npc.displayName != null && Game1.IsEnglish()) ? npc.displayName : npc.Name;
             var newMarker = new NpcMarker()
             {
-              DisplayName = npc.displayName ?? npc.Name,
+              DisplayName = displayName,
               CropOffset = offset,
               IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
               Type = type
