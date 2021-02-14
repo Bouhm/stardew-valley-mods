@@ -60,7 +60,6 @@ namespace NPCMapLocations
       drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
       drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
       drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
-      //drawIsland = true;
       drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
       mapX = (int)center.X;
       mapY = (int)center.Y;
@@ -369,7 +368,7 @@ namespace NPCMapLocations
 
       if (drawIsland)
       {
-        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), new Rectangle(208, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), new Rectangle(248, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
