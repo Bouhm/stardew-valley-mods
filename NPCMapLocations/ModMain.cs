@@ -1001,7 +1001,7 @@ namespace NPCMapLocations
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
       Dictionary<string, MapVector[]> CustomMapVectors = null, List<string> LocationBlacklist = null, bool isPlayer = false)
     {
-      if (LocationBlacklist != null && LocationBlacklist.Contains(locationName)) return UNKNOWN;
+      if ((LocationBlacklist != null && LocationBlacklist.Contains(locationName)) || locationName.Contains("WarpRoom")) return UNKNOWN;
 
       if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
 
