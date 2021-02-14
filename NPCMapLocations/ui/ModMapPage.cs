@@ -35,6 +35,7 @@ namespace NPCMapLocations
     private bool drawPamHouseUpgrade;
     private bool drawMovieTheaterJoja;
     private bool drawMovieTheater;
+    private bool drawIsland;
 
     // Map menu that uses modified map page and modified component locations for hover
     public ModMapPage(
@@ -44,8 +45,8 @@ namespace NPCMapLocations
       Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
       Texture2D buildingMarkers,
       ModCustomizations customizations
-    ) : base(Game1.viewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
-      Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
+    ) : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
+      Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
       600 + IClickableMenu.borderWidth * 2)
     {
       this.NpcMarkers = npcMarkers;
@@ -59,6 +60,7 @@ namespace NPCMapLocations
       drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
       drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
       drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
+      drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
       mapX = (int)center.X;
       mapY = (int)center.Y;
 
@@ -123,7 +125,7 @@ namespace NPCMapLocations
 
     public override void performHoverAction(int x, int y)
     {
-      var f = points;
+      //var f = points;
       hoveredLocationText = "";
       hoveredNames = "";
       hasIndoorCharacter = false;
@@ -154,11 +156,15 @@ namespace NPCMapLocations
           if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
               Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
           {
-            if (!npcMarker.Value.IsHidden && !(npcMarker.Value.Type == Character.Horse))
+            if (!npcMarker.Value.IsHidden) //&& !(npcMarker.Value.Type == Character.Horse))
             {
               if (Customizations.Names.TryGetValue(npcMarker.Key, out var name))
               {
                 hoveredList.Add(name);
+              }
+              else if (npcMarker.Value.Type == Character.Horse)
+              {
+                hoveredList.Add(npcMarker.Key);
               }
             }
 
@@ -222,43 +228,41 @@ namespace NPCMapLocations
 
       if (!hoveredLocationText.Equals(""))
       {
-        IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1,
-          -1, -1, 1f, null);
         int textLength = (int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2;
         width = Math.Max((int)Game1.smallFont.MeasureString(hoveredLocationText).X + Game1.tileSize / 2, textLength);
         height = (int)Math.Max(60, Game1.smallFont.MeasureString(hoveredLocationText).Y + 5 * Game1.tileSize / 8);
-        if (x + width > Game1.viewport.Width)
+        if (x + width > Game1.uiViewport.Width)
         {
-          x = Game1.viewport.Width - width;
+          x = Game1.uiViewport.Width - width;
           y += Game1.tileSize / 4;
         }
 
         if (ModMain.Config.NameTooltipMode == 1)
         {
-          if (y + height > Game1.viewport.Height)
+          if (y + height > Game1.uiViewport.Height)
           {
             x += Game1.tileSize / 4;
-            y = Game1.viewport.Height - height;
+            y = Game1.uiViewport.Height - height;
           }
 
           offsetY = 2 - Game1.tileSize;
         }
         else if (ModMain.Config.NameTooltipMode == 2)
         {
-          if (y + height > Game1.viewport.Height)
+          if (y + height > Game1.uiViewport.Height)
           {
             x += Game1.tileSize / 4;
-            y = Game1.viewport.Height - height;
+            y = Game1.uiViewport.Height - height;
           }
 
           offsetY = height - 4;
         }
         else
         {
-          if (y + height > Game1.viewport.Height)
+          if (y + height > Game1.uiViewport.Height)
           {
             x += Game1.tileSize / 4;
-            y = Game1.viewport.Height - height;
+            y = Game1.uiViewport.Height - height;
           }
         }
 
@@ -266,6 +270,10 @@ namespace NPCMapLocations
         DrawNames(b, hoveredNames, x, y, offsetY, height, ModMain.Config.NameTooltipMode);
 
         // Draw location tooltip
+        IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont);
+        //IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1,
+        //-1, -1, 1f, null);
+        /*
         IClickableMenu.drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height,
           Color.White, 1f, false);
         b.DrawString(Game1.smallFont, hoveredLocationText,
@@ -279,6 +287,7 @@ namespace NPCMapLocations
           Game1.textShadowColor);
         b.DrawString(Game1.smallFont, hoveredLocationText,
           new Vector2((float)(x + Game1.tileSize / 4), (float)(y + Game1.tileSize / 4 + 4)), Game1.textColor * 0.9f);
+          */
       }
       else
       {
@@ -335,6 +344,9 @@ namespace NPCMapLocations
         case 5:
           b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
+        case 6:
+          b.Draw(ModMain.Map, new Vector2(mapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+          break;
       }
 
       if (drawPamHouseUpgrade)
@@ -352,6 +364,11 @@ namespace NPCMapLocations
           new Rectangle(275, 181, 15, 11), Color.White,
           0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         
+      }
+
+      if (drawIsland)
+      {
+        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), new Rectangle(248, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
@@ -505,9 +522,9 @@ namespace NPCMapLocations
 
         // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
         // without the cursor covering the tooltip
-        if (x + width > Game1.viewport.Width)
+        if (x + width > Game1.uiViewport.Width)
         {
-          x = Game1.viewport.Width - width;
+          x = Game1.uiViewport.Width - width;
           if (lines.Length > 1)
           {
             y += relocate - 8 + ((int)Game1.smallFont.MeasureString(names).Y) + Game1.tileSize / 2;
@@ -521,13 +538,13 @@ namespace NPCMapLocations
       else if (nameTooltipMode == 2)
       {
         y += offsetY;
-        if (x + width > Game1.viewport.Width)
+        if (x + width > Game1.uiViewport.Width)
         {
-          x = Game1.viewport.Width - width;
+          x = Game1.uiViewport.Width - width;
         }
 
         // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
-        if (y + height > Game1.viewport.Height)
+        if (y + height > Game1.uiViewport.Height)
         {
           x = Game1.getOldMouseX() + Game1.tileSize / 2;
           if (lines.Length > 1)
@@ -836,43 +853,51 @@ namespace NPCMapLocations
     }
     /// <summary>Get the ModMain.Map points to display on a map.</summary>
     /// vanilla locations that have to be tweaked to match modified map
-    private Dictionary<string, Rectangle> RegionRects() => new Dictionary<string, Rectangle>()
+    private Dictionary<string, Rectangle> RegionRects()
     {
-      {"Desert_Region", new Rectangle(-1, -1, 261, 175)},
-      {"Farm_Region", new Rectangle(-1, -1, 188, 148)},
-      {"Backwoods_Region", new Rectangle(-1, -1, 148, 120)},
-      {"BusStop_Region", new Rectangle(-1, -1, 76, 100)},
-      {"WizardHouse", new Rectangle(-1, -1, 36, 76)},
-      {"AnimalShop", new Rectangle(-1, -1, 76, 40)},
-      {"LeahHouse", new Rectangle(-1, -1, 32, 24)},
-      {"SamHouse", new Rectangle(-1, -1, 36, 52)},
-      {"HaleyHouse", new Rectangle(-1, -1, 40, 36)},
-      {"TownSquare", new Rectangle(-1, -1, 48, 45)},
-      {"Hospital", new Rectangle(-1, -1, 16, 32)},
-      {"SeedShop", new Rectangle(-1, -1, 28, 40)},
-      {"Blacksmith", new Rectangle(-1, -1, 80, 36)},
-      {"Saloon", new Rectangle(-1, -1, 28, 40)},
-      {"ManorHouse", new Rectangle(-1, -1, 44, 56)},
-      {"ArchaeologyHouse", new Rectangle(-1, -1, 32, 28)},
-      {"ElliottHouse", new Rectangle(-1, -1, 28, 20)},
-      {"Sewer", new Rectangle(-1, -1, 24, 20)},
-      {"Graveyard", new Rectangle(-1, -1, 40, 32)},
-      {"Trailer", new Rectangle(-1, -1, 20, 12)},
-      {"JoshHouse", new Rectangle(-1, -1, 36, 36)},
-      {"ScienceHouse", new Rectangle(-1, -1, 48, 32)},
-      {"Tent", new Rectangle(-1, -1, 12, 16)},
-      {"Mine", new Rectangle(-1, -1, 16, 24)},
-      {"AdventureGuild", new Rectangle(-1, -1, 32, 36)},
-      {"Quarry", new Rectangle(-1, -1, 88, 76)},
-      {"JojaMart", new Rectangle(-1, -1, 52, 52)},
-      {"FishShop", new Rectangle(-1, -1, 36, 40)},
-      {"Spa", new Rectangle(-1, -1, 48, 36)},
-      {"Woods", new Rectangle(-1, -1, 196, 176)},
-      {"RuinedHouse", new Rectangle(-1, -1, 20, 20)},
-      {"CommunityCenter", new Rectangle(-1, -1, 44, 36)},
-      {"SewerPipe", new Rectangle(-1, -1, 24, 32)},
-      {"Railroad_Region", new Rectangle(-1, -1, 180, 69)},
-      {"LonelyStone", new Rectangle(-1, -1, 28, 28)},
-    };
+      var rects = new Dictionary<string, Rectangle>()
+      {
+        {"Desert_Region", new Rectangle(-1, -1, 261, 175)},
+        {"Farm_Region", new Rectangle(-1, -1, 188, 148)},
+        {"Backwoods_Region", new Rectangle(-1, -1, 148, 120)},
+        {"BusStop_Region", new Rectangle(-1, -1, 76, 100)},
+        {"WizardHouse", new Rectangle(-1, -1, 36, 76)},
+        {"AnimalShop", new Rectangle(-1, -1, 76, 40)},
+        {"LeahHouse", new Rectangle(-1, -1, 32, 24)},
+        {"SamHouse", new Rectangle(-1, -1, 36, 52)},
+        {"HaleyHouse", new Rectangle(-1, -1, 40, 36)},
+        {"TownSquare", new Rectangle(-1, -1, 48, 45)},
+        {"Hospital", new Rectangle(-1, -1, 16, 32)},
+        {"SeedShop", new Rectangle(-1, -1, 28, 40)},
+        {"Blacksmith", new Rectangle(-1, -1, 80, 36)},
+        {"Saloon", new Rectangle(-1, -1, 28, 40)},
+        {"ManorHouse", new Rectangle(-1, -1, 44, 56)},
+        {"ArchaeologyHouse", new Rectangle(-1, -1, 32, 28)},
+        {"ElliottHouse", new Rectangle(-1, -1, 28, 20)},
+        {"Sewer", new Rectangle(-1, -1, 24, 20)},
+        {"Graveyard", new Rectangle(-1, -1, 40, 32)},
+        {"Trailer", new Rectangle(-1, -1, 20, 12)},
+        {"JoshHouse", new Rectangle(-1, -1, 36, 36)},
+        {"ScienceHouse", new Rectangle(-1, -1, 48, 32)},
+        {"Tent", new Rectangle(-1, -1, 12, 16)},
+        {"Mine", new Rectangle(-1, -1, 16, 24)},
+        {"AdventureGuild", new Rectangle(-1, -1, 32, 36)},
+        {"Quarry", new Rectangle(-1, -1, 88, 76)},
+        {"JojaMart", new Rectangle(-1, -1, 52, 52)},
+        {"FishShop", new Rectangle(-1, -1, 36, 40)},
+        {"Spa", new Rectangle(-1, -1, 48, 36)},
+        {"Woods", new Rectangle(-1, -1, 196, 176)},
+        {"RuinedHouse", new Rectangle(-1, -1, 20, 20)},
+        {"CommunityCenter", new Rectangle(-1, -1, 44, 36)},
+        {"SewerPipe", new Rectangle(-1, -1, 24, 32)},
+        {"Railroad_Region", new Rectangle(-1, -1, 180, 69)},
+        {"LonelyStone", new Rectangle(-1, -1, 28, 28)},
+      };
+      if (drawIsland)
+      {
+        rects.Add("GingerIsland", new Rectangle(-1, -1, 180, 160));
+      }
+      return rects;
+    }
   }
 }

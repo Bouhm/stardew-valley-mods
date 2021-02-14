@@ -10,5 +10,6 @@
   "ShowHorse": true,
   "CustomNpcMarkerOffsets": {},
   "NpcBlackList": [],
-  "DEBUG_MODE": false
+  "UseDetailedIsland": true,
+  "DEBUG_MODE": true
 }
