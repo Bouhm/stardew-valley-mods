@@ -368,7 +368,13 @@ namespace NPCMapLocations
 
       if (drawIsland)
       {
-        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), new Rectangle(248, 363, 45, 40), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        var islandRect = new Rectangle(208, 363, 40, 30);
+        if (ModMain.Globals.UseDetailedIsland)
+        {
+          islandRect = new Rectangle(248, 363, 45, 40);
+        }
+
+        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
