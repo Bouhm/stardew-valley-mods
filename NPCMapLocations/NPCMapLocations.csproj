@@ -3,12 +3,17 @@
   <PropertyGroup>
     <AssemblyName>NPCMapLocations</AssemblyName>
     <RootNamespace>NPCMapLocations</RootNamespace>
-    <Version>2.5.5</Version>
+    <Version>2.5.12</Version>
     <TargetFramework>net452</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,9 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config\globals_sve.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
     <None Update="maps\acerbicon.recolor\buildings.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -1,6 +1,6 @@
 {
   "UseSeasonalMaps": true,
-  "MinimapBlacklist": [],
+  "MinimapExclusions": [],
   "MenuKey": "Tab",
   "TooltipKey": "Space",
   "MinimapDragKey": "LeftControl",
@@ -9,7 +9,7 @@
   "ShowChildren": false,
   "ShowHorse": true,
   "CustomNpcMarkerOffsets": {},
-  "NpcBlackList": [],
+  "NpcExclusions": [],
   "UseDetailedIsland": false,
   "DEBUG_MODE": true
 }

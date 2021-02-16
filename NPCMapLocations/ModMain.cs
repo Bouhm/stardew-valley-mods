@@ -12,6 +12,7 @@ using StardewValley.Menus;
 using StardewValley.Quests;
 using StardewValley.Characters;
 using StardewModdingAPI.Utilities;
+using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
@@ -25,7 +26,6 @@ namespace NPCMapLocations
     public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
     private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 
-
     private readonly PerScreen<Texture2D> BuildingMarkers = new PerScreen<Texture2D>();
     private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new PerScreen<Dictionary<string, MapVector[]>>();
     private readonly PerScreen<ModMinimap> Minimap = new PerScreen<ModMinimap>();
@@ -33,6 +33,10 @@ namespace NPCMapLocations
     private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new PerScreen<Dictionary<string, bool>>();
     private readonly PerScreen<bool> hasOpenedMap = new PerScreen<bool>();
     private readonly PerScreen<bool> isModMapOpen = new PerScreen<bool>();
+
+    // External mod settings
+    private readonly string MapPath = @"LooseSprites\Map";
+    private readonly string NPCMapCustomizationsPath = @"Data\NPCMapCustomizations";
 
     // Multiplayer
     private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new PerScreen<Dictionary<long, FarmerMarker>>();
@@ -47,43 +51,56 @@ namespace NPCMapLocations
     private static bool DEBUG_MODE;
     private static List<string> alertFlags;
 
-    // Replace game map with modified mapinit
+    // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
     {
-      return asset.AssetNameEquals(@"LooseSprites\Map") && Customizations != null;
+      return (
+        (asset.AssetNameEquals(MapPath) && Customizations != null) ||
+        (asset.AssetNameEquals(NPCMapCustomizationsPath))
+       );
     }
 
     public T Load<T>(IAssetInfo asset)
     {
-      T map;
-
-      if (MapSeason == null)
+      if (asset.AssetNameEquals(MapPath))
       {
-        Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-        MapSeason = "spring";
+        T map;
+
+        if (MapSeason == null)
+        {
+          Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
+          MapSeason = "spring";
+        }
+
+        if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{MapSeason}_map.png")))
+        {
+          Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+          MapSeason = null; // Set to null so that cache is not invalidate when game season changes
+        }
+
+        // Replace map page 
+        string filename = MapSeason == null ? "spring_map.png" : $"{MapSeason}_map.png";
+
+        bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
+        map = useRecolor
+          ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
+          : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
+
+        if (useRecolor)
+          Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
+
+        return map;
+      }
+      else if (asset.AssetNameEquals(NPCMapCustomizationsPath))
+      {
+        return (T)(object)new Dictionary<string, JObject>();
       }
 
-      if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{MapSeason}_map.png")))
-      {
-        Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
-        MapSeason = null; // Set to null so that cache is not invalidate when game season changes
-      }
-
-      // Replace map page
-      string filename = MapSeason == null ? "spring_map.png" : $"{MapSeason}_map.png";
-
-      bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
-      map = useRecolor
-        ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
-        : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
-
-      if (useRecolor)
-        Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
-
-      return map;
+      return (T)asset;
     }
-
-    public override void Entry(IModHelper helper)
+     
+    
+  public override void Entry(IModHelper helper)
     {
       if (!Context.IsMainPlayer && Context.IsSplitScreen) return;
 
@@ -124,11 +141,13 @@ namespace NPCMapLocations
         }
       }
 
-      // Load customizations
       // Initialize these early for multiplayer sync
       NpcMarkers.Value = new Dictionary<string, NpcMarker>();
       FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
-      Customizations = new ModCustomizations();
+
+      // Load customizations
+      var NPCMapSettings = Helper.Content.Load<Dictionary<string, JObject>>(NPCMapCustomizationsPath, ContentSource.GameContent);
+      Customizations = new ModCustomizations(NPCMapSettings);
       Customizations.LoadCustomData();
 
       // Let host know farmhand is ready to receive updates
@@ -216,7 +235,7 @@ namespace NPCMapLocations
     {
       return
         !ModConstants.ExcludedNpcs.Contains(npc.Name)
-        && npc.GetType().GetProperty("ExcludeFromMap") == null // For other developers to always exclude an npc"
+
         && (
           npc.isVillager()
           | npc.isMarried()

@@ -185,5 +185,5 @@
       "PrimaryText": "Town East"
     }
   },
-  "LocationBlacklist": [ "Claire_WarpRoom" ]
+  "LocationExclusions": [ "Claire_WarpRoom" ]
 }

@@ -369,12 +369,15 @@ namespace NPCMapLocations
       if (drawIsland)
       {
         var islandRect = new Rectangle(208, 363, 40, 30);
+        var mapRect = new Vector2(mapX + 1040, mapY + 600);
+
         if (ModMain.Globals.UseDetailedIsland)
         {
           islandRect = new Rectangle(248, 363, 45, 40);
+          mapRect = new Vector2(mapX + 1020, mapY + 560);
         }
 
-        b.Draw(ModMain.Map, new Vector2(mapX + 1020, mapY + 560), islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        b.Draw(ModMain.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       var playerLocationName = getPlayerLocationNameForMap();
@@ -433,7 +436,7 @@ namespace NPCMapLocations
 
           // Skip if no specified location or should be hidden
           if (marker.Sprite == null
-            || ModMain.Globals.NpcBlacklist.Contains(name)
+            || ModMain.Globals.NpcExclusions.Contains(name)
             || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
             || (ConditionalNpcs.ContainsKey(name) && !ConditionalNpcs[name])
           )
@@ -496,7 +499,7 @@ namespace NPCMapLocations
       else
       {
         Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-          Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist, true);
+          Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationExclusions, true);
 
         Game1.player.FarmerRenderer.drawMiniPortrat(b,
           new Vector2(mapX + playerLoc.X - 16, mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
@@ -750,7 +753,7 @@ namespace NPCMapLocations
         case "Farm":
           if (player.IsLocalPlayer)
           {
-            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", player.farmName);
+            playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11064", player.farmName.Value);
           }
           break;
         case "Forest":

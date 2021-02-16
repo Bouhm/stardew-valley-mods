@@ -350,12 +350,15 @@ namespace NPCMapLocations
       if (drawIsland)
       {
         var islandRect = new Rectangle(208, 363, 40, 30);
+        var mapRect = new Vector2(NormalizeToMap(offsetMmLoc.X + 1040), NormalizeToMap(offsetMmLoc.Y + 600));
+
         if (ModMain.Globals.UseDetailedIsland)
         {
           islandRect = new Rectangle(248, 363, 45, 40);
+          mapRect = new Vector2(NormalizeToMap(offsetMmLoc.X + 1020), NormalizeToMap(offsetMmLoc.Y + 560));
         }
 
-        b.Draw(ModMain.Map, new Vector2(NormalizeToMap(offsetMmLoc.X + 1020), NormalizeToMap(offsetMmLoc.Y + 560)), islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        b.Draw(ModMain.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       //

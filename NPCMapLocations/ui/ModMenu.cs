@@ -483,7 +483,7 @@ namespace NPCMapLocations
       // Villager names
       if (whichOption > 12 && npcMarkers != null)
 			{
-        isChecked = !ModMain.Globals.NpcBlacklist.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
+        isChecked = !ModMain.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
         return;
       }
 
@@ -524,9 +524,9 @@ namespace NPCMapLocations
 			if (whichOption > 12 && npcMarkers != null)
 			{
 				if (isChecked)
-          ModMain.Globals.NpcBlacklist.Remove(npcMarkers.ElementAt(whichOption - 13).Key);
+          ModMain.Globals.NpcExclusions.Remove(npcMarkers.ElementAt(whichOption - 13).Key);
 				else
-          ModMain.Globals.NpcBlacklist.Add(npcMarkers.ElementAt(whichOption - 13).Key);
+          ModMain.Globals.NpcExclusions.Add(npcMarkers.ElementAt(whichOption - 13).Key);
 			}
 			else
 			{

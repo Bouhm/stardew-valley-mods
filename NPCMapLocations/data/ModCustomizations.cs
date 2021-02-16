@@ -14,20 +14,22 @@ namespace NPCMapLocations
   // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
   public class ModCustomizations
   {
-    private readonly HashSet<string> NpcCustomizations;
-    private readonly CustomData CustomData;
     public readonly string MapsRootPath = "maps";
-
     public Dictionary<string, MapVector[]> MapVectors { get; set; }
     public Dictionary<string, string> Names { get; set; }
     public Dictionary<string, CustomLocation> Locations { get; set; }
-    public List<string> LocationBlacklist { get; set; }
+    public List<string> LocationExclusions { get; set; }
     public Dictionary<string, int> NpcMarkerOffsets { get; set; }
     public List<ClickableComponent> Tooltips { get; set; }
     public string MapsPath { get; set; }
 
-    public ModCustomizations()
+    private readonly HashSet<string> NpcCustomizations;
+    private readonly CustomData CustomData;
+    private readonly Dictionary<string, JObject> NPCMapSettings;
+
+    public ModCustomizations(Dictionary<string, JObject> NPCMapSettings)
     {
+      this.NPCMapSettings = NPCMapSettings;
       MapsPath = GetCustomMapFolderName();
       if (MapsPath != null)
         MapsPath = Path.Combine(MapsRootPath, MapsPath);
@@ -40,6 +42,11 @@ namespace NPCMapLocations
       NpcCustomizations = new HashSet<string>();
       Locations = new Dictionary<string, CustomLocation>();
       Tooltips = new List<ClickableComponent>();
+    }
+
+    private void ParseCustomLocations()
+    {
+
     }
 
     // Handles customizations for NPCs
@@ -308,8 +315,9 @@ namespace NPCMapLocations
 
   public class CustomData
   {
+    public List<string> NPCExclusions { get; set; } = new List<string>();
     public Dictionary<string, JObject[]> CustomMapLocations { get; set; } = new Dictionary<string, JObject[]>();
     public Dictionary<string, JObject> CustomMapTooltips { get; set; } = new Dictionary<string, JObject>();
-    public List<string> LocationBlacklist { get; set; } = new List<string>();
+    public List<string> LocationExclusions { get; set; } = new List<string>();
   }
 }
