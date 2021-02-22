@@ -35,7 +35,7 @@ Ideally, the custom location is drawn accurately in proportion onto the map such
 
 ## Creating an accurate map
 
-Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. If you are looking to add just a few buildings or a small area, consider creating a [Content Pack for Content Patcher](https://github.com/Pathoschild/StardewMods/blob/develop/ContentPatcher/docs/author-guide.md#editimage) instead with `"PatchMode": "Overlay"`. Do not **`"Replace"`** the map as it will cause a conflict with NPC Map Locations.
+Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. Mod authors should **`"Replace"`** the map.
 
 In order to draw a custom location accurately, the recommended method is to use the actual tilemap of the custom location and tracing it. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a render of the whole tilemap of the location. Using this as a reference, you can resize and overlay the tilemap to accurately trace it onto the map.
 
