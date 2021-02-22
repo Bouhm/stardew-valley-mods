@@ -35,6 +35,7 @@ namespace NPCMapLocations
       Names = new Dictionary<string, string>();
       MapVectors = new Dictionary<string, MapVector[]>();
       Tooltips = new Dictionary<string, MapTooltip>();
+      LocationExclusions = new HashSet<string>();
     }
 
     public void LoadCustomData(Dictionary<string, JObject> CustomNpcJson, Dictionary<string, JObject> CustomLocationJson)
@@ -58,7 +59,7 @@ namespace NPCMapLocations
         }
         if (location.ContainsKey("Excluded"))
         {
-          if ((bool)location.GetValue("Excluded"))
+          if ((bool) location.GetValue("Excluded"))
           {
             LocationExclusions.Add(locationData.Key);
           }
