@@ -274,7 +274,7 @@ For any custom locations that should be HIDDEN from the map (ex. when a characte
   "Target": "Mods/Bouhm.NPCMapLocations/Locations",
   "Entries": {
     "Claire_WarpRoom": {
-      "Excluded": true
+      "Exclude": true
     }
   }
 }
