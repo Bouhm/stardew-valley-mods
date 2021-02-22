@@ -193,7 +193,7 @@ namespace NPCMapLocations
 
       MapVectors.Value = ModConstants.MapVectors;
 
-      // Add custom map vectors from customlocations.json
+      // Add custom map vectors from content.json
       foreach (var locVectors in Customizations.MapVectors)
       {
         if (MapVectors.Value.TryGetValue(locVectors.Key, out var mapVectors))
@@ -206,13 +206,14 @@ namespace NPCMapLocations
       LocationUtil.GetLocationContexts();
       alertFlags = new List<string>();
 
-      // Log any custom locations not in customlocations.json
+      // Log any custom locations not handled in content.json
       foreach (var locCtx in LocationUtil.LocationContexts)
       {
         if ((locCtx.Value.Root == null && !MapVectors.Value.ContainsKey(locCtx.Key))
           || (locCtx.Value.Root != null && !MapVectors.Value.ContainsKey(locCtx.Value.Root))
         )
         {
+          if (Customizations.LocationExclusions.Contains(locCtx.Key)) return;
           if (!alertFlags.Contains("UnknownLocation:" + locCtx.Key))
           {
             Monitor.Log($"Unknown location: {locCtx.Key}", LogLevel.Debug);

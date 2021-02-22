@@ -17,6 +17,8 @@ namespace NPCMapLocations
 
   public class GlobalConfig
   {
+    public bool DEBUG_MODE { get; set; } = false;
+
     public string MenuKey { get; set; } = "Tab";
     public string TooltipKey { get; set; } = "Space";
     public int NameTooltipMode { get; set; } = 1;
@@ -32,21 +34,13 @@ namespace NPCMapLocations
     public int MinimapY { get; set; } = 12;
     public int MinimapWidth { get; set; } = 75;
     public int MinimapHeight { get; set; } = 45;
-
     public HashSet<string> MinimapExclusions { get; set; } = new HashSet<string>() { };
+
     public bool UseSeasonalMaps { get; set; } = true;
+    public bool UseDetailedIsland { get; set; } = true;
     public bool ShowChildren { get; set; } = false;
     public bool ShowHorse { get; set; } = true;
-    public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public HashSet<string> NpcExclusions { get; set; } = new HashSet<string>() { };
-    public bool UseDetailedIsland { get; set; } = true;
-    public bool DEBUG_MODE { get; set; } = false;
+    public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
   }
-}
-
-public class LocationsConfig
-{
-  public Dictionary<string, MapVector[]> MapVectors = new Dictionary<string, MapVector[]>();
-  public Dictionary<string, MapTooltip> MapTooltips = new Dictionary<string, MapTooltip>();
-  public HashSet<string> LocationExclusions = new HashSet<string>();
 }

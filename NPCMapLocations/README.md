@@ -81,7 +81,7 @@ If multiple folders match, the first one alphabetically which matches more mods 
 
 The folder should include the following files:
 
-- customlocations.json (only if there are custom locations)
+- content.json (only if there are custom locations)
 - spring_map.png
 - fall_map.png (if adding seasonal maps)
 - summer_map.png (if adding seasonal maps)
@@ -106,7 +106,7 @@ NPC Map Locations will try its best to figure out where custom locations are. Ea
 
 ## Adding points
 
-Any custom locations that need tracking need to be included in `maps\customlocations.json`. The format for adding one location is as shown:
+Any custom locations that need tracking need to be included in `maps\content.json`. The format for adding one location is as shown:
 
 ```js
 "LocationName": [
@@ -273,11 +273,11 @@ If the character does not show up in the map in the custom locations, there are 
 
 - The folder containing the custom map is not named correctly
   - You can confirm this by checking the SMAPI console or the [logs](log.smapi.io) and looking for the message that indicates which map NPC Map Locations has loaded.
-- The location is not properly added in `customlocations.json`. It must be added in properly by its exact location name, provided with `DEBUG_MODE` info.
+- The location is not properly added in `content.json`. It must be added in properly by its exact location name, provided with `DEBUG_MODE` info.
 
 ## See also
 
-- [Data file that adds support for Stardew Valley Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/maps/flashShifter.stardewValleyExpandedCP/customlocations.json)
+- [Data file that adds support for Stardew Valley Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/maps/flashShifter.stardewValleyExpandedCP/content.json)
 - [My other mod that also shows characters while inherently supporting all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
 
 ## Get additional help

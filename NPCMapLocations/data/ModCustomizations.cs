@@ -55,9 +55,9 @@ namespace NPCMapLocations
         {
           AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
         }
-        if (location.ContainsKey("Excluded"))
+        if (location.ContainsKey("Exclude"))
         {
-          if ((bool) location.GetValue("Excluded"))
+          if ((bool) location.GetValue("Exclude"))
           {
             LocationExclusions.Add(locationData.Key);
           }
@@ -75,12 +75,14 @@ namespace NPCMapLocations
       foreach (var npcData in customNpcJson)
       {
         var npc = npcData.Value;
-        var gameNpc = Game1.getCharacterFromName(npcData.Key);
 
-        if (npc.ContainsKey("Excluded"))
+        if (npc.ContainsKey("Exclude"))
         {
-          npcExclusions.Add(npcData.Key);
-          continue;
+          if ((bool)npc.GetValue("Exclude"))
+          {
+            npcExclusions.Add(npcData.Key);
+            continue;
+          }
         }
 
         if (npc.ContainsKey("MarkerCropOffset"))
@@ -89,6 +91,7 @@ namespace NPCMapLocations
         }
         else
         {
+          var gameNpc = Game1.getCharacterFromName(npcData.Key);
           if (gameNpc != null)
           {
             // If custom crop offset is not specified, default to 0
