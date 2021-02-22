@@ -316,11 +316,6 @@ For any NPCs that should be HIDDEN from the map, we use the field `Exclude` whic
 After making the changes to the config, make sure to use the [JSON validator](https://json.smapi.io/) to make sure the JSON does not contain any errors.
 If the JSON is valid, you can go into game and test the newly added custom locations on the map. If the JSON is not valid, SMAPI will throw an error and the game will crash.
 
-## See also
-
-- [Data file that adds support for Stardew Valley Expanded locations](https://github.com/Bouhm/stardew-valley-mods/blob/master/NPCMapLocations/maps/flashShifter.stardewValleyExpandedCP/content.json)
-- [My other mod that also shows characters while inherently supporting all custom locations](https://www.nexusmods.com/stardewvalley/mods/3045)
-
 ## Get additional help
 
 Visit [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#using-mods` channel.
