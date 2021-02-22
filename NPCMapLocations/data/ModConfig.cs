@@ -7,12 +7,12 @@ using Newtonsoft.Json.Linq;
 
 namespace NPCMapLocations
 {
-	public class PlayerConfig
-	{
-	  public int ImmersionOption { get; set; } = 1;
-	  public bool ByHeartLevel { get; set; } = false;
-	  public int HeartLevelMin { get; set; } = 0;
-	  public int HeartLevelMax { get; set; } = 12;
+  public class PlayerConfig
+  {
+    public int ImmersionOption { get; set; } = 1;
+    public bool ByHeartLevel { get; set; } = false;
+    public int HeartLevelMin { get; set; } = 0;
+    public int HeartLevelMax { get; set; } = 12;
   }
 
   public class GlobalConfig
@@ -37,9 +37,16 @@ namespace NPCMapLocations
     public bool UseSeasonalMaps { get; set; } = true;
     public bool ShowChildren { get; set; } = false;
     public bool ShowHorse { get; set; } = true;
-    public Dictionary<string, int> CustomNpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
+    public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new Dictionary<string, int>();
     public HashSet<string> NpcExclusions { get; set; } = new HashSet<string>() { };
     public bool UseDetailedIsland { get; set; } = true;
     public bool DEBUG_MODE { get; set; } = false;
   }
+}
+
+public class LocationsConfig
+{
+  public Dictionary<string, MapVector[]> MapVectors = new Dictionary<string, MapVector[]>();
+  public Dictionary<string, MapTooltip> MapTooltips = new Dictionary<string, MapTooltip>();
+  public HashSet<string> LocationExclusions = new HashSet<string>();
 }

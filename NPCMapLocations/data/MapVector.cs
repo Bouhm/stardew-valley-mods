@@ -1,13 +1,17 @@
 // Class for Location Vectors
 // Maps the tileX and tileY in a game location to the location on the map
+using Newtonsoft.Json;
+
 public class MapVector
 {
+  [JsonConstructor]
   public MapVector(int x, int y)
   {
     MapX = x;
     MapY = y;
   }
 
+  [JsonConstructor]
   public MapVector(int x, int y, int tileX, int tileY)
   {
     MapX = x;

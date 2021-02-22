@@ -35,7 +35,7 @@ namespace NPCMapLocations
     private readonly PerScreen<bool> isModMapOpen = new PerScreen<bool>();
 
     // External mod settings
-    private readonly string MapPath = @"LooseSprites\Map";
+    private readonly string MapFilePath = @"LooseSprites\Map";
     private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
     private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
 
@@ -56,7 +56,7 @@ namespace NPCMapLocations
     public bool CanLoad<T>(IAssetInfo asset)
     {
       return (
-        asset.AssetNameEquals(MapPath) ||
+        asset.AssetNameEquals(MapFilePath) ||
         asset.AssetNameEquals(NpcCustomizationsPath) ||
         asset.AssetNameEquals(LocationCustomizationsPath) 
       );
@@ -64,7 +64,7 @@ namespace NPCMapLocations
 
     public T Load<T>(IAssetInfo asset)
     {
-      if (asset.AssetNameEquals(MapPath))
+      if (asset.AssetNameEquals(MapFilePath))
       {
         T map;
 
@@ -77,11 +77,12 @@ namespace NPCMapLocations
         if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{MapSeason}_map.png")))
         {
           Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
-          MapSeason = null; // Set to null so that cache is not invalidate when game season changes
+          MapSeason = null; // Set to null so that cache is not invalidated when game season changes
         }
 
-        // Replace map page 
-        string filename = MapSeason == null ? "spring_map.png" : $"{MapSeason}_map.png";
+        // Replace map page
+        string defaultMapFile = File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
+        string filename = MapSeason == null ? defaultMapFile : $"{MapSeason}_map.png";
 
         bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
         map = useRecolor
@@ -109,6 +110,7 @@ namespace NPCMapLocations
       Helper = helper;
       IMonitor = Monitor;
       Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
+      Customizations = new ModCustomizations();
 
       Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
       Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -147,16 +149,16 @@ namespace NPCMapLocations
       NpcMarkers.Value = new Dictionary<string, NpcMarker>();
       FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
-      // Load customizations
-      var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
-      var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
-      Customizations = new ModCustomizations(NpcSettings, LocationSettings);
-
       // Let host know farmhand is ready to receive updates
       if (Context.IsMultiplayer && !Context.IsMainPlayer)
       {
         Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { ModManifest.UniqueID }, playerIDs: new long[] { hostId });
       }
+
+      // Load customizations
+      var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
+      var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
+      Customizations.LoadCustomData(NpcSettings, LocationSettings);
 
       // Load farm buildings
       try
@@ -165,13 +167,19 @@ namespace NPCMapLocations
       }
       catch
       {
-        BuildingMarkers.Value = null;
+        if (File.Exists(Path.Combine("maps/_default", "buildings.png"))) {
+          BuildingMarkers.Value = Helper.Content.Load<Texture2D>(Path.Combine("maps/_default", "buildings.png"));
+        }
+        else
+        {
+          BuildingMarkers.Value = null;
+        }
       }
 
       // Get season for map
       MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
-      Helper.Content.InvalidateCache("LooseSprites/Map");
-      Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+      Helper.Content.InvalidateCache(MapFilePath);
+      Map = Game1.content.Load<Texture2D>(MapFilePath);
 
       // Disable for multiplayer for anti-cheat
       DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
@@ -236,13 +244,13 @@ namespace NPCMapLocations
     private static bool ShouldTrackNpc(NPC npc)
     {
       return
-        !ModConstants.ExcludedNpcs.Contains(npc.Name)
-
-        && (
-          npc.isVillager()
+        (
+          !Globals.NpcExclusions.Contains(npc.Name) &&
+          !ModConstants.ExcludedNpcs.Contains(npc.Name) &&
+          (npc.isVillager()
           | npc.isMarried()
           | (Globals.ShowHorse && npc is Horse)
-          | (Globals.ShowChildren && npc is Child)
+          | (Globals.ShowChildren && npc is Child))
         );
     }
 
@@ -417,7 +425,7 @@ namespace NPCMapLocations
     private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
     {
       // Check for travelining merchant day
-      if (ConditionalNpcs.Value.ContainsKey("Merchant") && ConditionalNpcs.Value["Merchant"]) {
+      if (ConditionalNpcs.Value != null && ConditionalNpcs.Value.ContainsKey("Merchant") && ConditionalNpcs.Value["Merchant"]) {
         ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
       }
 
@@ -461,7 +469,7 @@ namespace NPCMapLocations
             type = Character.Child;
           }
 
-          if (!Customizations.NpcMarkerOffsets.TryGetValue(npc.Name, out var offset))
+          if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out var offset))
           {
             offset = 0;
           }
@@ -545,7 +553,7 @@ namespace NPCMapLocations
           // Force reload of map for season changes
           try
           {
-            Helper.Content.InvalidateCache("LooseSprites/Map");
+            Helper.Content.InvalidateCache(MapFilePath);
           }
           catch
           {
@@ -633,7 +641,7 @@ namespace NPCMapLocations
             var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
             foreach (var syncedMarker in syncedNpcMarkers)
             {
-              if (!Customizations.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out var offset))
+              if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out var offset))
               {
                 offset = 0;
               }
@@ -807,7 +815,7 @@ namespace NPCMapLocations
           if (horse.rider != null)
           {
             npcMarker.MapX = -9999;
-            npcMarker.MapY = -9999;
+            npcMarker.MapY = -9999;                                                                                                              
             continue;
           }
         } */
@@ -1020,7 +1028,7 @@ namespace NPCMapLocations
     // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
     // Requires MapModConstants and modified map page in /maps
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-      Dictionary<string, MapVector[]> CustomMapVectors = null, List<string> LocationExclusions = null, bool isPlayer = false)
+      Dictionary<string, MapVector[]> CustomMapVectors = null, HashSet<string> LocationExclusions = null, bool isPlayer = false)
     {
       if ((LocationExclusions != null && LocationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom")) return UNKNOWN;
 

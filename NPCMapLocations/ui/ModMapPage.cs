@@ -94,17 +94,22 @@ namespace NPCMapLocations
         );
       }
 
-      var customTooltips = Customizations.Tooltips.ToList();
+      var customTooltips = Customizations.Tooltips;
 
       foreach (var tooltip in customTooltips)
       {
-        var vanillaTooltip = this.points.Find(x => x.name == tooltip.name);
+        var vanillaTooltip = this.points.Find(x => x.name == tooltip.Key);
+
+        string text = tooltip.Value.SecondaryText != null
+        ? tooltip.Value.PrimaryText + Environment.NewLine + tooltip.Value.SecondaryText
+        : tooltip.Value.PrimaryText;
+
         var customTooltip = new ClickableComponent(new Rectangle(
-          mapX + tooltip.bounds.X,
-          mapY + tooltip.bounds.Y,
-          tooltip.bounds.Width,
-          tooltip.bounds.Height
-        ), tooltip.name);
+          mapX + tooltip.Value.X,
+          mapY + tooltip.Value.Y,
+          tooltip.Value.Width,
+          tooltip.Value.Height
+        ), tooltip.Key);
 
         // Replace vanilla with custom
         if (vanillaTooltip != null)
