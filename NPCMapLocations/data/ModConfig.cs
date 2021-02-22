@@ -37,7 +37,7 @@ namespace NPCMapLocations
     public HashSet<string> MinimapExclusions { get; set; } = new HashSet<string>() { };
 
     public bool UseSeasonalMaps { get; set; } = true;
-    public bool UseDetailedIsland { get; set; } = true;
+    public bool UseDetailedIsland { get; set; } = false;
     public bool ShowChildren { get; set; } = false;
     public bool ShowHorse { get; set; } = true;
     public HashSet<string> NpcExclusions { get; set; } = new HashSet<string>() { };

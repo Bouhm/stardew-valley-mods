@@ -24,10 +24,10 @@ namespace NPCMapLocations
 
     public ModCustomizations()
     {
-      MapsPath = GetCustomMapFolderName();
-      if (MapsPath != null)
-        MapsPath = Path.Combine(MapsRootPath, MapsPath);
-      else
+      //MapsPath = GetCustomMapFolderName();
+      //if (MapsPath != null)
+      //  MapsPath = Path.Combine(MapsRootPath, MapsPath);
+      //else
         MapsPath = Path.Combine(MapsRootPath, "_default");
 
       Names = new Dictionary<string, string>();

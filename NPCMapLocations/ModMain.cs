@@ -90,7 +90,7 @@ namespace NPCMapLocations
           : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
 
         if (useRecolor)
-          Monitor.Log($"Using recolored map {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
+          Monitor.Log($"Using {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
         return map;
       }
