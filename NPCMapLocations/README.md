@@ -35,7 +35,16 @@ Ideally, the custom location is drawn accurately in proportion onto the map such
 
 ## Creating an accurate map
 
-Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. Mod authors should **`"Replace"`** the map.
+Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. Mod authors should **`"Replace"`** the map through Content Patcher:
+
+```js
+{
+   "Action": "EditImage",
+   "Target": "LooseSprites/map",
+   "FromFile": "Assets/Maps/WorldMaps/{{Season}}_map.png",
+   "PatchMode": "Replace"
+}
+```
 
 In order to draw a custom location accurately, the recommended method is to use the actual tilemap of the custom location and tracing it. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a render of the whole tilemap of the location. Using this as a reference, you can resize and overlay the tilemap to accurately trace it onto the map.
 
