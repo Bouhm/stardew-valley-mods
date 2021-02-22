@@ -14,15 +14,13 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 - [Unknown locations](#unknown-locations)
 - [Adding points](#adding-points)
   - [Example](#example)
-    - [Farm types](#farm-types)
+  - [Farm types](#farm-types)
   - [Single points](#single-points)
   - [Adding location tooltips](#adding-location-tooltips)
   - [Excluding locations](#excluding-locations)
   - [Testing and validating](#testing-and-validating)
-  - [Common issues](#common-issues)
 - [Custom Npcs](#custom-npcs)
   - [Excluding NPCs](#excluding-npcs)
-- [See also](#see-also)
 - [Get additional help](#get-additional-help)
 
 ## How tracking works
@@ -168,7 +166,7 @@ Tips:
 - In the SMAPI console, use `debug warp [LocationName] to quickly move to the map.
 - Use control + right click to move the player around the map in debug mode.
 
-#### Farm types
+### Farm types
 
 Sometimes a mod will change a farm only based on the farm type. If you want to specify points for any farm, you can leave the location name as "Farm" but for specific farm types, you will need to use the following:
 - "Farm_Default"
