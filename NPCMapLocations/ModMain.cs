@@ -36,7 +36,8 @@ namespace NPCMapLocations
 
     // External mod settings
     private readonly string MapPath = @"LooseSprites\Map";
-    private readonly string NPCMapCustomizationsPath = @"Data\NPCMapCustomizations";
+    private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
+    private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
 
     // Multiplayer
     private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new PerScreen<Dictionary<long, FarmerMarker>>();
@@ -55,9 +56,10 @@ namespace NPCMapLocations
     public bool CanLoad<T>(IAssetInfo asset)
     {
       return (
-        (asset.AssetNameEquals(MapPath) && Customizations != null) ||
-        (asset.AssetNameEquals(NPCMapCustomizationsPath))
-       );
+        asset.AssetNameEquals(MapPath) ||
+        asset.AssetNameEquals(NpcCustomizationsPath) ||
+        asset.AssetNameEquals(LocationCustomizationsPath) 
+      );
     }
 
     public T Load<T>(IAssetInfo asset)
@@ -91,7 +93,7 @@ namespace NPCMapLocations
 
         return map;
       }
-      else if (asset.AssetNameEquals(NPCMapCustomizationsPath))
+      else if (asset.AssetNameEquals(LocationCustomizationsPath) || asset.AssetNameEquals(NpcCustomizationsPath))
       {
         return (T)(object)new Dictionary<string, JObject>();
       }
@@ -146,9 +148,9 @@ namespace NPCMapLocations
       FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
       // Load customizations
-      var NPCMapSettings = Helper.Content.Load<Dictionary<string, JObject>>(NPCMapCustomizationsPath, ContentSource.GameContent);
-      Customizations = new ModCustomizations(NPCMapSettings);
-      Customizations.LoadCustomData();
+      var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
+      var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
+      Customizations = new ModCustomizations(NpcSettings, LocationSettings);
 
       // Let host know farmhand is ready to receive updates
       if (Context.IsMultiplayer && !Context.IsMainPlayer)
@@ -286,7 +288,7 @@ namespace NPCMapLocations
           building.tileX.Value,
           building.tileY.Value,
           Customizations.MapVectors,
-          Customizations.LocationBlacklist
+          Customizations.LocationExclusions
         );
 
         // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
@@ -330,7 +332,7 @@ namespace NPCMapLocations
       if (!Context.IsWorldReady) return;
 
       // Minimap dragging
-      if (Config.ShowMinimap && Minimap.Value != null)
+      if (Globals.ShowMinimap && Minimap.Value != null)
       {
         if (Minimap.Value.isHoveringDragZone() && e.Button == SButton.MouseRight)
         {
@@ -348,7 +350,7 @@ namespace NPCMapLocations
       // Minimap toggle
       if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
       {
-        Config.ShowMinimap = !Config.ShowMinimap;
+        Globals.ShowMinimap = !Globals.ShowMinimap;
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
 
@@ -399,13 +401,13 @@ namespace NPCMapLocations
     {
       if (incre)
       {
-        if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
+        if (++Globals.NameTooltipMode > 3) Globals.NameTooltipMode = 1;
 
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
       else
       {
-        if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
+        if (--Globals.NameTooltipMode < 1) Globals.NameTooltipMode = 3;
 
         Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
       }
@@ -432,10 +434,10 @@ namespace NPCMapLocations
       );
     }
 
-    private bool IsLocationBlacklisted(string location)
+    private bool IsLocationExcluded(string location)
     {
-      return Config.ShowMinimap && Globals.MinimapBlacklist.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-               ((Globals.MinimapBlacklist.Contains("Mine") || Globals.MinimapBlacklist.Contains("UndergroundMine")) && location.Contains("Mine"));
+      return Globals.ShowMinimap && Globals.MinimapExclusions.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
+               ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"));
     }
 
     private void ResetMarkers()
@@ -501,7 +503,7 @@ namespace NPCMapLocations
       // Half-second tick
       if (e.IsMultipleOf(30))
       {
-        var updateForMinimap = Config.ShowMinimap && Minimap.Value != null;
+        var updateForMinimap = Globals.ShowMinimap && Minimap.Value != null;
 
         if (updateForMinimap)
         {
@@ -563,7 +565,7 @@ namespace NPCMapLocations
       }
 
       // Update tick
-      if (Config.ShowMinimap && Minimap.Value != null && Minimap.Value.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
+      if (Globals.ShowMinimap && Minimap.Value != null && Minimap.Value.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
       {
         Minimap.Value.HandleMouseDrag();
       }
@@ -816,7 +818,7 @@ namespace NPCMapLocations
         // For show Npcs in player's location option
         var isSameLocation = false;
 
-        if (Config.OnlySameLocation)
+        if (Globals.OnlySameLocation)
         {
           string playerLocationName =
             Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
@@ -834,7 +836,7 @@ namespace NPCMapLocations
         // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
         npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
                              || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
-                             || Config.OnlySameLocation && !isSameLocation
+                             || Globals.OnlySameLocation && !isSameLocation
                              || Config.ByHeartLevel
                              && !(Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
@@ -879,7 +881,7 @@ namespace NPCMapLocations
         if (locationName != null)
         {
           // Get center of NPC marker
-          var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist);
+          var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors, Customizations.LocationExclusions);
           npcMarker.MapX = (int)npcLocation.X - 16;
           npcMarker.MapY = (int)npcLocation.Y - 15;
         }
@@ -898,7 +900,7 @@ namespace NPCMapLocations
 
         // For show Npcs in player's location option
         var isSameLocation = false;
-        if (Config.OnlySameLocation)
+        if (Globals.OnlySameLocation)
         {
           string playerLocationName =
             Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
@@ -916,7 +918,7 @@ namespace NPCMapLocations
         // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
         marker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(name)
                              || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(name)
-                             || Config.OnlySameLocation && !isSameLocation
+                             || Globals.OnlySameLocation && !isSameLocation
                              || Config.ByHeartLevel
                              && !(Game1.player.getFriendshipHeartLevelForNPC(name)
                                   >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(name)
@@ -977,7 +979,7 @@ namespace NPCMapLocations
           farmer.getTileX(),
           farmer.getTileY(),
           Customizations.MapVectors,
-          Customizations.LocationBlacklist
+          Customizations.LocationExclusions
         );
 
         if (FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
@@ -1018,9 +1020,9 @@ namespace NPCMapLocations
     // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
     // Requires MapModConstants and modified map page in /maps
     public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-      Dictionary<string, MapVector[]> CustomMapVectors = null, List<string> LocationBlacklist = null, bool isPlayer = false)
+      Dictionary<string, MapVector[]> CustomMapVectors = null, List<string> LocationExclusions = null, bool isPlayer = false)
     {
-      if ((LocationBlacklist != null && LocationBlacklist.Contains(locationName)) || locationName.Contains("WarpRoom")) return UNKNOWN;
+      if ((LocationExclusions != null && LocationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom")) return UNKNOWN;
 
       if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
 
@@ -1053,7 +1055,7 @@ namespace NPCMapLocations
           var doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
           // Slightly adjust warp location to depict being inside the building 
-          var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, LocationBlacklist, isPlayer);
+          var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, LocationExclusions, isPlayer);
           return new Vector2(warpPos.X + 1, warpPos.Y - 8);
         }
       }
@@ -1177,7 +1179,7 @@ namespace NPCMapLocations
       if (e.IsLocalPlayer)
       {
         // Hide minimap in blacklisted locations with special case for Mines as usual
-        Config.ShowMinimap = Config.ShowMinimap && !IsLocationBlacklisted(e.NewLocation.Name);
+        Globals.ShowMinimap = Globals.ShowMinimap && !IsLocationExcluded(e.NewLocation.Name);
 
         // Check if map does not fill screen and adjust for black bars (ex. BusStop)
         Minimap.Value?.CheckOffsetForMap();
@@ -1186,7 +1188,7 @@ namespace NPCMapLocations
 
     private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
     {
-      if (Context.IsWorldReady && Config.ShowMinimap && Game1.displayHUD) Minimap.Value?.DrawMiniMap();
+      if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD) Minimap.Value?.DrawMiniMap();
     }
 
     private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)

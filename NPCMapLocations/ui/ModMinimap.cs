@@ -59,10 +59,10 @@ namespace NPCMapLocations
       drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
       drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
 
-      mmX = ModMain.Config.MinimapX;
-      mmY = ModMain.Config.MinimapY;
-      mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
-      mmHeight = ModMain.Config.MinimapHeight * Game1.pixelZoom;
+      mmX = ModMain.Globals.MinimapX;
+      mmY = ModMain.Globals.MinimapY;
+      mmWidth = ModMain.Globals.MinimapWidth * Game1.pixelZoom;
+      mmHeight = ModMain.Globals.MinimapHeight * Game1.pixelZoom;
     }
 
     private Dictionary<string, bool> ConditionalNpcs { get; }
@@ -95,8 +95,8 @@ namespace NPCMapLocations
 
     public void HandleMouseRelease()
     {
-      ModMain.Config.MinimapX = mmX;
-      ModMain.Config.MinimapY = mmY;
+      ModMain.Globals.MinimapX = mmX;
+      ModMain.Globals.MinimapY = mmY;
       ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
       dragStarted = false;
 
@@ -131,8 +131,8 @@ namespace NPCMapLocations
     }
     public void Resize()
     {
-      mmWidth = ModMain.Config.MinimapWidth * Game1.pixelZoom;
-      mmHeight = ModMain.Config.MinimapHeight * Game1.pixelZoom;
+      mmWidth = ModMain.Globals.MinimapWidth * Game1.pixelZoom;
+      mmHeight = ModMain.Globals.MinimapHeight * Game1.pixelZoom;
     }
 
     public void Update()
@@ -141,7 +141,7 @@ namespace NPCMapLocations
       // Positions relative to the map are not.
 
       center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-        Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationBlacklist, true);
+        Game1.player.getTileY(), Customizations.MapVectors, Customizations.LocationExclusions, true);
 
       // Player in unknown location, use previous location as center
       if (center.Equals(ModMain.UNKNOWN) && prevCenter != null)
@@ -397,7 +397,7 @@ namespace NPCMapLocations
       //
       // ===== Traveling Merchant =====
       //
-      if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
+      if (ModMain.Globals.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
       {
         Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         if (IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
@@ -422,8 +422,8 @@ namespace NPCMapLocations
           // Skip if no specified location
           if (marker.Sprite == null
               || !IsWithinMapArea(marker.MapX, marker.MapY)
-              || ModMain.Globals.NpcBlacklist.Contains(name)
-              || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
+              || ModMain.Globals.NpcExclusions.Contains(name)
+              || (!ModMain.Globals.ShowHiddenVillagers && marker.IsHidden)
               || (ConditionalNpcs.ContainsKey(name) && !ConditionalNpcs[name])
           )
             continue;
@@ -451,7 +451,7 @@ namespace NPCMapLocations
           }
 
           // Icons for birthday/quest
-          if (ModMain.Config.MarkQuests)
+          if (ModMain.Globals.ShowQuests)
           {
             if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
               b.Draw(Game1.mouseCursors,

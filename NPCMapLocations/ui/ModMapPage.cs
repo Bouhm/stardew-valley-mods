@@ -237,7 +237,7 @@ namespace NPCMapLocations
           y += Game1.tileSize / 4;
         }
 
-        if (ModMain.Config.NameTooltipMode == 1)
+        if (ModMain.Globals.NameTooltipMode == 1)
         {
           if (y + height > Game1.uiViewport.Height)
           {
@@ -247,7 +247,7 @@ namespace NPCMapLocations
 
           offsetY = 2 - Game1.tileSize;
         }
-        else if (ModMain.Config.NameTooltipMode == 2)
+        else if (ModMain.Globals.NameTooltipMode == 2)
         {
           if (y + height > Game1.uiViewport.Height)
           {
@@ -267,7 +267,7 @@ namespace NPCMapLocations
         }
 
         // Draw name tooltip positioned around location tooltip
-        DrawNames(b, hoveredNames, x, y, offsetY, height, ModMain.Config.NameTooltipMode);
+        DrawNames(b, hoveredNames, x, y, offsetY, height, ModMain.Globals.NameTooltipMode);
 
         // Draw location tooltip
         IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont);
@@ -292,7 +292,7 @@ namespace NPCMapLocations
       else
       {
         // Draw name tooltip only
-        DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, ModMain.Config.NameTooltipMode);
+        DrawNames(Game1.spriteBatch, hoveredNames, x, y, offsetY, this.height, ModMain.Globals.NameTooltipMode);
       }
 
       // Draw indoor icon
@@ -414,7 +414,7 @@ namespace NPCMapLocations
       }
 
       // Traveling Merchant
-      if (ModMain.Config.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
+      if (ModMain.Globals.ShowTravelingMerchant && ConditionalNpcs["Merchant"])
       {
         Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
         b.Draw(Game1.mouseCursors, new Vector2(mapX + merchantLoc.X - 16, mapY + merchantLoc.Y - 15),
@@ -437,7 +437,7 @@ namespace NPCMapLocations
           // Skip if no specified location or should be hidden
           if (marker.Sprite == null
             || ModMain.Globals.NpcExclusions.Contains(name)
-            || (!ModMain.Config.ShowHiddenVillagers && marker.IsHidden)
+            || (!ModMain.Globals.ShowHiddenVillagers && marker.IsHidden)
             || (ConditionalNpcs.ContainsKey(name) && !ConditionalNpcs[name])
           )
           {
@@ -456,7 +456,7 @@ namespace NPCMapLocations
             new Rectangle?(spriteRect), markerColor);
 
           // Draw icons for quests/birthday
-          if (ModMain.Config.MarkQuests)
+          if (ModMain.Globals.ShowQuests)
           {
             if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
             {
