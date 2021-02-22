@@ -19,7 +19,6 @@ namespace NPCMapLocations
     public HashSet<string> LocationExclusions { get; set; }
     public Dictionary<string, MapTooltip> Tooltips { get; set; }
 
-    private LocationsConfig LocationsConfig;
     public readonly string MapsRootPath = "maps";
     public string MapsPath { get; set; }
 
@@ -31,7 +30,6 @@ namespace NPCMapLocations
       else
         MapsPath = Path.Combine(MapsRootPath, "_default");
 
-      //LocationsConfig = ModMain.Helper.Data.ReadJsonFile<LocationsConfig>(Path.Combine(MapsPath, "customlocations.json")) ?? new LocationsConfig();
       Names = new Dictionary<string, string>();
       MapVectors = new Dictionary<string, MapVector[]>();
       Tooltips = new Dictionary<string, MapTooltip>();
@@ -65,14 +63,6 @@ namespace NPCMapLocations
           }
         }
       }
-
-      //LocationsConfig.MapVectors = MergeDictionaries(MapVectors, LocationsConfig.MapVectors);
-      //LocationsConfig.MapTooltips = MergeDictionaries(Tooltips, LocationsConfig.MapTooltips);
-      //LocationsConfig.LocationExclusions = locationExclusions;
-      //MapVectors = LocationsConfig.MapVectors;
-      //Tooltips = LocationsConfig.MapTooltips;
-      //LocationExclusions = LocationsConfig.LocationExclusions;
-      //ModMain.Helper.Data.WriteJsonFile(Path.Combine(MapsPath, "customlocations.json"), LocationsConfig);
     }
 
     // Handles customizations for NPCs
