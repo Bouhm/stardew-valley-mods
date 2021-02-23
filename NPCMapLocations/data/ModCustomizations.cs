@@ -122,20 +122,6 @@ namespace NPCMapLocations
         }
       }
 
-      // For farmhands, custom NPCs can't be found so rely on config
-      if (Context.IsMultiplayer && !Context.IsMainPlayer)
-      {
-        var NpcMarkerOffsets = ModMain.Globals.NpcMarkerOffsets;
-
-        if (NpcMarkerOffsets != null && NpcMarkerOffsets.Count > 0)
-        {
-          foreach (var villager in NpcMarkerOffsets)
-          {
-            NpcMarkerOffsets[villager.Key] = villager.Value;
-          }
-        }
-      }
-
       // Handle duplicate displayName -- custom NPCs that replaces villagers
       Dictionary<string, string> dupes = Names
         .Where(n1 => Names.Any(n2 => n2.Key != n1.Key && n2.Value == n1.Value))
