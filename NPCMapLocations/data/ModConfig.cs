@@ -18,6 +18,7 @@ namespace NPCMapLocations
   public class GlobalConfig
   {
     public bool DEBUG_MODE { get; set; } = false;
+    public string MapModId { get; set; } = "";
 
     public string MenuKey { get; set; } = "Tab";
     public string TooltipKey { get; set; } = "Space";

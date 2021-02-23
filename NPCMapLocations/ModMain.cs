@@ -50,7 +50,6 @@ namespace NPCMapLocations
 
     // Debugging
     private static bool DEBUG_MODE;
-    private static List<string> alertFlags;
 
     // Replace game map with modified map
     public bool CanLoad<T>(IAssetInfo asset)
@@ -58,7 +57,7 @@ namespace NPCMapLocations
       return (
         asset.AssetNameEquals(MapFilePath) ||
         asset.AssetNameEquals(NpcCustomizationsPath) ||
-        asset.AssetNameEquals(LocationCustomizationsPath) 
+        asset.AssetNameEquals(LocationCustomizationsPath)
       );
     }
 
@@ -207,23 +206,30 @@ namespace NPCMapLocations
 
       // Get context of all locations (indoor, outdoor, relativity)
       LocationUtil.GetLocationContexts();
-      alertFlags = new List<string>();
 
       // Log any custom locations not handled in content.json
-      foreach (var locCtx in LocationUtil.LocationContexts)
+      try
       {
-        if ((locCtx.Value.Root == null && !MapVectors.Value.ContainsKey(locCtx.Key))
-          || (locCtx.Value.Root != null && !MapVectors.Value.ContainsKey(locCtx.Value.Root))
-        )
+        var alertStr = "Unknown locations:";
+        foreach (var locCtx in LocationUtil.LocationContexts)
         {
-          if (Customizations.LocationExclusions.Contains(locCtx.Key)) return;
-          if (!alertFlags.Contains("UnknownLocation:" + locCtx.Key))
+          if (
+            (locCtx.Value.Root == null && !MapVectors.Value.ContainsKey(locCtx.Key))
+            || (locCtx.Value.Root != null && !MapVectors.Value.ContainsKey(locCtx.Value.Root))
+            && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
+          )
           {
-            Monitor.Log($"Unknown location: {locCtx.Key}", LogLevel.Debug);
-            alertFlags.Add("UnknownLocation:" + locCtx.Key);
+            if (Customizations.LocationExclusions.Contains(locCtx.Key)) return;
+            alertStr += $" {locCtx.Key},";
           }
         }
+        Monitor.Log(alertStr.TrimEnd(',') + ".", LogLevel.Debug);
       }
+      catch
+      {
+        Monitor.Log("Too many unknown locations; NPCs in unknown locations will not be visible.", LogLevel.Debug);
+      }
+     
 
       UpdateFarmBuildingLocs();
 
@@ -245,6 +251,7 @@ namespace NPCMapLocations
           Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
       }
     }
+
     private static bool ShouldTrackNpc(NPC npc)
     {
       return
