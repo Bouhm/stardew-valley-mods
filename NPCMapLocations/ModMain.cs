@@ -155,10 +155,13 @@ namespace NPCMapLocations
         Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { ModManifest.UniqueID }, playerIDs: new long[] { hostId });
       }
 
-      // Load customizations
-      var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
-      var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
-      Customizations.LoadCustomData(NpcSettings, LocationSettings);
+      if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
+      {
+        // Load customizations
+        var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
+        var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
+        Customizations.LoadCustomData(NpcSettings, LocationSettings);
+      }
 
       // Load farm buildings
       try
