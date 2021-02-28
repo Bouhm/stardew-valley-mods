@@ -227,7 +227,7 @@ For this we need the top-left corner and the width and height of the bounding bo
   "Entries": {
     "TownEast": {
       ...
-      "MapToolip": {
+      "MapTooltip": {
         "X": 960,
         "Y": 337,
         "Width": 100,
