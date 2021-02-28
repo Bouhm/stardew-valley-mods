@@ -109,7 +109,7 @@ namespace NPCMapLocations
           mapY + tooltip.Value.Y,
           tooltip.Value.Width,
           tooltip.Value.Height
-        ), tooltip.Key);
+        ), text);
 
         // Replace vanilla with custom
         if (vanillaTooltip != null)
