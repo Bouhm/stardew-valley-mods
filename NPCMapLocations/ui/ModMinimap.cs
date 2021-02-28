@@ -326,7 +326,7 @@ namespace NPCMapLocations
             Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
       }
-        
+
       if (drawPamHouseUpgrade)
       {
         var houseLoc = ModMain.LocationToMap("Trailer_Big");
@@ -345,20 +345,44 @@ namespace NPCMapLocations
             new Rectangle(275, 181, 15, 11), color,
             0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
         }
-      }      
+      }
 
       if (drawIsland)
       {
-        var islandRect = new Rectangle(208, 363, 40, 30);
-        var mapRect = new Vector2(NormalizeToMap(offsetMmLoc.X + 1040), NormalizeToMap(offsetMmLoc.Y + 600));
+        var islandWidth = 40;
+        var islandHeight = 30;
+        var islandImageX = 208;
+        var islandImageY = 363;
+        var mapX = 1040;
+        var mapY = 600;
 
         if (ModMain.Globals.UseDetailedIsland)
         {
-          islandRect = new Rectangle(248, 363, 45, 40);
-          mapRect = new Vector2(NormalizeToMap(offsetMmLoc.X + 1020), NormalizeToMap(offsetMmLoc.Y + 560));
+          islandWidth = 45;
+          islandHeight = 40;
+          islandImageX = 248;
+          islandImageY = 363;
+          mapX = 1020;
+          mapY = 560;
         }
 
-        b.Draw(ModMain.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+        var islandX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, offsetMmX, offsetMmX + mmWidth));
+        var islandY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, mmY, mmY + mmHeight) + 2);
+        var islandCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
+        var islandCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
+
+        // Check if island crop extends outside of minimap
+        var islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - islandX) / Game1.pixelZoom) : islandWidth - islandCropX;
+        var islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - islandY) / Game1.pixelZoom) : islandHeight - islandCropY;
+
+        // Check if island crop extends beyond island size
+        if (islandCropX + islandCropWidth > islandWidth)
+          islandCropWidth = islandWidth - islandCropX;
+
+        if (islandCropY + islandCropHeight > islandHeight)
+          islandCropHeight = islandHeight - islandCropY;
+
+        b.Draw(ModMain.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
       }
 
       //
