@@ -102,12 +102,12 @@ internal class LocationUtil
       if (currLocationName == warp.TargetName || prevLocationName == warp.TargetName) continue;
 
       var warpLocation = Game1.getLocationFromName(warp.TargetName);
+      if (warpLocation == null)
+        continue;
 
       // If one of the warps is a root location, current location is an indoor building 
       if (warpLocation.IsOutdoors)
-      {
         hasOutdoorWarp = true;
-      }
 
       // If all warps are indoors, then the current location is a room
       LocationContexts[currLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
