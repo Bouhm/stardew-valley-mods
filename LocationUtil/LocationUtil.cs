@@ -135,13 +135,26 @@ internal class LocationUtil
   // Finds the upper-most indoor location (building)
   public static string GetBuilding(string loc)
   {
-    if (loc.Contains("UndergroundMine")) return GetMinesLocationName(loc);
-    if (LocationContexts[loc].Type == LocationType.Building) return loc;
+    static string GetRecursively(string loc, ISet<string> seen)
+    {
+      if (!seen.Add(loc))
+        return loc; // break infinite loop
 
-    var building = LocationContexts[loc].Parent;
-    if (building == null) return null;
-    if (building == LocationContexts[loc].Root) return loc;
-    return GetBuilding(building);
+      if (loc.Contains("UndergroundMine"))
+        return GetMinesLocationName(loc);
+      if (LocationContexts[loc].Type == LocationType.Building)
+        return loc;
+
+      var building = LocationContexts[loc].Parent;
+      if (building == null)
+        return null;
+      if (building == LocationContexts[loc].Root)
+        return loc;
+
+      return GetRecursively(building, seen);
+    }
+
+    return GetRecursively(loc, new HashSet<string>());
   }
 
   // Get Mines name from floor level
