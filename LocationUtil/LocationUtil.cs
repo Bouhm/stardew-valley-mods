@@ -132,33 +132,29 @@ internal class LocationUtil
     return root;
   }
 
-  // Finds the upper-most indoor location the player is in
-  // Assuming there are warps to get there from the NPC's position
-  public static string GetTargetIndoor(string playerLoc, string npcLoc)
-  {
-    if (playerLoc.Contains("UndergroundMine") && npcLoc.Contains("UndergroundMine"))
-    {
-      return GetMinesLocationName(playerLoc);
-    }
-
-    var target = LocationContexts[npcLoc].Parent;
-
-    if (target == null) return null;
-    if (target == LocationContexts[npcLoc].Root) return npcLoc;
-    if (target == playerLoc) return target;
-    return GetTargetIndoor(playerLoc, target);
-  }
-
   // Finds the upper-most indoor location (building)
   public static string GetBuilding(string loc)
   {
-    if (loc.Contains("UndergroundMine")) return GetMinesLocationName(loc);
-    if (LocationContexts[loc].Type == LocationType.Building) return loc;
+    static string GetRecursively(string loc, ISet<string> seen)
+    {
+      if (!seen.Add(loc))
+        return loc; // break infinite loop
 
-    var building = LocationContexts[loc].Parent;
-    if (building == null) return null;
-    if (building == LocationContexts[loc].Root) return loc;
-    return GetBuilding(building);
+      if (loc.Contains("UndergroundMine"))
+        return GetMinesLocationName(loc);
+      if (LocationContexts[loc].Type == LocationType.Building)
+        return loc;
+
+      var building = LocationContexts[loc].Parent;
+      if (building == null)
+        return null;
+      if (building == LocationContexts[loc].Root)
+        return loc;
+
+      return GetRecursively(building, seen);
+    }
+
+    return GetRecursively(loc, new HashSet<string>());
   }
 
   // Get Mines name from floor level
