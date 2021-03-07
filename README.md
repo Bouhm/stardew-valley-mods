@@ -1,5 +1,6 @@
 # StardewValleyMods
 A collection of Stardew Valley mods that improve player experience, quality of life, and add new content to the game.
+
 Co-maintained by [@Pathoschild](https://github.com/Pathoschild)
 
 ## Install
