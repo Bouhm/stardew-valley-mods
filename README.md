@@ -1,6 +1,8 @@
 # StardewValleyMods
 A collection of Stardew Valley mods that improve player experience, quality of life, and add new content to the game.
 
+No longer actively maintained by me. Co-maintained by [@Pathoschild](https://github.com/Pathoschild)
+
 ## Install
 1. [Install the latest version of SMAPI](https://smapi.io)
 2. Download mods and unzip them into *Stardew Valley/Mods*.
