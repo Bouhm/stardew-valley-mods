@@ -109,6 +109,13 @@ public static class ModConstants
           }
       },
       {
+          "Farm_Beach", new MapVector[]
+          {
+              new MapVector(330, 237, 0, 0),
+              new MapVector(514, 386, 102, 106)
+          }
+      },
+      {
           "Farm_Region", new MapVector[]
           {
               new MapVector(423, 321)

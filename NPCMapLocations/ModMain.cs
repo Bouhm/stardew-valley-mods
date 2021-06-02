@@ -1087,7 +1087,7 @@ namespace NPCMapLocations
       if (locationName == "Farm")
       {
         // Handle different farm types for custom vectors
-        var farms = new string[6] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners" };
+        var farms = new string[7] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
         if (CustomMapVectors != null && (CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
         {
           if (!CustomMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
@@ -1099,8 +1099,13 @@ namespace NPCMapLocations
         {
           if (!CustomMapVectors.TryGetValue("Farm", out locVectors))
           {
-            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+            locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
+            if(locationNotFound)
+            {
+              locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+            }
           }
+
         }
       }
       // If not in custom vectors, use default
