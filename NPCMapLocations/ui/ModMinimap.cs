@@ -320,7 +320,7 @@ namespace NPCMapLocations
             Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
           break;
         case 6:
-          b.Draw(ModMain.Map, new Vector2(farmX, farmY + 172),
+          b.Draw(ModMain.Map, new Vector2(farmX, farmY),
             new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color,
             0f,
             Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
