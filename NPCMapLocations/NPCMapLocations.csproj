@@ -15,5 +15,4 @@
   </ItemGroup>
 
   <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
-  <Import Project="..\MouseUtil\MouseUtil.projitems" Label="Shared" />
 </Project>

@@ -17,13 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLo
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocationUtil", "LocationUtil\LocationUtil.shproj", "{B5722EEF-6C91-400D-B644-9FAC63FE2777}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MouseUtil", "MouseUtil\MouseUtil.shproj", "{07F48E86-0BAD-4DCE-A967-7F42A8BD3D13}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		MouseUtil\MouseUtil.projitems*{07f48e86-0bad-4dce-a967-7f42a8bd3d13}*SharedItemsImports = 13
 		LocationUtil\LocationUtil.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
-		MouseUtil\MouseUtil.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
 		LocationUtil\LocationUtil.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
 		LocationUtil\LocationUtil.projitems*{b5722eef-6c91-400d-b644-9fac63fe2777}*SharedItemsImports = 13
 	EndGlobalSection

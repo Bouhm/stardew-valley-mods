@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using NPCMapLocations;
 using StardewValley;
 
-namespace Bouhm.Shared.Mouse
+namespace NPCMapLocations.Framework
 {
     // Library for methods that get tile position, map position, drag and drop position
     // based on the location of the cursor
