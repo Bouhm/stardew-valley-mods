@@ -1,5 +1,6 @@
-﻿## Adding custom locations
+﻿﻿[← back to readme](README.md)
 
+## Adding custom locations
 This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended to be followed on a PC.
 
 **For more information on other features and usage of the mod, check the [Nexus Mods page](https://www.nexusmods.com/stardewvalley/mods/239).**
