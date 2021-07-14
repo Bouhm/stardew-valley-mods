@@ -5,8 +5,6 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
-
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="3.3.0" />
   </ItemGroup>
@@ -14,4 +12,6 @@
   <ItemGroup>
     <None Update="constants.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <Import Project="..\Bouhm.Shared\Bouhm.Shared.projitems" Label="Shared" />
 </Project>

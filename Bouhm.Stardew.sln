@@ -15,13 +15,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocationCompass", "Location
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLocations\NPCMapLocations.csproj", "{657A6295-99BE-4E58-A6B8-D5557FC1B46F}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LocationUtil", "LocationUtil\LocationUtil.shproj", "{B5722EEF-6C91-400D-B644-9FAC63FE2777}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bouhm.Shared", "Bouhm.Shared\Bouhm.Shared.shproj", "{A77ED09B-6BA5-4890-B0D0-3CCD9B7DA9B3}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		LocationUtil\LocationUtil.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
-		LocationUtil\LocationUtil.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
-		LocationUtil\LocationUtil.projitems*{b5722eef-6c91-400d-b644-9fac63fe2777}*SharedItemsImports = 13
+		Bouhm.Shared\Bouhm.Shared.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
+		Bouhm.Shared\Bouhm.Shared.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
+		Bouhm.Shared\Bouhm.Shared.projitems*{a77ed09b-6ba5-4890-b0d0-3ccd9b7da9b3}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

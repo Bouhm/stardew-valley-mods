@@ -14,5 +14,5 @@
     <None Update="maps\_default\*.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
+  <Import Project="..\Bouhm.Shared\Bouhm.Shared.projitems" Label="Shared" />
 </Project>
