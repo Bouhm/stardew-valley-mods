@@ -56,8 +56,8 @@ internal class LocationUtil
         // There can be multiple warps to the same location
         if (location == prevLocation) return root;
 
-        var currLocationName = location.uniqueName.Value ?? location.Name;
-        var prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
+        string currLocationName = location.uniqueName.Value ?? location.Name;
+        string prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
 
         if (!LocationContexts.ContainsKey(currLocationName))
             LocationContexts.Add(currLocationName, new LocationContext());
@@ -144,7 +144,7 @@ internal class LocationUtil
             if (LocationContexts[loc].Type == LocationType.Building)
                 return loc;
 
-            var building = LocationContexts[loc].Parent;
+            string building = LocationContexts[loc].Parent;
             if (building == null)
                 return null;
             if (building == LocationContexts[loc].Root)
@@ -159,8 +159,8 @@ internal class LocationUtil
     // Get Mines name from floor level
     public static string GetMinesLocationName(string locationName)
     {
-        var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-        if (int.TryParse(mine, out var mineLevel))
+        string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+        if (int.TryParse(mine, out int mineLevel))
         {
             // Skull cave
             if (mineLevel > 120)

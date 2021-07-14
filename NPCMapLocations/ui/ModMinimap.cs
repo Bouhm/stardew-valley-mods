@@ -196,8 +196,8 @@ namespace NPCMapLocations
         public void DrawMiniMap()
         {
             var b = Game1.spriteBatch;
-            var IsHoveringMinimap = isHoveringDragZone();
-            var offsetMmX = mmX + offset;
+            bool IsHoveringMinimap = isHoveringDragZone();
+            int offsetMmX = mmX + offset;
 
             // Make transparent on hover
             var color = IsHoveringMinimap
@@ -259,7 +259,7 @@ namespace NPCMapLocations
         {
             var b = Game1.spriteBatch;
             var color = Color.White;
-            var offsetMmX = mmX + offset;
+            int offsetMmX = mmX + offset;
             var offsetMmLoc = new Vector2(mmLoc.X + offset + 2, mmLoc.Y + 2);
 
             //
@@ -268,16 +268,16 @@ namespace NPCMapLocations
             // The farms are always overlayed at (0, 43) on the map
             // The crop position, dimensions, and overlay position must all be adjusted accordingly
             // When any part of the cropped farm is outside of the minimap as player moves
-            var farmWidth = 131;
-            var farmHeight = 61;
-            var farmX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, offsetMmX, offsetMmX + mmWidth));
-            var farmY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, mmY, mmY + mmHeight) + 2);
-            var farmCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
-            var farmCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
+            int farmWidth = 131;
+            int farmHeight = 61;
+            int farmX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, offsetMmX, offsetMmX + mmWidth));
+            int farmY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, mmY, mmY + mmHeight) + 2);
+            int farmCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
+            int farmCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
 
             // Check if farm crop extends outside of minimap
-            var farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
-            var farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
+            int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
 
             // Check if farm crop extends beyond farm size
             if (farmCropX + farmCropWidth > farmWidth)
@@ -348,12 +348,12 @@ namespace NPCMapLocations
 
             if (drawIsland)
             {
-                var islandWidth = 40;
-                var islandHeight = 30;
-                var islandImageX = 208;
-                var islandImageY = 363;
-                var mapX = 1040;
-                var mapY = 600;
+                int islandWidth = 40;
+                int islandHeight = 30;
+                int islandImageX = 208;
+                int islandImageY = 363;
+                int mapX = 1040;
+                int mapY = 600;
 
                 if (ModMain.Globals.UseDetailedIsland)
                 {
@@ -365,14 +365,14 @@ namespace NPCMapLocations
                     mapY = 560;
                 }
 
-                var islandX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, offsetMmX, offsetMmX + mmWidth));
-                var islandY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, mmY, mmY + mmHeight) + 2);
-                var islandCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
-                var islandCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
+                int islandX = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, offsetMmX, offsetMmX + mmWidth));
+                int islandY = NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, mmY, mmY + mmHeight) + 2);
+                int islandCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
+                int islandCropY = (int)MathHelper.Clamp((mmY - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
 
                 // Check if island crop extends outside of minimap
-                var islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - islandX) / Game1.pixelZoom) : islandWidth - islandCropX;
-                var islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - islandY) / Game1.pixelZoom) : islandHeight - islandCropY;
+                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + mmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + mmWidth - islandX) / Game1.pixelZoom) : islandWidth - islandCropX;
+                int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (mmY + mmHeight) / Game1.pixelZoom) ? (int)((mmY + mmHeight - islandY) / Game1.pixelZoom) : islandHeight - islandCropY;
 
                 // Check if island crop extends beyond island size
                 if (islandCropX + islandCropWidth > islandWidth)
@@ -439,7 +439,7 @@ namespace NPCMapLocations
 
                 foreach (var npcMarker in sortedMarkers)
                 {
-                    var name = npcMarker.Key;
+                    string name = npcMarker.Key;
                     var marker = npcMarker.Value;
 
                     // Skip if no specified location
@@ -541,7 +541,7 @@ namespace NPCMapLocations
         {
             var r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + 2, width);
             var v = Vector2.Normalize(begin - end);
-            var angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
+            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
             if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
             b.Draw(tex, r, srcRect, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }

@@ -75,7 +75,7 @@ namespace NPCMapLocations
                 upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, scrollBar.bounds.Width,
                 height - Game1.tileSize * 2 - upArrow.bounds.Height - Game1.pixelZoom * 2);
 
-            for (var i = 0; i < 7; i++)
+            for (int i = 0; i < 7; i++)
             {
                 optionSlots.Add(new ClickableComponent(
                   new Rectangle(xPositionOnScreen + Game1.tileSize / 4,
@@ -86,11 +86,11 @@ namespace NPCMapLocations
             options.Add(new OptionsElement("NPC Map Locations"));
 
             var widths = new List<int>();
-            for (var i = 0; i < 16; i++)
+            for (int i = 0; i < 16; i++)
                 widths.Add(75 + i * 15);
 
             var heights = new List<int>();
-            for (var j = 0; j < 10; j++)
+            for (int j = 0; j < 10; j++)
                 heights.Add(45 + j * 15);
 
             string minimapLabel = ModMain.Helper.Translation.Get("minimap.label");
@@ -125,7 +125,7 @@ namespace NPCMapLocations
               .Where(x => x.Value.Sprite != null && x.Value.Type == Character.Villager)
               .OrderBy(x => x.Value.DisplayName);
 
-            var idx = 13;
+            int idx = 13;
             foreach (var npcMarker in orderedMarkers)
             {
                 if (conditionalNpcs.ContainsKey(npcMarker.Key))
@@ -167,12 +167,12 @@ namespace NPCMapLocations
             base.leftClickHeld(x, y);
             if (scrolling)
             {
-                var y2 = scrollBar.bounds.Y;
+                int y2 = scrollBar.bounds.Y;
                 scrollBar.bounds.Y =
                     Math.Min(
                         yPositionOnScreen + height - Game1.tileSize - Game1.pixelZoom * 3 - scrollBar.bounds.Height,
                         Math.Max(y, yPositionOnScreen + upArrow.bounds.Height + Game1.pixelZoom * 5));
-                var num = (y - scrollBarRunner.Y) / (float)scrollBarRunner.Height;
+                float num = (y - scrollBarRunner.Y) / (float)scrollBarRunner.Height;
                 currentItemIndex = Math.Min(options.Count - 7, Math.Max(0, (int)(options.Count * num)));
                 SetScrollBarToCurrentIndex();
                 if (y2 != scrollBar.bounds.Y) Game1.playSound("shiny4");
@@ -311,7 +311,7 @@ namespace NPCMapLocations
 
             y -= 15;
             currentItemIndex = Math.Max(0, Math.Min(options.Count() - 7, currentItemIndex));
-            for (var i = 0; i < optionSlots.Count(); i++)
+            for (int i = 0; i < optionSlots.Count(); i++)
                 if (optionSlots[i].bounds.Contains(x, y) &&
                     currentItemIndex + i < options.Count() && options[currentItemIndex + i]
                         .bounds.Contains(x - optionSlots[i].bounds.X, y - optionSlots[i].bounds.Y))
@@ -356,7 +356,7 @@ namespace NPCMapLocations
             Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen, width, height, false, true, null,
               false);
             okButton.draw(b);
-            var buttonWidth = (int)Game1.dialogueFont.MeasureString(ModMain.Helper.Translation.Get("immersion.option3")).X;
+            int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModMain.Helper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
                 upArrow.draw(b);
@@ -370,10 +370,10 @@ namespace NPCMapLocations
                     scrollBar.draw(b);
                 }
 
-                for (var i = 0; i < optionSlots.Count(); i++)
+                for (int i = 0; i < optionSlots.Count(); i++)
                 {
-                    var x = optionSlots[i].bounds.X;
-                    var y = optionSlots[i].bounds.Y + Game1.tileSize / 4;
+                    int x = optionSlots[i].bounds.X;
+                    int y = optionSlots[i].bounds.Y + Game1.tileSize / 4;
                     if (currentItemIndex >= 0 && currentItemIndex + i < options.Count())
                     {
                         if (options[currentItemIndex + i] is MapModButton)
@@ -518,7 +518,7 @@ namespace NPCMapLocations
 
             base.receiveLeftClick(x, y);
             isChecked = !isChecked;
-            var whichOption = this.whichOption;
+            int whichOption = this.whichOption;
 
             // Show/hide villager options
             if (whichOption > 12 && npcMarkers != null)
@@ -706,7 +706,7 @@ namespace NPCMapLocations
             if (y == -1) y = 16;
 
             txtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
-            foreach (var displayOption in options)
+            foreach (int displayOption in options)
             {
                 txtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, txtSize);
                 displayOptions.Add($"{displayOption}px");
@@ -739,7 +739,7 @@ namespace NPCMapLocations
         {
             if (!greyedOut && options.Count > 0)
             {
-                var num = selected;
+                int num = selected;
                 if (minusButton.Contains(x, y) && selected != 0)
                 {
                     selected--;

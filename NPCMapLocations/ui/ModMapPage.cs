@@ -69,7 +69,7 @@ namespace NPCMapLocations
             for (int i = 0; i < regionRects.Count; i++)
             {
                 var rect = regionRects.ElementAtOrDefault(i);
-                var locationName = rect.Key;
+                string locationName = rect.Key;
 
                 // Special cases where the name is not an ingame location
                 switch (locationName)
@@ -164,7 +164,7 @@ namespace NPCMapLocations
                     {
                         if (!npcMarker.Value.IsHidden) //&& !(npcMarker.Value.Type == Character.Horse))
                         {
-                            if (Customizations.Names.TryGetValue(npcMarker.Key, out var name))
+                            if (Customizations.Names.TryGetValue(npcMarker.Key, out string name))
                             {
                                 hoveredList.Add(name);
                             }
@@ -203,7 +203,7 @@ namespace NPCMapLocations
                 hoveredNames = hoveredList[0];
                 for (int i = 1; i < hoveredList.Count; i++)
                 {
-                    var lines = hoveredNames.Split('\n');
+                    string[] lines = hoveredNames.Split('\n');
                     if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X >
                         (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
                     {
@@ -386,7 +386,7 @@ namespace NPCMapLocations
                 b.Draw(ModMain.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
-            var playerLocationName = getPlayerLocationNameForMap();
+            string playerLocationName = getPlayerLocationNameForMap();
             if (playerLocationName != null)
             {
                 SpriteText.drawStringWithScrollCenteredAt(b, playerLocationName, base.xPositionOnScreen + base.width / 2,
@@ -437,7 +437,7 @@ namespace NPCMapLocations
 
                 foreach (var npcMarker in sortedMarkers)
                 {
-                    var name = npcMarker.Key;
+                    string name = npcMarker.Key;
                     var marker = npcMarker.Value;
 
                     // Skip if no specified location or should be hidden
@@ -519,7 +519,7 @@ namespace NPCMapLocations
             if (hoveredNames.Equals("")) return;
 
             indoorIconVector = ModMain.UNKNOWN;
-            var lines = names.Split('\n');
+            string[] lines = names.Split('\n');
             int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
             int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
 
@@ -601,7 +601,7 @@ namespace NPCMapLocations
         {
             var player = Game1.player;
             string playerLocationName = null;
-            var replacedName = player.currentLocation.Name;
+            string replacedName = player.currentLocation.Name;
 
             if (replacedName.StartsWith("UndergroundMine") || replacedName == "Mine")
             {

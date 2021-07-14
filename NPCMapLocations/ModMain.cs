@@ -189,7 +189,7 @@ namespace NPCMapLocations
 
             // NPCs that player should meet before being shown
             ConditionalNpcs.Value = new Dictionary<string, bool>();
-            foreach (var npcName in ModConstants.ConditionalNpcs)
+            foreach (string npcName in ModConstants.ConditionalNpcs)
             {
                 ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
             }
@@ -211,7 +211,7 @@ namespace NPCMapLocations
             // Log any custom locations not handled in content.json
             try
             {
-                var alertStr = "Unknown locations:";
+                string alertStr = "Unknown locations:";
                 foreach (var locCtx in LocationUtil.LocationContexts)
                 {
                     if (
@@ -237,7 +237,7 @@ namespace NPCMapLocations
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
             {
-                var hostHasMod = false;
+                bool hostHasMod = false;
 
                 foreach (IMultiplayerPeer peer in Helper.Multiplayer.GetConnectedPlayers())
                 {
@@ -313,7 +313,7 @@ namespace NPCMapLocations
 
                 // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
                 // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
-                var commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
+                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
 
                 if (commonName.Contains("Barn")) locVector.Y += 3;
 
@@ -471,7 +471,7 @@ namespace NPCMapLocations
             {
                 foreach (var npc in GetVillagers())
                 {
-                    if (!Customizations.Names.TryGetValue(npc.Name, out var name) && !(npc is Horse || npc is Child)) continue;
+                    if (!Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
 
                     var type = Character.Villager;
                     if (npc is Horse)
@@ -483,14 +483,14 @@ namespace NPCMapLocations
                         type = Character.Child;
                     }
 
-                    if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out var offset))
+                    if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
                     {
                         offset = 0;
                     }
 
                     if (!NpcMarkers.Value.ContainsKey(npc.Name))
                     {
-                        var displayName = (npc.displayName != null && Game1.IsEnglish()) ? npc.displayName : npc.Name;
+                        string displayName = (npc.displayName != null && Game1.IsEnglish()) ? npc.displayName : npc.Name;
                         var newMarker = new NpcMarker()
                         {
                             DisplayName = displayName,
@@ -525,7 +525,7 @@ namespace NPCMapLocations
             // Half-second tick
             if (e.IsMultipleOf(30))
             {
-                var updateForMinimap = Globals.ShowMinimap && Minimap.Value != null;
+                bool updateForMinimap = Globals.ShowMinimap && Minimap.Value != null;
 
                 if (updateForMinimap)
                 {
@@ -578,7 +578,7 @@ namespace NPCMapLocations
                 }
 
                 // Check if conditional NPCs have been talked to
-                foreach (var npcName in ModConstants.ConditionalNpcs)
+                foreach (string npcName in ModConstants.ConditionalNpcs)
                 {
                     if (ConditionalNpcs.Value[npcName]) continue;
 
@@ -655,7 +655,7 @@ namespace NPCMapLocations
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
                         {
-                            if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out var offset))
+                            if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
                             {
                                 offset = 0;
                             }
@@ -670,7 +670,7 @@ namespace NPCMapLocations
                                 npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
                                 npcMarker.Type = syncedMarker.Value.Type;
 
-                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out var name))
+                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
                                 {
                                     name = syncedMarker.Key;
                                 }
@@ -712,7 +712,7 @@ namespace NPCMapLocations
                                     Type = syncedMarker.Value.Type
                                 };
 
-                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out var name))
+                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
                                 {
                                     name = syncedMarker.Key;
                                 }
@@ -838,7 +838,7 @@ namespace NPCMapLocations
                 npcMarker.LocationName = locationName;
 
                 // For show Npcs in player's location option
-                var isSameLocation = false;
+                bool isSameLocation = false;
 
                 if (Globals.OnlySameLocation)
                 {
@@ -917,11 +917,11 @@ namespace NPCMapLocations
 
             foreach (var npcMarker in NpcMarkers.Value)
             {
-                var name = npcMarker.Key;
+                string name = npcMarker.Key;
                 var marker = npcMarker.Value;
 
                 // For show Npcs in player's location option
-                var isSameLocation = false;
+                bool isSameLocation = false;
                 if (Globals.OnlySameLocation)
                 {
                     string playerLocationName =
@@ -989,14 +989,14 @@ namespace NPCMapLocations
             foreach (var farmer in Game1.getOnlineFarmers())
             {
                 if (farmer?.currentLocation == null) continue;
-                var locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
+                string locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
                 if (locationName.Contains("UndergroundMine"))
                 {
                     locationName = LocationUtil.GetMinesLocationName(locationName);
                 }
 
-                var farmerId = farmer.UniqueMultiplayerID;
+                long farmerId = farmer.UniqueMultiplayerID;
                 var farmerLoc = LocationToMap(
                   locationName,
                   farmer.getTileX(),
@@ -1007,8 +1007,8 @@ namespace NPCMapLocations
 
                 if (FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
                 {
-                    var deltaX = farmerLoc.X - farMarker.PrevMapX;
-                    var deltaY = farmerLoc.Y - farMarker.PrevMapY;
+                    float deltaX = farmerLoc.X - farMarker.PrevMapX;
+                    float deltaY = farmerLoc.Y - farMarker.PrevMapY;
 
                     // Location changes before tile position, causing farmhands to blink
                     // to the wrong position upon entering new location. Handle this in draw.
@@ -1051,8 +1051,8 @@ namespace NPCMapLocations
 
             if (locationName.StartsWith("UndergroundMine"))
             {
-                var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-                if (int.TryParse(mine, out var mineLevel))
+                string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+                if (int.TryParse(mine, out int mineLevel))
                 {
                     // Skull cave
                     if (mineLevel > 120)
@@ -1070,12 +1070,12 @@ namespace NPCMapLocations
               && locationName != "MovieTheater"         // Weird edge cases where the warps are off
             )
             {
-                var building = LocationUtil.GetBuilding(locationName);
+                string building = LocationUtil.GetBuilding(locationName);
 
                 if (building != null)
                 {
-                    var doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
-                    var doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
+                    int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
+                    int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
                     // Slightly adjust warp location to depict being inside the building 
                     var warpPos = LocationToMap(loc.Root, doorX, doorY, CustomMapVectors, LocationExclusions, isPlayer);
@@ -1091,7 +1091,7 @@ namespace NPCMapLocations
             if (locationName == "Farm")
             {
                 // Handle different farm types for custom vectors
-                var farms = new string[6] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners" };
+                string[] farms = new string[6] { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners" };
                 if (CustomMapVectors != null && (CustomMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
                 {
                     if (!CustomMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
@@ -1132,7 +1132,7 @@ namespace NPCMapLocations
 
                 MapVector lower = null;
                 MapVector upper = null;
-                var isSameAxis = false;
+                bool isSameAxis = false;
 
                 // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
                 foreach (var vector in vectors)
@@ -1159,7 +1159,7 @@ namespace NPCMapLocations
 
                 // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
                 // Uses fallback strategy - get closest points such that lower != upper
-                var tilePos = "(" + tileX + ", " + tileY + ")";
+                string tilePos = "(" + tileX + ", " + tileY + ")";
                 if (lower == null)
                     lower = upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
@@ -1239,7 +1239,7 @@ namespace NPCMapLocations
         {
             if (Game1.player.currentLocation == null) return;
             string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-            var textHeight = (int)Game1.dialogueFont
+            int textHeight = (int)Game1.dialogueFont
               .MeasureString("()").Y - 6;
 
             var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;

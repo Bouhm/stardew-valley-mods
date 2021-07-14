@@ -121,7 +121,7 @@ namespace LocationCompass
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
             {
-                var hostHasMod = false;
+                bool hostHasMod = false;
 
                 foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
                 {
@@ -238,10 +238,10 @@ namespace LocationCompass
 
         private string getMineName(string locationName)
         {
-            var mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-            var mineName = locationName;
+            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+            string mineName = locationName;
 
-            if (Int32.TryParse(mine, out var mineLevel))
+            if (Int32.TryParse(mine, out int mineLevel))
             {
                 mineName = mineLevel > 120 ? "SkullCave" : "Mine";
             }
@@ -260,8 +260,8 @@ namespace LocationCompass
                 if (!syncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
                 if (character is NPC npc && config.ShowQuestsAndBirthdaysOnly)
                 {
-                    var isBirthday = false;
-                    var hasQuest = false;
+                    bool isBirthday = false;
+                    bool hasQuest = false;
                     // Check if gifted for birthday
                     if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
                     {
@@ -293,11 +293,11 @@ namespace LocationCompass
                         continue;
                 }
 
-                var playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-                var charLocName = character is Farmer
+                string playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+                string charLocName = character is Farmer
                   ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
                   : npcLoc.LocationName;
-                var isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
+                bool isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
 
                 LocationContext playerLocCtx;
                 LocationContext characterLocCtx;
@@ -327,10 +327,10 @@ namespace LocationCompass
                 var playerPos =
                   new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom,
                     Game1.player.position.Y);
-                var isWarp = false;
-                var isOnScreen = false;
-                var isOutdoors = false;
-                var isHourse = character is Horse;
+                bool isWarp = false;
+                bool isOnScreen = false;
+                bool isOutdoors = false;
+                bool isHourse = character is Horse;
 
                 Vector2 charPosition;
                 int charSpriteHeight;
@@ -458,8 +458,8 @@ namespace LocationCompass
                     IsHorse = isHourse
                 };
 
-                var angle = GetPlayerToTargetAngle(playerPos, characterPos);
-                var quadrant = GetViewportQuadrant(angle, playerPos);
+                double angle = GetPlayerToTargetAngle(playerPos, characterPos);
+                int quadrant = GetViewportQuadrant(angle, playerPos);
                 var locatorPos = GetLocatorPosition(angle, quadrant, playerPos, characterPos, isOnScreen, isWarp);
 
                 locator.X = locatorPos.X;
@@ -486,9 +486,9 @@ namespace LocationCompass
         private double GetPlayerToTargetAngle(Vector2 playerPos, Vector2 npcPos)
         {
             // Hypotenuse is the line from player to npc
-            var opposite = npcPos.Y - playerPos.Y;
-            var adjacent = npcPos.X - playerPos.X;
-            var angle = Math.Atan2(opposite, adjacent) + MathHelper.Pi;
+            float opposite = npcPos.Y - playerPos.Y;
+            float adjacent = npcPos.X - playerPos.X;
+            double angle = Math.Atan2(opposite, adjacent) + MathHelper.Pi;
 
             return angle;
         }
@@ -535,8 +535,8 @@ namespace LocationCompass
         private static Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos,
           bool isOnScreen = false, bool IsWarp = false)
         {
-            var x = playerPos.X - Game1.viewport.X;
-            var y = playerPos.Y - Game1.viewport.Y;
+            float x = playerPos.X - Game1.viewport.X;
+            float y = playerPos.Y - Game1.viewport.Y;
 
             if (IsWarp)
                 if (Utility.isOnScreen(new Vector2(npcPos.X, npcPos.Y), Game1.tileSize / 4))
@@ -611,7 +611,7 @@ namespace LocationCompass
                 {
                     foreach (var locator in locPair.Value)
                     {
-                        var isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(
+                        bool isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(
                           Game1.getMouseX(),
                           Game1.getMouseY());
 
@@ -619,11 +619,11 @@ namespace LocationCompass
                         offsetY = 15;
 
                         // Change opacity based on distance from player
-                        var alphaLevel = isHovering ? 1f : locator.Proximity > MAX_PROXIMITY
+                        double alphaLevel = isHovering ? 1f : locator.Proximity > MAX_PROXIMITY
                           ? 0.35
                           : 0.35 + (MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY * 0.65;
 
-                        if (!constants.MarkerCrop.TryGetValue(locator.Name, out var cropY))
+                        if (!constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
                             cropY = 0;
 
                         var npcSrcRect = locator.IsHorse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, cropY, 16, 15);
@@ -664,7 +664,7 @@ namespace LocationCompass
                         // Draw distance text
                         if (locator.Proximity > 0)
                         {
-                            var distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
+                            string distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
                             DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                               Color.Black * (float)alphaLevel,
                               new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
@@ -686,7 +686,7 @@ namespace LocationCompass
                     else
                         locator = locPair.Value.FirstOrDefault();
 
-                    var isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(
+                    bool isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(
                       Game1.getMouseX(),
                       Game1.getMouseY());
 
@@ -712,7 +712,7 @@ namespace LocationCompass
                         }
 
                     // Change opacity based on distance from player
-                    var alphaLevel = isHovering ? 1f : (locator.IsOutdoors ? locator.Proximity > MAX_PROXIMITY
+                    double alphaLevel = isHovering ? 1f : (locator.IsOutdoors ? locator.Proximity > MAX_PROXIMITY
                       ? 0.3
                       : 0.3 + (MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY * 0.7 : locator.Proximity > MAX_PROXIMITY
                         ? 0.35
@@ -725,7 +725,7 @@ namespace LocationCompass
                         locator.Proximity = 0;
                     }
 
-                    if (!constants.MarkerCrop.TryGetValue(locator.Name, out var cropY))
+                    if (!constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
                         cropY = 0;
 
                     var compassSrcRect = locator.IsOutdoors ? new Rectangle(64, 0, 64, 64) : new Rectangle(0, 0, 64, 64); // Different locator color for neighboring outdoor locations
@@ -769,8 +769,8 @@ namespace LocationCompass
                         if (locPair.Value.Count > 1)
                         {
                             // Draw NPC count
-                            var countString = $"{locPair.Value.Count}";
-                            var headOffset = locPair.Value.Count > 9 ? 37 : 31;
+                            string countString = $"{locPair.Value.Count}";
+                            int headOffset = locPair.Value.Count > 9 ? 37 : 31;
 
                             // head icon
                             Game1.spriteBatch.Draw(
@@ -793,7 +793,7 @@ namespace LocationCompass
                     // Draw distance text
                     else if (locator.Proximity > 0)
                     {
-                        var distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
+                        string distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
                         DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                           Color.Black * (float)alphaLevel,
                           new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
@@ -824,7 +824,7 @@ namespace LocationCompass
         {
             var r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + 2, 2);
             var v = Vector2.Normalize(begin - end);
-            var angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
+            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
             if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
             b.Draw(tex, r, null, Color.White, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
@@ -860,11 +860,10 @@ namespace LocationCompass
                         continue;
 
                     var npc = Game1.getCharacterFromName(locator.Name);
-                    var viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 -
-                                    Game1.viewport.X;
-                    var viewportY = Game1.player.position.Y - Game1.viewport.Y;
-                    var npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
-                    var npcViewportY = npc.position.Y - Game1.viewport.Y;
+                    float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float viewportY = Game1.player.position.Y - Game1.viewport.Y;
+                    float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float npcViewportY = npc.position.Y - Game1.viewport.Y;
 
                     // Draw NPC sprite noodle connecting center of screen to NPC for debugging
                     DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY),

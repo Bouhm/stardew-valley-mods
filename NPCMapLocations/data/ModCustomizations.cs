@@ -93,7 +93,7 @@ namespace NPCMapLocations
                     if (gameNpc != null)
                     {
                         // If custom crop offset is not specified, default to 0
-                        if (!npcMarkerOffsets.TryGetValue(gameNpc.Name, out var crop)) npcMarkerOffsets[gameNpc.Name] = 0;
+                        if (!npcMarkerOffsets.TryGetValue(gameNpc.Name, out int crop)) npcMarkerOffsets[gameNpc.Name] = 0;
 
                         // Children sprites are short so give them a booster seat
                         if (gameNpc is Child)
@@ -112,9 +112,9 @@ namespace NPCMapLocations
             {
                 // Handle any modified NPC names 
                 // Specifically mods that change names in dialogue files (displayName)
-                if (!Names.TryGetValue(character.Name, out var customName))
+                if (!Names.TryGetValue(character.Name, out string customName))
                 {
-                    var displayName = (character.displayName != null && Game1.IsEnglish()) ? character.displayName : character.Name;
+                    string displayName = (character.displayName != null && Game1.IsEnglish()) ? character.displayName : character.Name;
 
                     Names.Add(character.Name, displayName);
                 }
@@ -210,7 +210,7 @@ namespace NPCMapLocations
         {
             var mapVectors = mapLocations.ToObject<JObject[]>();
             var mapVectorArr = new MapVector[mapVectors.Length];
-            for (var i = 0; i < mapVectors.Length; i++)
+            for (int i = 0; i < mapVectors.Length; i++)
             {
                 var mapVector = mapVectors[i];
 
