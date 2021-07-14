@@ -13,8 +13,8 @@ namespace NPCMapLocations.Framework.Menus
     {
         public static bool snapZoomPlus;
         public static bool snapZoomMinus;
-        public static Rectangle minusButtonSource = new Rectangle(177, 345, 7, 8);
-        public static Rectangle plusButtonSource = new Rectangle(184, 345, 7, 8);
+        public static Rectangle minusButtonSource = new(177, 345, 7, 8);
+        public static Rectangle plusButtonSource = new(184, 345, 7, 8);
         public List<string> displayOptions;
         private Rectangle minusButton;
         public List<int> options;

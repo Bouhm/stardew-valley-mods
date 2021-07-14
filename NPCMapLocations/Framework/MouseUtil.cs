@@ -49,13 +49,13 @@ namespace NPCMapLocations.Framework
         // Return Rectangle of current dragging area
         public static Rectangle GetCurrentDraggingArea()
         {
-            return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
+            return new((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
         }
 
         // Return Rectangle of drag and drop area
         public static Rectangle GetDragAndDropArea()
         {
-            return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+            return new((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
         }
 
         // Convert absolute positions to map positions

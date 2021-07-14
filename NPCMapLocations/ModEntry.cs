@@ -26,16 +26,16 @@ namespace NPCMapLocations
         public static GlobalConfig Globals;
         public static IModHelper Helper;
         public static Texture2D Map;
-        public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
+        public static Vector2 UNKNOWN = new(-9999, -9999);
         private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 
-        private readonly PerScreen<Texture2D> BuildingMarkers = new PerScreen<Texture2D>();
-        private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new PerScreen<Dictionary<string, MapVector[]>>();
-        private readonly PerScreen<ModMinimap> Minimap = new PerScreen<ModMinimap>();
-        private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new PerScreen<Dictionary<string, NpcMarker>>();
-        private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new PerScreen<Dictionary<string, bool>>();
-        private readonly PerScreen<bool> hasOpenedMap = new PerScreen<bool>();
-        private readonly PerScreen<bool> isModMapOpen = new PerScreen<bool>();
+        private readonly PerScreen<Texture2D> BuildingMarkers = new();
+        private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new();
+        private readonly PerScreen<ModMinimap> Minimap = new();
+        private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new();
+        private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new();
+        private readonly PerScreen<bool> hasOpenedMap = new();
+        private readonly PerScreen<bool> isModMapOpen = new();
 
         // External mod settings
         private readonly string MapFilePath = @"LooseSprites\Map";
@@ -43,7 +43,7 @@ namespace NPCMapLocations
         private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
 
         // Multiplayer
-        private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new PerScreen<Dictionary<long, FarmerMarker>>();
+        private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new();
         private long hostId;
         private List<long> playerIds;
 

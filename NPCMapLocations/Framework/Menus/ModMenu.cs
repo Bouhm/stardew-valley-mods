@@ -25,8 +25,8 @@ namespace NPCMapLocations.Framework.Menus
         private readonly int mapX;
         private readonly int mapY;
         private readonly ClickableTextureComponent okButton;
-        private readonly List<OptionsElement> options = new List<OptionsElement>();
-        private readonly List<ClickableComponent> optionSlots = new List<ClickableComponent>();
+        private readonly List<OptionsElement> options = new();
+        private readonly List<ClickableComponent> optionSlots = new();
         private readonly ClickableTextureComponent scrollBar;
         private readonly Rectangle scrollBarRunner;
         private readonly ClickableTextureComponent upArrow;

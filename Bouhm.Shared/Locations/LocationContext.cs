@@ -10,7 +10,7 @@ namespace Bouhm.Shared.Locations
         public LocationType Type { get; set; } // Outdoors, Building, or Room
         public string Root { get; set; } // Top-most outdoor location
         public string Parent { get; set; } // Level above
-        public Dictionary<string, Vector2> Neighbors { get; set; } = new Dictionary<string, Vector2>(); // Connected outdoor locations
+        public Dictionary<string, Vector2> Neighbors { get; set; } = new(); // Connected outdoor locations
         public List<string> Children { get; set; } // Levels below
         public Vector2 Warp { get; set; } // Position of warp
     }
