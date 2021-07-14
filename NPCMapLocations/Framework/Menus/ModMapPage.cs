@@ -173,7 +173,7 @@ namespace NPCMapLocations.Framework.Menus
                             {
                                 hoveredList.Add(name);
                             }
-                            else if (npcMarker.Value.Type == Character.Horse)
+                            else if (npcMarker.Value.Type == CharacterType.Horse)
                             {
                                 hoveredList.Add(npcMarker.Key);
                             }
@@ -459,7 +459,7 @@ namespace NPCMapLocations.Framework.Menus
                     var markerColor = marker.IsHidden ? Color.DarkGray * 0.7f : Color.White;
 
                     // Draw NPC marker
-                    var spriteRect = marker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
+                    var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
                     b.Draw(marker.Sprite,
                       new Rectangle((int)(this.mapX + marker.MapX), (int)(this.mapY + marker.MapY),

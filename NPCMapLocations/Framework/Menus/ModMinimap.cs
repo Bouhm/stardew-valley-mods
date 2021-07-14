@@ -446,9 +446,9 @@ namespace NPCMapLocations.Framework.Menus
                     var markerColor = marker.IsHidden ? Color.DarkGray * 0.7f : Color.White;
 
                     // Draw NPC marker
-                    var spriteRect = marker.Type == Character.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
+                    var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
-                    if (marker.Type == Character.Horse)
+                    if (marker.Type == CharacterType.Horse)
                     {
                         b.Draw(marker.Sprite,
                           new Rectangle(this.NormalizeToMap(offsetMmLoc.X + marker.MapX),

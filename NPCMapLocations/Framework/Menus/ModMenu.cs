@@ -129,7 +129,7 @@ namespace NPCMapLocations.Framework.Menus
             this.options.Add(new OptionsElement(villagersLabel));
 
             var orderedMarkers = npcMarkers.ToList()
-              .Where(x => x.Value.Sprite != null && x.Value.Type == Character.Villager)
+              .Where(x => x.Value.Sprite != null && x.Value.Type == CharacterType.Villager)
               .OrderBy(x => x.Value.DisplayName);
 
             int idx = 13;

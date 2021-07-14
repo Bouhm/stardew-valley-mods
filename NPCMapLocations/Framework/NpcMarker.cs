@@ -12,7 +12,7 @@ namespace NPCMapLocations.Framework
         public int MapX { get; set; }
         public int MapY { get; set; }
         public bool IsBirthday { get; set; }
-        public Character Type { get; set; }
+        public CharacterType Type { get; set; }
         public bool HasQuest { get; set; }
         public bool IsHidden { get; set; }
         public int Layer { get; set; }
@@ -29,7 +29,7 @@ namespace NPCMapLocations.Framework
             this.HasQuest = false;
             this.IsHidden = false;
             this.Layer = 4;
-            this.Type = Character.Villager;
+            this.Type = CharacterType.Villager;
         }
     }
 }

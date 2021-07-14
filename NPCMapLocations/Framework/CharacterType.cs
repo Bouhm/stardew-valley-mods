@@ -1,6 +1,6 @@
 ﻿namespace NPCMapLocations.Framework
 {
-    public enum Character
+    public enum CharacterType
     {
         Villager,
         Child,

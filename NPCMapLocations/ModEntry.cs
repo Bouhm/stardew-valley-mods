@@ -17,7 +17,6 @@ using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
-using Character = NPCMapLocations.Framework.Character;
 
 namespace NPCMapLocations
 {
@@ -464,14 +463,14 @@ namespace NPCMapLocations
                 {
                     if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
 
-                    var type = Character.Villager;
+                    var type = CharacterType.Villager;
                     if (npc is Horse)
                     {
-                        type = Character.Horse;
+                        type = CharacterType.Horse;
                     }
                     else if (npc is Child)
                     {
-                        type = Character.Child;
+                        type = CharacterType.Child;
                     }
 
                     if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
@@ -667,7 +666,7 @@ namespace NPCMapLocations
 
                                 try
                                 {
-                                    if (syncedMarker.Value.Type == Character.Villager)
+                                    if (syncedMarker.Value.Type == CharacterType.Villager)
                                     {
                                         if (name == "Leo")
                                         {
@@ -709,7 +708,7 @@ namespace NPCMapLocations
 
                                 try
                                 {
-                                    if (syncedMarker.Value.Type == Character.Villager)
+                                    if (syncedMarker.Value.Type == CharacterType.Villager)
                                     {
                                         if (name == "Leo")
                                         {
@@ -956,7 +955,7 @@ namespace NPCMapLocations
                 // Establish draw order, higher number infront
                 // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
                 // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-                if (marker.Type == Character.Horse || marker.Type == Character.Child)
+                if (marker.Type == CharacterType.Horse || marker.Type == CharacterType.Child)
                 {
                     marker.Layer = 0;
                 }
