@@ -26,7 +26,6 @@ namespace NPCMapLocations
         public static PlayerConfig Config;
         public static GlobalConfig Globals;
         public static IModHelper Helper;
-        public static IMonitor IMonitor;
         public static Texture2D Map;
         public static Vector2 UNKNOWN = new Vector2(-9999, -9999);
         private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
@@ -46,15 +45,15 @@ namespace NPCMapLocations
 
         // Multiplayer
         private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new PerScreen<Dictionary<long, FarmerMarker>>();
-        private static long hostId;
-        private static List<long> playerIds;
+        private long hostId;
+        private List<long> playerIds;
 
         // Customizations/Custom mods
         private string MapSeason;
         private ModCustomizations Customizations;
 
         // Debugging
-        private static bool DEBUG_MODE;
+        private bool DEBUG_MODE;
 
         // Replace game map with modified map
         public bool CanLoad<T>(IAssetInfo asset)
@@ -112,7 +111,6 @@ namespace NPCMapLocations
             if (!Context.IsMainPlayer && Context.IsSplitScreen) return;
 
             Helper = helper;
-            IMonitor = this.Monitor;
             Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
 
@@ -143,7 +141,7 @@ namespace NPCMapLocations
                 {
                     if (peer.IsHost)
                     {
-                        hostId = peer.PlayerID;
+                        this.hostId = peer.PlayerID;
                         break;
                     }
                 }
@@ -156,7 +154,7 @@ namespace NPCMapLocations
             // Let host know farmhand is ready to receive updates
             if (Context.IsMultiplayer && !Context.IsMainPlayer)
             {
-                Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: new long[] { hostId });
+                Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: new long[] { this.hostId });
             }
 
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
@@ -190,7 +188,7 @@ namespace NPCMapLocations
             Map = Game1.content.Load<Texture2D>(this.MapFilePath);
 
             // Disable for multiplayer for anti-cheat
-            DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
+            this.DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
 
             // NPCs that player should meet before being shown
             this.ConditionalNpcs.Value = new Dictionary<string, bool>();
@@ -257,7 +255,7 @@ namespace NPCMapLocations
             }
         }
 
-        private static bool ShouldTrackNpc(NPC npc)
+        private bool ShouldTrackNpc(NPC npc)
         {
             return
               (
@@ -271,7 +269,7 @@ namespace NPCMapLocations
         }
 
         // Get only relevant villagers for map
-        public static List<NPC> GetVillagers()
+        private List<NPC> GetVillagers()
         {
             var villagers = new List<NPC>();
 
@@ -282,7 +280,7 @@ namespace NPCMapLocations
                     if (npc == null) continue;
                     if (
                       !villagers.Contains(npc)
-                      && ShouldTrackNpc(npc)
+                      && this.ShouldTrackNpc(npc)
                     )
                     {
                         villagers.Add(npc);
@@ -365,11 +363,8 @@ namespace NPCMapLocations
             }
 
             // Debug DnD
-            if
-              (DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
-            {
+            if (this.DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
                 MouseUtil.HandleMouseDown();
-            }
 
             // Minimap toggle
             if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
@@ -382,7 +377,7 @@ namespace NPCMapLocations
             if (Game1.activeClickableMenu is GameMenu)
                 this.HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
-            if (DEBUG_MODE && !Context.IsMultiplayer && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held && e.Button.Equals(SButton.MouseRight))
+            if (this.DEBUG_MODE && !Context.IsMultiplayer && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held && e.Button.Equals(SButton.MouseRight))
                 Game1.player.setTileLocation(Game1.currentCursorTile);
         }
 
@@ -390,20 +385,14 @@ namespace NPCMapLocations
         {
             if (!Context.IsWorldReady) return;
 
-            if (DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
-            {
+            if (this.DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
                 MouseUtil.HandleMouseRelease();
-            }
             else if (this.Minimap.Value != null)
             {
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
-                {
                     this.Minimap.Value.Resize();
-                }
                 else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
-                {
                     MouseUtil.HandleMouseRelease(() => this.Minimap.Value.HandleMouseRelease());
-                }
             }
         }
 
@@ -471,7 +460,7 @@ namespace NPCMapLocations
 
             if (!Context.IsMultiplayer || Context.IsMainPlayer)
             {
-                foreach (var npc in GetVillagers())
+                foreach (var npc in this.GetVillagers())
                 {
                     if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
 
@@ -537,7 +526,7 @@ namespace NPCMapLocations
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
                 // Sync multiplayer data
-                if (Context.IsMainPlayer && Context.IsMultiplayer && playerIds != null)
+                if (Context.IsMainPlayer && Context.IsMultiplayer && this.playerIds != null)
                 {
                     var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
 
@@ -554,7 +543,7 @@ namespace NPCMapLocations
                         });
                     }
 
-                    Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
+                    Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: this.playerIds.ToArray());
                 }
             }
 
@@ -612,12 +601,12 @@ namespace NPCMapLocations
             // Remove disconnected peer's ID from list if exists
             if (Context.IsMainPlayer && Context.IsMultiplayer)
             {
-                playerIds.Remove(e.Peer.PlayerID);
+                this.playerIds.Remove(e.Peer.PlayerID);
 
-                if (playerIds.Count == 0)
+                if (this.playerIds.Count == 0)
                 {
                     // Set list to null and stop listening to disconnections
-                    playerIds = null;
+                    this.playerIds = null;
                     Helper.Events.Multiplayer.PeerDisconnected -= this.Multiplayer_PeerDisconnected;
                 }
             }
@@ -632,15 +621,15 @@ namespace NPCMapLocations
                     case "PlayerReady":
                         if (Context.IsMainPlayer)
                         {
-                            if (playerIds == null)
+                            if (this.playerIds == null)
                             {
                                 // Instantiate list and listen to player disconnects
-                                playerIds = new List<long>(3);
+                                this.playerIds = new List<long>(3);
                                 Helper.Events.Multiplayer.PeerDisconnected += this.Multiplayer_PeerDisconnected;
                             }
-                            playerIds.Add(e.FromPlayerID);
+                            this.playerIds.Add(e.FromPlayerID);
 
-                            Helper.Multiplayer.SendMessage(this.Customizations.Names, "SyncedNames", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
+                            Helper.Multiplayer.SendMessage(this.Customizations.Names, "SyncedNames", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: this.playerIds.ToArray());
                         }
                         break;
                     case "SyncedNames":
@@ -792,7 +781,7 @@ namespace NPCMapLocations
         {
             if (this.NpcMarkers.Value == null) return;
 
-            List<NPC> npc_list = GetVillagers();
+            List<NPC> npc_list = this.GetVillagers();
 
             // If player is riding a horse, add it to list
             if (Game1.player.isRidingHorse())
@@ -1213,12 +1202,14 @@ namespace NPCMapLocations
         private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
         {
             // Highlight tile for debug mode
-            if (DEBUG_MODE)
+            if (this.DEBUG_MODE)
+            {
                 Game1.spriteBatch.Draw(Game1.mouseCursors,
                   new Vector2(
                     Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
                     Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
                   new Rectangle(448, 128, 64, 64), Color.White);
+            }
         }
 
         // DEBUG 
@@ -1226,7 +1217,7 @@ namespace NPCMapLocations
         {
             if (!Context.IsWorldReady || Game1.player == null) return;
 
-            if (DEBUG_MODE)
+            if (this.DEBUG_MODE)
                 this.ShowDebugInfo();
         }
 
@@ -1257,50 +1248,41 @@ namespace NPCMapLocations
                   Rectangle.Empty, Color.White);
 
                 // Show map pixel position at cursor
-                DrawText($"Map position: ({mapPos.X}, {mapPos.Y})",
-                  new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+                this.DrawText($"Map position: ({mapPos.X}, {mapPos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
 
                 // Draw drag and drop area
                 if (Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
                 {
                     // Draw dragging box
-                    DrawBorder(tex,
-                     MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
+                    this.DrawBorder(tex, MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
                 }
                 else
                 {
                     if (MouseUtil.BeginMousePosition.X < 0 && MouseUtil.EndMousePosition.X < 0) return;
 
                     // Draw drag and drop box
-                    DrawBorder(tex,
-                      bounds,
-                      borderWidth, Color.White * borderOpacity);
+                    this.DrawBorder(tex, bounds, borderWidth, Color.White * borderOpacity);
 
                     var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
 
                     if (mapBounds.Width == 0 && mapBounds.Height == 0)
                     {
                         // Show point
-                        DrawText($"Point: ({mapBounds.X}, {mapBounds.Y})",
-                          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+                        this.DrawText($"Point: ({mapBounds.X}, {mapBounds.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
                     }
                     else
                     {
                         // Show first point of DnD box
-                        DrawText($"Top-left: ({mapBounds.X}, {mapBounds.Y})",
-                          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+                        this.DrawText($"Top-left: ({mapBounds.X}, {mapBounds.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
 
                         // Show second point of DnD box
-                        DrawText($"Bot-right: ({mapBounds.X + mapBounds.Width}, {mapBounds.Y + mapBounds.Height})",
-                          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
+                        this.DrawText($"Bot-right: ({mapBounds.X + mapBounds.Width}, {mapBounds.Y + mapBounds.Height})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
 
                         // Show width of DnD box
-                        DrawText($"Width: {mapBounds.Width}",
-                          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
+                        this.DrawText($"Width: {mapBounds.Width}", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
 
                         // Show height of DnD box
-                        DrawText($"Height: {mapBounds.Height}",
-                          new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
+                        this.DrawText($"Height: {mapBounds.Height}", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
                     }
                 }
             }
@@ -1308,13 +1290,13 @@ namespace NPCMapLocations
             {
                 // Show tile position of tile at cursor
                 var tilePos = MouseUtil.GetTilePositionAtCursor();
-                DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-                DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
+                this.DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
+                this.DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
             }
         }
 
         // Draw outlined text
-        private static void DrawText(string text, Vector2 pos, Color? color = null)
+        private void DrawText(string text, Vector2 pos, Color? color = null)
         {
             var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
             tex.SetData(new Color[] { Color.Black * 0.75f });
@@ -1339,7 +1321,7 @@ namespace NPCMapLocations
         }
 
         // Draw rectangle border
-        private static void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
+        private void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
         {
             // Draw top line
             Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1, rect.Y - 1, rect.Width + 3, borderWidth), color);

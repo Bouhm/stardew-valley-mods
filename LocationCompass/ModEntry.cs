@@ -16,16 +16,15 @@ namespace LocationCompass
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
     {
-        private const int MAX_PROXIMITY = 4800;
+        private readonly int MAX_PROXIMITY = 4800;
 
-        private const bool DEBUG_MODE = false;
-        private static IMonitor monitor;
-        private static Texture2D pointer;
-        private static ModData constants;
-        private static List<Character> characters;
-        private static SyncedNpcLocationData syncedLocationData;
-        private static Dictionary<string, List<Locator>> locators;
-        private static Dictionary<string, LocatorScroller> activeWarpLocators; // Active indices of locators of doors
+        private readonly bool DEBUG_MODE = false;
+        private Texture2D pointer;
+        private ModData constants;
+        private List<Character> characters;
+        private SyncedNpcLocationData syncedLocationData;
+        private Dictionary<string, List<Locator>> locators;
+        private Dictionary<string, LocatorScroller> activeWarpLocators; // Active indices of locators of doors
         private ModConfig config;
         private IModHelper helper;
         private bool showLocators;
@@ -33,10 +32,9 @@ namespace LocationCompass
         public override void Entry(IModHelper helper)
         {
             this.helper = helper;
-            monitor = this.Monitor;
             this.config = helper.ReadConfig<ModConfig>();
-            pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
-            constants = this.helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
+            this.pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
+            this.constants = this.helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
 
             helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
             helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
@@ -50,10 +48,10 @@ namespace LocationCompass
 
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         {
-            characters = new List<Character>();
+            this.characters = new List<Character>();
 
-            foreach (var NPC in this.GetVillagers())
-                characters.Add(NPC);
+            foreach (var npc in this.GetVillagers())
+                this.characters.Add(npc);
 
             this.UpdateLocators();
         }
@@ -80,11 +78,11 @@ namespace LocationCompass
             }
 
             // Configs
-            if (activeWarpLocators != null)
+            if (this.activeWarpLocators != null)
             {
                 // Handle scroller click
                 if (e.Button.Equals(SButton.MouseRight) || e.Button.Equals(SButton.ControllerA))
-                    foreach (var doorLocator in activeWarpLocators)
+                    foreach (var doorLocator in this.activeWarpLocators)
                     {
                         if (doorLocator.Value.Characters.Count > 1)
                             doorLocator.Value.ReceiveLeftClick();
@@ -113,8 +111,8 @@ namespace LocationCompass
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            activeWarpLocators = new Dictionary<string, LocatorScroller>();
-            syncedLocationData = new SyncedNpcLocationData();
+            this.activeWarpLocators = new Dictionary<string, LocatorScroller>();
+            this.syncedLocationData = new SyncedNpcLocationData();
             LocationUtil.GetLocationContexts();
 
             // Log warning if host does not have mod installed
@@ -139,7 +137,7 @@ namespace LocationCompass
         private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
-                syncedLocationData = e.ReadAs<SyncedNpcLocationData>();
+                this.syncedLocationData = e.ReadAs<SyncedNpcLocationData>();
         }
 
         // Get only relevant villagers for map
@@ -190,25 +188,25 @@ namespace LocationCompass
             // Quarter-second tick
             if (e.IsMultipleOf(15))
             {
-                if (characters != null && Context.IsMultiplayer)
+                if (this.characters != null && Context.IsMultiplayer)
                 {
                     foreach (var farmer in Game1.getOnlineFarmers())
                     {
                         if (farmer == Game1.player) continue;
-                        if (!characters.Contains(farmer))
-                            characters.Add(farmer);
+                        if (!this.characters.Contains(farmer))
+                            this.characters.Add(farmer);
                     }
                 }
 
-                if (Context.IsMainPlayer && Context.IsMultiplayer && syncedLocationData != null)
+                if (Context.IsMainPlayer && Context.IsMultiplayer && this.syncedLocationData != null)
                 {
                     this.getSyncedLocationData();
-                    this.Helper.Multiplayer.SendMessage(syncedLocationData, "SyncedLocationData", modIDs: new[] { this.ModManifest.UniqueID });
+                    this.Helper.Multiplayer.SendMessage(this.syncedLocationData, "SyncedLocationData", modIDs: new[] { this.ModManifest.UniqueID });
                 }
             }
 
             // Update tick
-            if (!Game1.paused && this.showLocators && syncedLocationData != null)
+            if (!Game1.paused && this.showLocators && this.syncedLocationData != null)
             {
                 if (Context.IsMainPlayer)
                     this.getSyncedLocationData();
@@ -222,13 +220,13 @@ namespace LocationCompass
             foreach (var npc in this.GetVillagers())
             {
                 if (npc == null || npc.currentLocation == null) continue;
-                if (syncedLocationData.Locations.TryGetValue(npc.Name, out var locationData))
+                if (this.syncedLocationData.Locations.TryGetValue(npc.Name, out var locationData))
                 {
-                    syncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
+                    this.syncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
                 }
                 else
                 {
-                    syncedLocationData.AddLocation(npc.Name,
+                    this.syncedLocationData.AddLocation(npc.Name,
                       new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y));
                 }
             }
@@ -249,13 +247,13 @@ namespace LocationCompass
 
         private void UpdateLocators()
         {
-            locators = new Dictionary<string, List<Locator>>();
+            this.locators = new Dictionary<string, List<Locator>>();
 
-            foreach (var character in characters)
+            foreach (var character in this.characters)
             {
                 if (character.currentLocation == null) continue;
                 if (!this.config.ShowHorses && character is Horse || this.config.ShowFarmersOnly && (character is NPC && !(character is Horse))) continue;
-                if (!syncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
+                if (!this.syncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
                 if (character is NPC npc && this.config.ShowQuestsAndBirthdaysOnly)
                 {
                     bool isBirthday = false;
@@ -428,9 +426,9 @@ namespace LocationCompass
                     }
 
                     // Add character to the list of locators inside a building
-                    if (!activeWarpLocators.ContainsKey(charLocName))
+                    if (!this.activeWarpLocators.ContainsKey(charLocName))
                     {
-                        activeWarpLocators.Add(charLocName, new LocatorScroller()
+                        this.activeWarpLocators.Add(charLocName, new LocatorScroller()
                         {
                             Location = charLocName,
                             Characters = new HashSet<string>() { character.Name },
@@ -439,7 +437,7 @@ namespace LocationCompass
                         });
                     }
                     else
-                        activeWarpLocators[charLocName].Characters.Add(character.Name);
+                        this.activeWarpLocators[charLocName].Characters.Add(character.Name);
                 }
 
                 isOnScreen = Utility.isOnScreen(characterPos, Game1.tileSize / 4);
@@ -458,14 +456,14 @@ namespace LocationCompass
 
                 double angle = this.GetPlayerToTargetAngle(playerPos, characterPos);
                 int quadrant = this.GetViewportQuadrant(angle, playerPos);
-                var locatorPos = GetLocatorPosition(angle, quadrant, playerPos, characterPos, isOnScreen, isWarp);
+                var locatorPos = this.GetLocatorPosition(angle, quadrant, playerPos, characterPos, isOnScreen, isWarp);
 
                 locator.X = locatorPos.X;
                 locator.Y = locatorPos.Y;
                 locator.Angle = angle;
                 locator.Quadrant = quadrant;
 
-                if (locators.TryGetValue(charLocName, out var warpLocators))
+                if (this.locators.TryGetValue(charLocName, out var warpLocators))
                 {
                     if (!warpLocators.Contains(locator))
                         warpLocators.Add(locator);
@@ -475,7 +473,7 @@ namespace LocationCompass
                     warpLocators = new List<Locator> { locator };
                 }
 
-                locators[charLocName] = warpLocators;
+                this.locators[charLocName] = warpLocators;
             }
         }
 
@@ -530,7 +528,7 @@ namespace LocationCompass
 
         // Get position of location relative to viewport from
         // the viewport quadrant and positions of player/npc relative to map
-        private static Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos,
+        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos,
           bool isOnScreen = false, bool IsWarp = false)
         {
             float x = playerPos.X - Game1.viewport.X;
@@ -596,7 +594,7 @@ namespace LocationCompass
 
         private void DrawLocators()
         {
-            var sortedLocators = locators.OrderBy(x => !x.Value.FirstOrDefault().IsOutdoors);
+            var sortedLocators = this.locators.OrderBy(x => !x.Value.FirstOrDefault().IsOutdoors);
 
             // Individual locators, onscreen or offscreen
             foreach (var locPair in sortedLocators)
@@ -617,41 +615,41 @@ namespace LocationCompass
                         offsetY = 15;
 
                         // Change opacity based on distance from player
-                        double alphaLevel = isHovering ? 1f : locator.Proximity > MAX_PROXIMITY
+                        double alphaLevel = isHovering ? 1f : locator.Proximity > this.MAX_PROXIMITY
                           ? 0.35
-                          : 0.35 + (MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY * 0.65;
+                          : 0.35 + (this.MAX_PROXIMITY - locator.Proximity) / this.MAX_PROXIMITY * 0.65;
 
-                        if (!constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
+                        if (!this.constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
                             cropY = 0;
 
                         var npcSrcRect = locator.IsHorse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, cropY, 16, 15);
 
                         // Pointer texture
                         Game1.spriteBatch.Draw(
-                          pointer,
-                          new Vector2(locator.X, locator.Y),
-                          new Rectangle(0, 0, 64, 64),
-                          Color.White * (float)alphaLevel,
-                          (float)(locator.Angle - 3 * MathHelper.PiOver4),
-                          new Vector2(32, 32),
-                          1f,
-                          SpriteEffects.None,
-                          0.0f
+                            this.pointer,
+                            new Vector2(locator.X, locator.Y),
+                            new Rectangle(0, 0, 64, 64),
+                            Color.White * (float)alphaLevel,
+                            (float)(locator.Angle - 3 * MathHelper.PiOver4),
+                            new Vector2(32, 32),
+                            1f,
+                            SpriteEffects.None,
+                            0.0f
                         );
 
                         // NPC head
                         if (locator.Marker != null)
                         {
                             Game1.spriteBatch.Draw(
-                              locator.Marker,
-                              new Vector2(locator.X + offsetX, locator.Y + offsetY),
-                              npcSrcRect,
-                              Color.White * (float)alphaLevel,
-                              0f,
-                              new Vector2(16, 16),
-                              3f,
-                              SpriteEffects.None,
-                              1f
+                                locator.Marker,
+                                new Vector2(locator.X + offsetX, locator.Y + offsetY),
+                                npcSrcRect,
+                                Color.White * (float)alphaLevel,
+                                0f,
+                                new Vector2(16, 16),
+                                3f,
+                                SpriteEffects.None,
+                                1f
                             );
                         }
                         else
@@ -663,7 +661,7 @@ namespace LocationCompass
                         if (locator.Proximity > 0)
                         {
                             string distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
-                            DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
+                            this.DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                               Color.Black * (float)alphaLevel,
                               new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
                                 (float)(Game1.tileSize / 4 * 0.5)), 1f);
@@ -676,7 +674,7 @@ namespace LocationCompass
                     Locator locator = null;
                     LocatorScroller activeLocator = null;
 
-                    if (activeWarpLocators != null && activeWarpLocators.TryGetValue(locPair.Key, out activeLocator))
+                    if (this.activeWarpLocators != null && this.activeWarpLocators.TryGetValue(locPair.Key, out activeLocator))
                     {
                         locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
                         activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);
@@ -710,11 +708,11 @@ namespace LocationCompass
                         }
 
                     // Change opacity based on distance from player
-                    double alphaLevel = isHovering ? 1f : (locator.IsOutdoors ? locator.Proximity > MAX_PROXIMITY
+                    double alphaLevel = isHovering ? 1f : (locator.IsOutdoors ? locator.Proximity > this.MAX_PROXIMITY
                       ? 0.3
-                      : 0.3 + (MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY * 0.7 : locator.Proximity > MAX_PROXIMITY
+                      : 0.3 + (this.MAX_PROXIMITY - locator.Proximity) / this.MAX_PROXIMITY * 0.7 : locator.Proximity > this.MAX_PROXIMITY
                         ? 0.35
-                        : 0.35 + (MAX_PROXIMITY - locator.Proximity) / MAX_PROXIMITY * 0.65);
+                        : 0.35 + (this.MAX_PROXIMITY - locator.Proximity) / this.MAX_PROXIMITY * 0.65);
 
                     // Make locators point down at the door
                     if (locator.IsOnScreen)
@@ -723,7 +721,7 @@ namespace LocationCompass
                         locator.Proximity = 0;
                     }
 
-                    if (!constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
+                    if (!this.constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
                         cropY = 0;
 
                     var compassSrcRect = locator.IsOutdoors ? new Rectangle(64, 0, 64, 64) : new Rectangle(0, 0, 64, 64); // Different locator color for neighboring outdoor locations
@@ -731,30 +729,30 @@ namespace LocationCompass
 
                     // Pointer texture
                     Game1.spriteBatch.Draw(
-                      pointer,
-                      new Vector2(locator.X, locator.Y),
-                      compassSrcRect,
-                      Color.White * (float)alphaLevel,
-                      (float)(locator.Angle - 3 * MathHelper.PiOver4),
-                      new Vector2(32, 32),
-                      1f,
-                      SpriteEffects.None,
-                      0.0f
+                        this.pointer,
+                        new Vector2(locator.X, locator.Y),
+                        compassSrcRect,
+                        Color.White * (float)alphaLevel,
+                        (float)(locator.Angle - 3 * MathHelper.PiOver4),
+                        new Vector2(32, 32),
+                        1f,
+                        SpriteEffects.None,
+                        0.0f
                     );
 
                     // NPC head
                     if (locator.Marker != null)
                     {
                         Game1.spriteBatch.Draw(
-                          locator.Marker,
-                          new Vector2(locator.X + offsetX, locator.Y + offsetY),
-                          npcSrcRect,
-                          Color.White * (float)alphaLevel,
-                          0f,
-                          new Vector2(16, 16),
-                          3f,
-                          SpriteEffects.None,
-                          1f
+                            locator.Marker,
+                            new Vector2(locator.X + offsetX, locator.Y + offsetY),
+                            npcSrcRect,
+                            Color.White * (float)alphaLevel,
+                            0f,
+                            new Vector2(16, 16),
+                            3f,
+                            SpriteEffects.None,
+                            1f
                         );
                     }
                     else
@@ -772,16 +770,16 @@ namespace LocationCompass
 
                             // head icon
                             Game1.spriteBatch.Draw(
-                              pointer,
-                              new Vector2(locator.X + offsetX - headOffset, locator.Y + offsetY),
-                              new Rectangle(128, 0, 7, 9),
-                              Color.White * (float)alphaLevel, 0f, Vector2.Zero,
-                              1f,
-                              SpriteEffects.None,
-                              1f
+                                this.pointer,
+                                new Vector2(locator.X + offsetX - headOffset, locator.Y + offsetY),
+                                new Rectangle(128, 0, 7, 9),
+                                Color.White * (float)alphaLevel, 0f, Vector2.Zero,
+                                1f,
+                                SpriteEffects.None,
+                                1f
                             );
 
-                            DrawText(Game1.tinyFont, countString, new Vector2(locator.X + offsetX - 31, locator.Y + offsetY),
+                            this.DrawText(Game1.tinyFont, countString, new Vector2(locator.X + offsetX - 31, locator.Y + offsetY),
                               Color.Black * (float)alphaLevel,
                               new Vector2((int)(Game1.tinyFont.MeasureString(countString).X - 24) / 2,
                                 (float)(Game1.tileSize / 8) + 3), 1f);
@@ -792,7 +790,7 @@ namespace LocationCompass
                     else if (locator.Proximity > 0)
                     {
                         string distanceString = $"{Math.Round(locator.Proximity / Game1.tileSize, 0)}";
-                        DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
+                        this.DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                           Color.Black * (float)alphaLevel,
                           new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
                             (float)(Game1.tileSize / 4 * 0.5)), 1f);
@@ -828,7 +826,7 @@ namespace LocationCompass
         }
 
         // Draw outlined text
-        private static void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null,
+        private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null,
           float scale = 1f)
         {
             //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
@@ -847,10 +845,10 @@ namespace LocationCompass
             if (this.showLocators && Game1.activeClickableMenu == null)
                 this.DrawLocators();
 
-            if (!DEBUG_MODE)
+            if (!this.DEBUG_MODE)
                 return;
 
-            foreach (var locPair in locators)
+            foreach (var locPair in this.locators)
             {
                 foreach (var locator in locPair.Value)
                 {
