@@ -305,7 +305,7 @@ namespace NPCMapLocations
             }
 
             // Draw indoor icon
-            if (this.hasIndoorCharacter && !String.IsNullOrEmpty(this.hoveredNames))
+            if (this.hasIndoorCharacter && !string.IsNullOrEmpty(this.hoveredNames))
                 b.Draw(Game1.mouseCursors, this.indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
                   Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
 

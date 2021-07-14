@@ -239,7 +239,7 @@ namespace LocationCompass
             string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
             string mineName = locationName;
 
-            if (Int32.TryParse(mine, out int mineLevel))
+            if (int.TryParse(mine, out int mineLevel))
             {
                 mineName = mineLevel > 120 ? "SkullCave" : "Mine";
             }
