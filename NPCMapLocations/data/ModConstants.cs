@@ -11,7 +11,7 @@ using StardewValley.Menus;
 public static class ModConstants
 {
     // The page index of mapTab
-    public static int MapTabIndex => StardewModdingAPI.Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
+    public static int MapTabIndex => Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
 
     // Cropping heads for NPC markers
     // Values shift the head up (negative) or down (positive)

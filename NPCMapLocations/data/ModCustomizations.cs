@@ -26,18 +26,18 @@ namespace NPCMapLocations
             //if (MapsPath != null)
             //  MapsPath = Path.Combine(MapsRootPath, MapsPath);
             //else
-            MapsPath = Path.Combine(MapsRootPath, "_default");
+            this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
 
-            Names = new Dictionary<string, string>();
-            MapVectors = new Dictionary<string, MapVector[]>();
-            Tooltips = new Dictionary<string, MapTooltip>();
-            LocationExclusions = new HashSet<string>();
+            this.Names = new Dictionary<string, string>();
+            this.MapVectors = new Dictionary<string, MapVector[]>();
+            this.Tooltips = new Dictionary<string, MapTooltip>();
+            this.LocationExclusions = new HashSet<string>();
         }
 
         public void LoadCustomData(Dictionary<string, JObject> CustomNpcJson, Dictionary<string, JObject> CustomLocationJson)
         {
-            LoadCustomLocations(CustomLocationJson);
-            LoadCustomNpcs(CustomNpcJson);
+            this.LoadCustomLocations(CustomLocationJson);
+            this.LoadCustomNpcs(CustomNpcJson);
         }
 
         private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
@@ -47,17 +47,17 @@ namespace NPCMapLocations
                 var location = locationData.Value;
                 if (location.ContainsKey("MapVectors"))
                 {
-                    AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
+                    this.AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
                 }
                 if (location.ContainsKey("MapTooltip"))
                 {
-                    AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
+                    this.AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
                 }
                 if (location.ContainsKey("Exclude"))
                 {
                     if ((bool)location.GetValue("Exclude"))
                     {
-                        LocationExclusions.Add(locationData.Key);
+                        this.LocationExclusions.Add(locationData.Key);
                     }
                 }
             }
@@ -105,24 +105,24 @@ namespace NPCMapLocations
             }
 
             // Merge customizations into globals config
-            ModMain.Globals.NpcMarkerOffsets = MergeDictionaries(npcMarkerOffsets, ModMain.Globals.NpcMarkerOffsets);
+            ModMain.Globals.NpcMarkerOffsets = this.MergeDictionaries(npcMarkerOffsets, ModMain.Globals.NpcMarkerOffsets);
             ModMain.Globals.NpcExclusions = npcExclusions;
 
             foreach (var character in Utility.getAllCharacters())
             {
                 // Handle any modified NPC names 
                 // Specifically mods that change names in dialogue files (displayName)
-                if (!Names.TryGetValue(character.Name, out string customName))
+                if (!this.Names.TryGetValue(character.Name, out string customName))
                 {
                     string displayName = (character.displayName != null && Game1.IsEnglish()) ? character.displayName : character.Name;
 
-                    Names.Add(character.Name, displayName);
+                    this.Names.Add(character.Name, displayName);
                 }
             }
 
             // Handle duplicate displayName -- custom NPCs that replaces villagers
-            Dictionary<string, string> dupes = Names
-              .Where(n1 => Names.Any(n2 => n2.Key != n1.Key && n2.Value == n1.Value))
+            Dictionary<string, string> dupes = this.Names
+              .Where(n1 => this.Names.Any(n2 => n2.Key != n1.Key && n2.Value == n1.Value))
               .ToDictionary(n => n.Key, n => n.Value);
 
             // Properly replace the villager with custom NPC
@@ -130,11 +130,11 @@ namespace NPCMapLocations
             {
                 if (dupe.Key != dupe.Value)
                 {
-                    Names[dupe.Key] = dupe.Value;
+                    this.Names[dupe.Key] = dupe.Value;
                 }
                 else
                 {
-                    Names.Remove(dupe.Key);
+                    this.Names.Remove(dupe.Key);
                 }
             }
 
@@ -147,7 +147,7 @@ namespace NPCMapLocations
         private string GetCustomMapFolderName()
         {
             // get root compatibility folder
-            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, MapsRootPath));
+            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, this.MapsRootPath));
             if (!compatFolder.Exists)
                 return null;
 
@@ -190,7 +190,7 @@ namespace NPCMapLocations
 
         private void AddTooltip(string locationName, JObject tooltip)
         {
-            Tooltips[locationName] = new MapTooltip(
+            this.Tooltips[locationName] = new MapTooltip(
               (int)tooltip.GetValue("X"),
               (int)tooltip.GetValue("Y"),
               (int)tooltip.GetValue("Width"),
@@ -201,7 +201,7 @@ namespace NPCMapLocations
 
             if (tooltip.ContainsKey("SecondaryText"))
             {
-                Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
+                this.Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
             }
         }
 
@@ -231,7 +231,7 @@ namespace NPCMapLocations
                     );
             }
 
-            MapVectors.Add(locationName, mapVectorArr);
+            this.MapVectors.Add(locationName, mapVectorArr);
         }
 
         // Merge dictionaries, in case of key conflict d1 takes precendence
@@ -252,9 +252,9 @@ namespace NPCMapLocations
                 var fromAreaRect = locationRects.GetValue("FromArea");
                 var toAreaRect = locationRects.GetValue("ToArea");
 
-                SrcRect = new Rectangle(fromAreaRect.Value<int>("X"), fromAreaRect.Value<int>("Y"),
+                this.SrcRect = new Rectangle(fromAreaRect.Value<int>("X"), fromAreaRect.Value<int>("Y"),
                   fromAreaRect.Value<int>("Width"), fromAreaRect.Value<int>("Height"));
-                LocVector = new Vector2(toAreaRect.Value<int>("X"), toAreaRect.Value<int>("Y"));
+                this.LocVector = new Vector2(toAreaRect.Value<int>("X"), toAreaRect.Value<int>("Y"));
             }
         }
     }

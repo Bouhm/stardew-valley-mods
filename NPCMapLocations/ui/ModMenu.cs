@@ -47,43 +47,52 @@ namespace NPCMapLocations
             var topLeftPositionForCenteringOnScreen =
                 Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
                     0, 0);
-            mapX = (int)topLeftPositionForCenteringOnScreen.X;
-            mapY = (int)topLeftPositionForCenteringOnScreen.Y;
+            this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
+            this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
 
             // Most of this mess is straight from the game code just... just give it space
-            okButton = new ClickableTextureComponent("OK",
-                new Rectangle(xPositionOnScreen + width - Game1.tileSize * 2,
-                    yPositionOnScreen + height - 7 * Game1.tileSize / 4, Game1.tileSize, Game1.tileSize), null, null,
-                Game1.mouseCursors, Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1), 1f, false);
+            this.okButton = new ClickableTextureComponent(
+                "OK",
+                new Rectangle(this.xPositionOnScreen + this.width - Game1.tileSize * 2, this.yPositionOnScreen + this.height - 7 * Game1.tileSize / 4, Game1.tileSize, Game1.tileSize),
+                null,
+                null,
+                Game1.mouseCursors,
+                Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1),
+                1f,
+                false
+            );
 
-            upArrow = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width + Game1.tileSize / 4,
-                    yPositionOnScreen + Game1.tileSize,
-                    11 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(421, 459, 11, 12),
-                Game1.pixelZoom);
+            this.upArrow = new ClickableTextureComponent(
+                new Rectangle(this.xPositionOnScreen + this.width + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom),
+                Game1.mouseCursors,
+                new Rectangle(421, 459, 11, 12),
+                Game1.pixelZoom
+            );
 
-            downArrow = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width + Game1.tileSize / 4,
-                    yPositionOnScreen + height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom),
-                Game1.mouseCursors, new Rectangle(421, 472, 11, 12), Game1.pixelZoom);
+            this.downArrow = new ClickableTextureComponent(
+                new Rectangle(this.xPositionOnScreen + this.width + Game1.tileSize / 4, this.yPositionOnScreen + this.height - Game1.tileSize, 11 * Game1.pixelZoom, 12 * Game1.pixelZoom),
+                Game1.mouseCursors,
+                new Rectangle(421, 472, 11, 12),
+                Game1.pixelZoom
+            );
 
-            scrollBar = new ClickableTextureComponent(
-                new Rectangle(upArrow.bounds.X + Game1.pixelZoom * 3,
-                    upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom,
-                    10 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(435, 463, 6, 10), Game1.pixelZoom);
+            this.scrollBar = new ClickableTextureComponent(
+                new Rectangle(this.upArrow.bounds.X + Game1.pixelZoom * 3, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, 6 * Game1.pixelZoom, 10 * Game1.pixelZoom),
+                Game1.mouseCursors,
+                new Rectangle(435, 463, 6, 10),
+                Game1.pixelZoom
+            );
 
-            scrollBarRunner = new Rectangle(scrollBar.bounds.X,
-                upArrow.bounds.Y + upArrow.bounds.Height + Game1.pixelZoom, scrollBar.bounds.Width,
-                height - Game1.tileSize * 2 - upArrow.bounds.Height - Game1.pixelZoom * 2);
+            this.scrollBarRunner = new Rectangle(this.scrollBar.bounds.X, this.upArrow.bounds.Y + this.upArrow.bounds.Height + Game1.pixelZoom, this.scrollBar.bounds.Width, this.height - Game1.tileSize * 2 - this.upArrow.bounds.Height - Game1.pixelZoom * 2);
 
             for (int i = 0; i < 7; i++)
             {
-                optionSlots.Add(new ClickableComponent(
-                  new Rectangle(xPositionOnScreen + Game1.tileSize / 4,
-                    yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((height - Game1.tileSize * 2) / 7),
-                    width - Game1.tileSize / 2, (height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)));
+                this.optionSlots.Add(new ClickableComponent(
+                    new Rectangle(this.xPositionOnScreen + Game1.tileSize / 4, this.yPositionOnScreen + Game1.tileSize * 5 / 4 + Game1.pixelZoom + i * ((this.height - Game1.tileSize * 2) / 7), this.width - Game1.tileSize / 2, (this.height - Game1.tileSize * 2) / 7 + Game1.pixelZoom), string.Concat(i)
+                ));
             }
 
-            options.Add(new OptionsElement("NPC Map Locations"));
+            this.options.Add(new OptionsElement("NPC Map Locations"));
 
             var widths = new List<int>();
             for (int i = 0; i < 16; i++)
@@ -94,32 +103,32 @@ namespace NPCMapLocations
                 heights.Add(45 + j * 15);
 
             string minimapLabel = ModMain.Helper.Translation.Get("minimap.label");
-            options.Add(new OptionsElement(minimapLabel));
-            options.Add(new ModCheckbox("minimap.option1", 0, -1, -1));
-            options.Add(new ModPlusMinus("minimap.plusMinus1", 1, widths));
-            options.Add(new ModPlusMinus("minimap.plusMinus2", 2, heights));
+            this.options.Add(new OptionsElement(minimapLabel));
+            this.options.Add(new ModCheckbox("minimap.option1", 0, -1, -1));
+            this.options.Add(new ModPlusMinus("minimap.plusMinus1", 1, widths));
+            this.options.Add(new ModPlusMinus("minimap.plusMinus2", 2, heights));
 
             // Translate labels and initialize buttons to handle button press
             string immersionLabel = ModMain.Helper.Translation.Get("immersion.label");
-            options.Add(new OptionsElement(immersionLabel));
-            immersionButton1 = new MapModButton("immersion.option1", 3, -1, -1, -1, -1);
-            immersionButton2 = new MapModButton("immersion.option2", 4, -1, -1, -1, -1);
-            immersionButton3 = new MapModButton("immersion.option3", 5, -1, -1, -1, -1);
-            options.Add(immersionButton1);
-            options.Add(immersionButton2);
-            options.Add(immersionButton3);
+            this.options.Add(new OptionsElement(immersionLabel));
+            this.immersionButton1 = new MapModButton("immersion.option1", 3, -1, -1, -1, -1);
+            this.immersionButton2 = new MapModButton("immersion.option2", 4, -1, -1, -1, -1);
+            this.immersionButton3 = new MapModButton("immersion.option3", 5, -1, -1, -1, -1);
+            this.options.Add(this.immersionButton1);
+            this.options.Add(this.immersionButton2);
+            this.options.Add(this.immersionButton3);
 
-            options.Add(new ModCheckbox("immersion.option4", 6, -1, -1));
-            options.Add(new ModCheckbox("immersion.option5", 7, -1, -1));
-            options.Add(new MapModSlider("immersion.slider1", 8, -1, -1, 0, 12));
-            options.Add(new MapModSlider("immersion.slider2", 9, -1, -1, 0, 12));
+            this.options.Add(new ModCheckbox("immersion.option4", 6, -1, -1));
+            this.options.Add(new ModCheckbox("immersion.option5", 7, -1, -1));
+            this.options.Add(new MapModSlider("immersion.slider1", 8, -1, -1, 0, 12));
+            this.options.Add(new MapModSlider("immersion.slider2", 9, -1, -1, 0, 12));
 
-            options.Add(new ModCheckbox("extra.option1", 10, -1, -1));
-            options.Add(new ModCheckbox("extra.option2", 11, -1, -1));
-            options.Add(new ModCheckbox("extra.option3", 12, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option1", 10, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option2", 11, -1, -1));
+            this.options.Add(new ModCheckbox("extra.option3", 12, -1, -1));
 
             string villagersLabel = ModMain.Helper.Translation.Get("villagers.label");
-            options.Add(new OptionsElement(villagersLabel));
+            this.options.Add(new OptionsElement(villagersLabel));
 
             var orderedMarkers = npcMarkers.ToList()
               .Where(x => x.Value.Sprite != null && x.Value.Type == Character.Villager)
@@ -131,13 +140,13 @@ namespace NPCMapLocations
                 if (conditionalNpcs.ContainsKey(npcMarker.Key))
                 {
                     if (conditionalNpcs[npcMarker.Key])
-                        options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
+                        this.options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
                     else
                         idx++;
                 }
                 else
                 {
-                    options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
+                    this.options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
                 }
             }
         }
@@ -150,13 +159,11 @@ namespace NPCMapLocations
 
         private void SetScrollBarToCurrentIndex()
         {
-            if (options.Any())
+            if (this.options.Any())
             {
-                scrollBar.bounds.Y =
-                    scrollBarRunner.Height / Math.Max(1, options.Count - 7 + 1) * currentItemIndex +
-                    upArrow.bounds.Bottom + Game1.pixelZoom;
-                if (currentItemIndex == options.Count() - 7)
-                    scrollBar.bounds.Y = downArrow.bounds.Y - scrollBar.bounds.Height - Game1.pixelZoom;
+                this.scrollBar.bounds.Y = this.scrollBarRunner.Height / Math.Max(1, this.options.Count - 7 + 1) * this.currentItemIndex + this.upArrow.bounds.Bottom + Game1.pixelZoom;
+                if (this.currentItemIndex == this.options.Count() - 7)
+                    this.scrollBar.bounds.Y = this.downArrow.bounds.Y - this.scrollBar.bounds.Height - Game1.pixelZoom;
             }
         }
 
@@ -165,37 +172,41 @@ namespace NPCMapLocations
             if (GameMenu.forcePreventClose) return;
 
             base.leftClickHeld(x, y);
-            if (scrolling)
+            if (this.scrolling)
             {
-                int y2 = scrollBar.bounds.Y;
-                scrollBar.bounds.Y =
-                    Math.Min(
-                        yPositionOnScreen + height - Game1.tileSize - Game1.pixelZoom * 3 - scrollBar.bounds.Height,
-                        Math.Max(y, yPositionOnScreen + upArrow.bounds.Height + Game1.pixelZoom * 5));
-                float num = (y - scrollBarRunner.Y) / (float)scrollBarRunner.Height;
-                currentItemIndex = Math.Min(options.Count - 7, Math.Max(0, (int)(options.Count * num)));
-                SetScrollBarToCurrentIndex();
-                if (y2 != scrollBar.bounds.Y) Game1.playSound("shiny4");
+                int y2 = this.scrollBar.bounds.Y;
+                this.scrollBar.bounds.Y = Math.Min(
+                    this.yPositionOnScreen + this.height - Game1.tileSize - Game1.pixelZoom * 3 - this.scrollBar.bounds.Height,
+                    Math.Max(y, this.yPositionOnScreen + this.upArrow.bounds.Height + Game1.pixelZoom * 5)
+                );
+                float num = (y - this.scrollBarRunner.Y) / (float)this.scrollBarRunner.Height;
+                this.currentItemIndex = Math.Min(this.options.Count - 7, Math.Max(0, (int)(this.options.Count * num)));
+                this.SetScrollBarToCurrentIndex();
+                if (y2 != this.scrollBar.bounds.Y)
+                    Game1.playSound("shiny4");
             }
             else
             {
-                if (optionsSlotHeld == -1 || optionsSlotHeld + currentItemIndex >= options.Count) return;
+                if (this.optionsSlotHeld == -1 || this.optionsSlotHeld + this.currentItemIndex >= this.options.Count)
+                    return;
 
-                options[currentItemIndex + optionsSlotHeld].leftClickHeld(
-                    x - optionSlots[optionsSlotHeld].bounds.X, y - optionSlots[optionsSlotHeld].bounds.Y);
+                this.options[this.currentItemIndex + this.optionsSlotHeld].leftClickHeld(
+                    x - this.optionSlots[this.optionsSlotHeld].bounds.X,
+                    y - this.optionSlots[this.optionsSlotHeld].bounds.Y
+                );
             }
         }
 
         public override void receiveKeyPress(Keys key)
         {
             if ((Game1.options.menuButton.Contains(new InputButton(key)) ||
-                 Game1.options.doesInputListContain(Game1.options.mapButton, key)) && readyToClose() && canClose)
+                 Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.canClose)
             {
-                exitThisMenu(true);
+                this.exitThisMenu(true);
                 return;
             }
 
-            if (key.ToString().Equals(ModMain.Globals.MenuKey) && readyToClose() && canClose)
+            if (key.ToString().Equals(ModMain.Globals.MenuKey) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
@@ -203,10 +214,11 @@ namespace NPCMapLocations
                 return;
             }
 
-            canClose = true;
-            if (optionsSlotHeld == -1 || optionsSlotHeld + currentItemIndex >= options.Count) return;
+            this.canClose = true;
+            if (this.optionsSlotHeld == -1 || this.optionsSlotHeld + this.currentItemIndex >= this.options.Count)
+                return;
 
-            options[currentItemIndex + optionsSlotHeld].receiveKeyPress(key);
+            this.options[this.currentItemIndex + this.optionsSlotHeld].receiveKeyPress(key);
         }
 
         public override void receiveScrollWheelAction(int direction)
@@ -214,16 +226,16 @@ namespace NPCMapLocations
             if (GameMenu.forcePreventClose) return;
 
             base.receiveScrollWheelAction(direction);
-            if (direction > 0 && currentItemIndex > 0)
+            if (direction > 0 && this.currentItemIndex > 0)
             {
-                UpArrowPressed();
+                this.UpArrowPressed();
                 Game1.playSound("shiny4");
                 return;
             }
 
-            if (direction < 0 && currentItemIndex < Math.Max(0, options.Count() - 7))
+            if (direction < 0 && this.currentItemIndex < Math.Max(0, this.options.Count() - 7))
             {
-                DownArrowPressed();
+                this.DownArrowPressed();
                 Game1.playSound("shiny4");
             }
         }
@@ -233,94 +245,97 @@ namespace NPCMapLocations
             if (GameMenu.forcePreventClose) return;
 
             base.releaseLeftClick(x, y);
-            if (optionsSlotHeld != -1 && optionsSlotHeld + currentItemIndex < options.Count)
-                options[currentItemIndex + optionsSlotHeld].leftClickReleased(
-                    x - optionSlots[optionsSlotHeld].bounds.X, y - optionSlots[optionsSlotHeld].bounds.Y);
+            if (this.optionsSlotHeld != -1 && this.optionsSlotHeld + this.currentItemIndex < this.options.Count)
+            {
+                this.options[this.currentItemIndex + this.optionsSlotHeld].leftClickReleased(
+                    x - this.optionSlots[this.optionsSlotHeld].bounds.X,
+                    y - this.optionSlots[this.optionsSlotHeld].bounds.Y
+                );
+            }
 
-            optionsSlotHeld = -1;
-            scrolling = false;
+            this.optionsSlotHeld = -1;
+            this.scrolling = false;
         }
 
         private void DownArrowPressed()
         {
-            downArrow.scale = downArrow.baseScale;
-            currentItemIndex++;
-            SetScrollBarToCurrentIndex();
+            this.downArrow.scale = this.downArrow.baseScale;
+            this.currentItemIndex++;
+            this.SetScrollBarToCurrentIndex();
         }
 
         private void UpArrowPressed()
         {
-            upArrow.scale = upArrow.baseScale;
-            currentItemIndex--;
-            SetScrollBarToCurrentIndex();
+            this.upArrow.scale = this.upArrow.baseScale;
+            this.currentItemIndex--;
+            this.SetScrollBarToCurrentIndex();
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             if (GameMenu.forcePreventClose) return;
 
-            if (downArrow.containsPoint(x, y) &&
-                currentItemIndex < Math.Max(0, options.Count() - 7))
+            if (this.downArrow.containsPoint(x, y) && this.currentItemIndex < Math.Max(0, this.options.Count() - 7))
             {
-                DownArrowPressed();
+                this.DownArrowPressed();
                 Game1.playSound("shwip");
             }
-            else if (upArrow.containsPoint(x, y) && currentItemIndex > 0)
+            else if (this.upArrow.containsPoint(x, y) && this.currentItemIndex > 0)
             {
-                UpArrowPressed();
+                this.UpArrowPressed();
                 Game1.playSound("shwip");
             }
-            else if (scrollBar.containsPoint(x, y))
+            else if (this.scrollBar.containsPoint(x, y))
             {
-                scrolling = true;
+                this.scrolling = true;
             }
-            else if (!downArrow.containsPoint(x, y) && x > xPositionOnScreen + width &&
-                     x < xPositionOnScreen + width + Game1.tileSize * 2 && y > yPositionOnScreen &&
-                     y < yPositionOnScreen + height)
+            else if (!this.downArrow.containsPoint(x, y) && x > this.xPositionOnScreen + this.width &&
+                     x < this.xPositionOnScreen + this.width + Game1.tileSize * 2 && y > this.yPositionOnScreen &&
+                     y < this.yPositionOnScreen + this.height)
             {
-                scrolling = true;
-                leftClickHeld(x, y);
+                this.scrolling = true;
+                this.leftClickHeld(x, y);
             }
-            else if (immersionButton1.rect.Contains(x, y))
+            else if (this.immersionButton1.rect.Contains(x, y))
             {
-                immersionButton1.receiveLeftClick(x, y);
-                immersionButton2.GreyOut();
-                immersionButton3.GreyOut();
+                this.immersionButton1.receiveLeftClick(x, y);
+                this.immersionButton2.GreyOut();
+                this.immersionButton3.GreyOut();
             }
-            else if (immersionButton2.rect.Contains(x, y))
+            else if (this.immersionButton2.rect.Contains(x, y))
             {
-                immersionButton2.receiveLeftClick(x, y);
-                immersionButton1.GreyOut();
-                immersionButton3.GreyOut();
+                this.immersionButton2.receiveLeftClick(x, y);
+                this.immersionButton1.GreyOut();
+                this.immersionButton3.GreyOut();
             }
-            else if (immersionButton3.rect.Contains(x, y))
+            else if (this.immersionButton3.rect.Contains(x, y))
             {
-                immersionButton3.receiveLeftClick(x, y);
-                immersionButton1.GreyOut();
-                immersionButton2.GreyOut();
+                this.immersionButton3.receiveLeftClick(x, y);
+                this.immersionButton1.GreyOut();
+                this.immersionButton2.GreyOut();
             }
 
-            if (okButton.containsPoint(x, y))
+            if (this.okButton.containsPoint(x, y))
             {
-                okButton.scale -= 0.25f;
-                okButton.scale = Math.Max(0.75f, okButton.scale);
+                this.okButton.scale -= 0.25f;
+                this.okButton.scale = Math.Max(0.75f, this.okButton.scale);
                 (Game1.activeClickableMenu as ModMenu).exitThisMenu(false);
                 Game1.activeClickableMenu = new GameMenu();
                 (Game1.activeClickableMenu as GameMenu).changeTab(3);
             }
 
             y -= 15;
-            currentItemIndex = Math.Max(0, Math.Min(options.Count() - 7, currentItemIndex));
-            for (int i = 0; i < optionSlots.Count(); i++)
-                if (optionSlots[i].bounds.Contains(x, y) &&
-                    currentItemIndex + i < options.Count() && options[currentItemIndex + i]
-                        .bounds.Contains(x - optionSlots[i].bounds.X, y - optionSlots[i].bounds.Y))
+            this.currentItemIndex = Math.Max(0, Math.Min(this.options.Count() - 7, this.currentItemIndex));
+            for (int i = 0; i < this.optionSlots.Count(); i++)
+            {
+                if (this.optionSlots[i].bounds.Contains(x, y) && this.currentItemIndex + i < this.options.Count() && this.options[this.currentItemIndex + i]
+                        .bounds.Contains(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y))
                 {
-                    options[currentItemIndex + i]
-                        .receiveLeftClick(x - optionSlots[i].bounds.X, y - optionSlots[i].bounds.Y);
-                    optionsSlotHeld = i;
+                    this.options[this.currentItemIndex + i].receiveLeftClick(x - this.optionSlots[i].bounds.X, y - this.optionSlots[i].bounds.Y);
+                    this.optionsSlotHeld = i;
                     break;
                 }
+            }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
@@ -331,77 +346,75 @@ namespace NPCMapLocations
         {
             if (GameMenu.forcePreventClose) return;
 
-            if (okButton.containsPoint(x, y))
+            if (this.okButton.containsPoint(x, y))
             {
-                okButton.scale = Math.Min(okButton.scale + 0.02f, okButton.baseScale + 0.1f);
+                this.okButton.scale = Math.Min(this.okButton.scale + 0.02f, this.okButton.baseScale + 0.1f);
                 return;
             }
 
-            okButton.scale = Math.Max(okButton.scale - 0.02f, okButton.baseScale);
-            upArrow.tryHover(x, y, 0.1f);
-            downArrow.tryHover(x, y, 0.1f);
-            scrollBar.tryHover(x, y, 0.1f);
+            this.okButton.scale = Math.Max(this.okButton.scale - 0.02f, this.okButton.baseScale);
+            this.upArrow.tryHover(x, y, 0.1f);
+            this.downArrow.tryHover(x, y, 0.1f);
+            this.scrollBar.tryHover(x, y, 0.1f);
         }
 
         // Draw menu
         public override void draw(SpriteBatch b)
         {
-            if (Game1.options.showMenuBackground) drawBackground(b);
+            if (Game1.options.showMenuBackground) this.drawBackground(b);
 
-            Game1.drawDialogueBox(mapX - Game1.pixelZoom * 8, mapY - Game1.pixelZoom * 24,
+            Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24,
               (ModMain.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
-            b.Draw(ModMain.Map, new Vector2(mapX, mapY), new Rectangle(0, 0, 300, 180),
+            b.Draw(ModMain.Map, new Vector2(this.mapX, this.mapY), new Rectangle(0, 0, 300, 180),
               Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
-            Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen, width, height, false, true, null,
-              false);
-            okButton.draw(b);
+            Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
+            this.okButton.draw(b);
             int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModMain.Helper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
-                upArrow.draw(b);
-                downArrow.draw(b);
+                this.upArrow.draw(b);
+                this.downArrow.draw(b);
 
-                if (options.Count() > 7)
+                if (this.options.Count() > 7)
                 {
-                    drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), scrollBarRunner.X,
-                        scrollBarRunner.Y, scrollBarRunner.Width, scrollBarRunner.Height, Color.White,
+                    drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), this.scrollBarRunner.X,
+                        this.scrollBarRunner.Y, this.scrollBarRunner.Width, this.scrollBarRunner.Height, Color.White,
                         Game1.pixelZoom, false);
-                    scrollBar.draw(b);
+                    this.scrollBar.draw(b);
                 }
 
-                for (int i = 0; i < optionSlots.Count(); i++)
+                for (int i = 0; i < this.optionSlots.Count(); i++)
                 {
-                    int x = optionSlots[i].bounds.X;
-                    int y = optionSlots[i].bounds.Y + Game1.tileSize / 4;
-                    if (currentItemIndex >= 0 && currentItemIndex + i < options.Count())
+                    int x = this.optionSlots[i].bounds.X;
+                    int y = this.optionSlots[i].bounds.Y + Game1.tileSize / 4;
+                    if (this.currentItemIndex >= 0 && this.currentItemIndex + i < this.options.Count())
                     {
-                        if (options[currentItemIndex + i] is MapModButton)
+                        if (this.options[this.currentItemIndex + i] is MapModButton)
                         {
                             var bounds = new Rectangle(x + 28, y, buttonWidth + Game1.tileSize + 8, Game1.tileSize + 8);
-                            switch (options[currentItemIndex + i].whichOption)
+                            switch (this.options[this.currentItemIndex + i].whichOption)
                             {
                                 case 3:
-                                    immersionButton1.rect = bounds;
+                                    this.immersionButton1.rect = bounds;
                                     break;
                                 case 4:
-                                    immersionButton2.rect = bounds;
+                                    this.immersionButton2.rect = bounds;
                                     break;
                                 case 5:
-                                    immersionButton3.rect = bounds;
+                                    this.immersionButton3.rect = bounds;
                                     break;
                             }
 
                             drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y,
-                                bounds.Width, bounds.Height, Color.White * (options[currentItemIndex + i].greyedOut ? 0.33f : 1f),
+                                bounds.Width, bounds.Height, Color.White * (this.options[this.currentItemIndex + i].greyedOut ? 0.33f : 1f),
                                 1f, false);
                         }
 
-                        if (currentItemIndex + i == 0)
-                            Utility.drawTextWithShadow(b, "NPC Map Locations", Game1.dialogueFont,
-                                new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
+                        if (this.currentItemIndex + i == 0)
+                            Utility.drawTextWithShadow(b, "NPC Map Locations", Game1.dialogueFont, new Vector2(x + Game1.tileSize / 2, y + Game1.tileSize / 4), Color.Black);
                         else
-                            options[currentItemIndex + i].draw(b, x, y);
+                            this.options[this.currentItemIndex + i].draw(b, x, y);
                     }
                 }
             }
@@ -430,31 +443,33 @@ namespace NPCMapLocations
         ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.label = ModMain.Helper.Translation.Get(label);
-            rect = new Rectangle(x, y, width, height);
+            this.rect = new Rectangle(x, y, width, height);
 
             if (ModMain.Config.ImmersionOption == whichOption - 2)
-                greyedOut = false;
+                this.greyedOut = false;
             else
-                greyedOut = true;
+                this.greyedOut = true;
         }
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (!isActive)
-                if (whichOption == 3 || whichOption == 4 || whichOption == 5)
+            if (!this.isActive)
+            {
+                if (this.whichOption == 3 || this.whichOption == 4 || this.whichOption == 5)
                 {
                     Game1.playSound("drumkit6");
                     base.receiveLeftClick(x, y);
-                    isActive = true;
-                    greyedOut = false;
-                    ModMain.Config.ImmersionOption = whichOption - 2;
+                    this.isActive = true;
+                    this.greyedOut = false;
+                    ModMain.Config.ImmersionOption = this.whichOption - 2;
                 }
+            }
         }
 
         public void GreyOut()
         {
-            isActive = false;
-            greyedOut = true;
+            this.isActive = false;
+            this.greyedOut = true;
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
@@ -483,29 +498,29 @@ namespace NPCMapLocations
             // Villager names
             if (whichOption > 12 && npcMarkers != null)
             {
-                isChecked = !ModMain.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
+                this.isChecked = !ModMain.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
                 return;
             }
 
             switch (whichOption)
             {
                 case 0:
-                    isChecked = ModMain.Globals.ShowMinimap;
+                    this.isChecked = ModMain.Globals.ShowMinimap;
                     return;
                 case 6:
-                    isChecked = ModMain.Globals.OnlySameLocation;
+                    this.isChecked = ModMain.Globals.OnlySameLocation;
                     return;
                 case 7:
-                    isChecked = ModMain.Config.ByHeartLevel;
+                    this.isChecked = ModMain.Config.ByHeartLevel;
                     return;
                 case 10:
-                    isChecked = ModMain.Globals.ShowQuests;
+                    this.isChecked = ModMain.Globals.ShowQuests;
                     return;
                 case 11:
-                    isChecked = ModMain.Globals.ShowHiddenVillagers;
+                    this.isChecked = ModMain.Globals.ShowHiddenVillagers;
                     return;
                 case 12:
-                    isChecked = ModMain.Globals.ShowTravelingMerchant;
+                    this.isChecked = ModMain.Globals.ShowTravelingMerchant;
                     return;
                 default:
                     return;
@@ -514,41 +529,42 @@ namespace NPCMapLocations
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (greyedOut) return;
+            if (this.greyedOut)
+                return;
 
             base.receiveLeftClick(x, y);
-            isChecked = !isChecked;
+            this.isChecked = !this.isChecked;
             int whichOption = this.whichOption;
 
             // Show/hide villager options
-            if (whichOption > 12 && npcMarkers != null)
+            if (whichOption > 12 && this.npcMarkers != null)
             {
-                if (isChecked)
-                    ModMain.Globals.NpcExclusions.Remove(npcMarkers.ElementAt(whichOption - 13).Key);
+                if (this.isChecked)
+                    ModMain.Globals.NpcExclusions.Remove(this.npcMarkers.ElementAt(whichOption - 13).Key);
                 else
-                    ModMain.Globals.NpcExclusions.Add(npcMarkers.ElementAt(whichOption - 13).Key);
+                    ModMain.Globals.NpcExclusions.Add(this.npcMarkers.ElementAt(whichOption - 13).Key);
             }
             else
             {
                 switch (whichOption)
                 {
                     case 0:
-                        ModMain.Globals.ShowMinimap = isChecked;
+                        ModMain.Globals.ShowMinimap = this.isChecked;
                         break;
                     case 6:
-                        ModMain.Globals.OnlySameLocation = isChecked;
+                        ModMain.Globals.OnlySameLocation = this.isChecked;
                         break;
                     case 7:
-                        ModMain.Config.ByHeartLevel = isChecked;
+                        ModMain.Config.ByHeartLevel = this.isChecked;
                         break;
                     case 10:
-                        ModMain.Globals.ShowQuests = isChecked;
+                        ModMain.Globals.ShowQuests = this.isChecked;
                         break;
                     case 11:
-                        ModMain.Globals.ShowHiddenVillagers = isChecked;
+                        ModMain.Globals.ShowHiddenVillagers = this.isChecked;
                         break;
                     case 12:
-                        ModMain.Globals.ShowTravelingMerchant = isChecked;
+                        ModMain.Globals.ShowTravelingMerchant = this.isChecked;
                         break;
                     default:
                         break;
@@ -561,32 +577,32 @@ namespace NPCMapLocations
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + bounds.X, slotY + bounds.Y),
-                isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
-                Color.White * (greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.bounds.X, slotY + this.bounds.Y),
+                this.isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
+                Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
                 0.4f);
-            if (whichOption > 12 && npcMarkers != null)
+            if (this.whichOption > 12 && this.npcMarkers != null)
             {
-                var marker = npcMarkers.ElementAt(whichOption - 13).Value;
+                var marker = this.npcMarkers.ElementAt(this.whichOption - 13).Value;
 
-                if (isChecked)
-                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + bounds.X + 50, slotY),
+                if (this.isChecked)
+                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY),
                         new Rectangle(0, marker.CropOffset, 16, 15), Color.White, 0f, Vector2.Zero,
                         Game1.pixelZoom, SpriteEffects.None, 0.4f);
                 else
-                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + bounds.X + 50, slotY),
+                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY),
                         new Rectangle(0, marker.CropOffset, 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
                         Game1.pixelZoom, SpriteEffects.None, 0.4f);
 
                 // Draw names
                 slotX += 75;
-                if (whichOption == -1)
-                    SpriteText.drawString(b, label, slotX + bounds.X, slotY + bounds.Y + 12, 999, -1, 999, 1f,
+                if (this.whichOption == -1)
+                    SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f,
                         0.1f, false, -1, "", -1);
                 else
                     Utility.drawTextWithShadow(b, marker.DisplayName, Game1.dialogueFont,
-                        new Vector2(slotX + bounds.X + bounds.Width + 8, slotY + bounds.Y),
-                        greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
+                        new Vector2(slotX + this.bounds.X + this.bounds.Width + 8, slotY + this.bounds.Y),
+                        this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
             }
             else
             {
@@ -614,16 +630,16 @@ namespace NPCMapLocations
         {
             this.min = min;
             this.max = max;
-            if (whichOption != 8 && whichOption != 9) bounds.Width = bounds.Width * 2;
-            valueLabel = ModMain.Helper.Translation.Get(label);
+            if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
+            this.valueLabel = ModMain.Helper.Translation.Get(label);
 
             switch (whichOption)
             {
                 case 8:
-                    value = ModMain.Config.HeartLevelMin;
+                    this.value = ModMain.Config.HeartLevelMin;
                     break;
                 case 9:
-                    value = ModMain.Config.HeartLevelMax;
+                    this.value = ModMain.Config.HeartLevelMax;
                     break;
                 default:
                     break;
@@ -632,23 +648,23 @@ namespace NPCMapLocations
 
         public override void leftClickHeld(int x, int y)
         {
-            if (greyedOut) return;
+            if (this.greyedOut)
+                return;
 
             base.leftClickHeld(x, y);
-            value = x >= bounds.X
-                ? (x <= bounds.Right - 10 * Game1.pixelZoom
-                    ? (int)((x - bounds.X) / (float)(bounds.Width - 10 * Game1.pixelZoom) *
-                             max)
-                    : max)
+            this.value = x >= this.bounds.X
+                ? (x <= this.bounds.Right - 10 * Game1.pixelZoom
+                    ? (int)((x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom) * this.max)
+                    : this.max)
                 : 0;
 
-            switch (whichOption)
+            switch (this.whichOption)
             {
                 case 8:
-                    ModMain.Config.HeartLevelMin = (int)value;
+                    ModMain.Config.HeartLevelMin = (int)this.value;
                     break;
                 case 9:
-                    ModMain.Config.HeartLevelMax = (int)value;
+                    ModMain.Config.HeartLevelMax = (int)this.value;
                     break;
                 default:
                     break;
@@ -659,25 +675,25 @@ namespace NPCMapLocations
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (greyedOut) return;
+            if (this.greyedOut) return;
 
             base.receiveLeftClick(x, y);
-            leftClickHeld(x, y);
+            this.leftClickHeld(x, y);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            label = valueLabel + ": " + value;
-            greyedOut = false;
-            if (whichOption == 8 || whichOption == 9) greyedOut = !ModMain.Config.ByHeartLevel;
+            this.label = this.valueLabel + ": " + this.value;
+            this.greyedOut = false;
+            if (this.whichOption == 8 || this.whichOption == 9) this.greyedOut = !ModMain.Config.ByHeartLevel;
 
             base.draw(b, slotX, slotY, context);
-            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + bounds.X,
-                slotY + bounds.Y, bounds.Width, bounds.Height, Color.White, Game1.pixelZoom, false);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X,
+                slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, Game1.pixelZoom, false);
             b.Draw(Game1.mouseCursors,
                 new Vector2(
-                    slotX + bounds.X + (bounds.Width - 10 * Game1.pixelZoom) *
-                    (value / max), slotY + bounds.Y),
+                    slotX + this.bounds.X + (this.bounds.Width - 10 * Game1.pixelZoom) *
+                    (this.value / this.max), slotY + this.bounds.Y),
                 OptionsSlider.sliderButtonRect, Color.White, 0f, Vector2.Zero, Game1.pixelZoom,
                 SpriteEffects.None, 0.9f);
         }
@@ -700,35 +716,35 @@ namespace NPCMapLocations
             : base(label, x, y, 28, 28, whichOption)
         {
             this.options = options;
-            displayOptions = new List<string>();
+            this.displayOptions = new List<string>();
 
             if (x == -1) x = 32;
             if (y == -1) y = 16;
 
-            txtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
+            this.txtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
             foreach (int displayOption in options)
             {
-                txtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, txtSize);
-                displayOptions.Add($"{displayOption}px");
+                this.txtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, this.txtSize);
+                this.displayOptions.Add($"{displayOption}px");
             }
 
-            bounds = new Rectangle(x, y, (int)(1.5 * txtSize), 32);
+            this.bounds = new Rectangle(x, y, (int)(1.5 * this.txtSize), 32);
             this.label = ModMain.Helper.Translation.Get(label);
             this.whichOption = whichOption;
-            minusButton = new Rectangle(x, 16, 28, 32);
-            plusButton = new Rectangle(bounds.Right - 96, 16, 28, 32);
+            this.minusButton = new Rectangle(x, 16, 28, 32);
+            this.plusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);
 
             switch (whichOption)
             {
                 case 1:
-                    selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapWidth - 75) / 15.0)), 0,
+                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapWidth - 75) / 15.0)), 0,
                         options.Count - 1);
-                    options[selected] = ModMain.Globals.MinimapWidth;
+                    options[this.selected] = ModMain.Globals.MinimapWidth;
                     break;
                 case 2:
-                    selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapHeight - 45) / 15.0)), 0,
+                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapHeight - 45) / 15.0)), 0,
                         options.Count - 1);
-                    options[selected] = ModMain.Globals.MinimapHeight;
+                    options[this.selected] = ModMain.Globals.MinimapHeight;
                     break;
                 default:
                     break;
@@ -737,34 +753,34 @@ namespace NPCMapLocations
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (!greyedOut && options.Count > 0)
+            if (!this.greyedOut && this.options.Count > 0)
             {
-                int num = selected;
-                if (minusButton.Contains(x, y) && selected != 0)
+                int num = this.selected;
+                if (this.minusButton.Contains(x, y) && this.selected != 0)
                 {
-                    selected--;
+                    this.selected--;
                     snapZoomMinus = true;
                     Game1.playSound("drumkit6");
                 }
-                else if (plusButton.Contains(x, y) && selected != options.Count - 1)
+                else if (this.plusButton.Contains(x, y) && this.selected != this.options.Count - 1)
                 {
-                    selected++;
+                    this.selected++;
                     snapZoomPlus = true;
                     Game1.playSound("drumkit6");
                 }
 
-                if (selected < 0)
-                    selected = 0;
-                else if (selected >= options.Count) selected = options.Count - 1;
+                if (this.selected < 0)
+                    this.selected = 0;
+                else if (this.selected >= this.options.Count) this.selected = this.options.Count - 1;
             }
 
-            switch (whichOption)
+            switch (this.whichOption)
             {
                 case 1:
-                    ModMain.Globals.MinimapWidth = options[selected];
+                    ModMain.Globals.MinimapWidth = this.options[this.selected];
                     break;
                 case 2:
-                    ModMain.Globals.MinimapHeight = options[selected];
+                    ModMain.Globals.MinimapHeight = this.options[this.selected];
                     break;
                 default:
                     break;
@@ -779,34 +795,34 @@ namespace NPCMapLocations
             if (Game1.options.snappyMenus && Game1.options.gamepadControls)
             {
                 if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
-                    receiveLeftClick(plusButton.Center.X, plusButton.Center.Y);
+                    this.receiveLeftClick(this.plusButton.Center.X, this.plusButton.Center.Y);
                 else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
-                    receiveLeftClick(minusButton.Center.X, minusButton.Center.Y);
+                    this.receiveLeftClick(this.minusButton.Center.X, this.minusButton.Center.Y);
             }
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            greyedOut = !ModMain.Globals.ShowMinimap;
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + minusButton.X, slotY + minusButton.Y), minusButtonSource,
-                Color.White * (greyedOut ? 0.33f : 1f) * (selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
+            this.greyedOut = !ModMain.Globals.ShowMinimap;
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.minusButton.X, slotY + this.minusButton.Y), minusButtonSource,
+                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
                 0.4f);
             b.DrawString(Game1.dialogueFont,
-                selected < displayOptions.Count && selected != -1 ? displayOptions[selected] : "",
-                new Vector2((int)(txtSize / 2) + slotX, slotY + minusButton.Y), Game1.textColor * (greyedOut ? 0.33f : 1f));
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + plusButton.X, slotY + plusButton.Y), plusButtonSource,
-                Color.White * (greyedOut ? 0.33f : 1f) * (selected == displayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
+                this.selected < this.displayOptions.Count && this.selected != -1 ? this.displayOptions[this.selected] : "",
+                new Vector2((int)(this.txtSize / 2) + slotX, slotY + this.minusButton.Y), Game1.textColor * (this.greyedOut ? 0.33f : 1f));
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.plusButton.X, slotY + this.plusButton.Y), plusButtonSource,
+                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.selected == this.displayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
                 4f, SpriteEffects.None, 0.4f);
             if (!Game1.options.snappyMenus && Game1.options.gamepadControls)
             {
                 if (snapZoomMinus)
                 {
-                    Game1.setMousePosition(slotX + minusButton.Center.X, slotY + minusButton.Center.Y);
+                    Game1.setMousePosition(slotX + this.minusButton.Center.X, slotY + this.minusButton.Center.Y);
                     snapZoomMinus = false;
                 }
                 else if (snapZoomPlus)
                 {
-                    Game1.setMousePosition(slotX + plusButton.Center.X, slotY + plusButton.Center.Y);
+                    Game1.setMousePosition(slotX + this.plusButton.Center.X, slotY + this.plusButton.Center.Y);
                     snapZoomPlus = false;
                 }
             }

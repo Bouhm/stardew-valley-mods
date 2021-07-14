@@ -6,14 +6,15 @@
     public int MapY { get; set; }
     public bool IsBirthday { get; set; }
     public Character Type { get; set; }
+
     public SyncedNpcMarker()
     {
-        DisplayName = null;
-        LocationName = null;
-        MapX = -9999;
-        MapY = -9999;
-        IsBirthday = false;
-        Type = Character.Villager;
+        this.DisplayName = null;
+        this.LocationName = null;
+        this.MapX = -9999;
+        this.MapY = -9999;
+        this.IsBirthday = false;
+        this.Type = Character.Villager;
     }
 }
 

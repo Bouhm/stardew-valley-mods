@@ -7,17 +7,17 @@ public class MapVector
     [JsonConstructor]
     public MapVector(int x, int y)
     {
-        MapX = x;
-        MapY = y;
+        this.MapX = x;
+        this.MapY = y;
     }
 
     [JsonConstructor]
     public MapVector(int x, int y, int tileX, int tileY)
     {
-        MapX = x;
-        MapY = y;
-        TileX = tileX;
-        TileY = tileY;
+        this.MapX = x;
+        this.MapY = y;
+        this.TileX = tileX;
+        this.TileY = tileY;
     }
 
     public int TileX { get; set; } // tileX in a game location

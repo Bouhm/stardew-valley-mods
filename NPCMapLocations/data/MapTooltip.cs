@@ -12,22 +12,22 @@ public class MapTooltip
 
     public MapTooltip(int x, int y, int width, int height, string primaryText)
     {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-        PrimaryText = primaryText;
-        SecondaryText = "";
+        this.X = x;
+        this.Y = y;
+        this.Width = width;
+        this.Height = height;
+        this.PrimaryText = primaryText;
+        this.SecondaryText = "";
     }
 
     [JsonConstructor]
     public MapTooltip(int x, int y, int width, int height, string primaryText, string secondaryText)
     {
-        X = x;
-        Y = y;
-        Width = width;
-        Height = height;
-        PrimaryText = primaryText;
-        SecondaryText = secondaryText;
+        this.X = x;
+        this.Y = y;
+        this.Width = width;
+        this.Height = height;
+        this.PrimaryText = primaryText;
+        this.SecondaryText = secondaryText;
     }
 }

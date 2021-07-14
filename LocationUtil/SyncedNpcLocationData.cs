@@ -7,19 +7,15 @@ internal class SyncedNpcLocationData
 
     public SyncedNpcLocationData()
     {
-        Locations = new Dictionary<string, LocationData>();
+        this.Locations = new Dictionary<string, LocationData>();
     }
 
     public void AddLocation(string name, LocationData location)
     {
-        if (!Locations.ContainsKey(name))
-        {
-            Locations.Add(name, location);
-        }
+        if (!this.Locations.ContainsKey(name))
+            this.Locations.Add(name, location);
         else
-        {
-            Locations[name] = location;
-        }
+            this.Locations[name] = location;
     }
 }
 

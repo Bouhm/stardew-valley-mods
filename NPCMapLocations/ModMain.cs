@@ -55,45 +55,45 @@ namespace NPCMapLocations
         public bool CanLoad<T>(IAssetInfo asset)
         {
             return (
-              asset.AssetNameEquals(MapFilePath) ||
-              asset.AssetNameEquals(NpcCustomizationsPath) ||
-              asset.AssetNameEquals(LocationCustomizationsPath)
+              asset.AssetNameEquals(this.MapFilePath) ||
+              asset.AssetNameEquals(this.NpcCustomizationsPath) ||
+              asset.AssetNameEquals(this.LocationCustomizationsPath)
             );
         }
 
         public T Load<T>(IAssetInfo asset)
         {
-            if (asset.AssetNameEquals(MapFilePath))
+            if (asset.AssetNameEquals(this.MapFilePath))
             {
                 T map;
 
-                if (MapSeason == null)
+                if (this.MapSeason == null)
                 {
-                    Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-                    MapSeason = "spring";
+                    this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
+                    this.MapSeason = "spring";
                 }
 
-                if (!File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, $"{MapSeason}_map.png")))
+                if (!File.Exists(Path.Combine(Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
                 {
-                    Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
-                    MapSeason = null; // Set to null so that cache is not invalidated when game season changes
+                    this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+                    this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
                 }
 
                 // Replace map page
-                string defaultMapFile = File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
-                string filename = MapSeason == null ? defaultMapFile : $"{MapSeason}_map.png";
+                string defaultMapFile = File.Exists(Path.Combine(Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
+                string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
 
-                bool useRecolor = Customizations.MapsPath != null && File.Exists(Path.Combine(ModMain.Helper.DirectoryPath, Customizations.MapsPath, filename));
+                bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(Helper.DirectoryPath, this.Customizations.MapsPath, filename));
                 map = useRecolor
-                  ? Helper.Content.Load<T>(Path.Combine(Customizations.MapsPath, filename))
-                  : Helper.Content.Load<T>(Path.Combine(Customizations.MapsRootPath, "_default", filename));
+                  ? Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsPath, filename))
+                  : Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsRootPath, "_default", filename));
 
                 if (useRecolor)
-                    Monitor.Log($"Using {Path.Combine(Customizations.MapsPath, filename)}.", LogLevel.Debug);
+                    this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.", LogLevel.Debug);
 
                 return map;
             }
-            else if (asset.AssetNameEquals(LocationCustomizationsPath) || asset.AssetNameEquals(NpcCustomizationsPath))
+            else if (asset.AssetNameEquals(this.LocationCustomizationsPath) || asset.AssetNameEquals(this.NpcCustomizationsPath))
             {
                 return (T)(object)new Dictionary<string, JObject>();
             }
@@ -107,23 +107,23 @@ namespace NPCMapLocations
             if (!Context.IsMainPlayer && Context.IsSplitScreen) return;
 
             Helper = helper;
-            IMonitor = Monitor;
+            IMonitor = this.Monitor;
             Globals = Helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
-            Customizations = new ModCustomizations();
+            this.Customizations = new ModCustomizations();
 
-            Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
-            Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
-            Helper.Events.World.BuildingListChanged += World_BuildingListChanged;
-            Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
-            Helper.Events.Input.ButtonReleased += Input_ButtonReleased;
-            Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
-            Helper.Events.Player.Warped += Player_Warped;
-            Helper.Events.Display.MenuChanged += Display_MenuChanged;
-            Helper.Events.Display.RenderingHud += Display_RenderingHud;
-            Helper.Events.Display.RenderedWorld += Display_RenderedWorld;
-            Helper.Events.Display.Rendered += Display_Rendered;
-            Helper.Events.Display.WindowResized += Display_WindowResized;
-            Helper.Events.Multiplayer.ModMessageReceived += Multiplayer_ModMessageReceived;
+            Helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
+            Helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
+            Helper.Events.World.BuildingListChanged += this.World_BuildingListChanged;
+            Helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
+            Helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
+            Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
+            Helper.Events.Player.Warped += this.Player_Warped;
+            Helper.Events.Display.MenuChanged += this.Display_MenuChanged;
+            Helper.Events.Display.RenderingHud += this.Display_RenderingHud;
+            Helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
+            Helper.Events.Display.Rendered += this.Display_Rendered;
+            Helper.Events.Display.WindowResized += this.Display_WindowResized;
+            Helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
         }
 
         // Load config and other one-off data
@@ -145,64 +145,62 @@ namespace NPCMapLocations
             }
 
             // Initialize these early for multiplayer sync
-            NpcMarkers.Value = new Dictionary<string, NpcMarker>();
-            FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
+            this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
+            this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
             // Let host know farmhand is ready to receive updates
             if (Context.IsMultiplayer && !Context.IsMainPlayer)
             {
-                Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { ModManifest.UniqueID }, playerIDs: new long[] { hostId });
+                Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: new long[] { hostId });
             }
 
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
             {
                 // Load customizations
-                var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(NpcCustomizationsPath, ContentSource.GameContent);
-                var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(LocationCustomizationsPath, ContentSource.GameContent);
-                Customizations.LoadCustomData(NpcSettings, LocationSettings);
+                var NpcSettings = Helper.Content.Load<Dictionary<string, JObject>>(this.NpcCustomizationsPath, ContentSource.GameContent);
+                var LocationSettings = Helper.Content.Load<Dictionary<string, JObject>>(this.LocationCustomizationsPath, ContentSource.GameContent);
+                this.Customizations.LoadCustomData(NpcSettings, LocationSettings);
             }
 
             // Load farm buildings
             try
             {
-                BuildingMarkers.Value = Helper.Content.Load<Texture2D>(Path.Combine(Customizations.MapsPath, "buildings.png"));
+                this.BuildingMarkers.Value = Helper.Content.Load<Texture2D>(Path.Combine(this.Customizations.MapsPath, "buildings.png"));
             }
             catch
             {
                 if (File.Exists(Path.Combine("maps/_default", "buildings.png")))
                 {
-                    BuildingMarkers.Value = Helper.Content.Load<Texture2D>(Path.Combine("maps/_default", "buildings.png"));
+                    this.BuildingMarkers.Value = Helper.Content.Load<Texture2D>(Path.Combine("maps/_default", "buildings.png"));
                 }
                 else
                 {
-                    BuildingMarkers.Value = null;
+                    this.BuildingMarkers.Value = null;
                 }
             }
 
             // Get season for map
-            MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
-            Helper.Content.InvalidateCache(MapFilePath);
-            Map = Game1.content.Load<Texture2D>(MapFilePath);
+            this.MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
+            Helper.Content.InvalidateCache(this.MapFilePath);
+            Map = Game1.content.Load<Texture2D>(this.MapFilePath);
 
             // Disable for multiplayer for anti-cheat
             DEBUG_MODE = Globals.DEBUG_MODE && !Context.IsMultiplayer;
 
             // NPCs that player should meet before being shown
-            ConditionalNpcs.Value = new Dictionary<string, bool>();
+            this.ConditionalNpcs.Value = new Dictionary<string, bool>();
             foreach (string npcName in ModConstants.ConditionalNpcs)
-            {
-                ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
-            }
+                this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
 
-            MapVectors.Value = ModConstants.MapVectors;
+            this.MapVectors.Value = ModConstants.MapVectors;
 
             // Add custom map vectors from content.json
-            foreach (var locVectors in Customizations.MapVectors)
+            foreach (var locVectors in this.Customizations.MapVectors)
             {
-                if (MapVectors.Value.TryGetValue(locVectors.Key, out var mapVectors))
-                    MapVectors.Value[locVectors.Key] = locVectors.Value;
+                if (this.MapVectors.Value.TryGetValue(locVectors.Key, out var mapVectors))
+                    this.MapVectors.Value[locVectors.Key] = locVectors.Value;
                 else
-                    MapVectors.Value.Add(locVectors.Key, locVectors.Value);
+                    this.MapVectors.Value.Add(locVectors.Key, locVectors.Value);
             }
 
             // Get context of all locations (indoor, outdoor, relativity)
@@ -215,24 +213,25 @@ namespace NPCMapLocations
                 foreach (var locCtx in LocationUtil.LocationContexts)
                 {
                     if (
-                      (locCtx.Value.Root == null && !MapVectors.Value.ContainsKey(locCtx.Key))
-                      || (locCtx.Value.Root != null && !MapVectors.Value.ContainsKey(locCtx.Value.Root))
+                      (locCtx.Value.Root == null && !this.MapVectors.Value.ContainsKey(locCtx.Key))
+                      || (locCtx.Value.Root != null && !this.MapVectors.Value.ContainsKey(locCtx.Value.Root))
                       && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
                     )
                     {
-                        if (Customizations.LocationExclusions.Contains(locCtx.Key)) return;
+                        if (this.Customizations.LocationExclusions.Contains(locCtx.Key)) return;
                         alertStr += $" {locCtx.Key},";
                     }
                 }
-                Monitor.Log(alertStr.TrimEnd(',') + ".", LogLevel.Debug);
+
+                this.Monitor.Log(alertStr.TrimEnd(',') + ".", LogLevel.Debug);
             }
             catch
             {
-                Monitor.Log("Too many unknown locations; NPCs in unknown locations will not be visible.", LogLevel.Debug);
+                this.Monitor.Log("Too many unknown locations; NPCs in unknown locations will not be visible.", LogLevel.Debug);
             }
 
 
-            UpdateFarmBuildingLocs();
+            this.UpdateFarmBuildingLocs();
 
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
@@ -249,7 +248,7 @@ namespace NPCMapLocations
                 }
 
                 if (!hostHasMod && !Context.IsMainPlayer)
-                    Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
+                    this.Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
             }
         }
 
@@ -304,11 +303,11 @@ namespace NPCMapLocations
                     continue;
 
                 var locVector = LocationToMap(
-                  "Farm", // Get building position in farm
-                  building.tileX.Value,
-                  building.tileY.Value,
-                  Customizations.MapVectors,
-                  Customizations.LocationExclusions
+                    "Farm", // Get building position in farm
+                    building.tileX.Value,
+                    building.tileY.Value,
+                    this.Customizations.MapVectors,
+                    this.Customizations.LocationExclusions
                 );
 
                 // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
@@ -326,14 +325,14 @@ namespace NPCMapLocations
             // Greenhouse unlocked after pantry bundles completed
             if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
             {
-                var greehouseLoc = LocationToMap("Greenhouse", -1, -1, Customizations.MapVectors);
+                var greehouseLoc = LocationToMap("Greenhouse", -1, -1, this.Customizations.MapVectors);
                 greehouseLoc.X -= 5 / 2 * 3;
                 greehouseLoc.Y -= 7 / 2 * 3;
                 FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greehouseLoc);
             }
 
             // Add FarmHouse
-            var farmhouseLoc = LocationToMap("FarmHouse", -1, -1, Customizations.MapVectors);
+            var farmhouseLoc = LocationToMap("FarmHouse", -1, -1, this.Customizations.MapVectors);
             farmhouseLoc.X -= 6;
             FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
         }
@@ -341,7 +340,7 @@ namespace NPCMapLocations
         private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
         {
             if (e.Location.IsFarm)
-                UpdateFarmBuildingLocs();
+                this.UpdateFarmBuildingLocs();
 
             LocationUtil.GetLocationContexts();
         }
@@ -352,17 +351,17 @@ namespace NPCMapLocations
             if (!Context.IsWorldReady) return;
 
             // Minimap dragging
-            if (Globals.ShowMinimap && Minimap.Value != null)
+            if (Globals.ShowMinimap && this.Minimap.Value != null)
             {
-                if (Minimap.Value.isHoveringDragZone() && e.Button == SButton.MouseRight)
+                if (this.Minimap.Value.isHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
-                    MouseUtil.HandleMouseDown(() => Minimap.Value.HandleMouseDown());
+                    MouseUtil.HandleMouseDown(() => this.Minimap.Value.HandleMouseDown());
                 }
             }
 
             // Debug DnD
             if
-              (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen.Value)
+              (DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
             {
                 MouseUtil.HandleMouseDown();
             }
@@ -376,7 +375,7 @@ namespace NPCMapLocations
 
             // ModMenu
             if (Game1.activeClickableMenu is GameMenu)
-                HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
+                this.HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
 
             if (DEBUG_MODE && !Context.IsMultiplayer && Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held && e.Button.Equals(SButton.MouseRight))
                 Game1.player.setTileLocation(Game1.currentCursorTile);
@@ -386,19 +385,19 @@ namespace NPCMapLocations
         {
             if (!Context.IsWorldReady) return;
 
-            if (DEBUG_MODE && e.Button == SButton.MouseRight && isModMapOpen.Value)
+            if (DEBUG_MODE && e.Button == SButton.MouseRight && this.isModMapOpen.Value)
             {
                 MouseUtil.HandleMouseRelease();
             }
-            else if (Minimap.Value != null)
+            else if (this.Minimap.Value != null)
             {
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                 {
-                    Minimap.Value.Resize();
+                    this.Minimap.Value.Resize();
                 }
                 else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
                 {
-                    MouseUtil.HandleMouseRelease(() => Minimap.Value.HandleMouseRelease());
+                    MouseUtil.HandleMouseRelease(() => this.Minimap.Value.HandleMouseRelease());
                 }
             }
         }
@@ -408,14 +407,12 @@ namespace NPCMapLocations
         {
             if (menu.currentTab != ModConstants.MapTabIndex) return;
             if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
-                Game1.activeClickableMenu = new ModMenu(
-                  NpcMarkers.Value,
-                  ConditionalNpcs.Value
-                );
+                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
 
             if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
-                ChangeTooltipConfig();
-            else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder) ChangeTooltipConfig(false);
+                this.ChangeTooltipConfig();
+            else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder)
+                this.ChangeTooltipConfig(false);
         }
 
         private void ChangeTooltipConfig(bool incre = true)
@@ -438,21 +435,21 @@ namespace NPCMapLocations
         private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
         {
             // Check for travelining merchant day
-            if (ConditionalNpcs.Value != null && ConditionalNpcs.Value.ContainsKey("Merchant") && ConditionalNpcs.Value["Merchant"])
+            if (this.ConditionalNpcs.Value != null && this.ConditionalNpcs.Value.ContainsKey("Merchant") && this.ConditionalNpcs.Value["Merchant"])
             {
-                ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
+                this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
             }
 
-            ResetMarkers();
-            UpdateMarkers(true);
+            this.ResetMarkers();
+            this.UpdateMarkers(true);
 
-            Minimap.Value = new ModMinimap(
-              NpcMarkers.Value,
-              ConditionalNpcs.Value,
-              FarmerMarkers.Value,
-              FarmBuildings,
-              BuildingMarkers.Value,
-              Customizations
+            this.Minimap.Value = new ModMinimap(
+                this.NpcMarkers.Value,
+                this.ConditionalNpcs.Value,
+                this.FarmerMarkers.Value,
+                FarmBuildings,
+                this.BuildingMarkers.Value,
+                this.Customizations
             );
         }
 
@@ -464,14 +461,14 @@ namespace NPCMapLocations
 
         private void ResetMarkers()
         {
-            NpcMarkers.Value = new Dictionary<string, NpcMarker>();
-            FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
+            this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
+            this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
             if (!Context.IsMultiplayer || Context.IsMainPlayer)
             {
                 foreach (var npc in GetVillagers())
                 {
-                    if (!Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
+                    if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
 
                     var type = Character.Villager;
                     if (npc is Horse)
@@ -488,7 +485,7 @@ namespace NPCMapLocations
                         offset = 0;
                     }
 
-                    if (!NpcMarkers.Value.ContainsKey(npc.Name))
+                    if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                     {
                         string displayName = (npc.displayName != null && Game1.IsEnglish()) ? npc.displayName : npc.Name;
                         var newMarker = new NpcMarker()
@@ -511,7 +508,7 @@ namespace NPCMapLocations
                             newMarker.Sprite = new AnimatedSprite($@"Characters\{(npc.Gender == NPC.male ? "maleRival" : "femaleRival")}", 0, 16, 32).Texture;
                         }
 
-                        NpcMarkers.Value.Add(npc.Name, newMarker);
+                        this.NpcMarkers.Value.Add(npc.Name, newMarker);
                     }
                 }
             }
@@ -525,21 +522,21 @@ namespace NPCMapLocations
             // Half-second tick
             if (e.IsMultipleOf(30))
             {
-                bool updateForMinimap = Globals.ShowMinimap && Minimap.Value != null;
+                bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
 
                 if (updateForMinimap)
                 {
-                    Minimap.Value.Update();
+                    this.Minimap.Value.Update();
                 }
 
-                UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
+                this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
                 // Sync multiplayer data
                 if (Context.IsMainPlayer && Context.IsMultiplayer && playerIds != null)
                 {
                     var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
 
-                    foreach (var npcMarker in NpcMarkers.Value)
+                    foreach (var npcMarker in this.NpcMarkers.Value)
                     {
                         syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker()
                         {
@@ -552,7 +549,7 @@ namespace NPCMapLocations
                         });
                     }
 
-                    Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new string[] { ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
+                    Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
                 }
             }
 
@@ -560,50 +557,49 @@ namespace NPCMapLocations
             if (e.IsOneSecond)
             {
                 // Check season change (for when it's changed via console)
-                if (Globals.UseSeasonalMaps && (MapSeason != null && MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
+                if (Globals.UseSeasonalMaps && (this.MapSeason != null && this.MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
                 {
-                    MapSeason = Game1.currentSeason;
+                    this.MapSeason = Game1.currentSeason;
 
                     // Force reload of map for season changes
                     try
                     {
-                        Helper.Content.InvalidateCache(MapFilePath);
+                        Helper.Content.InvalidateCache(this.MapFilePath);
                     }
                     catch
                     {
-                        Monitor.Log("Failed to update map for current season.", LogLevel.Error);
+                        this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
                     }
 
-                    Minimap.Value?.UpdateMapForSeason();
+                    this.Minimap.Value?.UpdateMapForSeason();
                 }
 
                 // Check if conditional NPCs have been talked to
                 foreach (string npcName in ModConstants.ConditionalNpcs)
                 {
-                    if (ConditionalNpcs.Value[npcName]) continue;
+                    if (this.ConditionalNpcs.Value[npcName]) continue;
 
-                    ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
+                    this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
                 }
             }
 
             // Update tick
-            if (Globals.ShowMinimap && Minimap.Value != null && Minimap.Value.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
+            if (Globals.ShowMinimap && this.Minimap.Value != null && this.Minimap.Value.isHoveringDragZone() && Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
             {
-                Minimap.Value.HandleMouseDrag();
+                this.Minimap.Value.HandleMouseDrag();
             }
 
             if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
             {
-                isModMapOpen.Value = false;
+                this.isModMapOpen.Value = false;
                 return;
             }
 
-            hasOpenedMap.Value =
-              gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
-            isModMapOpen.Value = hasOpenedMap.Value ? isModMapOpen.Value : hasOpenedMap.Value; // When vanilla MapPage is replaced by ModMap
+            this.hasOpenedMap.Value = gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
+            this.isModMapOpen.Value = this.hasOpenedMap.Value ? this.isModMapOpen.Value : this.hasOpenedMap.Value; // When vanilla MapPage is replaced by ModMap
 
-            if (hasOpenedMap.Value && !isModMapOpen.Value) // Only run once on map open
-                OpenModMap();
+            if (this.hasOpenedMap.Value && !this.isModMapOpen.Value) // Only run once on map open
+                this.OpenModMap();
         }
 
         private void Multiplayer_PeerDisconnected(object sender, PeerDisconnectedEventArgs e)
@@ -617,14 +613,14 @@ namespace NPCMapLocations
                 {
                     // Set list to null and stop listening to disconnections
                     playerIds = null;
-                    Helper.Events.Multiplayer.PeerDisconnected -= Multiplayer_PeerDisconnected;
+                    Helper.Events.Multiplayer.PeerDisconnected -= this.Multiplayer_PeerDisconnected;
                 }
             }
         }
 
         private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == ModManifest.UniqueID)
+            if (e.FromModID == this.ModManifest.UniqueID)
             {
                 switch (e.Type)
                 {
@@ -635,22 +631,22 @@ namespace NPCMapLocations
                             {
                                 // Instantiate list and listen to player disconnects
                                 playerIds = new List<long>(3);
-                                Helper.Events.Multiplayer.PeerDisconnected += Multiplayer_PeerDisconnected;
+                                Helper.Events.Multiplayer.PeerDisconnected += this.Multiplayer_PeerDisconnected;
                             }
                             playerIds.Add(e.FromPlayerID);
 
-                            Helper.Multiplayer.SendMessage(Customizations.Names, "SyncedNames", modIDs: new string[] { ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
+                            Helper.Multiplayer.SendMessage(this.Customizations.Names, "SyncedNames", modIDs: new string[] { this.ModManifest.UniqueID }, playerIDs: playerIds.ToArray());
                         }
                         break;
                     case "SyncedNames":
-                        if (Customizations != null)
+                        if (this.Customizations != null)
                         {
                             var syncedNames = e.ReadAs<Dictionary<string, string>>();
-                            Customizations.Names = syncedNames;
+                            this.Customizations.Names = syncedNames;
                         }
                         break;
                     case "SyncedNpcMarkers":
-                        if (NpcMarkers.Value == null) return;
+                        if (this.NpcMarkers.Value == null) return;
 
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
@@ -660,7 +656,7 @@ namespace NPCMapLocations
                                 offset = 0;
                             }
 
-                            if (NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
+                            if (this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
                             {
                                 npcMarker.LocationName = syncedMarker.Value.LocationName;
                                 npcMarker.MapX = syncedMarker.Value.MapX;
@@ -670,7 +666,7 @@ namespace NPCMapLocations
                                 npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
                                 npcMarker.Type = syncedMarker.Value.Type;
 
-                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
+                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
                                 {
                                     name = syncedMarker.Key;
                                 }
@@ -712,7 +708,7 @@ namespace NPCMapLocations
                                     Type = syncedMarker.Value.Type
                                 };
 
-                                if (!Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
+                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
                                 {
                                     name = syncedMarker.Key;
                                 }
@@ -741,7 +737,7 @@ namespace NPCMapLocations
                                     newMarker.Sprite = null;
                                 }
 
-                                NpcMarkers.Value.Add(syncedMarker.Key, newMarker);
+                                this.NpcMarkers.Value.Add(syncedMarker.Key, newMarker);
                             }
                         }
                         break;
@@ -755,7 +751,7 @@ namespace NPCMapLocations
         {
             if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
 
-            isModMapOpen.Value = true;
+            this.isModMapOpen.Value = true;
 
             var pages = Helper.Reflection
               .GetField<List<IClickableMenu>>(gameMenu, "pages").GetValue();
@@ -763,37 +759,33 @@ namespace NPCMapLocations
             // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
             // allows for better compatibility with other mods that use MapPage
             pages[ModConstants.MapTabIndex] = new ModMapPage(
-              NpcMarkers.Value,
-              ConditionalNpcs.Value,
-              FarmerMarkers.Value,
-              FarmBuildings,
-              BuildingMarkers.Value,
-              Customizations
+                this.NpcMarkers.Value,
+                this.ConditionalNpcs.Value,
+                this.FarmerMarkers.Value,
+                FarmBuildings,
+                this.BuildingMarkers.Value,
+                this.Customizations
             );
         }
 
         private void UpdateMarkers(bool forceUpdate = false)
         {
-            if (isModMapOpen.Value || forceUpdate)
+            if (this.isModMapOpen.Value || forceUpdate)
             {
                 if (!Context.IsMultiplayer || Context.IsMainPlayer)
-                {
-                    UpdateNpcs();
-                }
+                    this.UpdateNpcs();
                 else
-                {
-                    UpdateNpcsFarmhand();
-                }
+                    this.UpdateNpcsFarmhand();
 
                 if (Context.IsMultiplayer)
-                    UpdateFarmers();
+                    this.UpdateFarmers();
             }
         }
 
         // Update NPC marker data and names on hover
         private void UpdateNpcs()
         {
-            if (NpcMarkers.Value == null) return;
+            if (this.NpcMarkers.Value == null) return;
 
             List<NPC> npc_list = GetVillagers();
 
@@ -805,7 +797,7 @@ namespace NPCMapLocations
 
             foreach (var npc in npc_list)
             {
-                if (!NpcMarkers.Value.TryGetValue(npc.Name, out var npcMarker)
+                if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out var npcMarker)
                   || npc.currentLocation == null)
                 {
                     continue;
@@ -903,7 +895,7 @@ namespace NPCMapLocations
                 if (locationName != null)
                 {
                     // Get center of NPC marker
-                    var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), Customizations.MapVectors, Customizations.LocationExclusions);
+                    var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions);
                     npcMarker.MapX = (int)npcLocation.X - 16;
                     npcMarker.MapY = (int)npcLocation.Y - 15;
                 }
@@ -913,9 +905,9 @@ namespace NPCMapLocations
         // Update npc marker properties only relevant to farmhand
         private void UpdateNpcsFarmhand()
         {
-            if (NpcMarkers.Value == null) return;
+            if (this.NpcMarkers.Value == null) return;
 
-            foreach (var npcMarker in NpcMarkers.Value)
+            foreach (var npcMarker in this.NpcMarkers.Value)
             {
                 string name = npcMarker.Key;
                 var marker = npcMarker.Value;
@@ -998,14 +990,14 @@ namespace NPCMapLocations
 
                 long farmerId = farmer.UniqueMultiplayerID;
                 var farmerLoc = LocationToMap(
-                  locationName,
-                  farmer.getTileX(),
-                  farmer.getTileY(),
-                  Customizations.MapVectors,
-                  Customizations.LocationExclusions
+                    locationName,
+                    farmer.getTileX(),
+                    farmer.getTileY(),
+                    this.Customizations.MapVectors,
+                    this.Customizations.LocationExclusions
                 );
 
-                if (FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
+                if (this.FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
                 {
                     float deltaX = farmerLoc.X - farMarker.PrevMapX;
                     float deltaY = farmerLoc.Y - farMarker.PrevMapY;
@@ -1013,9 +1005,9 @@ namespace NPCMapLocations
                     // Location changes before tile position, causing farmhands to blink
                     // to the wrong position upon entering new location. Handle this in draw.
                     if (locationName == farMarker.LocationName && MathHelper.Distance(deltaX, deltaY) > 15)
-                        FarmerMarkers.Value[farmerId].DrawDelay = 1;
+                        this.FarmerMarkers.Value[farmerId].DrawDelay = 1;
                     else if (farMarker.DrawDelay > 0)
-                        FarmerMarkers.Value[farmerId].DrawDelay--;
+                        this.FarmerMarkers.Value[farmerId].DrawDelay--;
                 }
                 else
                 {
@@ -1025,17 +1017,17 @@ namespace NPCMapLocations
                         DrawDelay = 0
                     };
 
-                    FarmerMarkers.Value.Add(farmerId, newMarker);
+                    this.FarmerMarkers.Value.Add(farmerId, newMarker);
                 }
 
 
-                FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
-                FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
-                FarmerMarkers.Value[farmerId].PrevMapX = (int)farmerLoc.X;
-                FarmerMarkers.Value[farmerId].PrevMapY = (int)farmerLoc.Y;
-                FarmerMarkers.Value[farmerId].LocationName = locationName;
-                FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
-                FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
+                this.FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
+                this.FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
+                this.FarmerMarkers.Value[farmerId].PrevMapX = (int)farmerLoc.X;
+                this.FarmerMarkers.Value[farmerId].PrevMapY = (int)farmerLoc.Y;
+                this.FarmerMarkers.Value[farmerId].LocationName = locationName;
+                this.FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
+                this.FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
             }
         }
 
@@ -1177,14 +1169,12 @@ namespace NPCMapLocations
         {
             if (!Context.IsWorldReady) return;
 
-            UpdateMarkers(true);
-            UpdateFarmBuildingLocs();
-            Minimap.Value?.CheckOffsetForMap();
+            this.UpdateMarkers(true);
+            this.UpdateFarmBuildingLocs();
+            this.Minimap.Value?.CheckOffsetForMap();
 
-            if (isModMapOpen.Value)
-            {
-                OpenModMap();
-            }
+            if (this.isModMapOpen.Value)
+                this.OpenModMap();
         }
 
         private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
@@ -1194,7 +1184,7 @@ namespace NPCMapLocations
 
             // Check for resize after mod menu closed
             if (e.OldMenu is ModMenu)
-                Minimap.Value?.Resize();
+                this.Minimap.Value?.Resize();
         }
 
         private void Player_Warped(object sender, WarpedEventArgs e)
@@ -1202,16 +1192,17 @@ namespace NPCMapLocations
             if (e.IsLocalPlayer)
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
-                Globals.ShowMinimap = Globals.ShowMinimap && !IsLocationExcluded(e.NewLocation.Name);
+                Globals.ShowMinimap = Globals.ShowMinimap && !this.IsLocationExcluded(e.NewLocation.Name);
 
                 // Check if map does not fill screen and adjust for black bars (ex. BusStop)
-                Minimap.Value?.CheckOffsetForMap();
+                this.Minimap.Value?.CheckOffsetForMap();
             }
         }
 
         private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
         {
-            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD) Minimap.Value?.DrawMiniMap();
+            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
+                this.Minimap.Value?.DrawMiniMap();
         }
 
         private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
@@ -1231,7 +1222,7 @@ namespace NPCMapLocations
             if (!Context.IsWorldReady || Game1.player == null) return;
 
             if (DEBUG_MODE)
-                ShowDebugInfo();
+                this.ShowDebugInfo();
         }
 
         // Show debug info in top left corner
@@ -1245,7 +1236,7 @@ namespace NPCMapLocations
             var currMenu = Game1.activeClickableMenu is GameMenu ? (GameMenu)Game1.activeClickableMenu : null;
 
             // If map is open, show map position at cursor
-            if (isModMapOpen.Value)
+            if (this.isModMapOpen.Value)
             {
                 int borderWidth = 3;
                 float borderOpacity = 0.75f;

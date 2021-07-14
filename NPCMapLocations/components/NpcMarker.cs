@@ -17,17 +17,17 @@ public class NpcMarker
 
     public NpcMarker()
     {
-        DisplayName = null;
-        LocationName = null;
-        Sprite = null;
-        CropOffset = 0;
-        MapX = -9999;
-        MapY = -9999;
-        IsBirthday = false;
-        HasQuest = false;
-        IsHidden = false;
-        Layer = 4;
-        Type = Character.Villager;
+        this.DisplayName = null;
+        this.LocationName = null;
+        this.Sprite = null;
+        this.CropOffset = 0;
+        this.MapX = -9999;
+        this.MapY = -9999;
+        this.IsBirthday = false;
+        this.HasQuest = false;
+        this.IsHidden = false;
+        this.Layer = 4;
+        this.Type = Character.Villager;
     }
 }
 
