@@ -14,6 +14,5 @@ namespace LocationCompass
         public string FarmersOnlyToggleKey { get; set; } = "K";
         public bool ShowHorses { get; set; } = false;
         public string HorsesToggleKey { get; set; } = "L";
-        public List<string> NPCBlacklist { get; set; } = new List<string>();
     }
 }
