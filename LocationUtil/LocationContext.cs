@@ -12,10 +12,3 @@ internal class LocationContext
     public List<string> Children { get; set; } // Levels below
     public Vector2 Warp { get; set; } // Position of warp
 }
-
-internal enum LocationType
-{
-    Outdoors,
-    Building,
-    Room
-}

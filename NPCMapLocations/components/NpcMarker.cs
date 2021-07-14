@@ -30,10 +30,3 @@ public class NpcMarker
         this.Type = Character.Villager;
     }
 }
-
-public enum Character
-{
-    Villager,
-    Child,
-    Horse
-}
