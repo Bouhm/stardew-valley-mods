@@ -7,7 +7,7 @@ using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     // Mod checkbox for settings and npc blacklst
     internal class ModCheckbox : OptionsElement

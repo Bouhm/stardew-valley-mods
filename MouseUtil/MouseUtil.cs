@@ -3,64 +3,67 @@ using Microsoft.Xna.Framework;
 using NPCMapLocations;
 using StardewValley;
 
-// Library for methods that get tile position, map position, drag and drop position
-// based on the location of the cursor
-internal class MouseUtil
+namespace Bouhm.Shared.Mouse
 {
-    public static Vector2 BeginMousePosition { get; set; }
-    public static Vector2 EndMousePosition { get; set; }
-
-    public static void Reset()
+    // Library for methods that get tile position, map position, drag and drop position
+    // based on the location of the cursor
+    internal class MouseUtil
     {
-        BeginMousePosition = new Vector2(-1000, -1000);
-        EndMousePosition = new Vector2(-1000, -1000);
-    }
+        public static Vector2 BeginMousePosition { get; set; }
+        public static Vector2 EndMousePosition { get; set; }
 
-    // Return Vector2 position of tile at cursor
-    public static Vector2 GetTilePositionAtCursor()
-    {
-        return Game1.currentCursorTile;
-    }
+        public static void Reset()
+        {
+            BeginMousePosition = new Vector2(-1000, -1000);
+            EndMousePosition = new Vector2(-1000, -1000);
+        }
 
-    // Return Vector2 position of pixel position on the map at cursor
-    public static Vector2 GetMapPositionAtCursor()
-    {
-        Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
-        return new Vector2((int)(Math.Ceiling(Game1.getMousePosition().X - mapPos.X)), (int)(Math.Ceiling(Game1.getMousePosition().Y - mapPos.Y)));
-    }
+        // Return Vector2 position of tile at cursor
+        public static Vector2 GetTilePositionAtCursor()
+        {
+            return Game1.currentCursorTile;
+        }
 
-    // Handle mouse down for beginning of drag and drop action
-    // Accepts a callback function as an argument
-    public static void HandleMouseDown(Action fn = null)
-    {
-        BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-        fn?.Invoke();
-    }
+        // Return Vector2 position of pixel position on the map at cursor
+        public static Vector2 GetMapPositionAtCursor()
+        {
+            Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
+            return new Vector2((int)(Math.Ceiling(Game1.getMousePosition().X - mapPos.X)), (int)(Math.Ceiling(Game1.getMousePosition().Y - mapPos.Y)));
+        }
 
-    // Handle mouse release for end of drag and drop action
-    // Accepts a callback function as an argument
-    public static void HandleMouseRelease(Action fn = null)
-    {
-        EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-        fn?.Invoke();
-    }
+        // Handle mouse down for beginning of drag and drop action
+        // Accepts a callback function as an argument
+        public static void HandleMouseDown(Action fn = null)
+        {
+            BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+            fn?.Invoke();
+        }
 
-    // Return Rectangle of current dragging area
-    public static Rectangle GetCurrentDraggingArea()
-    {
-        return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
-    }
+        // Handle mouse release for end of drag and drop action
+        // Accepts a callback function as an argument
+        public static void HandleMouseRelease(Action fn = null)
+        {
+            EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+            fn?.Invoke();
+        }
 
-    // Return Rectangle of drag and drop area
-    public static Rectangle GetDragAndDropArea()
-    {
-        return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
-    }
+        // Return Rectangle of current dragging area
+        public static Rectangle GetCurrentDraggingArea()
+        {
+            return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
+        }
 
-    // Convert absolute positions to map positions
-    public static Rectangle GetRectangleOnMap(Rectangle rect)
-    {
-        Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
-        return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+        // Return Rectangle of drag and drop area
+        public static Rectangle GetDragAndDropArea()
+        {
+            return new Rectangle((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+        }
+
+        // Convert absolute positions to map positions
+        public static Rectangle GetRectangleOnMap(Rectangle rect)
+        {
+            Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720, 0, 0);
+            return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+        }
     }
 }

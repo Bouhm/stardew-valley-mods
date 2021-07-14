@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bouhm.Shared.Mouse;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     internal class ModMinimap
     {

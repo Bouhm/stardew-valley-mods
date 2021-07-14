@@ -4,7 +4,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     // Mod slider for heart level this.Config
     internal class MapModSlider : OptionsElement

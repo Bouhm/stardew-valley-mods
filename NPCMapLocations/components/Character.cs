@@ -1,6 +1,9 @@
-﻿public enum Character
+﻿namespace NPCMapLocations.Framework
 {
-    Villager,
-    Child,
-    Horse
+    public enum Character
+    {
+        Villager,
+        Child,
+        Horse
+    }
 }

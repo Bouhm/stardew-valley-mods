@@ -1,4 +1,4 @@
-﻿namespace NPCMapLocations
+﻿namespace NPCMapLocations.Framework.Models
 {
     /// <summary>The model for per-player config options.</summary>
     public class PlayerConfig

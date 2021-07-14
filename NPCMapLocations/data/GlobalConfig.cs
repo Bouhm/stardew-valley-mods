@@ -1,9 +1,6 @@
-﻿/*
- * Config file for mod settings.
- */
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Models
 {
     /// <summary>The model for global config options.</summary>
     public class GlobalConfig

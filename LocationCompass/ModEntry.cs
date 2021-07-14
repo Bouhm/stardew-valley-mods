@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -8,7 +9,6 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Quests;
-using static LocationUtil;
 
 namespace LocationCompass
 {
@@ -108,14 +108,14 @@ namespace LocationCompass
 
         private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
         {
-            GetLocationContexts();
+            LocationUtil.GetLocationContexts();
         }
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             activeWarpLocators = new Dictionary<string, LocatorScroller>();
             syncedLocationData = new SyncedNpcLocationData();
-            GetLocationContexts();
+            LocationUtil.GetLocationContexts();
 
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
@@ -309,13 +309,13 @@ namespace LocationCompass
                 if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
                 {
                     // Leave mine levels distinguished in name if player inside mine
-                    LocationContexts.TryGetValue(this.getMineName(playerLocName), out playerLocCtx);
-                    LocationContexts.TryGetValue(this.getMineName(charLocName), out characterLocCtx);
+                    LocationUtil.LocationContexts.TryGetValue(this.getMineName(playerLocName), out playerLocCtx);
+                    LocationUtil.LocationContexts.TryGetValue(this.getMineName(charLocName), out characterLocCtx);
                 }
                 else
                 {
-                    if (!LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
-                    if (!LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+                    if (!LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
+                    if (!LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
                 }
 
                 if (this.config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)

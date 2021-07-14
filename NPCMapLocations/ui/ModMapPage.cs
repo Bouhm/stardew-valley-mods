@@ -7,15 +7,17 @@ Based on regurgitated game code.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Locations;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     public class ModMapPage : MapPage
     {

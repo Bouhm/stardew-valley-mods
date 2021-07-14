@@ -7,7 +7,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     public class ModPlusMinus : OptionsElement
     {

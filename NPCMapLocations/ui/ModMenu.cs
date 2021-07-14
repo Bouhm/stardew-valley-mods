@@ -10,10 +10,11 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NPCMapLocations.Framework.Models;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     public class ModMenu : IClickableMenu
     {

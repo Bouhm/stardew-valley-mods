@@ -1,6 +1,9 @@
-﻿internal enum LocationType
+﻿namespace Bouhm.Shared.Locations
 {
-    Outdoors,
-    Building,
-    Room
+    internal enum LocationType
+    {
+        Outdoors,
+        Building,
+        Room
+    }
 }

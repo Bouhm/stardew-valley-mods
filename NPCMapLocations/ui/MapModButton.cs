@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework.Menus
 {
     // Mod button for the three main modes
     internal class MapModButton : OptionsElement

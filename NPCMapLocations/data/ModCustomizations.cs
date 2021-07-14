@@ -3,11 +3,12 @@ using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json.Linq;
+using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
-namespace NPCMapLocations
+namespace NPCMapLocations.Framework
 {
     // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
     public class ModCustomizations

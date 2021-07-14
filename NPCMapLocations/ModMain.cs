@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bouhm.Shared.Locations;
+using Bouhm.Shared.Mouse;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
+using NPCMapLocations.Framework;
+using NPCMapLocations.Framework.Menus;
+using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -13,6 +18,7 @@ using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using Character = NPCMapLocations.Framework.Character;
 
 namespace NPCMapLocations
 {
