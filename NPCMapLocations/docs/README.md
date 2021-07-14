@@ -79,3 +79,6 @@ Compatible with Stardew Valley 1.5+ on Linux/macOS/Windows, both single-player a
 The mod is compatible with **lots** of NPC/map mods with futureproofing.
 
 **In multiplayer, the mod will only work if the host player has it installed.**
+
+## See also
+* [Release notes](release-notes.md)
