@@ -1,11 +1,10 @@
-## Adding custom locations
+﻿## Adding custom locations
 
 This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended to be followed on a PC.
 
 **For more information on other features and usage of the mod, check the [Nexus Mods page](https://www.nexusmods.com/stardewvalley/mods/239).**
 
 ## Contents
-
 - [How tracking works](#how-tracking-works)
 - [Creating an accurate map](#creating-an-accurate-map)
   - [Video tutorial](#video-tutorial)
@@ -24,7 +23,6 @@ This documentation is for adding support for custom locations with **NPC Map Loc
 - [Get additional help](#get-additional-help)
 
 ## How tracking works
-
 For any outdoor location in the game, the mod needs at least two pairs of points to calculate the map location. The two pairs of points are required to create a bounding box (top-left corner and bottom-right corner) with which we can calculate the pixel position on the map from the current tile position in the location. One pair is the top-left and bottom-right pixel points on the map. The second pair are the top-left and bottom-right tile positions in the location.
 
 ![Two-Points](https://i.imgur.com/J8Btvdj.png)
@@ -34,7 +32,6 @@ Ideally, the custom location is drawn accurately in proportion onto the map such
 ![Four-Points](https://i.imgur.com/kEkgn1A.png)
 
 ## Creating an accurate map
-
 Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. Mod authors should **`"Replace"`** the map through Content Patcher:
 
 ```js
@@ -58,16 +55,13 @@ Here are the steps I take to create accurate modifications:
 6. Repeat steps 1-5 for any other custom locations.
 
 ### Video tutorial
-
 [Here is a short video guide on the process](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
 NOTE: This video guide is outdated, but the method is still the same.
 
 ### Seasonal maps
-
 NPC Map Locations also provides seasonal maps that dynamically load with the game season. If you choose not to create additional maps for different seasons, just create one for `spring_map.png` in the respective map folder and that will be the map used for all seasons, just like in the vanilla game.
 
 ## Loading the custom map
-
 NPC Map Locations provides its own default maps, however when in use with any mods that modify the world, the mod author should provide their owns maps using through Content Patcher.
 
 The folder should include the following files:
@@ -80,7 +74,6 @@ The folder should include the following files:
 If not using seasonal maps, just a "spring_map.png" map will suffice.
 
 ## Unknown locations
-
 NPC Map Locations will try its best to figure out where custom locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so indoor locations within can be automatically located as long as the outdoor location has tracking (explained below). Indoor locations are single points on the map and do not require tracking. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
 
 ```
@@ -92,7 +85,6 @@ NPC Map Locations will try its best to figure out where custom locations are. Ea
 ```
 
 ## Adding points
-
 Any custom locations that need tracking need to be included in the `content.json` of the mods that adds custom locations to the game.
 The target MUST be exactly as below.
 
@@ -130,7 +122,6 @@ Where `[LocationName]` is the name of the location. Each field between the curly
 By turning on the `DEBUG_MODE` in the `config\globals.json` by setting `"DEBUG_MODE": true`, additional information and helpful tools about the current locaton will be displayed in the game, including the exact name of the location, dimensions of its tilemap, and information about the selected box on the map. It will also give the player more freedom to move around by teleporting the player to the cursor (Ctrl+RightClick) to test the tracking.
 
 ### Example
-
 Let's look at an example using the custom location "TownEast" added on by the Stardew Valley Expanded mod.
 
 The first step would be to physically go to the location in-game with `DEBUG_MODE` on to gather information.
@@ -176,7 +167,6 @@ Tips:
 - Use control + right click to move the player around the map in debug mode.
 
 ### Farm types
-
 Sometimes a mod will change a farm only based on the farm type. If you want to specify points for any farm, you can leave the location name as "Farm" but for specific farm types, you will need to use the following:
 - "Farm_Default"
 - "Farm_Riverland"
@@ -187,7 +177,6 @@ Sometimes a mod will change a farm only based on the farm type. If you want to s
 - "Farm_Beach"
 
 ### Single points
-
 Instead of an area with tracking, if you want to display the character in a location in a single point on the map, you only need to specify the `MapX` and `MapY` like so:
 
 ```js
@@ -213,7 +202,6 @@ Other points are not needed because we're simply showing the character at (36, 4
 **Note that you do NOT need to add any indoor locations. NPC Map Locations will automatically find indoor locations on the map, given that the tracking for its outdoor location is accurate and there exists a valid warp into the indoor location.**
 
 ### Adding location tooltips
-
 Mod authors can add map tooltips when the player hovers the custom location if they choose to. The format includes the name of the location, the pixel position representng the top-left corner, the width and height of the bouding box where the tooltip hover should trigger, and the primary and secondary text that should display in the tooltip.
 
 ![Tooltips](https://i.imgur.com/UJSgR6l.png)
@@ -272,6 +260,7 @@ For adding just this one location, our final JSON file will look like this:
   }
 }
 ```
+
 ### Excluding locations
 For any custom locations that should be HIDDEN from the map (ex. when a character is in that location, they should not show up on the map), they need to be added to the LocationExclusions field.
 
@@ -324,5 +313,4 @@ After making the changes to the config, make sure to use the [JSON validator](ht
 If the JSON is valid, you can go into game and test the newly added custom locations on the map. If the JSON is not valid, SMAPI will throw an error and the game will crash.
 
 ## Get additional help
-
 Visit [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#using-mods` channel.

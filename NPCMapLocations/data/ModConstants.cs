@@ -1,21 +1,21 @@
-/*
+﻿/*
 Static class that stores constants for map mod.
 Do NOT modify anything here other than MapVectors
 */
 
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley.Menus;
-using System.Collections.Generic;
 
 public static class ModConstants
 {
-  // The page index of mapTab
-  public static int MapTabIndex => StardewModdingAPI.Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
+    // The page index of mapTab
+    public static int MapTabIndex => StardewModdingAPI.Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
 
-  // Cropping heads for NPC markers
-  // Values shift the head up (negative) or down (positive)
-  public static Dictionary<string, int> NpcMarkerOffsets => new Dictionary<string, int>
+    // Cropping heads for NPC markers
+    // Values shift the head up (negative) or down (positive)
+    public static Dictionary<string, int> NpcMarkerOffsets => new Dictionary<string, int>
     {
         {"Abigail", 3},
         {"Alex", 0},
@@ -56,8 +56,8 @@ public static class ModConstants
         {"Wizard", 0}
     };
 
-  // NPCs with no schedules 
-  public static List<string> ExcludedNpcs => new List<string>()
+    // NPCs with no schedules 
+    public static List<string> ExcludedNpcs => new List<string>()
     {
       // "Dwarf",
       "Mister Qi",
@@ -69,23 +69,23 @@ public static class ModConstants
       // "Dusty"
     };
 
-  // Spoiler characters that are unlocked later in the game
-  public static List<string> ConditionalNpcs => new List<string>()
-  { 
-      "Dwarf", 
-      "Kent", 
-      "Krobus", 
-      "Marlon", 
-      "Merchant", 
-      "Sandy", 
+    // Spoiler characters that are unlocked later in the game
+    public static List<string> ConditionalNpcs => new List<string>()
+  {
+      "Dwarf",
+      "Kent",
+      "Krobus",
+      "Marlon",
+      "Merchant",
+      "Sandy",
       "Wizard",
       "Leo",
   };
 
-  // tileX and TileY (the first two values) are tile positions in the game for that location
-  // X and Y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
-  // MapModMain handles all the calculations to make sure the positions are center-based.
-  public static Dictionary<string, MapVector[]> MapVectors => new Dictionary<string, MapVector[]>
+    // tileX and TileY (the first two values) are tile positions in the game for that location
+    // X and Y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
+    // MapModMain handles all the calculations to make sure the positions are center-based.
+    public static Dictionary<string, MapVector[]> MapVectors => new Dictionary<string, MapVector[]>
     {
       // Outdoor
 		  {
@@ -309,9 +309,9 @@ public static class ModConstants
       },
     };
 
-  // Custom farm markers
-  // Also used to do a quick check for currentLocation is farm building
-  public static Dictionary<string, Rectangle> FarmBuildingRects => new Dictionary<string, Rectangle>
+    // Custom farm markers
+    // Also used to do a quick check for currentLocation is farm building
+    public static Dictionary<string, Rectangle> FarmBuildingRects => new Dictionary<string, Rectangle>
     {
         {"Shed", new Rectangle(0, 0, 5, 7)},
         {"Coop", new Rectangle(5, 0, 5, 7)},

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <AssemblyName>NPCMapLocations</AssemblyName>
     <RootNamespace>NPCMapLocations</RootNamespace>
@@ -94,7 +93,5 @@
   </ItemGroup>
 
   <Import Project="..\LocationUtil\LocationUtil.projitems" Label="Shared" />
-
   <Import Project="..\MouseUtil\MouseUtil.projitems" Label="Shared" />
-
 </Project>
