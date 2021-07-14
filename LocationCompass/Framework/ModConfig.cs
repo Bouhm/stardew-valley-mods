@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace LocationCompass
+﻿namespace LocationCompass.Framework
 {
     /// <summary>The mod configuration model.</summary>
-    class ModConfig
+    internal class ModConfig
     {
         /// <summary>Whether you need to hold the button to show icons (else the button toggles them).</summary>
         public bool HoldToToggle { get; set; } = true;

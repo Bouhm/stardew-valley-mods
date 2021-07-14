@@ -10,7 +10,6 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NPCMapLocations.Framework.Models;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -44,7 +43,7 @@ namespace NPCMapLocations.Framework.Menus
             this.npcMarkers = npcMarkers;
 
             var topLeftPositionForCenteringOnScreen =
-                Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
+                Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
                     0, 0);
             this.mapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.mapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -101,14 +100,14 @@ namespace NPCMapLocations.Framework.Menus
             for (int j = 0; j < 10; j++)
                 heights.Add(45 + j * 15);
 
-            string minimapLabel = ModMain.Helper.Translation.Get("minimap.label");
+            string minimapLabel = ModEntry.Helper.Translation.Get("minimap.label");
             this.options.Add(new OptionsElement(minimapLabel));
             this.options.Add(new ModCheckbox("minimap.option1", 0, -1, -1));
             this.options.Add(new ModPlusMinus("minimap.plusMinus1", 1, widths));
             this.options.Add(new ModPlusMinus("minimap.plusMinus2", 2, heights));
 
             // Translate labels and initialize buttons to handle button press
-            string immersionLabel = ModMain.Helper.Translation.Get("immersion.label");
+            string immersionLabel = ModEntry.Helper.Translation.Get("immersion.label");
             this.options.Add(new OptionsElement(immersionLabel));
             this.immersionButton1 = new MapModButton("immersion.option1", 3, -1, -1, -1, -1);
             this.immersionButton2 = new MapModButton("immersion.option2", 4, -1, -1, -1, -1);
@@ -126,7 +125,7 @@ namespace NPCMapLocations.Framework.Menus
             this.options.Add(new ModCheckbox("extra.option2", 11, -1, -1));
             this.options.Add(new ModCheckbox("extra.option3", 12, -1, -1));
 
-            string villagersLabel = ModMain.Helper.Translation.Get("villagers.label");
+            string villagersLabel = ModEntry.Helper.Translation.Get("villagers.label");
             this.options.Add(new OptionsElement(villagersLabel));
 
             var orderedMarkers = npcMarkers.ToList()
@@ -205,7 +204,7 @@ namespace NPCMapLocations.Framework.Menus
                 return;
             }
 
-            if (key.ToString().Equals(ModMain.Globals.MenuKey) && this.readyToClose() && this.canClose)
+            if (key.ToString().Equals(ModEntry.Globals.MenuKey) && this.readyToClose() && this.canClose)
             {
                 Game1.exitActiveMenu();
                 Game1.activeClickableMenu = new GameMenu();
@@ -363,13 +362,13 @@ namespace NPCMapLocations.Framework.Menus
             if (Game1.options.showMenuBackground) this.drawBackground(b);
 
             Game1.drawDialogueBox(this.mapX - Game1.pixelZoom * 8, this.mapY - Game1.pixelZoom * 24,
-              (ModMain.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
-            b.Draw(ModMain.Map, new Vector2(this.mapX, this.mapY), new Rectangle(0, 0, 300, 180),
+              (ModEntry.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
+            b.Draw(ModEntry.Map, new Vector2(this.mapX, this.mapY), new Rectangle(0, 0, 300, 180),
               Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
             this.okButton.draw(b);
-            int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModMain.Helper.Translation.Get("immersion.option3")).X;
+            int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModEntry.Helper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
             {
                 this.upArrow.draw(b);

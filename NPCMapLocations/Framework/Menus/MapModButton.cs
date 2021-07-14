@@ -20,10 +20,10 @@ namespace NPCMapLocations.Framework.Menus
             int height
         ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            this.label = ModMain.Helper.Translation.Get(label);
+            this.label = ModEntry.Helper.Translation.Get(label);
             this.rect = new Rectangle(x, y, width, height);
 
-            if (ModMain.Config.ImmersionOption == whichOption - 2)
+            if (ModEntry.Config.ImmersionOption == whichOption - 2)
                 this.greyedOut = false;
             else
                 this.greyedOut = true;
@@ -39,7 +39,7 @@ namespace NPCMapLocations.Framework.Menus
                     base.receiveLeftClick(x, y);
                     this.isActive = true;
                     this.greyedOut = false;
-                    ModMain.Config.ImmersionOption = this.whichOption - 2;
+                    ModEntry.Config.ImmersionOption = this.whichOption - 2;
                 }
             }
         }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace LocationCompass
+namespace LocationCompass.Framework
 {
-    public class ModData
+    internal class ModData
     {
         public Dictionary<string, int> MarkerCrop { get; set; }
     }

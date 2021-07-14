@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley.Menus;
 
-namespace NPCMapLocations.Framework.Models
+namespace NPCMapLocations.Framework
 {
     /*
     Static class that stores constants for map mod.

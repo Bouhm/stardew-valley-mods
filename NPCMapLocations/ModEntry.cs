@@ -21,7 +21,7 @@ using Character = NPCMapLocations.Framework.Character;
 
 namespace NPCMapLocations
 {
-    public class ModMain : Mod, IAssetLoader
+    public class ModEntry : Mod, IAssetLoader
     {
         public static PlayerConfig Config;
         public static GlobalConfig Globals;
@@ -485,7 +485,7 @@ namespace NPCMapLocations
                         type = Character.Child;
                     }
 
-                    if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
+                    if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
                     {
                         offset = 0;
                     }
@@ -656,7 +656,7 @@ namespace NPCMapLocations
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
                         {
-                            if (!ModMain.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
+                            if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
                             {
                                 offset = 0;
                             }

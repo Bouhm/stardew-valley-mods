@@ -58,7 +58,7 @@ namespace NPCMapLocations.Framework.Menus
             this.BuildingMarkers = buildingMarkers;
             this.Customizations = customizations;
 
-            Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModMain.Map.Bounds.Width * 4, 720);
+            Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
             this.drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
             this.drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
             this.drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
@@ -86,7 +86,7 @@ namespace NPCMapLocations.Framework.Menus
                         break;
                 }
 
-                var locVector = ModMain.LocationToMap(locationName);
+                var locVector = ModEntry.LocationToMap(locationName);
 
                 this.points[i].bounds = new Rectangle(
                   // Snaps the cursor to the center instead of bottom right (default)
@@ -248,7 +248,7 @@ namespace NPCMapLocations.Framework.Menus
                     y += Game1.tileSize / 4;
                 }
 
-                if (ModMain.Globals.NameTooltipMode == 1)
+                if (ModEntry.Globals.NameTooltipMode == 1)
                 {
                     if (y + height > Game1.uiViewport.Height)
                     {
@@ -258,7 +258,7 @@ namespace NPCMapLocations.Framework.Menus
 
                     offsetY = 2 - Game1.tileSize;
                 }
-                else if (ModMain.Globals.NameTooltipMode == 2)
+                else if (ModEntry.Globals.NameTooltipMode == 2)
                 {
                     if (y + height > Game1.uiViewport.Height)
                     {
@@ -278,7 +278,7 @@ namespace NPCMapLocations.Framework.Menus
                 }
 
                 // Draw name tooltip positioned around location tooltip
-                this.DrawNames(b, this.hoveredNames, x, y, offsetY, height, ModMain.Globals.NameTooltipMode);
+                this.DrawNames(b, this.hoveredNames, x, y, offsetY, height, ModEntry.Globals.NameTooltipMode);
 
                 // Draw location tooltip
                 IClickableMenu.drawHoverText(b, this.hoveredLocationText, Game1.smallFont);
@@ -303,7 +303,7 @@ namespace NPCMapLocations.Framework.Menus
             else
             {
                 // Draw name tooltip only
-                this.DrawNames(Game1.spriteBatch, this.hoveredNames, x, y, offsetY, this.height, ModMain.Globals.NameTooltipMode);
+                this.DrawNames(Game1.spriteBatch, this.hoveredNames, x, y, offsetY, this.height, ModEntry.Globals.NameTooltipMode);
             }
 
             // Draw indoor icon
@@ -325,8 +325,8 @@ namespace NPCMapLocations.Framework.Menus
             int boxY = this.mapY - 96;
             int mY = this.mapY;
 
-            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModMain.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
-            b.Draw(ModMain.Map, new Vector2((float)this.mapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
+            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
+            b.Draw(ModEntry.Map, new Vector2((float)this.mapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
               4f, SpriteEffects.None, 0.86f);
 
             float scroll_draw_y = this.yPositionOnScreen + this.height + 32 + 16;
@@ -336,42 +336,42 @@ namespace NPCMapLocations.Framework.Menus
                 scroll_draw_y -= scroll_draw_bottom - (float)Game1.viewport.Height;
             }
 
-            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModMain.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
-            b.Draw(ModMain.Map, new Vector2(this.mapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
+            b.Draw(ModEntry.Map, new Vector2(this.mapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
                 case 1:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 2:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 3:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 4:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 5:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 6:
-                    b.Draw(ModMain.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
 
             if (this.drawPamHouseUpgrade)
             {
-                var houseLoc = ModMain.LocationToMap("Trailer_Big");
-                b.Draw(ModMain.Map, new Vector2(this.mapX + houseLoc.X - 16, this.mapY + houseLoc.Y - 11),
+                var houseLoc = ModEntry.LocationToMap("Trailer_Big");
+                b.Draw(ModEntry.Map, new Vector2(this.mapX + houseLoc.X - 16, this.mapY + houseLoc.Y - 11),
                   new Rectangle(263, 181, 8, 8), Color.White,
                   0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
             if (this.drawMovieTheater || this.drawMovieTheaterJoja)
             {
-                var theaterLoc = ModMain.LocationToMap("JojaMart");
-                b.Draw(ModMain.Map, new Vector2(this.mapX + theaterLoc.X - 20, this.mapY + theaterLoc.Y - 11),
+                var theaterLoc = ModEntry.LocationToMap("JojaMart");
+                b.Draw(ModEntry.Map, new Vector2(this.mapX + theaterLoc.X - 20, this.mapY + theaterLoc.Y - 11),
                   new Rectangle(275, 181, 15, 11), Color.White,
                   0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 
@@ -382,13 +382,13 @@ namespace NPCMapLocations.Framework.Menus
                 var islandRect = new Rectangle(208, 363, 40, 30);
                 var mapRect = new Vector2(this.mapX + 1040, this.mapY + 600);
 
-                if (ModMain.Globals.UseDetailedIsland)
+                if (ModEntry.Globals.UseDetailedIsland)
                 {
                     islandRect = new Rectangle(248, 363, 45, 40);
                     mapRect = new Vector2(this.mapX + 1020, this.mapY + 560);
                 }
 
-                b.Draw(ModMain.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                b.Draw(ModEntry.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
             string playerLocationName = this.getPlayerLocationNameForMap();
@@ -403,7 +403,7 @@ namespace NPCMapLocations.Framework.Menus
         // Subtractions within location vectors are to set the origin to the center of the sprite
         public void DrawMarkers(SpriteBatch b)
         {
-            if (ModMain.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+            if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
                 var sortedBuildings = this.FarmBuildings.ToList();
                 sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -425,7 +425,7 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             // Traveling Merchant
-            if (ModMain.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
+            if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
                 b.Draw(Game1.mouseCursors, new Vector2(this.mapX + merchantLoc.X - 16, this.mapY + merchantLoc.Y - 15),
@@ -447,8 +447,8 @@ namespace NPCMapLocations.Framework.Menus
 
                     // Skip if no specified location or should be hidden
                     if (marker.Sprite == null
-                      || ModMain.Globals.NpcExclusions.Contains(name)
-                      || (!ModMain.Globals.ShowHiddenVillagers && marker.IsHidden)
+                      || ModEntry.Globals.NpcExclusions.Contains(name)
+                      || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
                       || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                     )
                     {
@@ -467,7 +467,7 @@ namespace NPCMapLocations.Framework.Menus
                       new Rectangle?(spriteRect), markerColor);
 
                     // Draw icons for quests/birthday
-                    if (ModMain.Globals.ShowQuests)
+                    if (ModEntry.Globals.ShowQuests)
                     {
                         if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
                         {
@@ -509,7 +509,7 @@ namespace NPCMapLocations.Framework.Menus
             }
             else
             {
-                Vector2 playerLoc = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
+                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
                   Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions, true);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
@@ -523,7 +523,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             if (this.hoveredNames.Equals("")) return;
 
-            this.indoorIconVector = ModMain.UNKNOWN;
+            this.indoorIconVector = ModEntry.UNKNOWN;
             string[] lines = names.Split('\n');
             int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
             int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;

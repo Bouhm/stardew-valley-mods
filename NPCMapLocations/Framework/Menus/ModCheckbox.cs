@@ -24,34 +24,34 @@ namespace NPCMapLocations.Framework.Menus
         ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.npcMarkers = npcMarkers;
-            this.label = ModMain.Helper.Translation.Get(label);
+            this.label = ModEntry.Helper.Translation.Get(label);
 
             // Villager names
             if (whichOption > 12 && npcMarkers != null)
             {
-                this.isChecked = !ModMain.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
+                this.isChecked = !ModEntry.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
                 return;
             }
 
             switch (whichOption)
             {
                 case 0:
-                    this.isChecked = ModMain.Globals.ShowMinimap;
+                    this.isChecked = ModEntry.Globals.ShowMinimap;
                     return;
                 case 6:
-                    this.isChecked = ModMain.Globals.OnlySameLocation;
+                    this.isChecked = ModEntry.Globals.OnlySameLocation;
                     return;
                 case 7:
-                    this.isChecked = ModMain.Config.ByHeartLevel;
+                    this.isChecked = ModEntry.Config.ByHeartLevel;
                     return;
                 case 10:
-                    this.isChecked = ModMain.Globals.ShowQuests;
+                    this.isChecked = ModEntry.Globals.ShowQuests;
                     return;
                 case 11:
-                    this.isChecked = ModMain.Globals.ShowHiddenVillagers;
+                    this.isChecked = ModEntry.Globals.ShowHiddenVillagers;
                     return;
                 case 12:
-                    this.isChecked = ModMain.Globals.ShowTravelingMerchant;
+                    this.isChecked = ModEntry.Globals.ShowTravelingMerchant;
                     return;
                 default:
                     return;
@@ -71,39 +71,39 @@ namespace NPCMapLocations.Framework.Menus
             if (whichOption > 12 && this.npcMarkers != null)
             {
                 if (this.isChecked)
-                    ModMain.Globals.NpcExclusions.Remove(this.npcMarkers.ElementAt(whichOption - 13).Key);
+                    ModEntry.Globals.NpcExclusions.Remove(this.npcMarkers.ElementAt(whichOption - 13).Key);
                 else
-                    ModMain.Globals.NpcExclusions.Add(this.npcMarkers.ElementAt(whichOption - 13).Key);
+                    ModEntry.Globals.NpcExclusions.Add(this.npcMarkers.ElementAt(whichOption - 13).Key);
             }
             else
             {
                 switch (whichOption)
                 {
                     case 0:
-                        ModMain.Globals.ShowMinimap = this.isChecked;
+                        ModEntry.Globals.ShowMinimap = this.isChecked;
                         break;
                     case 6:
-                        ModMain.Globals.OnlySameLocation = this.isChecked;
+                        ModEntry.Globals.OnlySameLocation = this.isChecked;
                         break;
                     case 7:
-                        ModMain.Config.ByHeartLevel = this.isChecked;
+                        ModEntry.Config.ByHeartLevel = this.isChecked;
                         break;
                     case 10:
-                        ModMain.Globals.ShowQuests = this.isChecked;
+                        ModEntry.Globals.ShowQuests = this.isChecked;
                         break;
                     case 11:
-                        ModMain.Globals.ShowHiddenVillagers = this.isChecked;
+                        ModEntry.Globals.ShowHiddenVillagers = this.isChecked;
                         break;
                     case 12:
-                        ModMain.Globals.ShowTravelingMerchant = this.isChecked;
+                        ModEntry.Globals.ShowTravelingMerchant = this.isChecked;
                         break;
                     default:
                         break;
                 }
             }
 
-            ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
-            ModMain.Helper.Data.WriteJsonFile("config/globals.json", ModMain.Globals);
+            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.Helper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)

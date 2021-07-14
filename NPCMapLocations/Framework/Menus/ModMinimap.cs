@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -59,10 +58,10 @@ namespace NPCMapLocations.Framework.Menus
             this.drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
             this.drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
 
-            this.mmX = ModMain.Globals.MinimapX;
-            this.mmY = ModMain.Globals.MinimapY;
-            this.mmWidth = ModMain.Globals.MinimapWidth * Game1.pixelZoom;
-            this.mmHeight = ModMain.Globals.MinimapHeight * Game1.pixelZoom;
+            this.mmX = ModEntry.Globals.MinimapX;
+            this.mmY = ModEntry.Globals.MinimapY;
+            this.mmWidth = ModEntry.Globals.MinimapWidth * Game1.pixelZoom;
+            this.mmHeight = ModEntry.Globals.MinimapHeight * Game1.pixelZoom;
         }
 
         private Dictionary<string, bool> ConditionalNpcs { get; }
@@ -95,9 +94,9 @@ namespace NPCMapLocations.Framework.Menus
 
         public void HandleMouseRelease()
         {
-            ModMain.Globals.MinimapX = this.mmX;
-            ModMain.Globals.MinimapY = this.mmY;
-            ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+            ModEntry.Globals.MinimapX = this.mmX;
+            ModEntry.Globals.MinimapY = this.mmY;
+            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
             this.dragStarted = false;
 
             // Delay drawing on minimap after it's moved
@@ -107,7 +106,7 @@ namespace NPCMapLocations.Framework.Menus
 
         public void UpdateMapForSeason()
         {
-            ModMain.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+            ModEntry.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
         }
 
         public void CheckOffsetForMap()
@@ -125,8 +124,8 @@ namespace NPCMapLocations.Framework.Menus
         }
         public void Resize()
         {
-            this.mmWidth = ModMain.Globals.MinimapWidth * Game1.pixelZoom;
-            this.mmHeight = ModMain.Globals.MinimapHeight * Game1.pixelZoom;
+            this.mmWidth = ModEntry.Globals.MinimapWidth * Game1.pixelZoom;
+            this.mmHeight = ModEntry.Globals.MinimapHeight * Game1.pixelZoom;
         }
 
         public void Update()
@@ -134,11 +133,11 @@ namespace NPCMapLocations.Framework.Menus
             // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
             // Positions relative to the map are not.
 
-            this.center = ModMain.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
+            this.center = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
               Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions, true);
 
             // Player in unknown location, use previous location as center
-            if (this.center.Equals(ModMain.UNKNOWN) && this.prevCenter != null)
+            if (this.center.Equals(ModEntry.UNKNOWN) && this.prevCenter != null)
                 this.center = this.prevCenter;
             else
                 this.prevCenter = this.center;
@@ -202,16 +201,16 @@ namespace NPCMapLocations.Framework.Menus
                 Game1.mouseCursor = 2;
             }
 
-            if (ModMain.Map == null) return;
+            if (ModEntry.Map == null) return;
 
-            b.Draw(ModMain.Map, new Vector2(offsetMmX, this.mmY),
+            b.Draw(ModEntry.Map, new Vector2(offsetMmX, this.mmY),
               new Rectangle((int)Math.Floor(this.cropX / Game1.pixelZoom),
                 (int)Math.Floor(this.cropY / Game1.pixelZoom), this.mmWidth / Game1.pixelZoom + 2,
                 this.mmHeight / Game1.pixelZoom + 2), color, 0f, Vector2.Zero,
               4f, SpriteEffects.None, 0.86f);
 
             // Don't draw markers while being dragged
-            if (!(this.isHoveringDragZone() && ModMain.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
+            if (!(this.isHoveringDragZone() && ModEntry.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
             {
                 // When minimap is moved, redraw markers after recalculating & repositioning
                 if (this.drawDelay == 0)
@@ -282,37 +281,37 @@ namespace NPCMapLocations.Framework.Menus
             switch (Game1.whichFarm)
             {
                 case 1:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY),
                       new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
                       0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 2:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY),
                       new Rectangle(131 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color,
                       0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 3:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY),
                       new Rectangle(0 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
                       0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 4:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY),
                       new Rectangle(131 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color,
                       0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 5:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY),
                        new Rectangle(0 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color,
                        0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 6:
-                    b.Draw(ModMain.Map, new Vector2(farmX, farmY + 172),
+                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY + 172),
                       new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color,
                       0f,
                       Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
@@ -321,19 +320,19 @@ namespace NPCMapLocations.Framework.Menus
 
             if (this.drawPamHouseUpgrade)
             {
-                var houseLoc = ModMain.LocationToMap("Trailer_Big");
+                var houseLoc = ModEntry.LocationToMap("Trailer_Big");
                 if (this.IsWithinMapArea(houseLoc.X, houseLoc.Y))
-                    b.Draw(ModMain.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16), this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11)),
+                    b.Draw(ModEntry.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16), this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11)),
                       new Rectangle(263, 181, 8, 8), color,
                       0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
             if (this.drawMovieTheater || this.drawMovieTheaterJoja)
             {
-                var theaterLoc = ModMain.LocationToMap("JojaMart");
+                var theaterLoc = ModEntry.LocationToMap("JojaMart");
                 if (this.IsWithinMapArea(theaterLoc.X, theaterLoc.Y))
                 {
-                    b.Draw(ModMain.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20), this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11)),
+                    b.Draw(ModEntry.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20), this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11)),
                       new Rectangle(275, 181, 15, 11), color,
                       0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                 }
@@ -348,7 +347,7 @@ namespace NPCMapLocations.Framework.Menus
                 int mapX = 1040;
                 int mapY = 600;
 
-                if (ModMain.Globals.UseDetailedIsland)
+                if (ModEntry.Globals.UseDetailedIsland)
                 {
                     islandWidth = 45;
                     islandHeight = 40;
@@ -374,13 +373,13 @@ namespace NPCMapLocations.Framework.Menus
                 if (islandCropY + islandCropHeight > islandHeight)
                     islandCropHeight = islandHeight - islandCropY;
 
-                b.Draw(ModMain.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                b.Draw(ModEntry.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
             //
             // ===== Farm buildings =====
             //
-            if (ModMain.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+            if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
                 var sortedBuildings = this.FarmBuildings.ToList();
                 sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
@@ -413,7 +412,7 @@ namespace NPCMapLocations.Framework.Menus
             //
             // ===== Traveling Merchant =====
             //
-            if (ModMain.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
+            if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
                 if (this.IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
@@ -438,8 +437,8 @@ namespace NPCMapLocations.Framework.Menus
                     // Skip if no specified location
                     if (marker.Sprite == null
                         || !this.IsWithinMapArea(marker.MapX, marker.MapY)
-                        || ModMain.Globals.NpcExclusions.Contains(name)
-                        || (!ModMain.Globals.ShowHiddenVillagers && marker.IsHidden)
+                        || ModEntry.Globals.NpcExclusions.Contains(name)
+                        || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
                         || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                     )
                         continue;
@@ -467,7 +466,7 @@ namespace NPCMapLocations.Framework.Menus
                     }
 
                     // Icons for birthday/quest
-                    if (ModMain.Globals.ShowQuests)
+                    if (ModEntry.Globals.ShowQuests)
                     {
                         if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
                             b.Draw(Game1.mouseCursors,

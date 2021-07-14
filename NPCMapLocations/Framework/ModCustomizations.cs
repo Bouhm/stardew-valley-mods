@@ -69,7 +69,7 @@ namespace NPCMapLocations.Framework
         private void LoadCustomNpcs(Dictionary<string, JObject> customNpcJson)
         {
             var npcMarkerOffsets = ModConstants.NpcMarkerOffsets;
-            var npcExclusions = ModMain.Globals.NpcExclusions;
+            var npcExclusions = ModEntry.Globals.NpcExclusions;
 
             foreach (var npcData in customNpcJson)
             {
@@ -106,8 +106,8 @@ namespace NPCMapLocations.Framework
             }
 
             // Merge customizations into globals config
-            ModMain.Globals.NpcMarkerOffsets = this.MergeDictionaries(npcMarkerOffsets, ModMain.Globals.NpcMarkerOffsets);
-            ModMain.Globals.NpcExclusions = npcExclusions;
+            ModEntry.Globals.NpcMarkerOffsets = this.MergeDictionaries(npcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
+            ModEntry.Globals.NpcExclusions = npcExclusions;
 
             foreach (var character in Utility.getAllCharacters())
             {
@@ -139,8 +139,8 @@ namespace NPCMapLocations.Framework
                 }
             }
 
-            ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
-            ModMain.Helper.Data.WriteJsonFile($"config/globals.json", ModMain.Globals);
+            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.Helper.Data.WriteJsonFile($"config/globals.json", ModEntry.Globals);
         }
 
         /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
@@ -148,7 +148,7 @@ namespace NPCMapLocations.Framework
         private string GetCustomMapFolderName()
         {
             // get root compatibility folder
-            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModMain.Helper.DirectoryPath, this.MapsRootPath));
+            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModEntry.Helper.DirectoryPath, this.MapsRootPath));
             if (!compatFolder.Exists)
                 return null;
 
@@ -171,7 +171,7 @@ namespace NPCMapLocations.Framework
                     foreach (string group in modGroups)
                     {
                         string[] modIDs = group.Split('~');
-                        if (!modIDs.Any(id => ModMain.Helper.ModRegistry.IsLoaded(id.Trim())))
+                        if (!modIDs.Any(id => ModEntry.Helper.ModRegistry.IsLoaded(id.Trim())))
                         {
                             matched = false;
                             break;

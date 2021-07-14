@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bouhm.Shared.Locations;
+using LocationCompass.Framework;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -34,9 +35,8 @@ namespace LocationCompass
             this.helper = helper;
             monitor = this.Monitor;
             this.config = helper.ReadConfig<ModConfig>();
-            pointer =
-              helper.Content.Load<Texture2D>(@"assets/locator.png", ContentSource.ModFolder); // Load pointer tex
-            constants = this.helper.Data.ReadJsonFile<ModData>("constants.json") ?? new ModData();
+            pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
+            constants = this.helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
 
             helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
             helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;

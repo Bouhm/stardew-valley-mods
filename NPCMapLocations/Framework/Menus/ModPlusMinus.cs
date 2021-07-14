@@ -39,7 +39,7 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             this.bounds = new Rectangle(x, y, (int)(1.5 * this.txtSize), 32);
-            this.label = ModMain.Helper.Translation.Get(label);
+            this.label = ModEntry.Helper.Translation.Get(label);
             this.whichOption = whichOption;
             this.minusButton = new Rectangle(x, 16, 28, 32);
             this.plusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);
@@ -47,14 +47,14 @@ namespace NPCMapLocations.Framework.Menus
             switch (whichOption)
             {
                 case 1:
-                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapWidth - 75) / 15.0)), 0,
+                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapWidth - 75) / 15.0)), 0,
                         options.Count - 1);
-                    options[this.selected] = ModMain.Globals.MinimapWidth;
+                    options[this.selected] = ModEntry.Globals.MinimapWidth;
                     break;
                 case 2:
-                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModMain.Globals.MinimapHeight - 45) / 15.0)), 0,
+                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapHeight - 45) / 15.0)), 0,
                         options.Count - 1);
-                    options[this.selected] = ModMain.Globals.MinimapHeight;
+                    options[this.selected] = ModEntry.Globals.MinimapHeight;
                     break;
                 default:
                     break;
@@ -87,16 +87,16 @@ namespace NPCMapLocations.Framework.Menus
             switch (this.whichOption)
             {
                 case 1:
-                    ModMain.Globals.MinimapWidth = this.options[this.selected];
+                    ModEntry.Globals.MinimapWidth = this.options[this.selected];
                     break;
                 case 2:
-                    ModMain.Globals.MinimapHeight = this.options[this.selected];
+                    ModEntry.Globals.MinimapHeight = this.options[this.selected];
                     break;
                 default:
                     break;
             }
 
-            ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
         }
 
         public override void receiveKeyPress(Keys key)
@@ -113,7 +113,7 @@ namespace NPCMapLocations.Framework.Menus
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            this.greyedOut = !ModMain.Globals.ShowMinimap;
+            this.greyedOut = !ModEntry.Globals.ShowMinimap;
             b.Draw(Game1.mouseCursors, new Vector2(slotX + this.minusButton.X, slotY + this.minusButton.Y), minusButtonSource,
                 Color.White * (this.greyedOut ? 0.33f : 1f) * (this.selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
                 0.4f);

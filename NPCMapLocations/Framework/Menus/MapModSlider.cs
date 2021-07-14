@@ -26,15 +26,15 @@ namespace NPCMapLocations.Framework.Menus
             this.min = min;
             this.max = max;
             if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
-            this.valueLabel = ModMain.Helper.Translation.Get(label);
+            this.valueLabel = ModEntry.Helper.Translation.Get(label);
 
             switch (whichOption)
             {
                 case 8:
-                    this.value = ModMain.Config.HeartLevelMin;
+                    this.value = ModEntry.Config.HeartLevelMin;
                     break;
                 case 9:
-                    this.value = ModMain.Config.HeartLevelMax;
+                    this.value = ModEntry.Config.HeartLevelMax;
                     break;
                 default:
                     break;
@@ -56,16 +56,16 @@ namespace NPCMapLocations.Framework.Menus
             switch (this.whichOption)
             {
                 case 8:
-                    ModMain.Config.HeartLevelMin = (int)this.value;
+                    ModEntry.Config.HeartLevelMin = (int)this.value;
                     break;
                 case 9:
-                    ModMain.Config.HeartLevelMax = (int)this.value;
+                    ModEntry.Config.HeartLevelMax = (int)this.value;
                     break;
                 default:
                     break;
             }
 
-            ModMain.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModMain.Config);
+            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -80,7 +80,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             this.label = this.valueLabel + ": " + this.value;
             this.greyedOut = false;
-            if (this.whichOption == 8 || this.whichOption == 9) this.greyedOut = !ModMain.Config.ByHeartLevel;
+            if (this.whichOption == 8 || this.whichOption == 9) this.greyedOut = !ModEntry.Config.ByHeartLevel;
 
             base.draw(b, slotX, slotY, context);
             IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X,

@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 
-namespace LocationCompass
+namespace LocationCompass.Framework
 {
     // Object for keeping track of with NPC to show when
     // there are multiple NPCs in a building

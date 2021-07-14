@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 
-namespace LocationCompass
+namespace LocationCompass.Framework
 {
     // Class for locators AKA the 'needles' of the compass
     internal class Locator
