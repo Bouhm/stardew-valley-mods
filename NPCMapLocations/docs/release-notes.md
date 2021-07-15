@@ -1,6 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed crash in some cases with circular warps.
+* Fixed error when a location has invalid warp targets.
+* Internal refactoring and optimizations.
+
 ## 2.6.2
 Released 28 February 2021 for Stardew Valley 1.5 and SMAPI 3.9.
 

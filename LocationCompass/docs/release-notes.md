@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Internal refactoring.
+
 ## 1.3.2
 Released 02 March 2021 for Stardew Valley 1.4 and SMAPI 3.0.
 
