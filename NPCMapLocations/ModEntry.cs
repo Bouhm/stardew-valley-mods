@@ -191,12 +191,7 @@ namespace NPCMapLocations
 
             // Add custom map vectors from content.json
             foreach (var locVectors in this.Customizations.MapVectors)
-            {
-                if (this.MapVectors.Value.TryGetValue(locVectors.Key, out var mapVectors))
-                    this.MapVectors.Value[locVectors.Key] = locVectors.Value;
-                else
-                    this.MapVectors.Value.Add(locVectors.Key, locVectors.Value);
-            }
+                this.MapVectors.Value[locVectors.Key] = locVectors.Value;
 
             // Get context of all locations (indoor, outdoor, relativity)
             LocationUtil.GetLocationContexts();
@@ -454,7 +449,7 @@ namespace NPCMapLocations
             {
                 foreach (var npc in this.GetVillagers())
                 {
-                    if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && npc is not (Horse or Child))
+                    if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
                         continue;
 
                     var type = npc switch
@@ -1025,7 +1020,7 @@ namespace NPCMapLocations
 
             // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
 
-            MapVector[] locVectors = null;
+            MapVector[] locVectors;
             bool locationNotFound = false;
 
             if (locationName == "Farm")

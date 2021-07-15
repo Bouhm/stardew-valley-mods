@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using Newtonsoft.Json.Linq;
 using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
@@ -23,10 +22,6 @@ namespace NPCMapLocations.Framework
 
         public ModCustomizations()
         {
-            //MapsPath = GetCustomMapFolderName();
-            //if (MapsPath != null)
-            //  MapsPath = Path.Combine(MapsRootPath, MapsPath);
-            //else
             this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
 
             this.Names = new Dictionary<string, string>();
@@ -140,52 +135,6 @@ namespace NPCMapLocations.Framework
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
-        /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
-        /// <remarks>This selects a folder in assets/tilesheets by checking the folder name against the installed mod IDs. Each folder can optionally be comma-delimited to require multiple mods, with ~ separating alternative IDs. For example "A ~ B, C" means "if the player has (A OR B) AND C installed". If multiple folders match, the first one sorted alphabetically which matches the most mods is used.</remarks>
-        private string GetCustomMapFolderName()
-        {
-            // get root compatibility folder
-            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModEntry.StaticHelper.DirectoryPath, this.MapsRootPath));
-            if (!compatFolder.Exists)
-                return null;
-
-            // get tilesheet subfolder matching the highest number of installed mods
-            string folderName = null;
-            {
-                int modsMatched = 0;
-                foreach (DirectoryInfo folder in compatFolder.GetDirectories().OrderBy(p => p.Name))
-                {
-                    if (folder.Name == "_default")
-                        continue;
-
-                    // get mod ID groups
-                    string[] modGroups = folder.Name.Split(',');
-                    if (modGroups.Length <= modsMatched)
-                        continue;
-
-                    // check if all mods are installed
-                    bool matched = true;
-                    foreach (string group in modGroups)
-                    {
-                        string[] modIDs = group.Split('~');
-                        if (!modIDs.Any(id => ModEntry.StaticHelper.ModRegistry.IsLoaded(id.Trim())))
-                        {
-                            matched = false;
-                            break;
-                        }
-                    }
-
-                    if (matched)
-                    {
-                        folderName = folder.Name;
-                        modsMatched = modGroups.Length;
-                    }
-                }
-            }
-
-            return folderName;
-        }
-
         private void AddTooltip(string locationName, JObject tooltip)
         {
             this.Tooltips[locationName] = new MapTooltip(
@@ -239,21 +188,6 @@ namespace NPCMapLocations.Framework
             return dictionaries.SelectMany(dict => dict)
                     .ToLookup(pair => pair.Key, pair => pair.Value)
                     .ToDictionary(group => group.Key, group => group.First());
-        }
-
-        public class CustomLocation
-        {
-            public Vector2 LocVector;
-            public Rectangle SrcRect;
-            public CustomLocation(JObject locationRects)
-            {
-                var fromAreaRect = locationRects.GetValue("FromArea");
-                var toAreaRect = locationRects.GetValue("ToArea");
-
-                this.SrcRect = new Rectangle(fromAreaRect.Value<int>("X"), fromAreaRect.Value<int>("Y"),
-                  fromAreaRect.Value<int>("Width"), fromAreaRect.Value<int>("Height"));
-                this.LocVector = new Vector2(toAreaRect.Value<int>("X"), toAreaRect.Value<int>("Y"));
-            }
         }
     }
 }

@@ -63,7 +63,6 @@ namespace NPCMapLocations.Framework.Menus
         {
             if (!this.greyedOut && this.Options.Count > 0)
             {
-                int num = this.Selected;
                 if (this.MinusButton.Contains(x, y) && this.Selected != 0)
                 {
                     this.Selected--;

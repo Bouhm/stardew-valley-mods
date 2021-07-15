@@ -217,16 +217,8 @@ namespace LocationCompass
         {
             foreach (var npc in this.GetVillagers())
             {
-                if (npc == null || npc.currentLocation == null) continue;
-                if (this.SyncedLocationData.Locations.TryGetValue(npc.Name, out var locationData))
-                {
+                if (npc?.currentLocation != null)
                     this.SyncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
-                }
-                else
-                {
-                    this.SyncedLocationData.AddLocation(npc.Name,
-                      new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y));
-                }
             }
         }
 
@@ -236,9 +228,7 @@ namespace LocationCompass
             string mineName = locationName;
 
             if (int.TryParse(mine, out int mineLevel))
-            {
                 mineName = mineLevel > 120 ? "SkullCave" : "Mine";
-            }
 
             return mineName;
         }
@@ -443,7 +433,7 @@ namespace LocationCompass
 
                 double angle = this.GetPlayerToTargetAngle(playerPos, characterPos);
                 int quadrant = this.GetViewportQuadrant(angle, playerPos);
-                var locatorPos = this.GetLocatorPosition(angle, quadrant, playerPos, characterPos, isOnScreen, isWarp);
+                var locatorPos = this.GetLocatorPosition(angle, quadrant, playerPos, characterPos, isWarp);
 
                 locator.X = locatorPos.X;
                 locator.Y = locatorPos.Y;
@@ -515,7 +505,7 @@ namespace LocationCompass
 
         // Get position of location relative to viewport from
         // the viewport quadrant and positions of player/npc relative to map
-        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos, bool isOnScreen = false, bool isWarp = false)
+        private Vector2 GetLocatorPosition(double angle, int quadrant, Vector2 playerPos, Vector2 npcPos, bool isWarp = false)
         {
             float x = playerPos.X - Game1.viewport.X;
             float y = playerPos.Y - Game1.viewport.Y;
