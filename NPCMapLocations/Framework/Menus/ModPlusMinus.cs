@@ -11,50 +11,50 @@ namespace NPCMapLocations.Framework.Menus
 {
     public class ModPlusMinus : OptionsElement
     {
-        public static bool snapZoomPlus;
-        public static bool snapZoomMinus;
-        public static Rectangle minusButtonSource = new(177, 345, 7, 8);
-        public static Rectangle plusButtonSource = new(184, 345, 7, 8);
-        public List<string> displayOptions;
-        private Rectangle minusButton;
-        public List<int> options;
-        private Rectangle plusButton;
-        private int txtSize;
-        public int selected;
+        public static bool SnapZoomPlus;
+        public static bool SnapZoomMinus;
+        public static Rectangle MinusButtonSource = new(177, 345, 7, 8);
+        public static Rectangle PlusButtonSource = new(184, 345, 7, 8);
+        public List<string> DisplayOptions;
+        private Rectangle MinusButton;
+        public List<int> Options;
+        private Rectangle PlusButton;
+        private int TxtSize;
+        public int Selected;
 
         public ModPlusMinus(string label, int whichOption, List<int> options, int x = -1, int y = -1)
             : base(label, x, y, 28, 28, whichOption)
         {
-            this.options = options;
-            this.displayOptions = new List<string>();
+            this.Options = options;
+            this.DisplayOptions = new List<string>();
 
             if (x == -1) x = 32;
             if (y == -1) y = 16;
 
-            this.txtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
+            this.TxtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
             foreach (int displayOption in options)
             {
-                this.txtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, this.txtSize);
-                this.displayOptions.Add($"{displayOption}px");
+                this.TxtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, this.TxtSize);
+                this.DisplayOptions.Add($"{displayOption}px");
             }
 
-            this.bounds = new Rectangle(x, y, (int)(1.5 * this.txtSize), 32);
+            this.bounds = new Rectangle(x, y, (int)(1.5 * this.TxtSize), 32);
             this.label = ModEntry.Helper.Translation.Get(label);
             this.whichOption = whichOption;
-            this.minusButton = new Rectangle(x, 16, 28, 32);
-            this.plusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);
+            this.MinusButton = new Rectangle(x, 16, 28, 32);
+            this.PlusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);
 
             switch (whichOption)
             {
                 case 1:
-                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapWidth - 75) / 15.0)), 0,
+                    this.Selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapWidth - 75) / 15.0)), 0,
                         options.Count - 1);
-                    options[this.selected] = ModEntry.Globals.MinimapWidth;
+                    options[this.Selected] = ModEntry.Globals.MinimapWidth;
                     break;
                 case 2:
-                    this.selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapHeight - 45) / 15.0)), 0,
+                    this.Selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapHeight - 45) / 15.0)), 0,
                         options.Count - 1);
-                    options[this.selected] = ModEntry.Globals.MinimapHeight;
+                    options[this.Selected] = ModEntry.Globals.MinimapHeight;
                     break;
                 default:
                     break;
@@ -63,34 +63,34 @@ namespace NPCMapLocations.Framework.Menus
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (!this.greyedOut && this.options.Count > 0)
+            if (!this.greyedOut && this.Options.Count > 0)
             {
-                int num = this.selected;
-                if (this.minusButton.Contains(x, y) && this.selected != 0)
+                int num = this.Selected;
+                if (this.MinusButton.Contains(x, y) && this.Selected != 0)
                 {
-                    this.selected--;
-                    snapZoomMinus = true;
+                    this.Selected--;
+                    SnapZoomMinus = true;
                     Game1.playSound("drumkit6");
                 }
-                else if (this.plusButton.Contains(x, y) && this.selected != this.options.Count - 1)
+                else if (this.PlusButton.Contains(x, y) && this.Selected != this.Options.Count - 1)
                 {
-                    this.selected++;
-                    snapZoomPlus = true;
+                    this.Selected++;
+                    SnapZoomPlus = true;
                     Game1.playSound("drumkit6");
                 }
 
-                if (this.selected < 0)
-                    this.selected = 0;
-                else if (this.selected >= this.options.Count) this.selected = this.options.Count - 1;
+                if (this.Selected < 0)
+                    this.Selected = 0;
+                else if (this.Selected >= this.Options.Count) this.Selected = this.Options.Count - 1;
             }
 
             switch (this.whichOption)
             {
                 case 1:
-                    ModEntry.Globals.MinimapWidth = this.options[this.selected];
+                    ModEntry.Globals.MinimapWidth = this.Options[this.Selected];
                     break;
                 case 2:
-                    ModEntry.Globals.MinimapHeight = this.options[this.selected];
+                    ModEntry.Globals.MinimapHeight = this.Options[this.Selected];
                     break;
                 default:
                     break;
@@ -105,35 +105,35 @@ namespace NPCMapLocations.Framework.Menus
             if (Game1.options.snappyMenus && Game1.options.gamepadControls)
             {
                 if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
-                    this.receiveLeftClick(this.plusButton.Center.X, this.plusButton.Center.Y);
+                    this.receiveLeftClick(this.PlusButton.Center.X, this.PlusButton.Center.Y);
                 else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
-                    this.receiveLeftClick(this.minusButton.Center.X, this.minusButton.Center.Y);
+                    this.receiveLeftClick(this.MinusButton.Center.X, this.MinusButton.Center.Y);
             }
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
             this.greyedOut = !ModEntry.Globals.ShowMinimap;
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.minusButton.X, slotY + this.minusButton.Y), minusButtonSource,
-                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.MinusButton.X, slotY + this.MinusButton.Y), MinusButtonSource,
+                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.Selected == 0 ? 0.5f : 1f), 0f, Vector2.Zero, 4f, SpriteEffects.None,
                 0.4f);
             b.DrawString(Game1.dialogueFont,
-                this.selected < this.displayOptions.Count && this.selected != -1 ? this.displayOptions[this.selected] : "",
-                new Vector2((int)(this.txtSize / 2) + slotX, slotY + this.minusButton.Y), Game1.textColor * (this.greyedOut ? 0.33f : 1f));
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.plusButton.X, slotY + this.plusButton.Y), plusButtonSource,
-                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.selected == this.displayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
+                this.Selected < this.DisplayOptions.Count && this.Selected != -1 ? this.DisplayOptions[this.Selected] : "",
+                new Vector2((int)(this.TxtSize / 2) + slotX, slotY + this.MinusButton.Y), Game1.textColor * (this.greyedOut ? 0.33f : 1f));
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.PlusButton.X, slotY + this.PlusButton.Y), PlusButtonSource,
+                Color.White * (this.greyedOut ? 0.33f : 1f) * (this.Selected == this.DisplayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
                 4f, SpriteEffects.None, 0.4f);
             if (!Game1.options.snappyMenus && Game1.options.gamepadControls)
             {
-                if (snapZoomMinus)
+                if (SnapZoomMinus)
                 {
-                    Game1.setMousePosition(slotX + this.minusButton.Center.X, slotY + this.minusButton.Center.Y);
-                    snapZoomMinus = false;
+                    Game1.setMousePosition(slotX + this.MinusButton.Center.X, slotY + this.MinusButton.Center.Y);
+                    SnapZoomMinus = false;
                 }
-                else if (snapZoomPlus)
+                else if (SnapZoomPlus)
                 {
-                    Game1.setMousePosition(slotX + this.plusButton.Center.X, slotY + this.plusButton.Center.Y);
-                    snapZoomPlus = false;
+                    Game1.setMousePosition(slotX + this.PlusButton.Center.X, slotY + this.PlusButton.Center.Y);
+                    SnapZoomPlus = false;
                 }
             }
 

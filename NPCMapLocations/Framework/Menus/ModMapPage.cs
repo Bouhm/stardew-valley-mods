@@ -28,16 +28,16 @@ namespace NPCMapLocations.Framework.Menus
 
         private readonly Texture2D BuildingMarkers;
         private readonly ModCustomizations Customizations;
-        private string hoveredNames = "";
-        private string hoveredLocationText = "";
-        private int mapX;
-        private int mapY;
-        private bool hasIndoorCharacter;
-        private Vector2 indoorIconVector;
-        private bool drawPamHouseUpgrade;
-        private bool drawMovieTheaterJoja;
-        private bool drawMovieTheater;
-        private bool drawIsland;
+        private string HoveredNames = "";
+        private string HoveredLocationText = "";
+        private int MapX;
+        private int MapY;
+        private bool HasIndoorCharacter;
+        private Vector2 IndoorIconVector;
+        private bool DrawPamHouseUpgrade;
+        private bool DrawMovieTheaterJoja;
+        private bool DrawMovieTheater;
+        private bool DrawIsland;
 
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
@@ -59,12 +59,12 @@ namespace NPCMapLocations.Framework.Menus
             this.Customizations = customizations;
 
             Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
-            this.drawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-            this.drawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
-            this.drawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
-            this.drawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
-            this.mapX = (int)center.X;
-            this.mapY = (int)center.Y;
+            this.DrawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
+            this.DrawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
+            this.DrawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
+            this.DrawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
+            this.MapX = (int)center.X;
+            this.MapY = (int)center.Y;
 
             var regionRects = this.RegionRects().ToList();
 
@@ -90,8 +90,8 @@ namespace NPCMapLocations.Framework.Menus
 
                 this.points[i].bounds = new Rectangle(
                   // Snaps the cursor to the center instead of bottom right (default)
-                  (int)(this.mapX + locVector.X - rect.Value.Width / 2),
-                  (int)(this.mapY + locVector.Y - rect.Value.Height / 2),
+                  (int)(this.MapX + locVector.X - rect.Value.Width / 2),
+                  (int)(this.MapY + locVector.Y - rect.Value.Height / 2),
                   rect.Value.Width,
                   rect.Value.Height
                 );
@@ -109,8 +109,8 @@ namespace NPCMapLocations.Framework.Menus
 
                 var customTooltip = new ClickableComponent(
                     new Rectangle(
-                        this.mapX + tooltip.Value.X,
-                        this.mapY + tooltip.Value.Y,
+                        this.MapX + tooltip.Value.X,
+                        this.MapY + tooltip.Value.Y,
                         tooltip.Value.Width,
                         tooltip.Value.Height
                     ),
@@ -137,14 +137,14 @@ namespace NPCMapLocations.Framework.Menus
         public override void performHoverAction(int x, int y)
         {
             //var f = points;
-            this.hoveredLocationText = "";
-            this.hoveredNames = "";
-            this.hasIndoorCharacter = false;
+            this.HoveredLocationText = "";
+            this.HoveredNames = "";
+            this.HasIndoorCharacter = false;
             foreach (ClickableComponent current in this.points)
             {
                 if (current.containsPoint(x, y))
                 {
-                    this.hoveredLocationText = current.name;
+                    this.HoveredLocationText = current.name;
                     break;
                 }
             }
@@ -163,7 +163,7 @@ namespace NPCMapLocations.Framework.Menus
             {
                 foreach (var npcMarker in this.NpcMarkers)
                 {
-                    Vector2 npcLocation = new Vector2(this.mapX + npcMarker.Value.MapX, this.mapY + npcMarker.Value.MapY);
+                    Vector2 npcLocation = new Vector2(this.MapX + npcMarker.Value.MapX, this.MapY + npcMarker.Value.MapY);
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
                         Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
@@ -179,8 +179,8 @@ namespace NPCMapLocations.Framework.Menus
                             }
                         }
 
-                        if (!LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.hasIndoorCharacter)
-                            this.hasIndoorCharacter = true;
+                        if (!LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.HasIndoorCharacter)
+                            this.HasIndoorCharacter = true;
                     }
                 }
             }
@@ -189,7 +189,7 @@ namespace NPCMapLocations.Framework.Menus
             {
                 foreach (var farMarker in this.FarmerMarkers.Values)
                 {
-                    Vector2 farmerLocation = new Vector2(this.mapX + farMarker.MapX, this.mapY + farMarker.MapY);
+                    Vector2 farmerLocation = new Vector2(this.MapX + farMarker.MapX, this.MapY + farMarker.MapY);
                     if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
                      && Game1.getMouseX() <= farmerLocation.X + markerWidth / 2
                      && Game1.getMouseY() >= farmerLocation.Y - markerHeight / 2
@@ -197,27 +197,27 @@ namespace NPCMapLocations.Framework.Menus
                     {
                         hoveredList.Add(farMarker.Name);
 
-                        if (!LocationUtil.IsOutdoors(farMarker.LocationName) && !this.hasIndoorCharacter)
-                            this.hasIndoorCharacter = true;
+                        if (!LocationUtil.IsOutdoors(farMarker.LocationName) && !this.HasIndoorCharacter)
+                            this.HasIndoorCharacter = true;
                     }
                 }
             }
 
             if (hoveredList.Count > 0)
             {
-                this.hoveredNames = hoveredList[0];
+                this.HoveredNames = hoveredList[0];
                 for (int i = 1; i < hoveredList.Count; i++)
                 {
-                    string[] lines = this.hoveredNames.Split('\n');
+                    string[] lines = this.HoveredNames.Split('\n');
                     if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X >
                         (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
                     {
-                        this.hoveredNames += separator + Environment.NewLine;
-                        this.hoveredNames += hoveredList[i];
+                        this.HoveredNames += separator + Environment.NewLine;
+                        this.HoveredNames += hoveredList[i];
                     }
                     else
                     {
-                        this.hoveredNames += separator + hoveredList[i];
+                        this.HoveredNames += separator + hoveredList[i];
                     }
                 }
             }
@@ -237,11 +237,11 @@ namespace NPCMapLocations.Framework.Menus
 
             this.performHoverAction(x - Game1.tileSize / 2, y - Game1.tileSize / 2);
 
-            if (!this.hoveredLocationText.Equals(""))
+            if (!this.HoveredLocationText.Equals(""))
             {
-                int textLength = (int)Game1.smallFont.MeasureString(this.hoveredLocationText).X + Game1.tileSize / 2;
-                width = Math.Max((int)Game1.smallFont.MeasureString(this.hoveredLocationText).X + Game1.tileSize / 2, textLength);
-                height = (int)Math.Max(60, Game1.smallFont.MeasureString(this.hoveredLocationText).Y + 5 * Game1.tileSize / 8);
+                int textLength = (int)Game1.smallFont.MeasureString(this.HoveredLocationText).X + Game1.tileSize / 2;
+                width = Math.Max((int)Game1.smallFont.MeasureString(this.HoveredLocationText).X + Game1.tileSize / 2, textLength);
+                height = (int)Math.Max(60, Game1.smallFont.MeasureString(this.HoveredLocationText).Y + 5 * Game1.tileSize / 8);
                 if (x + width > Game1.uiViewport.Width)
                 {
                     x = Game1.uiViewport.Width - width;
@@ -278,10 +278,10 @@ namespace NPCMapLocations.Framework.Menus
                 }
 
                 // Draw name tooltip positioned around location tooltip
-                this.DrawNames(b, this.hoveredNames, x, y, offsetY, height, ModEntry.Globals.NameTooltipMode);
+                this.DrawNames(b, this.HoveredNames, x, y, offsetY, height, ModEntry.Globals.NameTooltipMode);
 
                 // Draw location tooltip
-                IClickableMenu.drawHoverText(b, this.hoveredLocationText, Game1.smallFont);
+                IClickableMenu.drawHoverText(b, this.HoveredLocationText, Game1.smallFont);
                 //IClickableMenu.drawHoverText(b, hoveredLocationText, Game1.smallFont, 0, 0, -1, null, -1, null, null, 0, -1, -1,
                 //-1, -1, 1f, null);
                 /*
@@ -303,12 +303,12 @@ namespace NPCMapLocations.Framework.Menus
             else
             {
                 // Draw name tooltip only
-                this.DrawNames(Game1.spriteBatch, this.hoveredNames, x, y, offsetY, this.height, ModEntry.Globals.NameTooltipMode);
+                this.DrawNames(Game1.spriteBatch, this.HoveredNames, x, y, offsetY, this.height, ModEntry.Globals.NameTooltipMode);
             }
 
             // Draw indoor icon
-            if (this.hasIndoorCharacter && !string.IsNullOrEmpty(this.hoveredNames))
-                b.Draw(Game1.mouseCursors, this.indoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
+            if (this.HasIndoorCharacter && !string.IsNullOrEmpty(this.HoveredNames))
+                b.Draw(Game1.mouseCursors, this.IndoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
                   Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
 
             // Cursor
@@ -322,76 +322,76 @@ namespace NPCMapLocations.Framework.Menus
         // Draw map to cover base rendering 
         public void DrawMap(SpriteBatch b)
         {
-            int boxY = this.mapY - 96;
-            int mY = this.mapY;
+            int boxY = this.MapY - 96;
+            int mY = this.MapY;
 
-            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
-            b.Draw(ModEntry.Map, new Vector2((float)this.mapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
+            Game1.drawDialogueBox(this.MapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
+            b.Draw(ModEntry.Map, new Vector2((float)this.MapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
               4f, SpriteEffects.None, 0.86f);
 
-            float scroll_draw_y = this.yPositionOnScreen + this.height + 32 + 16;
-            float scroll_draw_bottom = scroll_draw_y + 80f;
-            if (scroll_draw_bottom > (float)Game1.viewport.Height)
+            float scrollDrawY = this.yPositionOnScreen + this.height + 32 + 16;
+            float scrollDrawBottom = scrollDrawY + 80f;
+            if (scrollDrawBottom > (float)Game1.viewport.Height)
             {
-                scroll_draw_y -= scroll_draw_bottom - (float)Game1.viewport.Height;
+                scrollDrawY -= scrollDrawBottom - (float)Game1.viewport.Height;
             }
 
-            Game1.drawDialogueBox(this.mapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
-            b.Draw(ModEntry.Map, new Vector2(this.mapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            Game1.drawDialogueBox(this.MapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
+            b.Draw(ModEntry.Map, new Vector2(this.MapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
                 case 1:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 2:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 3:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 4:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 5:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
                 case 6:
-                    b.Draw(ModEntry.Map, new Vector2(this.mapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
 
-            if (this.drawPamHouseUpgrade)
+            if (this.DrawPamHouseUpgrade)
             {
                 var houseLoc = ModEntry.LocationToMap("Trailer_Big");
-                b.Draw(ModEntry.Map, new Vector2(this.mapX + houseLoc.X - 16, this.mapY + houseLoc.Y - 11),
+                b.Draw(ModEntry.Map, new Vector2(this.MapX + houseLoc.X - 16, this.MapY + houseLoc.Y - 11),
                   new Rectangle(263, 181, 8, 8), Color.White,
                   0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
-            if (this.drawMovieTheater || this.drawMovieTheaterJoja)
+            if (this.DrawMovieTheater || this.DrawMovieTheaterJoja)
             {
                 var theaterLoc = ModEntry.LocationToMap("JojaMart");
-                b.Draw(ModEntry.Map, new Vector2(this.mapX + theaterLoc.X - 20, this.mapY + theaterLoc.Y - 11),
+                b.Draw(ModEntry.Map, new Vector2(this.MapX + theaterLoc.X - 20, this.MapY + theaterLoc.Y - 11),
                   new Rectangle(275, 181, 15, 11), Color.White,
                   0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
 
             }
 
-            if (this.drawIsland)
+            if (this.DrawIsland)
             {
                 var islandRect = new Rectangle(208, 363, 40, 30);
-                var mapRect = new Vector2(this.mapX + 1040, this.mapY + 600);
+                var mapRect = new Vector2(this.MapX + 1040, this.MapY + 600);
 
                 if (ModEntry.Globals.UseDetailedIsland)
                 {
                     islandRect = new Rectangle(248, 363, 45, 40);
-                    mapRect = new Vector2(this.mapX + 1020, this.mapY + 560);
+                    mapRect = new Vector2(this.MapX + 1020, this.MapY + 560);
                 }
 
                 b.Draw(ModEntry.Map, mapRect, islandRect, Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
-            string playerLocationName = this.getPlayerLocationNameForMap();
+            string playerLocationName = this.GetPlayerLocationNameForMap();
             if (playerLocationName != null)
             {
                 SpriteText.drawStringWithScrollCenteredAt(b, playerLocationName, this.xPositionOnScreen + this.width / 2,
@@ -415,8 +415,8 @@ namespace NPCMapLocations.Framework.Menus
                         b.Draw(
                             this.BuildingMarkers,
                             new Vector2(
-                                this.mapX + building.Value.Value.X - buildingRect.Width / 2,
-                                this.mapY + building.Value.Value.Y - buildingRect.Height / 2
+                                this.MapX + building.Value.Value.X - buildingRect.Width / 2,
+                                this.MapY + building.Value.Value.Y - buildingRect.Height / 2
                             ),
                             new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
                         );
@@ -428,7 +428,7 @@ namespace NPCMapLocations.Framework.Menus
             if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
-                b.Draw(Game1.mouseCursors, new Vector2(this.mapX + merchantLoc.X - 16, this.mapY + merchantLoc.Y - 15),
+                b.Draw(Game1.mouseCursors, new Vector2(this.MapX + merchantLoc.X - 16, this.MapY + merchantLoc.Y - 15),
                   new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
                   1f);
             }
@@ -462,7 +462,7 @@ namespace NPCMapLocations.Framework.Menus
                     var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
                     b.Draw(marker.Sprite,
-                      new Rectangle((int)(this.mapX + marker.MapX), (int)(this.mapY + marker.MapY),
+                      new Rectangle((int)(this.MapX + marker.MapX), (int)(this.MapY + marker.MapY),
                         32, 30),
                       new Rectangle?(spriteRect), markerColor);
 
@@ -473,7 +473,7 @@ namespace NPCMapLocations.Framework.Menus
                         {
                             // Gift icon
                             b.Draw(Game1.mouseCursors,
-                              new Vector2(this.mapX + marker.MapX + 20, this.mapY + marker.MapY),
+                              new Vector2(this.MapX + marker.MapX + 20, this.MapY + marker.MapY),
                               new Rectangle?(new Rectangle(147, 412, 10, 11)), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
@@ -482,7 +482,7 @@ namespace NPCMapLocations.Framework.Menus
                         {
                             // Quest icon
                             b.Draw(Game1.mouseCursors,
-                              new Vector2(this.mapX + marker.MapX + 22, this.mapY + marker.MapY - 3),
+                              new Vector2(this.MapX + marker.MapX + 22, this.MapY + marker.MapY - 3),
                               new Rectangle?(new Rectangle(403, 496, 5, 14)), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
@@ -502,7 +502,7 @@ namespace NPCMapLocations.Framework.Menus
                     if (farMarker != null && farMarker.DrawDelay == 0)
                     {
                         farmer.FarmerRenderer.drawMiniPortrat(b,
-                          new Vector2(this.mapX + farMarker.MapX - 16, this.mapY + farMarker.MapY - 15),
+                          new Vector2(this.MapX + farMarker.MapX - 16, this.MapY + farMarker.MapY - 15),
                           0.00011f, 2f, 1, farmer);
                     }
                 }
@@ -513,7 +513,7 @@ namespace NPCMapLocations.Framework.Menus
                   Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions, true);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
-                  new Vector2(this.mapX + playerLoc.X - 16, this.mapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
+                  new Vector2(this.MapX + playerLoc.X - 16, this.MapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
                   Game1.player);
             }
         }
@@ -521,9 +521,9 @@ namespace NPCMapLocations.Framework.Menus
         // Draw NPC name tooltips map page
         public void DrawNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
-            if (this.hoveredNames.Equals("")) return;
+            if (this.HoveredNames.Equals("")) return;
 
-            this.indoorIconVector = ModEntry.UNKNOWN;
+            this.IndoorIconVector = ModEntry.Unknown;
             string[] lines = names.Split('\n');
             int height = (int)Math.Max(60, Game1.smallFont.MeasureString(names).Y + Game1.tileSize / 2);
             int width = (int)Game1.smallFont.MeasureString(names).X + Game1.tileSize / 2;
@@ -583,9 +583,9 @@ namespace NPCMapLocations.Framework.Menus
                 y = Game1.activeClickableMenu.yPositionOnScreen + 650 - height / 2;
             }
 
-            if (this.hasIndoorCharacter)
+            if (this.HasIndoorCharacter)
             {
-                this.indoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
+                this.IndoorIconVector = new Vector2(x - Game1.tileSize / 8 + 2, y - Game1.tileSize / 8 + 2);
             }
 
             Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
@@ -602,7 +602,7 @@ namespace NPCMapLocations.Framework.Menus
         }
 
         // The text to display below the map for the current location
-        private string getPlayerLocationNameForMap()
+        private string GetPlayerLocationNameForMap()
         {
             var player = Game1.player;
             string playerLocationName = null;
@@ -913,7 +913,7 @@ namespace NPCMapLocations.Framework.Menus
                 ["Railroad_Region"] = new(-1, -1, 180, 69),
                 ["LonelyStone"] = new(-1, -1, 28, 28)
             };
-            if (this.drawIsland)
+            if (this.DrawIsland)
                 rects.Add("GingerIsland", new(-1, -1, 180, 160));
 
             return rects;

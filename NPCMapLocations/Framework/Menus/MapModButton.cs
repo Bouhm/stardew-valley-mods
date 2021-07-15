@@ -8,8 +8,8 @@ namespace NPCMapLocations.Framework.Menus
     // Mod button for the three main modes
     internal class MapModButton : OptionsElement
     {
-        public bool isActive;
-        public Rectangle rect;
+        public bool IsActive;
+        public Rectangle Rect;
 
         public MapModButton(
             string label,
@@ -21,7 +21,7 @@ namespace NPCMapLocations.Framework.Menus
         ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.label = ModEntry.Helper.Translation.Get(label);
-            this.rect = new Rectangle(x, y, width, height);
+            this.Rect = new Rectangle(x, y, width, height);
 
             if (ModEntry.Config.ImmersionOption == whichOption - 2)
                 this.greyedOut = false;
@@ -31,13 +31,13 @@ namespace NPCMapLocations.Framework.Menus
 
         public override void receiveLeftClick(int x, int y)
         {
-            if (!this.isActive)
+            if (!this.IsActive)
             {
                 if (this.whichOption == 3 || this.whichOption == 4 || this.whichOption == 5)
                 {
                     Game1.playSound("drumkit6");
                     base.receiveLeftClick(x, y);
-                    this.isActive = true;
+                    this.IsActive = true;
                     this.greyedOut = false;
                     ModEntry.Config.ImmersionOption = this.whichOption - 2;
                 }
@@ -46,7 +46,7 @@ namespace NPCMapLocations.Framework.Menus
 
         public void GreyOut()
         {
-            this.isActive = false;
+            this.IsActive = false;
             this.greyedOut = true;
         }
 

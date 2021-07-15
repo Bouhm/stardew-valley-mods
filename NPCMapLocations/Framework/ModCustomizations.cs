@@ -35,10 +35,10 @@ namespace NPCMapLocations.Framework
             this.LocationExclusions = new HashSet<string>();
         }
 
-        public void LoadCustomData(Dictionary<string, JObject> CustomNpcJson, Dictionary<string, JObject> CustomLocationJson)
+        public void LoadCustomData(Dictionary<string, JObject> customNpcJson, Dictionary<string, JObject> customLocationJson)
         {
-            this.LoadCustomLocations(CustomLocationJson);
-            this.LoadCustomNpcs(CustomNpcJson);
+            this.LoadCustomLocations(customLocationJson);
+            this.LoadCustomNpcs(customNpcJson);
         }
 
         private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)

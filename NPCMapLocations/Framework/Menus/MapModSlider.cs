@@ -9,10 +9,10 @@ namespace NPCMapLocations.Framework.Menus
     // Mod slider for heart level this.Config
     internal class MapModSlider : OptionsElement
     {
-        private readonly int max;
-        private int min;
-        private float value;
-        public string valueLabel;
+        private readonly int Max;
+        private int Min;
+        private float Value;
+        public string ValueLabel;
 
         public MapModSlider(
             string label,
@@ -23,18 +23,18 @@ namespace NPCMapLocations.Framework.Menus
             int max
         ) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
         {
-            this.min = min;
-            this.max = max;
+            this.Min = min;
+            this.Max = max;
             if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
-            this.valueLabel = ModEntry.Helper.Translation.Get(label);
+            this.ValueLabel = ModEntry.Helper.Translation.Get(label);
 
             switch (whichOption)
             {
                 case 8:
-                    this.value = ModEntry.Config.HeartLevelMin;
+                    this.Value = ModEntry.Config.HeartLevelMin;
                     break;
                 case 9:
-                    this.value = ModEntry.Config.HeartLevelMax;
+                    this.Value = ModEntry.Config.HeartLevelMax;
                     break;
                 default:
                     break;
@@ -47,19 +47,19 @@ namespace NPCMapLocations.Framework.Menus
                 return;
 
             base.leftClickHeld(x, y);
-            this.value = x >= this.bounds.X
+            this.Value = x >= this.bounds.X
                 ? (x <= this.bounds.Right - 10 * Game1.pixelZoom
-                    ? (int)((x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom) * this.max)
-                    : this.max)
+                    ? (int)((x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom) * this.Max)
+                    : this.Max)
                 : 0;
 
             switch (this.whichOption)
             {
                 case 8:
-                    ModEntry.Config.HeartLevelMin = (int)this.value;
+                    ModEntry.Config.HeartLevelMin = (int)this.Value;
                     break;
                 case 9:
-                    ModEntry.Config.HeartLevelMax = (int)this.value;
+                    ModEntry.Config.HeartLevelMax = (int)this.Value;
                     break;
                 default:
                     break;
@@ -78,7 +78,7 @@ namespace NPCMapLocations.Framework.Menus
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            this.label = this.valueLabel + ": " + this.value;
+            this.label = this.ValueLabel + ": " + this.Value;
             this.greyedOut = false;
             if (this.whichOption == 8 || this.whichOption == 9) this.greyedOut = !ModEntry.Config.ByHeartLevel;
 
@@ -88,7 +88,7 @@ namespace NPCMapLocations.Framework.Menus
             b.Draw(Game1.mouseCursors,
                 new Vector2(
                     slotX + this.bounds.X + (this.bounds.Width - 10 * Game1.pixelZoom) *
-                    (this.value / this.max), slotY + this.bounds.Y),
+                    (this.Value / this.Max), slotY + this.bounds.Y),
                 OptionsSlider.sliderButtonRect, Color.White, 0f, Vector2.Zero, Game1.pixelZoom,
                 SpriteEffects.None, 0.9f);
         }
