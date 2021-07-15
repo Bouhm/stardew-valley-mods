@@ -4,6 +4,8 @@
 ## Upcoming release
 * Fixed crash in some cases with circular warps.
 * Fixed error when a location has invalid warp targets.
+* Fixed map positioning on the beach farm (thanks to RushedLogic!).
+* Fixed misaligned minimap texture on the beach farm (thanks to RushedLogic!).
 * Internal refactoring and optimizations.
 
 ## 2.6.2
