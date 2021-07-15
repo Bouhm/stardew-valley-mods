@@ -104,6 +104,11 @@ namespace NPCMapLocations.Framework
                 new(330, 237, 0, 0),
                 new(514, 386, 80, 65)
             },
+            ["Farm_Beach"] = new MapVector[]
+            {
+                new(330, 237, 0, 0),
+                new(514, 386, 102, 106)
+            },
             ["Farm_Region"] = new MapVector[]
             {
                 new(423, 321)
