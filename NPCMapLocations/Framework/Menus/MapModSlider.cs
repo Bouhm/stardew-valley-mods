@@ -14,31 +14,20 @@ namespace NPCMapLocations.Framework.Menus
         private float Value;
         public string ValueLabel;
 
-        public MapModSlider(
-            string label,
-            int whichOption,
-            int x,
-            int y,
-            int min,
-            int max
-        ) : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
+        public MapModSlider(string label, int whichOption, int x, int y, int min, int max)
+            : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
         {
             this.Min = min;
             this.Max = max;
             if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
             this.ValueLabel = ModEntry.Helper.Translation.Get(label);
 
-            switch (whichOption)
+            this.Value = whichOption switch
             {
-                case 8:
-                    this.Value = ModEntry.Config.HeartLevelMin;
-                    break;
-                case 9:
-                    this.Value = ModEntry.Config.HeartLevelMax;
-                    break;
-                default:
-                    break;
-            }
+                8 => ModEntry.Config.HeartLevelMin,
+                9 => ModEntry.Config.HeartLevelMax,
+                _ => this.Value
+            };
         }
 
         public override void leftClickHeld(int x, int y)
@@ -60,8 +49,6 @@ namespace NPCMapLocations.Framework.Menus
                     break;
                 case 9:
                     ModEntry.Config.HeartLevelMax = (int)this.Value;
-                    break;
-                default:
                     break;
             }
 

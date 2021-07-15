@@ -10,7 +10,6 @@ using System.Linq;
 using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
@@ -21,23 +20,23 @@ namespace NPCMapLocations.Framework.Menus
 {
     public class ModMapPage : MapPage
     {
-        private Dictionary<string, bool> ConditionalNpcs { get; set; }
-        private Dictionary<string, NpcMarker> NpcMarkers { get; set; }
-        private Dictionary<long, FarmerMarker> FarmerMarkers { get; set; }
+        private Dictionary<string, bool> ConditionalNpcs { get; }
+        private Dictionary<string, NpcMarker> NpcMarkers { get; }
+        private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
         private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
 
         private readonly Texture2D BuildingMarkers;
         private readonly ModCustomizations Customizations;
         private string HoveredNames = "";
         private string HoveredLocationText = "";
-        private int MapX;
-        private int MapY;
+        private readonly int MapX;
+        private readonly int MapY;
         private bool HasIndoorCharacter;
         private Vector2 IndoorIconVector;
-        private bool DrawPamHouseUpgrade;
-        private bool DrawMovieTheaterJoja;
-        private bool DrawMovieTheater;
-        private bool DrawIsland;
+        private readonly bool DrawPamHouseUpgrade;
+        private readonly bool DrawMovieTheaterJoja;
+        private readonly bool DrawMovieTheater;
+        private readonly bool DrawIsland;
 
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
@@ -73,18 +72,13 @@ namespace NPCMapLocations.Framework.Menus
                 var rect = regionRects.ElementAtOrDefault(i);
                 string locationName = rect.Key;
 
-                // Special cases where the name is not an ingame location
-                switch (locationName)
+                // Special cases where the name is not an in-game location
+                locationName = locationName switch
                 {
-                    case "Spa":
-                        locationName = "BathHouse_Entry";
-                        break;
-                    case "SewerPipe":
-                        locationName = "Sewer";
-                        break;
-                    default:
-                        break;
-                }
+                    "Spa" => "BathHouse_Entry",
+                    "SewerPipe" => "Sewer",
+                    _ => locationName
+                };
 
                 var locVector = ModEntry.LocationToMap(locationName);
 
@@ -129,8 +123,8 @@ namespace NPCMapLocations.Framework.Menus
                 }
             }
 
-            // If two tooltip areas overlap, the one earlier in the list takes precendence
-            // Reversing order allows custom tooltips to take precendence
+            // If two tooltip areas overlap, the one earlier in the list takes precedence
+            // Reversing order allows custom tooltips to take precedence
             this.points.Reverse();
         }
 
@@ -308,14 +302,14 @@ namespace NPCMapLocations.Framework.Menus
 
             // Draw indoor icon
             if (this.HasIndoorCharacter && !string.IsNullOrEmpty(this.HoveredNames))
-                b.Draw(Game1.mouseCursors, this.IndoorIconVector, new Rectangle?(new Rectangle(448, 64, 32, 32)), Color.White, 0f,
+                b.Draw(Game1.mouseCursors, this.IndoorIconVector, new Rectangle(448, 64, 32, 32), Color.White, 0f,
                   Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
 
             // Cursor
             if (!Game1.options.hardwareCursor)
                 b.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()),
-                  new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors,
-                    (Game1.options.gamepadControls ? 44 : 0), 16, 16)), Color.White, 0f, Vector2.Zero,
+                  Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors,
+                    (Game1.options.gamepadControls ? 44 : 0), 16, 16), Color.White, 0f, Vector2.Zero,
                   Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
         }
 
@@ -325,37 +319,35 @@ namespace NPCMapLocations.Framework.Menus
             int boxY = this.MapY - 96;
             int mY = this.MapY;
 
-            Game1.drawDialogueBox(this.MapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, false, true, null, false);
-            b.Draw(ModEntry.Map, new Vector2((float)this.MapX, (float)mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
+            Game1.drawDialogueBox(this.MapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, false, true);
+            b.Draw(ModEntry.Map, new Vector2(this.MapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero,
               4f, SpriteEffects.None, 0.86f);
-
-            float scrollDrawY = this.yPositionOnScreen + this.height + 32 + 16;
-            float scrollDrawBottom = scrollDrawY + 80f;
-            if (scrollDrawBottom > (float)Game1.viewport.Height)
-            {
-                scrollDrawY -= scrollDrawBottom - (float)Game1.viewport.Height;
-            }
 
             Game1.drawDialogueBox(this.MapX - 32, boxY, (ModEntry.Map.Bounds.Width + 16) * 4, 848, speaker: false, drawOnlyBox: true);
             b.Draw(ModEntry.Map, new Vector2(this.MapX, mY), new Rectangle(0, 0, 300, 180), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             switch (Game1.whichFarm)
             {
-                case 1:
+                case Farm.riverlands_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
-                case 2:
+
+                case Farm.forest_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 180, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
-                case 3:
+
+                case Farm.mountains_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
-                case 4:
+
+                case Farm.combat_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 241, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
-                case 5:
+
+                case Farm.fourCorners_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(0, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
-                case 6:
+
+                case Farm.beach_layout:
                     b.Draw(ModEntry.Map, new Vector2(this.MapX, mY + 172), new Rectangle(131, 302, 131, 61), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                     break;
             }
@@ -395,7 +387,7 @@ namespace NPCMapLocations.Framework.Menus
             if (playerLocationName != null)
             {
                 SpriteText.drawStringWithScrollCenteredAt(b, playerLocationName, this.xPositionOnScreen + this.width / 2,
-                  this.yPositionOnScreen + this.height + 32 + 16, "", 1f, -1, 0, 0.88f, false);
+                  this.yPositionOnScreen + this.height + 32 + 16);
             }
         }
 
@@ -418,7 +410,7 @@ namespace NPCMapLocations.Framework.Menus
                                 this.MapX + building.Value.Value.X - buildingRect.Width / 2,
                                 this.MapY + building.Value.Value.Y - buildingRect.Height / 2
                             ),
-                            new Rectangle?(buildingRect), Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+                            buildingRect, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
                         );
                     }
                 }
@@ -429,7 +421,7 @@ namespace NPCMapLocations.Framework.Menus
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
                 b.Draw(Game1.mouseCursors, new Vector2(this.MapX + merchantLoc.X - 16, this.MapY + merchantLoc.Y - 15),
-                  new Rectangle?(new Rectangle(191, 1410, 22, 21)), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
+                  new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
                   1f);
             }
 
@@ -462,9 +454,9 @@ namespace NPCMapLocations.Framework.Menus
                     var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
                     b.Draw(marker.Sprite,
-                      new Rectangle((int)(this.MapX + marker.MapX), (int)(this.MapY + marker.MapY),
+                      new Rectangle(this.MapX + marker.MapX, this.MapY + marker.MapY,
                         32, 30),
-                      new Rectangle?(spriteRect), markerColor);
+                      spriteRect, markerColor);
 
                     // Draw icons for quests/birthday
                     if (ModEntry.Globals.ShowQuests)
@@ -474,7 +466,7 @@ namespace NPCMapLocations.Framework.Menus
                             // Gift icon
                             b.Draw(Game1.mouseCursors,
                               new Vector2(this.MapX + marker.MapX + 20, this.MapY + marker.MapY),
-                              new Rectangle?(new Rectangle(147, 412, 10, 11)), markerColor, 0f, Vector2.Zero, 1.8f,
+                              new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
 
@@ -483,7 +475,7 @@ namespace NPCMapLocations.Framework.Menus
                             // Quest icon
                             b.Draw(Game1.mouseCursors,
                               new Vector2(this.MapX + marker.MapX + 22, this.MapY + marker.MapY - 3),
-                              new Rectangle?(new Rectangle(403, 496, 5, 14)), markerColor, 0f, Vector2.Zero, 1.8f,
+                              new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
                     }
@@ -499,7 +491,7 @@ namespace NPCMapLocations.Framework.Menus
                     if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker))
                         if (farMarker == null)
                             continue;
-                    if (farMarker != null && farMarker.DrawDelay == 0)
+                    if (farMarker is { DrawDelay: 0 })
                     {
                         farmer.FarmerRenderer.drawMiniPortrat(b,
                           new Vector2(this.MapX + farMarker.MapX - 16, this.MapY + farMarker.MapY - 15),
@@ -590,7 +582,7 @@ namespace NPCMapLocations.Framework.Menus
 
             Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
 
-            drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White, 1f, true);
+            drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White);
             b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
               SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
@@ -611,7 +603,7 @@ namespace NPCMapLocations.Framework.Menus
             if (replacedName.StartsWith("UndergroundMine") || replacedName == "Mine")
             {
                 replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11098");
-                if (player.currentLocation is MineShaft && (player.currentLocation as MineShaft).mineLevel > 120 && (player.currentLocation as MineShaft).mineLevel != 77377)
+                if (player.currentLocation is MineShaft shaft && shaft.mineLevel > 120 && shaft.mineLevel != 77377)
                 {
                     replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11062");
                 }
@@ -812,7 +804,7 @@ namespace NPCMapLocations.Framework.Menus
                             playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
                         }
                     }
-                    else if (y > 42 && y < 76)
+                    else if (y is > 42 and < 76)
                     {
                         if (player.IsLocalPlayer)
                         {
@@ -853,7 +845,7 @@ namespace NPCMapLocations.Framework.Menus
                             playerLocationName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
                         }
                     }
-                    else if (y > 42 && y < 76)
+                    else if (y is > 42 and < 76)
                     {
                         if (player.IsLocalPlayer)
                         {

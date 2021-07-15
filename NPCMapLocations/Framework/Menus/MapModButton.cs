@@ -11,22 +11,13 @@ namespace NPCMapLocations.Framework.Menus
         public bool IsActive;
         public Rectangle Rect;
 
-        public MapModButton(
-            string label,
-            int whichOption,
-            int x,
-            int y,
-            int width,
-            int height
-        ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public MapModButton(string label, int whichOption, int x, int y, int width, int height)
+            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.label = ModEntry.Helper.Translation.Get(label);
             this.Rect = new Rectangle(x, y, width, height);
 
-            if (ModEntry.Config.ImmersionOption == whichOption - 2)
-                this.greyedOut = false;
-            else
-                this.greyedOut = true;
+            this.greyedOut = ModEntry.Config.ImmersionOption != whichOption - 2;
         }
 
         public override void receiveLeftClick(int x, int y)

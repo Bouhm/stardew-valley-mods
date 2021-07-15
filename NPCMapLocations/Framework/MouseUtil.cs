@@ -26,7 +26,7 @@ namespace NPCMapLocations.Framework
         // Return Vector2 position of pixel position on the map at cursor
         public static Vector2 GetMapPositionAtCursor()
         {
-            Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720, 0, 0);
+            Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
             return new Vector2((int)(Math.Ceiling(Game1.getMousePosition().X - mapPos.X)), (int)(Math.Ceiling(Game1.getMousePosition().Y - mapPos.Y)));
         }
 
@@ -61,7 +61,7 @@ namespace NPCMapLocations.Framework
         // Convert absolute positions to map positions
         public static Rectangle GetRectangleOnMap(Rectangle rect)
         {
-            Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720, 0, 0);
+            Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
             return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
         }
     }

@@ -9,19 +9,14 @@ using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework.Menus
 {
-    // Mod checkbox for settings and npc blacklst
+    // Mod checkbox for settings and npc blacklist
     internal class ModCheckbox : OptionsElement
     {
-        private readonly IOrderedEnumerable<KeyValuePair<string, NpcMarker>> NpcMarkers;
+        private readonly KeyValuePair<string, NpcMarker>[] NpcMarkers;
         public bool IsChecked;
 
-        public ModCheckbox(
-            string label,
-            int whichOption,
-            int x,
-            int y,
-            IOrderedEnumerable<KeyValuePair<string, NpcMarker>> npcMarkers = null
-        ) : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public ModCheckbox(string label, int whichOption, int x, int y, KeyValuePair<string, NpcMarker>[] npcMarkers = null)
+            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.NpcMarkers = npcMarkers;
             this.label = ModEntry.Helper.Translation.Get(label);
@@ -97,8 +92,6 @@ namespace NPCMapLocations.Framework.Menus
                     case 12:
                         ModEntry.Globals.ShowTravelingMerchant = this.IsChecked;
                         break;
-                    default:
-                        break;
                 }
             }
 
@@ -128,12 +121,11 @@ namespace NPCMapLocations.Framework.Menus
                 // Draw names
                 slotX += 75;
                 if (this.whichOption == -1)
-                    SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f,
-                        0.1f, false, -1, "", -1);
+                    SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f, 0.1f);
                 else
                     Utility.drawTextWithShadow(b, marker.DisplayName, Game1.dialogueFont,
                         new Vector2(slotX + this.bounds.X + this.bounds.Width + 8, slotY + this.bounds.Y),
-                        this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f, -1, -1, 1f, 3);
+                        this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f);
             }
             else
             {

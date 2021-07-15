@@ -17,7 +17,6 @@ namespace NPCMapLocations.Framework.Menus
 {
     public class ModMenu : IClickableMenu
     {
-        private readonly Dictionary<string, NpcMarker> NpcMarkers;
         private readonly ClickableTextureComponent DownArrow;
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
@@ -35,16 +34,10 @@ namespace NPCMapLocations.Framework.Menus
         private int OptionsSlotHeld = -1;
         private bool Scrolling;
 
-        public ModMenu(
-      Dictionary<string, NpcMarker> npcMarkers,
-            Dictionary<string, bool> conditionalNpcs
-        ) : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
+        public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs)
+            : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
-            this.NpcMarkers = npcMarkers;
-
-            var topLeftPositionForCenteringOnScreen =
-                Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom,
-                    0, 0);
+            var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom);
             this.MapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.MapY = (int)topLeftPositionForCenteringOnScreen.Y;
 
@@ -55,9 +48,8 @@ namespace NPCMapLocations.Framework.Menus
                 null,
                 null,
                 Game1.mouseCursors,
-                Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46, -1, -1),
-                1f,
-                false
+                Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 46),
+                1f
             );
 
             this.UpArrow = new ClickableTextureComponent(
@@ -128,9 +120,10 @@ namespace NPCMapLocations.Framework.Menus
             string villagersLabel = ModEntry.Helper.Translation.Get("villagers.label");
             this.Options.Add(new OptionsElement(villagersLabel));
 
-            var orderedMarkers = npcMarkers.ToList()
-              .Where(x => x.Value.Sprite != null && x.Value.Type == CharacterType.Villager)
-              .OrderBy(x => x.Value.DisplayName);
+            var orderedMarkers = npcMarkers
+              .Where(p => p.Value.Sprite != null && p.Value.Type == CharacterType.Villager)
+              .OrderBy(p => p.Value.DisplayName)
+              .ToArray();
 
             int idx = 13;
             foreach (var npcMarker in orderedMarkers)
@@ -160,7 +153,7 @@ namespace NPCMapLocations.Framework.Menus
             if (this.Options.Any())
             {
                 this.ScrollBar.bounds.Y = this.ScrollBarRunner.Height / Math.Max(1, this.Options.Count - 7 + 1) * this.CurrentItemIndex + this.UpArrow.bounds.Bottom + Game1.pixelZoom;
-                if (this.CurrentItemIndex == this.Options.Count() - 7)
+                if (this.CurrentItemIndex == this.Options.Count - 7)
                     this.ScrollBar.bounds.Y = this.DownArrow.bounds.Y - this.ScrollBar.bounds.Height - Game1.pixelZoom;
             }
         }
@@ -200,7 +193,7 @@ namespace NPCMapLocations.Framework.Menus
             if ((Game1.options.menuButton.Contains(new InputButton(key)) ||
                  Game1.options.doesInputListContain(Game1.options.mapButton, key)) && this.readyToClose() && this.CanClose)
             {
-                this.exitThisMenu(true);
+                this.exitThisMenu();
                 return;
             }
 
@@ -231,7 +224,7 @@ namespace NPCMapLocations.Framework.Menus
                 return;
             }
 
-            if (direction < 0 && this.CurrentItemIndex < Math.Max(0, this.Options.Count() - 7))
+            if (direction < 0 && this.CurrentItemIndex < Math.Max(0, this.Options.Count - 7))
             {
                 this.DownArrowPressed();
                 Game1.playSound("shiny4");
@@ -273,7 +266,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             if (GameMenu.forcePreventClose) return;
 
-            if (this.DownArrow.containsPoint(x, y) && this.CurrentItemIndex < Math.Max(0, this.Options.Count() - 7))
+            if (this.DownArrow.containsPoint(x, y) && this.CurrentItemIndex < Math.Max(0, this.Options.Count - 7))
             {
                 this.DownArrowPressed();
                 Game1.playSound("shwip");
@@ -323,10 +316,10 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             y -= 15;
-            this.CurrentItemIndex = Math.Max(0, Math.Min(this.Options.Count() - 7, this.CurrentItemIndex));
-            for (int i = 0; i < this.OptionSlots.Count(); i++)
+            this.CurrentItemIndex = Math.Max(0, Math.Min(this.Options.Count - 7, this.CurrentItemIndex));
+            for (int i = 0; i < this.OptionSlots.Count; i++)
             {
-                if (this.OptionSlots[i].bounds.Contains(x, y) && this.CurrentItemIndex + i < this.Options.Count() && this.Options[this.CurrentItemIndex + i]
+                if (this.OptionSlots[i].bounds.Contains(x, y) && this.CurrentItemIndex + i < this.Options.Count && this.Options[this.CurrentItemIndex + i]
                         .bounds.Contains(x - this.OptionSlots[i].bounds.X, y - this.OptionSlots[i].bounds.Y))
                 {
                     this.Options[this.CurrentItemIndex + i].receiveLeftClick(x - this.OptionSlots[i].bounds.X, y - this.OptionSlots[i].bounds.Y);
@@ -351,9 +344,9 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             this.OkButton.scale = Math.Max(this.OkButton.scale - 0.02f, this.OkButton.baseScale);
-            this.UpArrow.tryHover(x, y, 0.1f);
-            this.DownArrow.tryHover(x, y, 0.1f);
-            this.ScrollBar.tryHover(x, y, 0.1f);
+            this.UpArrow.tryHover(x, y);
+            this.DownArrow.tryHover(x, y);
+            this.ScrollBar.tryHover(x, y);
         }
 
         // Draw menu
@@ -362,11 +355,11 @@ namespace NPCMapLocations.Framework.Menus
             if (Game1.options.showMenuBackground) this.drawBackground(b);
 
             Game1.drawDialogueBox(this.MapX - Game1.pixelZoom * 8, this.MapY - Game1.pixelZoom * 24,
-              (ModEntry.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true, null, false);
+              (ModEntry.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true);
             b.Draw(ModEntry.Map, new Vector2(this.MapX, this.MapY), new Rectangle(0, 0, 300, 180),
               Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
-            Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true, null, false);
+            Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
             this.OkButton.draw(b);
             int buttonWidth = (int)Game1.dialogueFont.MeasureString(ModEntry.Helper.Translation.Get("immersion.option3")).X;
             if (!GameMenu.forcePreventClose)
@@ -374,7 +367,7 @@ namespace NPCMapLocations.Framework.Menus
                 this.UpArrow.draw(b);
                 this.DownArrow.draw(b);
 
-                if (this.Options.Count() > 7)
+                if (this.Options.Count > 7)
                 {
                     drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), this.ScrollBarRunner.X,
                         this.ScrollBarRunner.Y, this.ScrollBarRunner.Width, this.ScrollBarRunner.Height, Color.White,
@@ -382,11 +375,11 @@ namespace NPCMapLocations.Framework.Menus
                     this.ScrollBar.draw(b);
                 }
 
-                for (int i = 0; i < this.OptionSlots.Count(); i++)
+                for (int i = 0; i < this.OptionSlots.Count; i++)
                 {
                     int x = this.OptionSlots[i].bounds.X;
                     int y = this.OptionSlots[i].bounds.Y + Game1.tileSize / 4;
-                    if (this.CurrentItemIndex >= 0 && this.CurrentItemIndex + i < this.Options.Count())
+                    if (this.CurrentItemIndex >= 0 && this.CurrentItemIndex + i < this.Options.Count)
                     {
                         if (this.Options[this.CurrentItemIndex + i] is MapModButton)
                         {

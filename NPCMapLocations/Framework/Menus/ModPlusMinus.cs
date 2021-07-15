@@ -19,7 +19,7 @@ namespace NPCMapLocations.Framework.Menus
         private Rectangle MinusButton;
         public List<int> Options;
         private Rectangle PlusButton;
-        private int TxtSize;
+        private readonly int TxtSize;
         public int Selected;
 
         public ModPlusMinus(string label, int whichOption, List<int> options, int x = -1, int y = -1)
@@ -31,7 +31,7 @@ namespace NPCMapLocations.Framework.Menus
             if (x == -1) x = 32;
             if (y == -1) y = 16;
 
-            this.TxtSize = (int)Game1.dialogueFont.MeasureString($"options[0]").X + 28;
+            this.TxtSize = (int)Game1.dialogueFont.MeasureString("options[0]").X + 28;
             foreach (int displayOption in options)
             {
                 this.TxtSize = Math.Max((int)Game1.dialogueFont.MeasureString($"{displayOption}px").X + 28, this.TxtSize);
@@ -55,8 +55,6 @@ namespace NPCMapLocations.Framework.Menus
                     this.Selected = (int)MathHelper.Clamp(((int)Math.Floor((ModEntry.Globals.MinimapHeight - 45) / 15.0)), 0,
                         options.Count - 1);
                     options[this.Selected] = ModEntry.Globals.MinimapHeight;
-                    break;
-                default:
                     break;
             }
         }
@@ -92,8 +90,6 @@ namespace NPCMapLocations.Framework.Menus
                 case 2:
                     ModEntry.Globals.MinimapHeight = this.Options[this.Selected];
                     break;
-                default:
-                    break;
             }
 
             ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
@@ -119,7 +115,7 @@ namespace NPCMapLocations.Framework.Menus
                 0.4f);
             b.DrawString(Game1.dialogueFont,
                 this.Selected < this.DisplayOptions.Count && this.Selected != -1 ? this.DisplayOptions[this.Selected] : "",
-                new Vector2((int)(this.TxtSize / 2) + slotX, slotY + this.MinusButton.Y), Game1.textColor * (this.greyedOut ? 0.33f : 1f));
+                new Vector2((this.TxtSize / 2) + slotX, slotY + this.MinusButton.Y), Game1.textColor * (this.greyedOut ? 0.33f : 1f));
             b.Draw(Game1.mouseCursors, new Vector2(slotX + this.PlusButton.X, slotY + this.PlusButton.Y), PlusButtonSource,
                 Color.White * (this.greyedOut ? 0.33f : 1f) * (this.Selected == this.DisplayOptions.Count - 1 ? 0.5f : 1f), 0f, Vector2.Zero,
                 4f, SpriteEffects.None, 0.4f);

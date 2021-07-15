@@ -140,7 +140,7 @@ namespace NPCMapLocations.Framework
             }
 
             ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-            ModEntry.Helper.Data.WriteJsonFile($"config/globals.json", ModEntry.Globals);
+            ModEntry.Helper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
         /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
@@ -235,10 +235,10 @@ namespace NPCMapLocations.Framework
             this.MapVectors.Add(locationName, mapVectorArr);
         }
 
-        // Merge dictionaries, in case of key conflict d1 takes precendence
+        // Merge dictionaries, in case of key conflict d1 takes precedence
         private Dictionary<string, T> MergeDictionaries<T>(Dictionary<string, T> d1, Dictionary<string, T> d2)
         {
-            var dictionaries = new Dictionary<string, T>[] { d1, d2 };
+            var dictionaries = new[] { d1, d2 };
             return dictionaries.SelectMany(dict => dict)
                     .ToLookup(pair => pair.Key, pair => pair.Value)
                     .ToDictionary(group => group.Key, group => group.First());

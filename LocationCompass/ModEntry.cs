@@ -26,12 +26,10 @@ namespace LocationCompass
         private Dictionary<string, List<Locator>> Locators;
         private Dictionary<string, LocatorScroller> ActiveWarpLocators; // Active indices of locators of doors
         private ModConfig Config;
-        private IModHelper StaticHelper;
         private bool ShowLocators;
 
         public override void Entry(IModHelper helper)
         {
-            this.StaticHelper = helper;
             this.Config = helper.ReadConfig<ModConfig>();
             this.Pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
@@ -80,7 +78,7 @@ namespace LocationCompass
             // Configs
             if (this.ActiveWarpLocators != null)
             {
-                // Handle scroller click
+                // Handle scroll click
                 if (e.Button.Equals(SButton.MouseRight) || e.Button.Equals(SButton.ControllerA))
                     foreach (var doorLocator in this.ActiveWarpLocators)
                     {
@@ -268,21 +266,14 @@ namespace LocationCompass
                     foreach (var quest in Game1.player.questLog)
                     {
                         if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-                            switch (quest.questType.Value)
+                            hasQuest = quest.questType.Value switch
                             {
-                                case 3:
-                                    hasQuest = ((ItemDeliveryQuest)quest).target.Value == npc.Name;
-                                    break;
-                                case 4:
-                                    hasQuest = ((SlayMonsterQuest)quest).target.Value == npc.Name;
-                                    break;
-                                case 7:
-                                    hasQuest = ((FishingQuest)quest).target.Value == npc.Name;
-                                    break;
-                                case 10:
-                                    hasQuest = ((ResourceCollectionQuest)quest).target.Value == npc.Name;
-                                    break;
-                            }
+                                3 => ((ItemDeliveryQuest)quest).target.Value == npc.Name,
+                                4 => ((SlayMonsterQuest)quest).target.Value == npc.Name,
+                                7 => ((FishingQuest)quest).target.Value == npc.Name,
+                                10 => ((ResourceCollectionQuest)quest).target.Value == npc.Name,
+                                _ => hasQuest
+                            };
                     }
 
                     if (!isBirthday && !hasQuest)
@@ -324,19 +315,16 @@ namespace LocationCompass
                   new Vector2(Game1.player.position.X + Game1.player.FarmerSprite.SpriteWidth / 2 * Game1.pixelZoom,
                     Game1.player.position.Y);
                 bool isWarp = false;
-                bool isOnScreen = false;
                 bool isOutdoors = false;
-                bool isHourse = character is Horse;
+                bool isHorse = character is Horse;
 
                 Vector2 charPosition;
                 int charSpriteHeight;
 
-                if (character is Farmer)
+                if (character is Farmer farmer)
                 {
                     charPosition = character.Position;
-                    var farmer = (Farmer)character;
                     charSpriteHeight = farmer.FarmerSprite.SpriteHeight;
-
                 }
                 else
                 {
@@ -409,9 +397,8 @@ namespace LocationCompass
                         else if (!this.Config.SameLocationOnly)
                         {
                             // Warps to other outdoor locations
-                            Vector2 warpPos;
                             isOutdoors = true;
-                            if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out warpPos)) || charLocName != null && playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
+                            if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out Vector2 warpPos)) || charLocName != null && playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
                             {
                                 charLocName = characterLocCtx.Root;
 
@@ -440,18 +427,18 @@ namespace LocationCompass
                         this.ActiveWarpLocators[charLocName].Characters.Add(character.Name);
                 }
 
-                isOnScreen = Utility.isOnScreen(characterPos, Game1.tileSize / 4);
+                bool isOnScreen = Utility.isOnScreen(characterPos, Game1.tileSize / 4);
 
                 var locator = new Locator
                 {
                     Name = character.Name,
-                    Farmer = character is Farmer ? (Farmer)character : null,
+                    Farmer = character as Farmer,
                     Marker = character is NPC ? character.Sprite.Texture : null,
                     Proximity = this.GetDistance(playerPos, characterPos),
                     IsWarp = isWarp,
                     IsOutdoors = isOutdoors,
                     IsOnScreen = isOnScreen,
-                    IsHorse = isHourse
+                    IsHorse = isHorse
                 };
 
                 double angle = this.GetPlayerToTargetAngle(playerPos, characterPos);
@@ -663,17 +650,16 @@ namespace LocationCompass
                             this.DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                               Color.Black * (float)alphaLevel,
                               new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
-                                (float)(Game1.tileSize / 4 * 0.5)), 1f);
+                                (float)(Game1.tileSize / 4 * 0.5)));
                         }
                     }
                 }
                 // Multiple indoor locators in a location, pointing to its door
                 else
                 {
-                    Locator locator = null;
-                    LocatorScroller activeLocator = null;
+                    Locator locator;
 
-                    if (this.ActiveWarpLocators != null && this.ActiveWarpLocators.TryGetValue(locPair.Key, out activeLocator))
+                    if (this.ActiveWarpLocators != null && this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller activeLocator))
                     {
                         locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
                         activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);
@@ -781,7 +767,7 @@ namespace LocationCompass
                             this.DrawText(Game1.tinyFont, countString, new Vector2(locator.X + offsetX - 31, locator.Y + offsetY),
                               Color.Black * (float)alphaLevel,
                               new Vector2((int)(Game1.tinyFont.MeasureString(countString).X - 24) / 2,
-                                (float)(Game1.tileSize / 8) + 3), 1f);
+                                (float)(Game1.tileSize / 8) + 3));
                         }
                     }
 
@@ -792,7 +778,7 @@ namespace LocationCompass
                         this.DrawText(Game1.tinyFont, distanceString, new Vector2(locator.X + offsetX - 24, locator.Y + offsetY - 4),
                           Color.Black * (float)alphaLevel,
                           new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2,
-                            (float)(Game1.tileSize / 4 * 0.5)), 1f);
+                            (float)(Game1.tileSize / 4 * 0.5)));
 
                     }
 
@@ -803,11 +789,11 @@ namespace LocationCompass
                             // Change mouse cursor on hover
                             Game1.mouseCursor = -1;
                             Game1.mouseCursorTransparency = 1f;
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16)), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 44, 16, 16), Color.White, 0f, Vector2.Zero, (Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
                         }
                         else
                         {
-                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2((float)Game1.getOldMouseX(), (float)Game1.getOldMouseY()), new Rectangle(0, 0, 8, 10), Color.White, 0f, Vector2.Zero, ((float)Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
+                            Game1.spriteBatch.Draw(Game1.mouseCursors, new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY()), new Rectangle(0, 0, 8, 10), Color.White, 0f, Vector2.Zero, (Game1.pixelZoom + Game1.dialogueButtonScale / 150f), SpriteEffects.None, 1f);
                         }
                     }
                 }

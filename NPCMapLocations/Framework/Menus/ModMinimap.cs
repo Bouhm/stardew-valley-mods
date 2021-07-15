@@ -28,12 +28,12 @@ namespace NPCMapLocations.Framework.Menus
         private Vector2 MmLoc; // minimap location relative to map location
         private int MmX; // top-left position of minimap relative to viewport
         private int MmY; // top-left position of minimap relative to viewport
-        private int Offset = 0; // offset for minimap if viewport changed
+        private int Offset; // offset for minimap if viewport changed
         private readonly Dictionary<string, NpcMarker> NpcMarkers;
         private Vector2 PlayerLoc;
         private int PrevMmX;
         private int PrevMmY;
-        private int DrawDelay = 0;
+        private int DrawDelay;
         private bool DragStarted;
 
         public ModMinimap(
@@ -114,7 +114,7 @@ namespace NPCMapLocations.Framework.Menus
             // When ModMain.Map is smaller than viewport (ex. Bus Stop)
             if (Game1.isOutdoorMapSmallerThanViewport())
             {
-                this.Offset = (int)(Game1.viewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
+                this.Offset = (Game1.viewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
 
                 if (this.MmX > Math.Max(12, this.Offset))
                     this.Offset = 0;
@@ -268,8 +268,8 @@ namespace NPCMapLocations.Framework.Menus
             int farmCropY = (int)MathHelper.Clamp((this.MmY - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
 
             // Check if farm crop extends outside of minimap
-            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (offsetMmX + this.MmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + this.MmWidth - farmX) / Game1.pixelZoom) : farmWidth - farmCropX;
-            int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (this.MmY + this.MmHeight) / Game1.pixelZoom) ? (int)((this.MmY + this.MmHeight - farmY) / Game1.pixelZoom) : farmHeight - farmCropY;
+            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (offsetMmX + this.MmWidth) / Game1.pixelZoom) ? (offsetMmX + this.MmWidth - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
+            int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (this.MmY + this.MmHeight) / Game1.pixelZoom) ? (this.MmY + this.MmHeight - farmY) / Game1.pixelZoom : farmHeight - farmCropY;
 
             // Check if farm crop extends beyond farm size
             if (farmCropX + farmCropWidth > farmWidth)
@@ -363,8 +363,8 @@ namespace NPCMapLocations.Framework.Menus
                 int islandCropY = (int)MathHelper.Clamp((this.MmY - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
 
                 // Check if island crop extends outside of minimap
-                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + this.MmWidth) / Game1.pixelZoom) ? (int)((offsetMmX + this.MmWidth - islandX) / Game1.pixelZoom) : islandWidth - islandCropX;
-                int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (this.MmY + this.MmHeight) / Game1.pixelZoom) ? (int)((this.MmY + this.MmHeight - islandY) / Game1.pixelZoom) : islandHeight - islandCropY;
+                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + this.MmWidth) / Game1.pixelZoom) ? (offsetMmX + this.MmWidth - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
+                int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (this.MmY + this.MmHeight) / Game1.pixelZoom) ? (this.MmY + this.MmHeight - islandY) / Game1.pixelZoom : islandHeight - islandCropY;
 
                 // Check if island crop extends beyond island size
                 if (islandCropX + islandCropWidth > islandWidth)
