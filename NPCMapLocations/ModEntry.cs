@@ -454,29 +454,24 @@ namespace NPCMapLocations
             {
                 foreach (var npc in this.GetVillagers())
                 {
-                    if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && !(npc is Horse || npc is Child)) continue;
+                    if (!this.Customizations.Names.TryGetValue(npc.Name, out string name) && npc is not (Horse or Child))
+                        continue;
 
-                    var type = CharacterType.Villager;
-                    if (npc is Horse)
+                    var type = npc switch
                     {
-                        type = CharacterType.Horse;
-                    }
-                    else if (npc is Child)
-                    {
-                        type = CharacterType.Child;
-                    }
+                        Horse => CharacterType.Horse,
+                        Child => CharacterType.Child,
+                        _ => CharacterType.Villager
+                    };
 
                     if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
-                    {
                         offset = 0;
-                    }
 
                     if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                     {
-                        string displayName = (npc.displayName != null && Game1.IsEnglish()) ? npc.displayName : npc.Name;
-                        var newMarker = new NpcMarker()
+                        var newMarker = new NpcMarker
                         {
-                            DisplayName = displayName,
+                            DisplayName = npc.displayName ?? npc.Name,
                             CropOffset = offset,
                             IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
                             Type = type

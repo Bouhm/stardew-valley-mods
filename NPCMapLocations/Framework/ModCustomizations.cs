@@ -94,7 +94,8 @@ namespace NPCMapLocations.Framework
                     if (gameNpc != null)
                     {
                         // If custom crop offset is not specified, default to 0
-                        if (!npcMarkerOffsets.TryGetValue(gameNpc.Name, out int crop)) npcMarkerOffsets[gameNpc.Name] = 0;
+                        if (!npcMarkerOffsets.ContainsKey(gameNpc.Name))
+                            npcMarkerOffsets[gameNpc.Name] = 0;
 
                         // Children sprites are short so give them a booster seat
                         if (gameNpc is Child)
@@ -113,12 +114,8 @@ namespace NPCMapLocations.Framework
             {
                 // Handle any modified NPC names 
                 // Specifically mods that change names in dialogue files (displayName)
-                if (!this.Names.TryGetValue(character.Name, out string customName))
-                {
-                    string displayName = (character.displayName != null && Game1.IsEnglish()) ? character.displayName : character.Name;
-
-                    this.Names.Add(character.Name, displayName);
-                }
+                if (!this.Names.ContainsKey(character.Name))
+                    this.Names.Add(character.Name, character.displayName ?? character.Name);
             }
 
             // Handle duplicate displayName -- custom NPCs that replaces villagers
