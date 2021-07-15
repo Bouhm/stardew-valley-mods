@@ -96,7 +96,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             ModEntry.Globals.MinimapX = this.MmX;
             ModEntry.Globals.MinimapY = this.MmY;
-            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
             this.DragStarted = false;
 
             // Delay drawing on minimap after it's moved
@@ -210,7 +210,7 @@ namespace NPCMapLocations.Framework.Menus
               4f, SpriteEffects.None, 0.86f);
 
             // Don't draw markers while being dragged
-            if (!(this.IsHoveringDragZone() && ModEntry.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
+            if (!(this.IsHoveringDragZone() && ModEntry.StaticHelper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
             {
                 // When minimap is moved, redraw markers after recalculating & repositioning
                 if (this.DrawDelay == 0)

@@ -39,7 +39,7 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             this.bounds = new Rectangle(x, y, (int)(1.5 * this.TxtSize), 32);
-            this.label = ModEntry.Helper.Translation.Get(label);
+            this.label = ModEntry.StaticHelper.Translation.Get(label);
             this.whichOption = whichOption;
             this.MinusButton = new Rectangle(x, 16, 28, 32);
             this.PlusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);
@@ -92,7 +92,7 @@ namespace NPCMapLocations.Framework.Menus
                     break;
             }
 
-            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
         }
 
         public override void receiveKeyPress(Keys key)

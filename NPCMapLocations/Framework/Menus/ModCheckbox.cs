@@ -19,7 +19,7 @@ namespace NPCMapLocations.Framework.Menus
             : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.NpcMarkers = npcMarkers;
-            this.label = ModEntry.Helper.Translation.Get(label);
+            this.label = ModEntry.StaticHelper.Translation.Get(label);
 
             // Villager names
             if (whichOption > 12 && npcMarkers != null)
@@ -95,8 +95,8 @@ namespace NPCMapLocations.Framework.Menus
                 }
             }
 
-            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-            ModEntry.Helper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)

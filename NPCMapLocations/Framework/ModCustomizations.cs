@@ -139,8 +139,8 @@ namespace NPCMapLocations.Framework
                 }
             }
 
-            ModEntry.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-            ModEntry.Helper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
         /// <summary>Get the folder from which to load tilesheet overrides for compatibility with other mods, if applicable.</summary>
@@ -148,7 +148,7 @@ namespace NPCMapLocations.Framework
         private string GetCustomMapFolderName()
         {
             // get root compatibility folder
-            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModEntry.Helper.DirectoryPath, this.MapsRootPath));
+            DirectoryInfo compatFolder = new DirectoryInfo(Path.Combine(ModEntry.StaticHelper.DirectoryPath, this.MapsRootPath));
             if (!compatFolder.Exists)
                 return null;
 
@@ -171,7 +171,7 @@ namespace NPCMapLocations.Framework
                     foreach (string group in modGroups)
                     {
                         string[] modIDs = group.Split('~');
-                        if (!modIDs.Any(id => ModEntry.Helper.ModRegistry.IsLoaded(id.Trim())))
+                        if (!modIDs.Any(id => ModEntry.StaticHelper.ModRegistry.IsLoaded(id.Trim())))
                         {
                             matched = false;
                             break;
