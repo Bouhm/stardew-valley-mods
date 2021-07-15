@@ -875,48 +875,47 @@ namespace NPCMapLocations.Framework.Menus
         /// vanilla locations that have to be tweaked to match modified map
         private Dictionary<string, Rectangle> RegionRects()
         {
-            var rects = new Dictionary<string, Rectangle>()
+            var rects = new Dictionary<string, Rectangle>
             {
-                {"Desert_Region", new Rectangle(-1, -1, 261, 175)},
-                {"Farm_Region", new Rectangle(-1, -1, 188, 148)},
-                {"Backwoods_Region", new Rectangle(-1, -1, 148, 120)},
-                {"BusStop_Region", new Rectangle(-1, -1, 76, 100)},
-                {"WizardHouse", new Rectangle(-1, -1, 36, 76)},
-                {"AnimalShop", new Rectangle(-1, -1, 76, 40)},
-                {"LeahHouse", new Rectangle(-1, -1, 32, 24)},
-                {"SamHouse", new Rectangle(-1, -1, 36, 52)},
-                {"HaleyHouse", new Rectangle(-1, -1, 40, 36)},
-                {"TownSquare", new Rectangle(-1, -1, 48, 45)},
-                {"Hospital", new Rectangle(-1, -1, 16, 32)},
-                {"SeedShop", new Rectangle(-1, -1, 28, 40)},
-                {"Blacksmith", new Rectangle(-1, -1, 80, 36)},
-                {"Saloon", new Rectangle(-1, -1, 28, 40)},
-                {"ManorHouse", new Rectangle(-1, -1, 44, 56)},
-                {"ArchaeologyHouse", new Rectangle(-1, -1, 32, 28)},
-                {"ElliottHouse", new Rectangle(-1, -1, 28, 20)},
-                {"Sewer", new Rectangle(-1, -1, 24, 20)},
-                {"Graveyard", new Rectangle(-1, -1, 40, 32)},
-                {"Trailer", new Rectangle(-1, -1, 20, 12)},
-                {"JoshHouse", new Rectangle(-1, -1, 36, 36)},
-                {"ScienceHouse", new Rectangle(-1, -1, 48, 32)},
-                {"Tent", new Rectangle(-1, -1, 12, 16)},
-                {"Mine", new Rectangle(-1, -1, 16, 24)},
-                {"AdventureGuild", new Rectangle(-1, -1, 32, 36)},
-                {"Quarry", new Rectangle(-1, -1, 88, 76)},
-                {"JojaMart", new Rectangle(-1, -1, 52, 52)},
-                {"FishShop", new Rectangle(-1, -1, 36, 40)},
-                {"Spa", new Rectangle(-1, -1, 48, 36)},
-                {"Woods", new Rectangle(-1, -1, 196, 176)},
-                {"RuinedHouse", new Rectangle(-1, -1, 20, 20)},
-                {"CommunityCenter", new Rectangle(-1, -1, 44, 36)},
-                {"SewerPipe", new Rectangle(-1, -1, 24, 32)},
-                {"Railroad_Region", new Rectangle(-1, -1, 180, 69)},
-                {"LonelyStone", new Rectangle(-1, -1, 28, 28)},
+                ["Desert_Region"] = new(-1, -1, 261, 175),
+                ["Farm_Region"] = new(-1, -1, 188, 148),
+                ["Backwoods_Region"] = new(-1, -1, 148, 120),
+                ["BusStop_Region"] = new(-1, -1, 76, 100),
+                ["WizardHouse"] = new(-1, -1, 36, 76),
+                ["AnimalShop"] = new(-1, -1, 76, 40),
+                ["LeahHouse"] = new(-1, -1, 32, 24),
+                ["SamHouse"] = new(-1, -1, 36, 52),
+                ["HaleyHouse"] = new(-1, -1, 40, 36),
+                ["TownSquare"] = new(-1, -1, 48, 45),
+                ["Hospital"] = new(-1, -1, 16, 32),
+                ["SeedShop"] = new(-1, -1, 28, 40),
+                ["Blacksmith"] = new(-1, -1, 80, 36),
+                ["Saloon"] = new(-1, -1, 28, 40),
+                ["ManorHouse"] = new(-1, -1, 44, 56),
+                ["ArchaeologyHouse"] = new(-1, -1, 32, 28),
+                ["ElliottHouse"] = new(-1, -1, 28, 20),
+                ["Sewer"] = new(-1, -1, 24, 20),
+                ["Graveyard"] = new(-1, -1, 40, 32),
+                ["Trailer"] = new(-1, -1, 20, 12),
+                ["JoshHouse"] = new(-1, -1, 36, 36),
+                ["ScienceHouse"] = new(-1, -1, 48, 32),
+                ["Tent"] = new(-1, -1, 12, 16),
+                ["Mine"] = new(-1, -1, 16, 24),
+                ["AdventureGuild"] = new(-1, -1, 32, 36),
+                ["Quarry"] = new(-1, -1, 88, 76),
+                ["JojaMart"] = new(-1, -1, 52, 52),
+                ["FishShop"] = new(-1, -1, 36, 40),
+                ["Spa"] = new(-1, -1, 48, 36),
+                ["Woods"] = new(-1, -1, 196, 176),
+                ["RuinedHouse"] = new(-1, -1, 20, 20),
+                ["CommunityCenter"] = new(-1, -1, 44, 36),
+                ["SewerPipe"] = new(-1, -1, 24, 32),
+                ["Railroad_Region"] = new(-1, -1, 180, 69),
+                ["LonelyStone"] = new(-1, -1, 28, 28)
             };
             if (this.drawIsland)
-            {
-                rects.Add("GingerIsland", new Rectangle(-1, -1, 180, 160));
-            }
+                rects.Add("GingerIsland", new(-1, -1, 180, 160));
+
             return rects;
         }
     }
