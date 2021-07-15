@@ -1,4 +1,4 @@
-# user-specific files
+﻿# user-specific files
 *.suo
 *.user
 *.userosscache
@@ -24,3 +24,5 @@ _ReSharper*/
 **/packages/*
 *.nuget.props
 *.nuget.targets
+
+_releases

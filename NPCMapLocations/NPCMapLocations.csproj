@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>2.5.12</Version>
     <TargetFramework>net452</TargetFramework>
     <LangVersion>latest</LangVersion>
+
+    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
   </PropertyGroup>
 
   <ItemGroup>
