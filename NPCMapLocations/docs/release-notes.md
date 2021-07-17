@@ -1,8 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Fixed crash in some cases with circular warps.
+## 2.6.3
+Released 17 July 2021 for SMAPI 3.11.0+. Updated by Pathoschild.
+
+* Fixed crash when a location has circular warps in some cases.
 * Fixed error when a location has invalid warp targets.
 * Fixed map positioning on the beach farm (thanks to RushedLogic!).
 * Fixed misaligned minimap texture on the beach farm (thanks to RushedLogic!).

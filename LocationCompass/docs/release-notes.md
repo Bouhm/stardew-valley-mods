@@ -1,7 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 1.3.3
+Released 17 July 2021 for SMAPI 3.11.0. Updated by Pathoschild.
+
+* Fixed crash when a location has circular warps in some cases.
+* Fixed error when a location has invalid warp targets.
 * Internal refactoring.
 
 ## 1.3.2
