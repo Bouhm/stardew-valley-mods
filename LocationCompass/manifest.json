@@ -1,12 +1,10 @@
-{
-  "Name": "Location Compass",
-  "Author": "Bouhm",
-  "Version": "1.3.2",
-  "Description": "Locates villagers and farmers on the screen",
-  "UniqueID": "Bouhm.LocationCompass",
-  "EntryDll": "LocationCompass.dll",
-  "MinimumApiVersion": "3.0",
-  "UpdateKeys": [
-  	"Nexus:3045"
-  ]
+﻿{
+    "Name": "NPC Location Compass",
+    "Author": "Bouhm",
+    "Version": "1.3.3",
+    "Description": "Locates villagers and farmers on the screen",
+    "UniqueID": "Bouhm.LocationCompass",
+    "EntryDll": "LocationCompass.dll",
+    "MinimumApiVersion": "3.11.0",
+    "UpdateKeys": [ "Nexus:3045" ]
 }

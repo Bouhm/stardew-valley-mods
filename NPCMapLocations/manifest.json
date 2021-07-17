@@ -1,12 +1,10 @@
-{
-  "Name": "NPC Map Locations",
-  "Author": "Bouhm",
-  "Version": "2.6.2",
-  "Description": "Shows NPCs and farmers on a modified map page for accurate tracking.",
-  "UniqueID": "Bouhm.NPCMapLocations",
-  "EntryDll": "NPCMapLocations.dll",
-  "MinimumApiVersion": "3.9.0",
-  "UpdateKeys": [
-    "Nexus:239"
-  ]
+﻿{
+    "Name": "NPC Map Locations",
+    "Author": "Bouhm",
+    "Version": "2.6.3",
+    "Description": "Shows NPCs and farmers on a modified map page for accurate tracking.",
+    "UniqueID": "Bouhm.NPCMapLocations",
+    "EntryDll": "NPCMapLocations.dll",
+    "MinimumApiVersion": "3.11.0",
+    "UpdateKeys": [ "Nexus:239" ]
 }
