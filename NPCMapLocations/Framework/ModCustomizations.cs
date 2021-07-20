@@ -63,47 +63,48 @@ namespace NPCMapLocations.Framework
         // Custom NPCs and custom names or sprites for existing NPCs
         private void LoadCustomNpcs(Dictionary<string, JObject> customNpcJson)
         {
-            var npcMarkerOffsets = ModConstants.NpcMarkerOffsets;
-            var npcExclusions = ModEntry.Globals.NpcExclusions;
-
-            foreach (var npcData in customNpcJson)
+            // load custom NPC marker offsets and exclusions
             {
-                var npc = npcData.Value;
+                // get defaults
+                var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
+                var exclusions = this.Merge(ModEntry.Globals.NpcExclusions);
 
-                if (npc.ContainsKey("Exclude"))
+                // get custom data
+                foreach (var npcData in customNpcJson)
                 {
-                    if ((bool)npc.GetValue("Exclude"))
+                    var npc = npcData.Value;
+
+                    if (npc.ContainsKey("Exclude"))
                     {
-                        npcExclusions.Add(npcData.Key);
-                        continue;
-                    }
-                }
-
-                if (npc.ContainsKey("MarkerCropOffset"))
-                {
-                    npcMarkerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
-                }
-                else
-                {
-                    var gameNpc = Game1.getCharacterFromName(npcData.Key);
-                    if (gameNpc != null)
-                    {
-                        // If custom crop offset is not specified, default to 0
-                        if (!npcMarkerOffsets.ContainsKey(gameNpc.Name))
-                            npcMarkerOffsets[gameNpc.Name] = 0;
-
-                        // Children sprites are short so give them a booster seat
-                        if (gameNpc is Child)
+                        if ((bool)npc.GetValue("Exclude"))
                         {
-                            npcMarkerOffsets[gameNpc.Name] += 7;
+                            exclusions.Add(npcData.Key);
+                            continue;
+                        }
+                    }
+
+                    if (npc.ContainsKey("MarkerCropOffset"))
+                        markerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
+                    else
+                    {
+                        var gameNpc = Game1.getCharacterFromName(npcData.Key);
+                        if (gameNpc != null)
+                        {
+                            // If custom crop offset is not specified, default to 0
+                            if (!markerOffsets.ContainsKey(gameNpc.Name))
+                                markerOffsets[gameNpc.Name] = 0;
+
+                            // Children sprites are short so give them a booster seat
+                            if (gameNpc is Child)
+                                markerOffsets[gameNpc.Name] += 7;
                         }
                     }
                 }
-            }
 
-            // Merge customizations into globals config
-            ModEntry.Globals.NpcMarkerOffsets = this.MergeDictionaries(npcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
-            ModEntry.Globals.NpcExclusions = npcExclusions;
+                // Merge customizations into globals config
+                ModEntry.Globals.NpcMarkerOffsets = markerOffsets;
+                ModEntry.Globals.NpcExclusions = exclusions;
+            }
 
             foreach (var character in Utility.getAllCharacters())
             {
@@ -181,13 +182,41 @@ namespace NPCMapLocations.Framework
             this.MapVectors.Add(locationName, mapVectorArr);
         }
 
-        // Merge dictionaries, in case of key conflict d1 takes precedence
-        private Dictionary<string, T> MergeDictionaries<T>(Dictionary<string, T> d1, Dictionary<string, T> d2)
+        /// <summary>Merge any number of dictionaries into a new dictionary.</summary>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="dictionaries">The dictionaries to merge. Later dictionaries have precedence for conflicting keys.</param>
+        /// <returns>Returns a new dictionary instance.</returns>
+        private Dictionary<string, TValue> Merge<TValue>(params Dictionary<string, TValue>[] dictionaries)
         {
-            var dictionaries = new[] { d1, d2 };
-            return dictionaries.SelectMany(dict => dict)
-                    .ToLookup(pair => pair.Key, pair => pair.Value)
-                    .ToDictionary(group => group.Key, group => group.First());
+            Dictionary<string, TValue> merged = new();
+
+            foreach (var dictionary in dictionaries)
+            {
+                foreach (var pair in dictionary)
+                    merged[pair.Key] = pair.Value;
+            }
+
+            return merged;
+        }
+
+        /// <summary>Merge any number of sets into a new set.</summary>
+        /// <typeparam name="TValue">The set value type.</typeparam>
+        /// <param name="sets">The sets to merge. Later sets have precedence for conflicting keys.</param>
+        /// <returns>Returns a new set instance.</returns>
+        private HashSet<TValue> Merge<TValue>(params HashSet<TValue>[] sets)
+        {
+            HashSet<TValue> merged = new();
+
+            foreach (var set in sets)
+            {
+                foreach (TValue value in set)
+                {
+                    merged.Remove(value);
+                    merged.Add(value);
+                }
+            }
+
+            return merged;
         }
     }
 }

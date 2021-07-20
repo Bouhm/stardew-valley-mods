@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed NPC marker offsets in `config/global.json` always overwritten by default values for vanilla NPCs.
 * Updated translations. Thanks to martin66789 (added Hungarian)!
 
 ## 2.6.3
