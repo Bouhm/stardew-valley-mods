@@ -110,8 +110,7 @@ namespace NPCMapLocations.Framework
             {
                 // Handle any modified NPC names 
                 // Specifically mods that change names in dialogue files (displayName)
-                if (!this.Names.ContainsKey(character.Name))
-                    this.Names.Add(character.Name, character.displayName ?? character.Name);
+                this.Names[character.Name] = character.displayName ?? character.Name;
             }
 
             // Handle duplicate displayName -- custom NPCs that replaces villagers
@@ -179,7 +178,7 @@ namespace NPCMapLocations.Framework
                     );
             }
 
-            this.MapVectors.Add(locationName, mapVectorArr);
+            this.MapVectors[locationName] = mapVectorArr;
         }
 
         /// <summary>Merge any number of dictionaries into a new dictionary.</summary>

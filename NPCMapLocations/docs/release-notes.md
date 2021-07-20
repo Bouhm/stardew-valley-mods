@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed NPC marker offsets in `config/global.json` always overwritten by default values for vanilla NPCs.
+* Fixed error when a mod overrides the vectors for a known location via `Mods/Bouhm.NPCMapLocations/Locations`.
 * Updated translations. Thanks to martin66789 (added Hungarian)!
 
 ## 2.6.3
