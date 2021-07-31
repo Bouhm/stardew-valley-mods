@@ -56,7 +56,8 @@ namespace Bouhm.Shared.Locations
         public static string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
         {
             // There can be multiple warps to the same location
-            if (location == prevLocation) return root;
+            if (location == prevLocation)
+                return root;
 
             string curLocationName = location.uniqueName.Value ?? location.Name;
             string prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
