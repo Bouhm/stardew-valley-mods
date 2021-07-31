@@ -9,6 +9,16 @@ namespace NPCMapLocations.Framework
     /// <summary>The constant values used by the mod.</summary>
     public static class ModConstants
     {
+        /// <summary>The network message IDs used by the mod.</summary>
+        public static class MessageIds
+        {
+            /// <summary>A message from the host containing NPC internal => display names.</summary>
+            public const string SyncedNames = "SyncedNames";
+
+            /// <summary>A message from the host containing NPC marker positions to show on the map.</summary>
+            public const string SyncedNpcMarkers = "SyncedNpcMarkers";
+        }
+
         /// <summary>The page index of the map tab in the <see cref="GameMenu"/>.</summary>
         public static int MapTabIndex => Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
 

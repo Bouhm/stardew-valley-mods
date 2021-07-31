@@ -44,8 +44,6 @@ namespace NPCMapLocations
 
         // Multiplayer
         private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new();
-        private long HostId;
-        private List<long> PlayerIds;
 
         // Customizations/Custom mods
         private string MapSeason;
@@ -123,6 +121,7 @@ namespace NPCMapLocations
             helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
             helper.Events.Display.Rendered += this.Display_Rendered;
             helper.Events.Display.WindowResized += this.Display_WindowResized;
+            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
         }
 
@@ -131,28 +130,9 @@ namespace NPCMapLocations
         {
             Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
-            if (!Context.IsMainPlayer)
-            {
-                // Determine host ID
-                foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
-                {
-                    if (peer.IsHost)
-                    {
-                        this.HostId = peer.PlayerID;
-                        break;
-                    }
-                }
-            }
-
             // Initialize these early for multiplayer sync
             this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
             this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
-
-            // Let host know farmhand is ready to receive updates
-            if (Context.IsMultiplayer && !Context.IsMainPlayer)
-            {
-                this.Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { this.HostId });
-            }
 
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
             {
@@ -493,7 +473,8 @@ namespace NPCMapLocations
         // To initialize ModMap quicker for smoother rendering when opening map
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             // Half-second tick
             if (e.IsMultipleOf(30))
@@ -508,13 +489,13 @@ namespace NPCMapLocations
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
                 // Sync multiplayer data
-                if (Context.IsMainPlayer && Context.IsMultiplayer && this.PlayerIds != null)
+                if (Context.IsMainPlayer && Context.IsMultiplayer)
                 {
                     var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
 
                     foreach (var npcMarker in this.NpcMarkers.Value)
                     {
-                        syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker()
+                        syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker
                         {
                             DisplayName = npcMarker.Value.DisplayName,
                             LocationName = npcMarker.Value.LocationName,
@@ -525,7 +506,7 @@ namespace NPCMapLocations
                         });
                     }
 
-                    this.Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: this.PlayerIds.ToArray());
+                    this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
                 }
             }
 
@@ -578,59 +559,31 @@ namespace NPCMapLocations
                 this.OpenModMap();
         }
 
-        private void Multiplayer_PeerDisconnected(object sender, PeerDisconnectedEventArgs e)
+        private void Multiplayer_PeerConnected(object sender, PeerConnectedEventArgs e)
         {
-            // Remove disconnected peer's ID from list if exists
-            if (Context.IsMainPlayer && Context.IsMultiplayer)
-            {
-                this.PlayerIds.Remove(e.Peer.PlayerID);
-
-                if (this.PlayerIds.Count == 0)
-                {
-                    // Set list to null and stop listening to disconnections
-                    this.PlayerIds = null;
-                    this.Helper.Events.Multiplayer.PeerDisconnected -= this.Multiplayer_PeerDisconnected;
-                }
-            }
+            if (Context.IsMainPlayer)
+                this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { e.Peer.PlayerID });
         }
 
         private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == this.ModManifest.UniqueID)
+            if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
             {
                 switch (e.Type)
                 {
-                    case "PlayerReady":
-                        if (Context.IsMainPlayer)
-                        {
-                            if (this.PlayerIds == null)
-                            {
-                                // Instantiate list and listen to player disconnects
-                                this.PlayerIds = new List<long>(3);
-                                this.Helper.Events.Multiplayer.PeerDisconnected += this.Multiplayer_PeerDisconnected;
-                            }
-                            this.PlayerIds.Add(e.FromPlayerID);
+                    case ModConstants.MessageIds.SyncedNames:
+                        this.Customizations.Names = e.ReadAs<Dictionary<string, string>>();
+                        break;
 
-                            this.Helper.Multiplayer.SendMessage(this.Customizations.Names, "SyncedNames", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: this.PlayerIds.ToArray());
-                        }
-                        break;
-                    case "SyncedNames":
-                        if (this.Customizations != null)
-                        {
-                            var syncedNames = e.ReadAs<Dictionary<string, string>>();
-                            this.Customizations.Names = syncedNames;
-                        }
-                        break;
-                    case "SyncedNpcMarkers":
-                        if (this.NpcMarkers.Value == null) return;
+                    case ModConstants.MessageIds.SyncedNpcMarkers:
+                        if (this.NpcMarkers.Value == null)
+                            return;
 
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
                         {
                             if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
-                            {
                                 offset = 0;
-                            }
 
                             if (this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
                             {
@@ -643,9 +596,7 @@ namespace NPCMapLocations
                                 npcMarker.Type = syncedMarker.Value.Type;
 
                                 if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
-                                {
                                     name = syncedMarker.Key;
-                                }
 
                                 try
                                 {
@@ -1052,7 +1003,8 @@ namespace NPCMapLocations
                 locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
             }
 
-            if (locVectors == null || locationNotFound) return Unknown;
+            if (locVectors == null || locationNotFound)
+                return Unknown;
 
             int x;
             int y;
