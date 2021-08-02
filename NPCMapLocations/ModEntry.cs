@@ -423,7 +423,7 @@ namespace NPCMapLocations
             this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
             this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
-            if (!Context.IsMultiplayer || Context.IsMainPlayer)
+            if (Context.IsMainPlayer)
             {
                 foreach (var npc in this.GetVillagers())
                 {
@@ -580,13 +580,14 @@ namespace NPCMapLocations
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
                         {
-                            if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
+                            string internalName = syncedMarker.Key;
+                            if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
                                 offset = 0;
 
-                            if (!this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
+                            if (!this.NpcMarkers.Value.TryGetValue(internalName, out var npcMarker))
                             {
                                 npcMarker = new NpcMarker();
-                                this.NpcMarkers.Value.Add(syncedMarker.Key, npcMarker);
+                                this.NpcMarkers.Value.Add(internalName, npcMarker);
                             }
 
                             npcMarker.LocationName = syncedMarker.Value.LocationName;
@@ -610,7 +611,7 @@ namespace NPCMapLocations
                                 }
                                 else
                                 {
-                                    var sprite = Game1.getCharacterFromName(syncedMarker.Key, false)?.Sprite.Texture;
+                                    var sprite = Game1.getCharacterFromName(internalName, false)?.Sprite.Texture;
                                     npcMarker.Sprite = sprite;
                                 }
                             }

@@ -12,22 +12,19 @@ namespace NPCMapLocations.Framework
     // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
     public class ModCustomizations
     {
-        public Dictionary<string, MapVector[]> MapVectors { get; set; }
-        public Dictionary<string, string> Names { get; set; }
-        public HashSet<string> LocationExclusions { get; set; }
-        public Dictionary<string, MapTooltip> Tooltips { get; set; }
+        public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
 
-        public readonly string MapsRootPath = "maps";
+        /// <summary>Maps NPCs' internal names to their translated or customized display names.</summary>
+        public Dictionary<string, string> Names { get; set; } = new();
+        public HashSet<string> LocationExclusions { get; set; } = new();
+        public Dictionary<string, MapTooltip> Tooltips { get; set; } = new();
+
+        public string MapsRootPath { get; } = "maps";
         public string MapsPath { get; set; }
 
         public ModCustomizations()
         {
             this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
-
-            this.Names = new Dictionary<string, string>();
-            this.MapVectors = new Dictionary<string, MapVector[]>();
-            this.Tooltips = new Dictionary<string, MapTooltip>();
-            this.LocationExclusions = new HashSet<string>();
         }
 
         public void LoadCustomData(Dictionary<string, JObject> customNpcJson, Dictionary<string, JObject> customLocationJson)
