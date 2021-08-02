@@ -598,16 +598,13 @@ namespace NPCMapLocations
                             npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
                             npcMarker.Type = syncedMarker.Value.Type;
 
-                            if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
-                                name = syncedMarker.Key;
-
                             try
                             {
                                 if (syncedMarker.Value.Type == CharacterType.Villager)
                                 {
-                                    npcMarker.Sprite = name == "Leo"
+                                    npcMarker.Sprite = internalName == "Leo"
                                         ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
-                                        : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
+                                        : new AnimatedSprite($"Characters\\{internalName}", 0, 16, 32).Texture;
                                 }
                                 else
                                 {
