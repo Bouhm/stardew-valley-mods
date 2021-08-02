@@ -103,8 +103,6 @@ namespace NPCMapLocations
 
         public override void Entry(IModHelper helper)
         {
-            if (!Context.IsMainPlayer && Context.IsSplitScreen) return;
-
             StaticHelper = helper;
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
@@ -585,76 +583,40 @@ namespace NPCMapLocations
                             if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
                                 offset = 0;
 
-                            if (this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
+                            if (!this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
                             {
-                                npcMarker.LocationName = syncedMarker.Value.LocationName;
-                                npcMarker.MapX = syncedMarker.Value.MapX;
-                                npcMarker.MapY = syncedMarker.Value.MapY;
-                                npcMarker.DisplayName = syncedMarker.Value.DisplayName;
-                                npcMarker.CropOffset = offset;
-                                npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
-                                npcMarker.Type = syncedMarker.Value.Type;
-
-                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
-                                    name = syncedMarker.Key;
-
-                                try
-                                {
-                                    if (syncedMarker.Value.Type == CharacterType.Villager)
-                                    {
-                                        npcMarker.Sprite = name == "Leo"
-                                            ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
-                                            : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
-                                    }
-                                    else
-                                    {
-                                        var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
-                                        npcMarker.Sprite = sprite;
-                                    }
-                                }
-                                catch
-                                {
-                                    npcMarker.Sprite = null;
-                                }
-
+                                npcMarker = new NpcMarker();
+                                this.NpcMarkers.Value.Add(syncedMarker.Key, npcMarker);
                             }
-                            else
+
+                            npcMarker.LocationName = syncedMarker.Value.LocationName;
+                            npcMarker.MapX = syncedMarker.Value.MapX;
+                            npcMarker.MapY = syncedMarker.Value.MapY;
+                            npcMarker.DisplayName = syncedMarker.Value.DisplayName;
+                            npcMarker.CropOffset = offset;
+                            npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
+                            npcMarker.Type = syncedMarker.Value.Type;
+
+                            if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
+                                name = syncedMarker.Key;
+
+                            try
                             {
-                                var newMarker = new NpcMarker
+                                if (syncedMarker.Value.Type == CharacterType.Villager)
                                 {
-                                    LocationName = syncedMarker.Value.LocationName,
-                                    MapX = syncedMarker.Value.MapX,
-                                    MapY = syncedMarker.Value.MapY,
-                                    DisplayName = syncedMarker.Value.DisplayName,
-                                    IsBirthday = syncedMarker.Value.IsBirthday,
-                                    Type = syncedMarker.Value.Type
-                                };
-
-                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
-                                {
-                                    name = syncedMarker.Key;
+                                    npcMarker.Sprite = name == "Leo"
+                                        ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
+                                        : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
                                 }
-
-                                try
+                                else
                                 {
-                                    if (syncedMarker.Value.Type == CharacterType.Villager)
-                                    {
-                                        newMarker.Sprite = name == "Leo"
-                                            ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
-                                            : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
-                                    }
-                                    else
-                                    {
-                                        var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
-                                        newMarker.Sprite = sprite;
-                                    }
+                                    var sprite = Game1.getCharacterFromName(syncedMarker.Key, false)?.Sprite.Texture;
+                                    npcMarker.Sprite = sprite;
                                 }
-                                catch
-                                {
-                                    newMarker.Sprite = null;
-                                }
-
-                                this.NpcMarkers.Value.Add(syncedMarker.Key, newMarker);
+                            }
+                            catch
+                            {
+                                npcMarker.Sprite = null;
                             }
                         }
                         break;
@@ -664,7 +626,8 @@ namespace NPCMapLocations
 
         private void OpenModMap()
         {
-            if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
+            if (Game1.activeClickableMenu is not GameMenu gameMenu)
+                return;
 
             this.IsModMapOpen.Value = true;
 
