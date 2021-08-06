@@ -231,13 +231,12 @@ namespace NPCMapLocations
                 {
                     bool shouldTrack =
                         npc != null
-                        && !Globals.NpcExclusions.Contains(npc.Name)
-                        && !ModConstants.ExcludedNpcs.Contains(npc.Name)
+                        && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
                         && (
                             npc.isVillager()
-                            | npc.isMarried()
-                            | (Globals.ShowHorse && npc is Horse)
-                            | (Globals.ShowChildren && npc is Child)
+                            || npc.isMarried()
+                            || (Globals.ShowHorse && npc is Horse)
+                            || (Globals.ShowChildren && npc is Child)
                         );
 
                     if (shouldTrack && !villagers.Contains(npc))
