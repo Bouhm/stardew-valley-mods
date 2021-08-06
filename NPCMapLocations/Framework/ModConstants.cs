@@ -6,17 +6,23 @@ using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework
 {
-    /*
-    Static class that stores constants for map mod.
-    Do NOT modify anything here other than MapVectors
-    */
+    /// <summary>The constant values used by the mod.</summary>
     public static class ModConstants
     {
-        // The page index of mapTab
+        /// <summary>The network message IDs used by the mod.</summary>
+        public static class MessageIds
+        {
+            /// <summary>A message from the host containing NPC internal => display names.</summary>
+            public const string SyncedNames = "SyncedNames";
+
+            /// <summary>A message from the host containing NPC marker positions to show on the map.</summary>
+            public const string SyncedNpcMarkers = "SyncedNpcMarkers";
+        }
+
+        /// <summary>The page index of the map tab in the <see cref="GameMenu"/>.</summary>
         public static int MapTabIndex => Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
 
-        // Cropping heads for NPC markers
-        // Values shift the head up (negative) or down (positive)
+        /// <summary>The offset to apply when cropping NPC heads for markers. These shift the head up (negative) or down (positive).</summary>
         public static Dictionary<string, int> NpcMarkerOffsets => new()
         {
             ["Abigail"] = 3,
@@ -58,7 +64,7 @@ namespace NPCMapLocations.Framework
             ["Wizard"] = 0
         };
 
-        // NPCs with no schedules 
+        /// <summary>NPCs with no schedules.</summary>
         public static List<string> ExcludedNpcs => new()
         {
             // "Dwarf",
@@ -71,7 +77,7 @@ namespace NPCMapLocations.Framework
             // "Dusty"
         };
 
-        // Spoiler characters that are unlocked later in the game
+        /// <summary>Spoiler characters that are unlocked later in the game.</summary>
         public static List<string> ConditionalNpcs => new()
         {
             "Dwarf",
@@ -84,9 +90,7 @@ namespace NPCMapLocations.Framework
             "Leo"
         };
 
-        // tileX and TileY (the first two values) are tile positions in the game for that location
-        // X and Y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location
-        // MapModMain handles all the calculations to make sure the positions are center-based.
+        /// <summary>tileX and TileY (the first two values) are tile positions in the game for that location.  X and Y (the latter values) are CENTERED pixel positions in the map sprite that correspond to the game location. The mod handles all the calculations to make sure the positions are center-based.</summary>
         public static Dictionary<string, MapVector[]> MapVectors => new()
         {
             // Outdoor
@@ -250,8 +254,7 @@ namespace NPCMapLocations.Framework
             }
         };
 
-        // Custom farm markers
-        // Also used to do a quick check for currentLocation is farm building
+        /// <summary>Custom farm markers. Also used to do a quick check for currentLocation is farm building.</summary>
         public static Dictionary<string, Rectangle> FarmBuildingRects => new()
         {
             ["Shed"] = new Rectangle(0, 0, 5, 7),

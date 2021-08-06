@@ -164,13 +164,9 @@ namespace NPCMapLocations.Framework.Menus
                         if (!npcMarker.Value.IsHidden) //&& !(npcMarker.Value.Type == Character.Horse))
                         {
                             if (this.Customizations.Names.TryGetValue(npcMarker.Key, out string name))
-                            {
                                 hoveredList.Add(name);
-                            }
                             else if (npcMarker.Value.Type == CharacterType.Horse)
-                            {
                                 hoveredList.Add(npcMarker.Key);
-                            }
                         }
 
                         if (!LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.HasIndoorCharacter)
@@ -435,7 +431,7 @@ namespace NPCMapLocations.Framework.Menus
                 foreach (var npcMarker in sortedMarkers)
                 {
                     string name = npcMarker.Key;
-                    var marker = npcMarker.Value;
+                    NpcMarker marker = npcMarker.Value;
 
                     // Skip if no specified location or should be hidden
                     if (marker.Sprite == null

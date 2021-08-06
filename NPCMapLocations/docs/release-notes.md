@@ -1,8 +1,18 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 2.6.4
+Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+
+* Fixed crash when scanning locations in some cases.
+* Fixed NPC markers not working when the multiplayer host is non-English.
+* Fixed NPC marker offsets in `config/global.json` always overwritten by default values for vanilla NPCs.
+* Fixed error when a mod overrides the vectors for a known location via `Mods/Bouhm.NPCMapLocations/Locations`.
+* Fixed NPCs hidden in the map options no longer unhideable after starting a new day.
+* Updated translations. Thanks to martin66789 (added Hungarian)!
+
 ## 2.6.3
-Released 17 July 2021 for SMAPI 3.11.0+. Updated by Pathoschild.
+Released 17 July 2021 for SMAPI 3.11.0. Updated by Pathoschild.
 
 * Fixed crash when a location has circular warps in some cases.
 * Fixed error when a location has invalid warp targets.

@@ -44,8 +44,6 @@ namespace NPCMapLocations
 
         // Multiplayer
         private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new();
-        private long HostId;
-        private List<long> PlayerIds;
 
         // Customizations/Custom mods
         private string MapSeason;
@@ -105,8 +103,6 @@ namespace NPCMapLocations
 
         public override void Entry(IModHelper helper)
         {
-            if (!Context.IsMainPlayer && Context.IsSplitScreen) return;
-
             StaticHelper = helper;
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
@@ -123,6 +119,7 @@ namespace NPCMapLocations
             helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
             helper.Events.Display.Rendered += this.Display_Rendered;
             helper.Events.Display.WindowResized += this.Display_WindowResized;
+            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
         }
 
@@ -131,28 +128,9 @@ namespace NPCMapLocations
         {
             Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
-            if (!Context.IsMainPlayer)
-            {
-                // Determine host ID
-                foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
-                {
-                    if (peer.IsHost)
-                    {
-                        this.HostId = peer.PlayerID;
-                        break;
-                    }
-                }
-            }
-
             // Initialize these early for multiplayer sync
             this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
             this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
-
-            // Let host know farmhand is ready to receive updates
-            if (Context.IsMultiplayer && !Context.IsMainPlayer)
-            {
-                this.Helper.Multiplayer.SendMessage(true, "PlayerReady", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { this.HostId });
-            }
 
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
             {
@@ -242,19 +220,6 @@ namespace NPCMapLocations
             }
         }
 
-        private bool ShouldTrackNpc(NPC npc)
-        {
-            return
-              (
-                !Globals.NpcExclusions.Contains(npc.Name) &&
-                !ModConstants.ExcludedNpcs.Contains(npc.Name) &&
-                (npc.isVillager()
-                | npc.isMarried()
-                | (Globals.ShowHorse && npc is Horse)
-                | (Globals.ShowChildren && npc is Child))
-              );
-        }
-
         // Get only relevant villagers for map
         private List<NPC> GetVillagers()
         {
@@ -264,14 +229,18 @@ namespace NPCMapLocations
             {
                 foreach (var npc in location.characters)
                 {
-                    if (npc == null) continue;
-                    if (
-                      !villagers.Contains(npc)
-                      && this.ShouldTrackNpc(npc)
-                    )
-                    {
+                    bool shouldTrack =
+                        npc != null
+                        && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
+                        && (
+                            npc.isVillager()
+                            || npc.isMarried()
+                            || (Globals.ShowHorse && npc is Horse)
+                            || (Globals.ShowChildren && npc is Child)
+                        );
+
+                    if (shouldTrack && !villagers.Contains(npc))
                         villagers.Add(npc);
-                    }
                 }
             }
 
@@ -338,7 +307,8 @@ namespace NPCMapLocations
         // Handle opening mod menu and changing tooltip options
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             // Minimap dragging
             if (Globals.ShowMinimap && this.Minimap.Value != null)
@@ -386,7 +356,9 @@ namespace NPCMapLocations
         // Handle keyboard/controller inputs
         private void HandleInput(GameMenu menu, SButton input)
         {
-            if (menu.currentTab != ModConstants.MapTabIndex) return;
+            if (menu.currentTab != ModConstants.MapTabIndex)
+                return;
+
             if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
                 Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
 
@@ -445,7 +417,7 @@ namespace NPCMapLocations
             this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
             this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
 
-            if (!Context.IsMultiplayer || Context.IsMainPlayer)
+            if (Context.IsMainPlayer)
             {
                 foreach (var npc in this.GetVillagers())
                 {
@@ -493,7 +465,8 @@ namespace NPCMapLocations
         // To initialize ModMap quicker for smoother rendering when opening map
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             // Half-second tick
             if (e.IsMultipleOf(30))
@@ -508,13 +481,13 @@ namespace NPCMapLocations
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
                 // Sync multiplayer data
-                if (Context.IsMainPlayer && Context.IsMultiplayer && this.PlayerIds != null)
+                if (Context.IsMainPlayer && Context.IsMultiplayer)
                 {
                     var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
 
                     foreach (var npcMarker in this.NpcMarkers.Value)
                     {
-                        syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker()
+                        syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker
                         {
                             DisplayName = npcMarker.Value.DisplayName,
                             LocationName = npcMarker.Value.LocationName,
@@ -525,7 +498,7 @@ namespace NPCMapLocations
                         });
                     }
 
-                    this.Helper.Multiplayer.SendMessage(syncedMarkers, "SyncedNpcMarkers", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: this.PlayerIds.ToArray());
+                    this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
                 }
             }
 
@@ -578,132 +551,64 @@ namespace NPCMapLocations
                 this.OpenModMap();
         }
 
-        private void Multiplayer_PeerDisconnected(object sender, PeerDisconnectedEventArgs e)
+        private void Multiplayer_PeerConnected(object sender, PeerConnectedEventArgs e)
         {
-            // Remove disconnected peer's ID from list if exists
-            if (Context.IsMainPlayer && Context.IsMultiplayer)
-            {
-                this.PlayerIds.Remove(e.Peer.PlayerID);
-
-                if (this.PlayerIds.Count == 0)
-                {
-                    // Set list to null and stop listening to disconnections
-                    this.PlayerIds = null;
-                    this.Helper.Events.Multiplayer.PeerDisconnected -= this.Multiplayer_PeerDisconnected;
-                }
-            }
+            if (Context.IsMainPlayer)
+                this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { e.Peer.PlayerID });
         }
 
         private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
-            if (e.FromModID == this.ModManifest.UniqueID)
+            if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
             {
                 switch (e.Type)
                 {
-                    case "PlayerReady":
-                        if (Context.IsMainPlayer)
-                        {
-                            if (this.PlayerIds == null)
-                            {
-                                // Instantiate list and listen to player disconnects
-                                this.PlayerIds = new List<long>(3);
-                                this.Helper.Events.Multiplayer.PeerDisconnected += this.Multiplayer_PeerDisconnected;
-                            }
-                            this.PlayerIds.Add(e.FromPlayerID);
+                    case ModConstants.MessageIds.SyncedNames:
+                        this.Customizations.Names = e.ReadAs<Dictionary<string, string>>();
+                        break;
 
-                            this.Helper.Multiplayer.SendMessage(this.Customizations.Names, "SyncedNames", modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: this.PlayerIds.ToArray());
-                        }
-                        break;
-                    case "SyncedNames":
-                        if (this.Customizations != null)
-                        {
-                            var syncedNames = e.ReadAs<Dictionary<string, string>>();
-                            this.Customizations.Names = syncedNames;
-                        }
-                        break;
-                    case "SyncedNpcMarkers":
-                        if (this.NpcMarkers.Value == null) return;
+                    case ModConstants.MessageIds.SyncedNpcMarkers:
+                        if (this.NpcMarkers.Value == null)
+                            return;
 
                         var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                         foreach (var syncedMarker in syncedNpcMarkers)
                         {
-                            if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(syncedMarker.Key, out int offset))
-                            {
+                            string internalName = syncedMarker.Key;
+                            if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
                                 offset = 0;
+
+                            if (!this.NpcMarkers.Value.TryGetValue(internalName, out var npcMarker))
+                            {
+                                npcMarker = new NpcMarker();
+                                this.NpcMarkers.Value.Add(internalName, npcMarker);
                             }
 
-                            if (this.NpcMarkers.Value.TryGetValue(syncedMarker.Key, out var npcMarker))
+                            npcMarker.LocationName = syncedMarker.Value.LocationName;
+                            npcMarker.MapX = syncedMarker.Value.MapX;
+                            npcMarker.MapY = syncedMarker.Value.MapY;
+                            npcMarker.DisplayName = syncedMarker.Value.DisplayName;
+                            npcMarker.CropOffset = offset;
+                            npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
+                            npcMarker.Type = syncedMarker.Value.Type;
+
+                            try
                             {
-                                npcMarker.LocationName = syncedMarker.Value.LocationName;
-                                npcMarker.MapX = syncedMarker.Value.MapX;
-                                npcMarker.MapY = syncedMarker.Value.MapY;
-                                npcMarker.DisplayName = syncedMarker.Value.DisplayName;
-                                npcMarker.CropOffset = offset;
-                                npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
-                                npcMarker.Type = syncedMarker.Value.Type;
-
-                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
+                                if (syncedMarker.Value.Type == CharacterType.Villager)
                                 {
-                                    name = syncedMarker.Key;
+                                    npcMarker.Sprite = internalName == "Leo"
+                                        ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
+                                        : new AnimatedSprite($"Characters\\{internalName}", 0, 16, 32).Texture;
                                 }
-
-                                try
+                                else
                                 {
-                                    if (syncedMarker.Value.Type == CharacterType.Villager)
-                                    {
-                                        npcMarker.Sprite = name == "Leo"
-                                            ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
-                                            : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
-                                    }
-                                    else
-                                    {
-                                        var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
-                                        npcMarker.Sprite = sprite;
-                                    }
+                                    var sprite = Game1.getCharacterFromName(internalName, false)?.Sprite.Texture;
+                                    npcMarker.Sprite = sprite;
                                 }
-                                catch
-                                {
-                                    npcMarker.Sprite = null;
-                                }
-
                             }
-                            else
+                            catch
                             {
-                                var newMarker = new NpcMarker
-                                {
-                                    LocationName = syncedMarker.Value.LocationName,
-                                    MapX = syncedMarker.Value.MapX,
-                                    MapY = syncedMarker.Value.MapY,
-                                    DisplayName = syncedMarker.Value.DisplayName,
-                                    IsBirthday = syncedMarker.Value.IsBirthday,
-                                    Type = syncedMarker.Value.Type
-                                };
-
-                                if (!this.Customizations.Names.TryGetValue(syncedMarker.Key, out string name))
-                                {
-                                    name = syncedMarker.Key;
-                                }
-
-                                try
-                                {
-                                    if (syncedMarker.Value.Type == CharacterType.Villager)
-                                    {
-                                        newMarker.Sprite = name == "Leo"
-                                            ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
-                                            : new AnimatedSprite($"Characters\\{name}", 0, 16, 32).Texture;
-                                    }
-                                    else
-                                    {
-                                        var sprite = Game1.getCharacterFromName(syncedMarker.Key, false) != null ? Game1.getCharacterFromName(syncedMarker.Key, false).Sprite.Texture : null;
-                                        newMarker.Sprite = sprite;
-                                    }
-                                }
-                                catch
-                                {
-                                    newMarker.Sprite = null;
-                                }
-
-                                this.NpcMarkers.Value.Add(syncedMarker.Key, newMarker);
+                                npcMarker.Sprite = null;
                             }
                         }
                         break;
@@ -713,7 +618,8 @@ namespace NPCMapLocations
 
         private void OpenModMap()
         {
-            if (!(Game1.activeClickableMenu is GameMenu gameMenu)) return;
+            if (Game1.activeClickableMenu is not GameMenu gameMenu)
+                return;
 
             this.IsModMapOpen.Value = true;
 
@@ -984,8 +890,7 @@ namespace NPCMapLocations
         // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
         // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
         // Requires MapModConstants and modified map page in /maps
-        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-          Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
+        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
         {
             if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom")) return Unknown;
 
@@ -1052,7 +957,8 @@ namespace NPCMapLocations
                 locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
             }
 
-            if (locVectors == null || locationNotFound) return Unknown;
+            if (locVectors == null || locationNotFound)
+                return Unknown;
 
             int x;
             int y;
