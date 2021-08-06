@@ -51,9 +51,9 @@ namespace Bouhm.Shared.Locations
         }
 
         // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-        // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations 
+        // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations
         // Which means there will be some rooms left out unless all the locations are iterated
-        public static string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
+        private static void MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
         {
             static string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
             {
@@ -61,28 +61,28 @@ namespace Bouhm.Shared.Locations
                 if (location == prevLocation)
                     return root;
 
-                string curLocationName = location.uniqueName.Value ?? location.Name;
-                string prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
+                // get location info
+                string curLocationName = location.NameOrUniqueName;
+                string prevLocationName = prevLocation?.NameOrUniqueName;
 
+                // track contexts
                 if (!LocationContexts.ContainsKey(curLocationName))
                     LocationContexts.Add(curLocationName, new LocationContext());
-
                 if (prevLocation != null && !warpPosition.Equals(Vector2.Zero))
                 {
                     LocationContexts[prevLocationName].Warp = warpPosition;
-
                     if (root != curLocationName)
                         LocationContexts[prevLocationName].Parent = curLocationName;
                 }
 
-                // Pass root location back recursively
+                // pass root location back recursively
                 if (root != null)
                 {
                     LocationContexts[curLocationName].Root = root;
                     return root;
                 }
 
-                // Root location found, set as root and return
+                // root location found, set as root and return
                 if (location.IsOutdoors)
                 {
                     LocationContexts[curLocationName].Type = LocationType.Outdoors;
@@ -99,24 +99,26 @@ namespace Bouhm.Shared.Locations
                     return curLocationName;
                 }
 
-                // Iterate warps of current location and traverse recursively
+                // recursively traverse warps from current location
                 foreach (var warp in location.warps)
                 {
-                    // Avoid circular loop
+                    // avoid circular loop
                     if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName)
                         continue;
 
+                    // get target location
                     var warpLocation = Game1.getLocationFromName(warp.TargetName);
                     if (warpLocation == null)
                         continue;
 
-                    // If one of the warps is a root location, current location is an indoor building 
+                    // if one of the warps is a root location, current location is an indoor building
                     if (warpLocation.IsOutdoors)
                         hasOutdoorWarp = true;
 
-                    // If all warps are indoors, then the current location is a room
+                    // if all warps are indoors, then the current location is a room
                     LocationContexts[curLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
 
+                    // update contexts
                     if (prevLocation != null)
                     {
                         LocationContexts[prevLocationName].Parent = curLocationName;
@@ -136,28 +138,33 @@ namespace Bouhm.Shared.Locations
                 return root;
             }
 
-            return ScanRecursively(location, prevLocation, root, hasOutdoorWarp, warpPosition);
+            ScanRecursively(location, prevLocation, root, hasOutdoorWarp, warpPosition);
         }
 
-        // Finds the upper-most indoor location (building)
+        /// <summary>Find the uppermost indoor location for a building.</summary>
+        /// <param name="loc">The location to scan.</param>
         public static string GetBuilding(string loc)
         {
             static string GetRecursively(string loc, ISet<string> seen)
             {
+                // break infinite loops
                 if (!seen.Add(loc))
-                    return loc; // break infinite loop
-
-                if (loc.Contains("UndergroundMine"))
-                    return GetMinesLocationName(loc);
-                if (LocationContexts[loc].Type == LocationType.Building)
                     return loc;
 
+                // handle mines
+                if (loc.Contains("UndergroundMine"))
+                    return GetMinesLocationName(loc);
+
+                // found root building
+                if (LocationContexts[loc].Type == LocationType.Building)
+                    return loc;
                 string building = LocationContexts[loc].Parent;
                 if (building == null)
                     return null;
                 if (building == LocationContexts[loc].Root)
                     return loc;
 
+                // scan recursively
                 return GetRecursively(building, seen);
             }
 

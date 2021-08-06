@@ -896,8 +896,7 @@ namespace NPCMapLocations
         // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
         // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
         // Requires MapModConstants and modified map page in /maps
-        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1,
-          Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
+        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
         {
             if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom")) return Unknown;
 
