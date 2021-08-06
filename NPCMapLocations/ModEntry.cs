@@ -220,19 +220,6 @@ namespace NPCMapLocations
             }
         }
 
-        private bool ShouldTrackNpc(NPC npc)
-        {
-            return
-              (
-                !Globals.NpcExclusions.Contains(npc.Name) &&
-                !ModConstants.ExcludedNpcs.Contains(npc.Name) &&
-                (npc.isVillager()
-                | npc.isMarried()
-                | (Globals.ShowHorse && npc is Horse)
-                | (Globals.ShowChildren && npc is Child))
-              );
-        }
-
         // Get only relevant villagers for map
         private List<NPC> GetVillagers()
         {
@@ -242,14 +229,19 @@ namespace NPCMapLocations
             {
                 foreach (var npc in location.characters)
                 {
-                    if (npc == null) continue;
-                    if (
-                      !villagers.Contains(npc)
-                      && this.ShouldTrackNpc(npc)
-                    )
-                    {
+                    bool shouldTrack =
+                        npc != null
+                        && !Globals.NpcExclusions.Contains(npc.Name)
+                        && !ModConstants.ExcludedNpcs.Contains(npc.Name)
+                        && (
+                            npc.isVillager()
+                            | npc.isMarried()
+                            | (Globals.ShowHorse && npc is Horse)
+                            | (Globals.ShowChildren && npc is Child)
+                        );
+
+                    if (shouldTrack && !villagers.Contains(npc))
                         villagers.Add(npc);
-                    }
                 }
             }
 
@@ -316,7 +308,8 @@ namespace NPCMapLocations
         // Handle opening mod menu and changing tooltip options
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             // Minimap dragging
             if (Globals.ShowMinimap && this.Minimap.Value != null)
@@ -364,7 +357,9 @@ namespace NPCMapLocations
         // Handle keyboard/controller inputs
         private void HandleInput(GameMenu menu, SButton input)
         {
-            if (menu.currentTab != ModConstants.MapTabIndex) return;
+            if (menu.currentTab != ModConstants.MapTabIndex)
+                return;
+
             if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
                 Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
 
