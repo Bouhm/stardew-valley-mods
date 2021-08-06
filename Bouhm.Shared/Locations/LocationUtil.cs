@@ -55,83 +55,88 @@ namespace Bouhm.Shared.Locations
         // Which means there will be some rooms left out unless all the locations are iterated
         public static string MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
         {
-            // There can be multiple warps to the same location
-            if (location == prevLocation)
-                return root;
-
-            string curLocationName = location.uniqueName.Value ?? location.Name;
-            string prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
-
-            if (!LocationContexts.ContainsKey(curLocationName))
-                LocationContexts.Add(curLocationName, new LocationContext());
-
-            if (prevLocation != null && !warpPosition.Equals(Vector2.Zero))
+            static string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
             {
-                LocationContexts[prevLocationName].Warp = warpPosition;
+                // There can be multiple warps to the same location
+                if (location == prevLocation)
+                    return root;
 
-                if (root != curLocationName)
-                    LocationContexts[prevLocationName].Parent = curLocationName;
-            }
+                string curLocationName = location.uniqueName.Value ?? location.Name;
+                string prevLocationName = prevLocation?.uniqueName.Value ?? prevLocation?.Name;
 
-            // Pass root location back recursively
-            if (root != null)
-            {
-                LocationContexts[curLocationName].Root = root;
-                return root;
-            }
+                if (!LocationContexts.ContainsKey(curLocationName))
+                    LocationContexts.Add(curLocationName, new LocationContext());
 
-            // Root location found, set as root and return
-            if (location.IsOutdoors)
-            {
-                LocationContexts[curLocationName].Type = LocationType.Outdoors;
-                LocationContexts[curLocationName].Root = curLocationName;
-
-                if (prevLocation != null)
+                if (prevLocation != null && !warpPosition.Equals(Vector2.Zero))
                 {
-                    if (LocationContexts[curLocationName].Children == null)
-                        LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
-                    else if (!LocationContexts[curLocationName].Children.Contains(prevLocationName))
-                        LocationContexts[curLocationName].Children.Add(prevLocationName);
+                    LocationContexts[prevLocationName].Warp = warpPosition;
+
+                    if (root != curLocationName)
+                        LocationContexts[prevLocationName].Parent = curLocationName;
                 }
 
-                return curLocationName;
-            }
-
-            // Iterate warps of current location and traverse recursively
-            foreach (var warp in location.warps)
-            {
-                // Avoid circular loop
-                if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName) continue;
-
-                var warpLocation = Game1.getLocationFromName(warp.TargetName);
-                if (warpLocation == null)
-                    continue;
-
-                // If one of the warps is a root location, current location is an indoor building 
-                if (warpLocation.IsOutdoors)
-                    hasOutdoorWarp = true;
-
-                // If all warps are indoors, then the current location is a room
-                LocationContexts[curLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
-
-                if (prevLocation != null)
+                // Pass root location back recursively
+                if (root != null)
                 {
-                    LocationContexts[prevLocationName].Parent = curLocationName;
-
-                    if (LocationContexts[curLocationName].Children == null)
-                        LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
-                    else if (!LocationContexts[curLocationName].Children.Contains(prevLocationName))
-                        LocationContexts[curLocationName].Children.Add(prevLocationName);
+                    LocationContexts[curLocationName].Root = root;
+                    return root;
                 }
 
-                root = MapRootLocations(warpLocation, location, root, hasOutdoorWarp,
-                  new Vector2(warp.TargetX, warp.TargetY));
-                LocationContexts[curLocationName].Root = root;
+                // Root location found, set as root and return
+                if (location.IsOutdoors)
+                {
+                    LocationContexts[curLocationName].Type = LocationType.Outdoors;
+                    LocationContexts[curLocationName].Root = curLocationName;
+
+                    if (prevLocation != null)
+                    {
+                        if (LocationContexts[curLocationName].Children == null)
+                            LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
+                        else if (!LocationContexts[curLocationName].Children.Contains(prevLocationName))
+                            LocationContexts[curLocationName].Children.Add(prevLocationName);
+                    }
+
+                    return curLocationName;
+                }
+
+                // Iterate warps of current location and traverse recursively
+                foreach (var warp in location.warps)
+                {
+                    // Avoid circular loop
+                    if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName)
+                        continue;
+
+                    var warpLocation = Game1.getLocationFromName(warp.TargetName);
+                    if (warpLocation == null)
+                        continue;
+
+                    // If one of the warps is a root location, current location is an indoor building 
+                    if (warpLocation.IsOutdoors)
+                        hasOutdoorWarp = true;
+
+                    // If all warps are indoors, then the current location is a room
+                    LocationContexts[curLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
+
+                    if (prevLocation != null)
+                    {
+                        LocationContexts[prevLocationName].Parent = curLocationName;
+
+                        if (LocationContexts[curLocationName].Children == null)
+                            LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
+                        else if (!LocationContexts[curLocationName].Children.Contains(prevLocationName))
+                            LocationContexts[curLocationName].Children.Add(prevLocationName);
+                    }
+
+                    root = ScanRecursively(warpLocation, location, root, hasOutdoorWarp, new Vector2(warp.TargetX, warp.TargetY));
+                    LocationContexts[curLocationName].Root = root;
+
+                    return root;
+                }
 
                 return root;
             }
 
-            return root;
+            return ScanRecursively(location, prevLocation, root, hasOutdoorWarp, warpPosition);
         }
 
         // Finds the upper-most indoor location (building)
