@@ -11,7 +11,7 @@ namespace Bouhm.Shared.Locations
     {
         /// <summary>The maximum method call depth when recursively scanning locations.</summary>
         /// <remarks>This is a last resort to prevent stack overflows. Normally the mod should prevent infinite recursion automatically by tracking locations it already visited.</remarks>
-        private const int MaxRecursionDepth = 500;
+        public const int MaxRecursionDepth = 500;
 
         public static Dictionary<string, LocationContext> LocationContexts { get; set; }
 
@@ -42,19 +42,20 @@ namespace Bouhm.Shared.Locations
                 }
                 // Get root locations from indoor locations
                 else
-                    MapRootLocations(location);
+                    MapRootLocations(location, curRecursionDepth: 1);
             }
 
             foreach (var location in Game1.getFarm().buildings)
-                MapRootLocations(location.indoors.Value);
+                MapRootLocations(location.indoors.Value, curRecursionDepth: 1);
 
             return LocationContexts;
         }
 
         /// <summary>Recursively traverse all locations accessible through warps from a given location, and map all locations to the root (outdoor) locations they can be reached from.</summary>
         /// <param name="location">The location to start searching from.</param>
+        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
         /// <remarks>This traverses in indoor-to-outdoor order because warps and doors are not complete subsets of Game1.locations, which means there will be some rooms left out unless all the locations are iterated.</remarks>
-        private static void MapRootLocations(GameLocation location)
+        private static void MapRootLocations(GameLocation location, int curRecursionDepth)
         {
             static string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, ISet<string> seen, int depth)
             {
@@ -140,12 +141,13 @@ namespace Bouhm.Shared.Locations
                 return root;
             }
 
-            ScanRecursively(location, null, null, false, Vector2.Zero, new HashSet<string>(), 1);
+            ScanRecursively(location, null, null, false, Vector2.Zero, new HashSet<string>(), curRecursionDepth);
         }
 
         /// <summary>Find the uppermost indoor location for a building.</summary>
         /// <param name="loc">The location to scan.</param>
-        public static string GetBuilding(string loc)
+        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
+        public static string GetBuilding(string loc, int curRecursionDepth)
         {
             static string GetRecursively(string loc, ISet<string> seen, int depth)
             {
@@ -172,7 +174,7 @@ namespace Bouhm.Shared.Locations
                 return GetRecursively(building, seen, depth + 1);
             }
 
-            return GetRecursively(loc, new HashSet<string>(), 1);
+            return GetRecursively(loc, new HashSet<string>(), curRecursionDepth);
         }
 
         // Get Mines name from floor level

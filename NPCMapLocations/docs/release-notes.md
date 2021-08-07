@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed another possible crash when scanning locations.
+
 ## 2.6.4
 Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
 

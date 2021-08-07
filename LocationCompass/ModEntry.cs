@@ -342,7 +342,7 @@ namespace LocationCompass
 
                     // Finds the upper-most indoor location that the player is in
                     isWarp = true;
-                    string indoor = LocationUtil.GetBuilding(charLocName);
+                    string indoor = LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                     if (this.Config.SameLocationOnly)
                     {
                         if (indoor == null) continue;

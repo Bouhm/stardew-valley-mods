@@ -890,8 +890,14 @@ namespace NPCMapLocations
         // Requires MapModConstants and modified map page in /maps
         public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
         {
-            static Vector2 ScanRecursively(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
+            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, bool isPlayer, ISet<string> seen, int depth)
             {
+                // break infinite loops
+                if (!seen.Add(locationName))
+                    return Unknown;
+                if (depth > LocationUtil.MaxRecursionDepth)
+                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
+
                 if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom"))
                     return Unknown;
 
@@ -912,7 +918,7 @@ namespace NPCMapLocations
                   && locationName != "MovieTheater"         // Weird edge cases where the warps are off
                 )
                 {
-                    string building = LocationUtil.GetBuilding(locationName);
+                    string building = LocationUtil.GetBuilding(locationName, depth + 1);
 
                     if (building != null)
                     {
@@ -920,7 +926,7 @@ namespace NPCMapLocations
                         int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
                         // Slightly adjust warp location to depict being inside the building 
-                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, isPlayer);
+                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, isPlayer, seen, depth + 1);
                         return new Vector2(warpPos.X + 1, warpPos.Y - 8);
                     }
                 }
@@ -1009,7 +1015,7 @@ namespace NPCMapLocations
                 return new Vector2(x, y);
             }
 
-            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, isPlayer);
+            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, isPlayer, new HashSet<string>(), 1);
         }
 
         private void Display_WindowResized(object sender, WindowResizedEventArgs e)
