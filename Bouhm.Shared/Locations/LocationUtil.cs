@@ -42,23 +42,19 @@ namespace Bouhm.Shared.Locations
                 }
                 // Get root locations from indoor locations
                 else
-                {
-                    MapRootLocations(location, null, null, false, Vector2.Zero);
-                }
+                    MapRootLocations(location);
             }
 
             foreach (var location in Game1.getFarm().buildings)
-            {
-                MapRootLocations(location.indoors.Value, null, null, false, Vector2.Zero);
-            }
+                MapRootLocations(location.indoors.Value);
 
             return LocationContexts;
         }
 
-        // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-        // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations
-        // Which means there will be some rooms left out unless all the locations are iterated
-        private static void MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
+        /// <summary>Recursively traverse all locations accessible through warps from a given location, and map all locations to the root (outdoor) locations they can be reached from.</summary>
+        /// <param name="location">The location to start searching from.</param>
+        /// <remarks>This traverses in indoor-to-outdoor order because warps and doors are not complete subsets of Game1.locations, which means there will be some rooms left out unless all the locations are iterated.</remarks>
+        private static void MapRootLocations(GameLocation location)
         {
             static string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, ISet<string> seen, int depth)
             {
@@ -144,7 +140,7 @@ namespace Bouhm.Shared.Locations
                 return root;
             }
 
-            ScanRecursively(location, prevLocation, root, hasOutdoorWarp, warpPosition, new HashSet<string>(), 1);
+            ScanRecursively(location, null, null, false, Vector2.Zero, new HashSet<string>(), 1);
         }
 
         /// <summary>Find the uppermost indoor location for a building.</summary>
