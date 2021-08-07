@@ -255,10 +255,7 @@ namespace NPCMapLocations
 
             foreach (var building in Game1.getFarm().buildings)
             {
-                if (building == null) continue;
-                if (building.nameOfIndoorsWithoutUnique == null
-                    || building.nameOfIndoors == null
-                    || building.nameOfIndoors.Equals("null")) // Some actually have value of "null"
+                if (building?.nameOfIndoorsWithoutUnique is null || building.nameOfIndoors is null or "null") // Some actually have value of "null"
                     continue;
 
                 var locVector = LocationToMap(
@@ -273,7 +270,8 @@ namespace NPCMapLocations
                 // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
                 string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
 
-                if (commonName.Contains("Barn")) locVector.Y += 3;
+                if (commonName.Contains("Barn"))
+                    locVector.Y += 3;
 
                 // Format: { uniqueName: { commonName: positionOnFarm } }
                 // buildingType will match currentLocation.Name for commonName
@@ -284,14 +282,14 @@ namespace NPCMapLocations
             // Greenhouse unlocked after pantry bundles completed
             if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
             {
-                var greenhouseLoc = LocationToMap("Greenhouse", -1, -1, this.Customizations.MapVectors);
+                var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
                 greenhouseLoc.X -= 5 / 2 * 3;
                 greenhouseLoc.Y -= 7 / 2 * 3;
                 FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greenhouseLoc);
             }
 
             // Add FarmHouse
-            var farmhouseLoc = LocationToMap("FarmHouse", -1, -1, this.Customizations.MapVectors);
+            var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
             farmhouseLoc.X -= 6;
             FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
         }
@@ -892,127 +890,126 @@ namespace NPCMapLocations
         // Requires MapModConstants and modified map page in /maps
         public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
         {
-            if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom")) return Unknown;
-
-            if (FarmBuildings.TryGetValue(locationName, out var mapLoc)) return mapLoc.Value;
-
-            if (locationName.StartsWith("UndergroundMine"))
+            static Vector2 ScanRecursively(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
             {
-                string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-                if (int.TryParse(mine, out int mineLevel))
-                    locationName = mineLevel > 120 ? "SkullCave" : "Mine";
-            }
+                if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom"))
+                    return Unknown;
 
-            // Get location of indoor location by its warp position in the outdoor location
-            if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
-              && loc.Type != LocationType.Outdoors
-              && loc.Root != null
-              && locationName != "MovieTheater"         // Weird edge cases where the warps are off
-            )
-            {
-                string building = LocationUtil.GetBuilding(locationName);
+                if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
+                    return mapLoc.Value;
 
-                if (building != null)
+                if (locationName.StartsWith("UndergroundMine"))
                 {
-                    int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
-                    int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
-
-                    // Slightly adjust warp location to depict being inside the building 
-                    var warpPos = LocationToMap(loc.Root, doorX, doorY, customMapVectors, locationExclusions, isPlayer);
-                    return new Vector2(warpPos.X + 1, warpPos.Y - 8);
+                    string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+                    if (int.TryParse(mine, out int mineLevel))
+                        locationName = mineLevel > 120 ? "SkullCave" : "Mine";
                 }
-            }
 
-            // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
-
-            MapVector[] locVectors;
-            bool locationNotFound = false;
-
-            if (locationName == "Farm")
-            {
-                // Handle different farm types for custom vectors
-                string[] farms = { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
-                if (customMapVectors != null && (customMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
+                // Get location of indoor location by its warp position in the outdoor location
+                if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
+                  && loc.Type != LocationType.Outdoors
+                  && loc.Root != null
+                  && locationName != "MovieTheater"         // Weird edge cases where the warps are off
+                )
                 {
-                    if (!customMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
+                    string building = LocationUtil.GetBuilding(locationName);
+
+                    if (building != null)
                     {
-                        locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+                        int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
+                        int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
+
+                        // Slightly adjust warp location to depict being inside the building 
+                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, isPlayer);
+                        return new Vector2(warpPos.X + 1, warpPos.Y - 8);
                     }
                 }
-                else
+
+                // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
+
+                MapVector[] locVectors;
+                bool locationNotFound = false;
+
+                if (locationName == "Farm")
                 {
-                    if (!customMapVectors.TryGetValue("Farm", out locVectors))
+                    // Handle different farm types for custom vectors
+                    string[] farms = { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
+                    if (customMapVectors != null && (customMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
                     {
-                        locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
-                        if (locationNotFound)
-                        {
+                        if (!customMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
                             locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+                    }
+                    else
+                    {
+                        if (!customMapVectors.TryGetValue("Farm", out locVectors))
+                        {
+                            locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
+                            if (locationNotFound)
+                                locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
                         }
                     }
                 }
-            }
-            // If not in custom vectors, use default
-            else if (!(customMapVectors != null && customMapVectors.TryGetValue(locationName, out locVectors)))
-            {
-                locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-            }
+                // If not in custom vectors, use default
+                else if (!(customMapVectors != null && customMapVectors.TryGetValue(locationName, out locVectors)))
+                    locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
 
-            if (locVectors == null || locationNotFound)
-                return Unknown;
+                if (locVectors == null || locationNotFound)
+                    return Unknown;
 
-            int x;
-            int y;
+                int x;
+                int y;
 
-            // Precise (static) regions and indoor locations
-            if (locVectors.Length == 1 || tileX == -1 || tileY == -1)
-            {
-                x = locVectors.FirstOrDefault().MapX;
-                y = locVectors.FirstOrDefault().MapY;
-            }
-            else
-            {
-                // Sort map vectors by distance to point
-                MapVector[] vectors = locVectors
-                    .OrderBy(vector => Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)))
-                    .ToArray();
-
-                MapVector lower = null;
-                MapVector upper = null;
-                bool isSameAxis = false;
-
-                // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
-                foreach (var vector in vectors)
+                // Precise (static) regions and indoor locations
+                if (locVectors.Length == 1 || tileX == -1 || tileY == -1)
                 {
-                    if (lower != null && upper != null)
+                    x = locVectors.FirstOrDefault().MapX;
+                    y = locVectors.FirstOrDefault().MapY;
+                }
+                else
+                {
+                    // Sort map vectors by distance to point
+                    MapVector[] vectors = locVectors
+                        .OrderBy(vector => Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)))
+                        .ToArray();
+
+                    MapVector lower = null;
+                    MapVector upper = null;
+                    bool isSameAxis = false;
+
+                    // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
+                    foreach (var vector in vectors)
                     {
-                        if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
-                            isSameAxis = true;
-                        else
-                            break;
+                        if (lower != null && upper != null)
+                        {
+                            if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
+                                isSameAxis = true;
+                            else
+                                break;
+                        }
+
+                        if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
+                        {
+                            lower = vector;
+                            continue;
+                        }
+
+                        if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
+                            upper = vector;
                     }
 
-                    if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
-                    {
-                        lower = vector;
-                        continue;
-                    }
+                    // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
+                    // Uses fallback strategy - get closest points such that lower != upper
+                    lower ??= upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
+                    upper ??= lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
 
-                    if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
-                    {
-                        upper = vector;
-                    }
+                    x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
+                    y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
                 }
 
-                // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
-                // Uses fallback strategy - get closest points such that lower != upper
-                lower ??= upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-                upper ??= lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-
-                x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
-                y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
+                return new Vector2(x, y);
             }
 
-            return new Vector2(x, y);
+            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, isPlayer);
         }
 
         private void Display_WindowResized(object sender, WindowResizedEventArgs e)
