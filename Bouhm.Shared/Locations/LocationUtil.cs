@@ -24,16 +24,12 @@ namespace Bouhm.Shared.Locations
                 if (location.IsOutdoors)
                 {
                     if (!LocationContexts.ContainsKey(location.Name))
-                    {
-                        LocationContexts.Add(location.Name, new LocationContext() { Root = location.Name, Type = LocationType.Outdoors });
-                    }
+                        LocationContexts.Add(location.Name, new LocationContext { Root = location.Name, Type = LocationType.Outdoors });
 
                     foreach (var warp in location.warps)
                     {
-                        if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
-                        var warpLocation = Game1.getLocationFromName(warp.TargetName);
-
-                        if (warpLocation.IsOutdoors)
+                        GameLocation warpLocation = LocationUtil.GetStaticLocation(warp?.TargetName);
+                        if (warpLocation?.IsOutdoors == true)
                         {
                             if (!LocationContexts[location.Name].Neighbors.ContainsKey(warp.TargetName))
                                 LocationContexts[location.Name].Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
@@ -111,7 +107,7 @@ namespace Bouhm.Shared.Locations
                         continue;
 
                     // get target location
-                    var warpLocation = Game1.getLocationFromName(warp.TargetName);
+                    var warpLocation = LocationUtil.GetStaticLocation(warp.TargetName);
                     if (warpLocation == null)
                         continue;
 
@@ -183,11 +179,9 @@ namespace Bouhm.Shared.Locations
             string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
             if (int.TryParse(mine, out int mineLevel))
             {
-                // Skull cave
-                if (mineLevel > 120)
-                    return "SkullCave";
-                // Mines
-                return "Mine";
+                return mineLevel > 120
+                    ? "SkullCave"
+                    : "Mine";
             }
 
             return null;
@@ -195,14 +189,26 @@ namespace Bouhm.Shared.Locations
 
         public static bool IsOutdoors(string locationName)
         {
-            if (locationName == null) return false;
+            if (locationName == null)
+                return false;
 
             if (LocationContexts.TryGetValue(locationName, out var locCtx))
-            {
                 return locCtx.Type == LocationType.Outdoors;
-            }
 
             return false;
+        }
+
+        /// <summary>Get a location instance from its name if it's not a procedurally generated location.</summary>
+        /// <param name="name">The location name.</param>
+        public static GameLocation GetStaticLocation(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            if (name.StartsWith("UndergroundMine") || (name.StartsWith("VolcanoDungeon") && name != "VolcanoDungeon0"))
+                return null;
+
+            return Game1.getLocationFromName(name);
         }
     }
 }
