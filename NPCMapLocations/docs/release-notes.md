@@ -3,7 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed possible errors when scanning locations.
-* Improved translations. Thanks to Evelyon (updated Spanish)!
+* Improved translations. Thanks to Aulberon (updated Portuguese) and Evelyon (updated Spanish)!
 
 ## 2.6.4
 Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
