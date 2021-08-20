@@ -11,7 +11,7 @@ namespace Bouhm.Shared.Locations
     {
         /// <summary>The maximum method call depth when recursively scanning locations.</summary>
         /// <remarks>This is a last resort to prevent stack overflows. Normally the mod should prevent infinite recursion automatically by tracking locations it already visited.</remarks>
-        private const int MaxRecursionDepth = 500;
+        public const int MaxRecursionDepth = 500;
 
         public static Dictionary<string, LocationContext> LocationContexts { get; set; }
 
@@ -24,16 +24,12 @@ namespace Bouhm.Shared.Locations
                 if (location.IsOutdoors)
                 {
                     if (!LocationContexts.ContainsKey(location.Name))
-                    {
-                        LocationContexts.Add(location.Name, new LocationContext() { Root = location.Name, Type = LocationType.Outdoors });
-                    }
+                        LocationContexts.Add(location.Name, new LocationContext { Root = location.Name, Type = LocationType.Outdoors });
 
                     foreach (var warp in location.warps)
                     {
-                        if (warp == null || Game1.getLocationFromName(warp.TargetName) == null) continue;
-                        var warpLocation = Game1.getLocationFromName(warp.TargetName);
-
-                        if (warpLocation.IsOutdoors)
+                        GameLocation warpLocation = LocationUtil.GetStaticLocation(warp?.TargetName);
+                        if (warpLocation?.IsOutdoors == true)
                         {
                             if (!LocationContexts[location.Name].Neighbors.ContainsKey(warp.TargetName))
                                 LocationContexts[location.Name].Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
@@ -42,23 +38,20 @@ namespace Bouhm.Shared.Locations
                 }
                 // Get root locations from indoor locations
                 else
-                {
-                    MapRootLocations(location, null, null, false, Vector2.Zero);
-                }
+                    MapRootLocations(location, curRecursionDepth: 1);
             }
 
             foreach (var location in Game1.getFarm().buildings)
-            {
-                MapRootLocations(location.indoors.Value, null, null, false, Vector2.Zero);
-            }
+                MapRootLocations(location.indoors.Value, curRecursionDepth: 1);
 
             return LocationContexts;
         }
 
-        // Recursively traverse warps of locations and map locations to root locations (outdoor locations)
-        // Traverse in reverse (indoor to outdoor) because warps and doors are not complete subsets of Game1.locations
-        // Which means there will be some rooms left out unless all the locations are iterated
-        private static void MapRootLocations(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition)
+        /// <summary>Recursively traverse all locations accessible through warps from a given location, and map all locations to the root (outdoor) locations they can be reached from.</summary>
+        /// <param name="location">The location to start searching from.</param>
+        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
+        /// <remarks>This traverses in indoor-to-outdoor order because warps and doors are not complete subsets of Game1.locations, which means there will be some rooms left out unless all the locations are iterated.</remarks>
+        private static void MapRootLocations(GameLocation location, int curRecursionDepth)
         {
             static string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, ISet<string> seen, int depth)
             {
@@ -114,7 +107,7 @@ namespace Bouhm.Shared.Locations
                         continue;
 
                     // get target location
-                    var warpLocation = Game1.getLocationFromName(warp.TargetName);
+                    var warpLocation = LocationUtil.GetStaticLocation(warp.TargetName);
                     if (warpLocation == null)
                         continue;
 
@@ -144,12 +137,13 @@ namespace Bouhm.Shared.Locations
                 return root;
             }
 
-            ScanRecursively(location, prevLocation, root, hasOutdoorWarp, warpPosition, new HashSet<string>(), 1);
+            ScanRecursively(location, null, null, false, Vector2.Zero, new HashSet<string>(), curRecursionDepth);
         }
 
         /// <summary>Find the uppermost indoor location for a building.</summary>
         /// <param name="loc">The location to scan.</param>
-        public static string GetBuilding(string loc)
+        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
+        public static string GetBuilding(string loc, int curRecursionDepth)
         {
             static string GetRecursively(string loc, ISet<string> seen, int depth)
             {
@@ -176,7 +170,7 @@ namespace Bouhm.Shared.Locations
                 return GetRecursively(building, seen, depth + 1);
             }
 
-            return GetRecursively(loc, new HashSet<string>(), 1);
+            return GetRecursively(loc, new HashSet<string>(), curRecursionDepth);
         }
 
         // Get Mines name from floor level
@@ -185,11 +179,9 @@ namespace Bouhm.Shared.Locations
             string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
             if (int.TryParse(mine, out int mineLevel))
             {
-                // Skull cave
-                if (mineLevel > 120)
-                    return "SkullCave";
-                // Mines
-                return "Mine";
+                return mineLevel > 120
+                    ? "SkullCave"
+                    : "Mine";
             }
 
             return null;
@@ -197,14 +189,26 @@ namespace Bouhm.Shared.Locations
 
         public static bool IsOutdoors(string locationName)
         {
-            if (locationName == null) return false;
+            if (locationName == null)
+                return false;
 
             if (LocationContexts.TryGetValue(locationName, out var locCtx))
-            {
                 return locCtx.Type == LocationType.Outdoors;
-            }
 
             return false;
+        }
+
+        /// <summary>Get a location instance from its name if it's not a procedurally generated location.</summary>
+        /// <param name="name">The location name.</param>
+        public static GameLocation GetStaticLocation(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            if (name.StartsWith("UndergroundMine") || (name.StartsWith("VolcanoDungeon") && name != "VolcanoDungeon0"))
+                return null;
+
+            return Game1.getLocationFromName(name);
         }
     }
 }
