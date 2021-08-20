@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.6.5
+Released 20 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+
 * Fixed possible errors when scanning locations.
 * Improved translations. Thanks to Aulberon (updated Portuguese) and Evelyon (updated Spanish)!
 
