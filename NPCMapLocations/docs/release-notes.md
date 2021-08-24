@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed mod not working correctly if a location couldn't be loaded.
+* Fixed error loading map info for the Volcano Dungeon. That area is now ignored.
 
 ## 2.6.5
 Released 20 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.

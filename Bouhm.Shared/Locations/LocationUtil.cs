@@ -231,7 +231,7 @@ namespace Bouhm.Shared.Locations
                 if (string.IsNullOrWhiteSpace(name))
                     return null;
 
-                if (name.StartsWith("UndergroundMine") || (name.StartsWith("VolcanoDungeon") && name != "VolcanoDungeon0"))
+                if (name.StartsWith("UndergroundMine") || name.StartsWith("VolcanoDungeon"))
                     return null;
 
                 return Game1.getLocationFromName(name);
