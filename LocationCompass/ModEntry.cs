@@ -28,11 +28,15 @@ namespace LocationCompass
         private ModConfig Config;
         private bool ShowLocators;
 
+        /// <summary>Scans and maps locations in the game world.</summary>
+        private LocationUtil LocationUtil;
+
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
             this.Pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
+            this.LocationUtil = new(this.Monitor);
 
             helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
             helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
@@ -104,14 +108,14 @@ namespace LocationCompass
 
         private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
         {
-            LocationUtil.GetLocationContexts();
+            this.LocationUtil.GetLocationContexts();
         }
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
             this.SyncedLocationData = new SyncedNpcLocationData();
-            LocationUtil.GetLocationContexts();
+            this.LocationUtil.GetLocationContexts();
 
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
@@ -288,13 +292,13 @@ namespace LocationCompass
                 if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
                 {
                     // Leave mine levels distinguished in name if player inside mine
-                    LocationUtil.LocationContexts.TryGetValue(this.GetMineName(playerLocName), out playerLocCtx);
-                    LocationUtil.LocationContexts.TryGetValue(this.GetMineName(charLocName), out characterLocCtx);
+                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(playerLocName), out playerLocCtx);
+                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(charLocName), out characterLocCtx);
                 }
                 else
                 {
-                    if (!LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
-                    if (!LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+                    if (!this.LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
+                    if (!this.LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
                 }
 
                 if (this.Config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
@@ -342,7 +346,7 @@ namespace LocationCompass
 
                     // Finds the upper-most indoor location that the player is in
                     isWarp = true;
-                    string indoor = LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
+                    string indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                     if (this.Config.SameLocationOnly)
                     {
                         if (indoor == null) continue;
@@ -368,8 +372,8 @@ namespace LocationCompass
                         else
                         {
                             characterPos = new Vector2(
-                              LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                             );
                         }
                     }
@@ -380,8 +384,8 @@ namespace LocationCompass
                             // Point locators to the neighboring outdoor warps and
                             // doors of buildings including nested rooms
                             characterPos = new Vector2(
-                              LocationUtil.LocationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              LocationUtil.LocationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                              this.LocationUtil.LocationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                              this.LocationUtil.LocationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                             );
                         }
                         else if (!this.Config.SameLocationOnly)

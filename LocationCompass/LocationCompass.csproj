@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>1.3.5</Version>
+    <Version>1.3.6</Version>
     <TargetFramework>net452</TargetFramework>
     <LangVersion>latest</LangVersion>
 

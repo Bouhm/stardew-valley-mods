@@ -18,7 +18,7 @@ using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework.Menus
 {
-    public class ModMapPage : MapPage
+    internal class ModMapPage : MapPage
     {
         private Dictionary<string, bool> ConditionalNpcs { get; }
         private Dictionary<string, NpcMarker> NpcMarkers { get; }
@@ -38,6 +38,9 @@ namespace NPCMapLocations.Framework.Menus
         private readonly bool DrawMovieTheater;
         private readonly bool DrawIsland;
 
+        /// <summary>Scans and maps locations in the game world.</summary>
+        private readonly LocationUtil LocationUtil;
+
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
           Dictionary<string, NpcMarker> npcMarkers,
@@ -45,7 +48,8 @@ namespace NPCMapLocations.Framework.Menus
           Dictionary<long, FarmerMarker> farmerMarkers,
           Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
           Texture2D buildingMarkers,
-          ModCustomizations customizations
+          ModCustomizations customizations,
+          LocationUtil locationUtil
         ) : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
           Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
           600 + IClickableMenu.borderWidth * 2)
@@ -56,6 +60,7 @@ namespace NPCMapLocations.Framework.Menus
             this.FarmBuildings = farmBuildings;
             this.BuildingMarkers = buildingMarkers;
             this.Customizations = customizations;
+            this.LocationUtil = locationUtil;
 
             Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
             this.DrawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
@@ -169,7 +174,7 @@ namespace NPCMapLocations.Framework.Menus
                                 hoveredList.Add(npcMarker.Key);
                         }
 
-                        if (!LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.HasIndoorCharacter)
+                        if (!this.LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.HasIndoorCharacter)
                             this.HasIndoorCharacter = true;
                     }
                 }
@@ -187,7 +192,7 @@ namespace NPCMapLocations.Framework.Menus
                     {
                         hoveredList.Add(farMarker.Name);
 
-                        if (!LocationUtil.IsOutdoors(farMarker.LocationName) && !this.HasIndoorCharacter)
+                        if (!this.LocationUtil.IsOutdoors(farMarker.LocationName) && !this.HasIndoorCharacter)
                             this.HasIndoorCharacter = true;
                     }
                 }

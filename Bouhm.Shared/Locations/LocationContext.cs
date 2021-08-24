@@ -7,6 +7,9 @@ namespace Bouhm.Shared.Locations
     // as the player as well as indoor location a room belongs to
     internal class LocationContext
     {
+        /*********
+        ** Accessors
+        *********/
         public LocationType Type { get; set; } // Outdoors, Building, or Room
         public string Root { get; set; } // Top-most outdoor location
         public string Parent { get; set; } // Level above
