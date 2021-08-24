@@ -37,6 +37,9 @@ namespace NPCMapLocations
         private readonly PerScreen<bool> HasOpenedMap = new();
         private readonly PerScreen<bool> IsModMapOpen = new();
 
+        /// <summary>Scans and maps locations in the game world.</summary>
+        private static readonly LocationUtil LocationUtil = new();
+
         // External mod settings
         private readonly string MapFilePath = @"LooseSprites\Map";
         private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
@@ -632,7 +635,8 @@ namespace NPCMapLocations
                 this.FarmerMarkers.Value,
                 FarmBuildings,
                 this.BuildingMarkers.Value,
-                this.Customizations
+                this.Customizations,
+                LocationUtil
             );
         }
 
