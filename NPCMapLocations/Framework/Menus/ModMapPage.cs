@@ -39,7 +39,7 @@ namespace NPCMapLocations.Framework.Menus
         private readonly bool DrawIsland;
 
         /// <summary>Scans and maps locations in the game world.</summary>
-        private readonly LocationUtil LocationUtil = new();
+        private readonly LocationUtil LocationUtil;
 
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(

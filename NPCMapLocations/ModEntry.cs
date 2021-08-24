@@ -38,7 +38,7 @@ namespace NPCMapLocations
         private readonly PerScreen<bool> IsModMapOpen = new();
 
         /// <summary>Scans and maps locations in the game world.</summary>
-        private static readonly LocationUtil LocationUtil = new();
+        private static LocationUtil LocationUtil;
 
         // External mod settings
         private readonly string MapFilePath = @"LooseSprites\Map";
@@ -106,6 +106,7 @@ namespace NPCMapLocations
 
         public override void Entry(IModHelper helper)
         {
+            ModEntry.LocationUtil = new(this.Monitor);
             StaticHelper = helper;
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();

@@ -29,13 +29,14 @@ namespace LocationCompass
         private bool ShowLocators;
 
         /// <summary>Scans and maps locations in the game world.</summary>
-        private readonly LocationUtil LocationUtil = new();
+        private LocationUtil LocationUtil;
 
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
             this.Pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
+            this.LocationUtil = new(this.Monitor);
 
             helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
             helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace Bouhm.Shared.Locations
@@ -8,6 +9,13 @@ namespace Bouhm.Shared.Locations
     /// <summary>Scans and maps locations in the game world.</summary>
     internal class LocationUtil
     {
+        /*********
+        ** Fields
+        *********/
+        /// <summary>The monitor with which to log errors.</summary>
+        private readonly IMonitor Monitor;
+
+
         /*********
         ** Accessors
         *********/
@@ -21,6 +29,13 @@ namespace Bouhm.Shared.Locations
         /*********
         ** Public methods
         *********/
+        /// <summary>Construct an instance.</summary>
+        /// <param name="monitor">The monitor with which to log errors.</param>
+        public LocationUtil(IMonitor monitor)
+        {
+            this.Monitor = monitor;
+        }
+
         public Dictionary<string, LocationContext> GetLocationContexts()
         {
             foreach (var location in Game1.locations)
@@ -211,13 +226,22 @@ namespace Bouhm.Shared.Locations
         /// <param name="name">The location name.</param>
         private GameLocation GetStaticLocation(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return null;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    return null;
 
-            if (name.StartsWith("UndergroundMine") || (name.StartsWith("VolcanoDungeon") && name != "VolcanoDungeon0"))
-                return null;
+                if (name.StartsWith("UndergroundMine") || (name.StartsWith("VolcanoDungeon") && name != "VolcanoDungeon0"))
+                    return null;
 
-            return Game1.getLocationFromName(name);
+                return Game1.getLocationFromName(name);
+            }
+            catch (Exception ex)
+            {
+                this.Monitor.Log($"Failed loading location '{name}'. See the log file for technical details.", LogLevel.Error);
+                this.Monitor.Log(ex.ToString());
+                return null;
+            }
         }
     }
 }

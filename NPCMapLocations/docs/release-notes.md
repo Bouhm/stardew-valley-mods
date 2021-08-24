@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed mod not working correctly if a location couldn't be loaded.
+
 ## 2.6.5
 Released 20 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
 
