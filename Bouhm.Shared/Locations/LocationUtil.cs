@@ -9,12 +9,19 @@ namespace Bouhm.Shared.Locations
     // and other helpful functions
     internal class LocationUtil
     {
+        /*********
+        ** Accessors
+        *********/
         /// <summary>The maximum method call depth when recursively scanning locations.</summary>
         /// <remarks>This is a last resort to prevent stack overflows. Normally the mod should prevent infinite recursion automatically by tracking locations it already visited.</remarks>
         public const int MaxRecursionDepth = 500;
 
         public static Dictionary<string, LocationContext> LocationContexts { get; set; }
 
+
+        /*********
+        ** Public methods
+        *********/
         public static Dictionary<string, LocationContext> GetLocationContexts()
         {
             LocationContexts = new Dictionary<string, LocationContext>();
@@ -47,6 +54,68 @@ namespace Bouhm.Shared.Locations
             return LocationContexts;
         }
 
+        /// <summary>Find the uppermost indoor location for a building.</summary>
+        /// <param name="loc">The location to scan.</param>
+        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
+        public static string GetBuilding(string loc, int curRecursionDepth)
+        {
+            static string GetRecursively(string loc, ISet<string> seen, int depth)
+            {
+                // break infinite loops
+                if (!seen.Add(loc))
+                    return loc;
+                if (depth > LocationUtil.MaxRecursionDepth)
+                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(loc)}: {loc}\n{nameof(depth)}: {depth}\n\n{Environment.StackTrace}");
+
+                // handle mines
+                if (loc.Contains("UndergroundMine"))
+                    return GetMinesLocationName(loc);
+
+                // found root building
+                if (LocationContexts[loc].Type == LocationType.Building)
+                    return loc;
+                string building = LocationContexts[loc].Parent;
+                if (building == null)
+                    return null;
+                if (building == LocationContexts[loc].Root)
+                    return loc;
+
+                // scan recursively
+                return GetRecursively(building, seen, depth + 1);
+            }
+
+            return GetRecursively(loc, new HashSet<string>(), curRecursionDepth);
+        }
+
+        // Get Mines name from floor level
+        public static string GetMinesLocationName(string locationName)
+        {
+            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+            if (int.TryParse(mine, out int mineLevel))
+            {
+                return mineLevel > 120
+                    ? "SkullCave"
+                    : "Mine";
+            }
+
+            return null;
+        }
+
+        public static bool IsOutdoors(string locationName)
+        {
+            if (locationName == null)
+                return false;
+
+            if (LocationContexts.TryGetValue(locationName, out var locCtx))
+                return locCtx.Type == LocationType.Outdoors;
+
+            return false;
+        }
+
+
+        /*********
+        ** Private methods
+        *********/
         /// <summary>Recursively traverse all locations accessible through warps from a given location, and map all locations to the root (outdoor) locations they can be reached from.</summary>
         /// <param name="location">The location to start searching from.</param>
         /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
@@ -140,67 +209,9 @@ namespace Bouhm.Shared.Locations
             ScanRecursively(location, null, null, false, Vector2.Zero, new HashSet<string>(), curRecursionDepth);
         }
 
-        /// <summary>Find the uppermost indoor location for a building.</summary>
-        /// <param name="loc">The location to scan.</param>
-        /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
-        public static string GetBuilding(string loc, int curRecursionDepth)
-        {
-            static string GetRecursively(string loc, ISet<string> seen, int depth)
-            {
-                // break infinite loops
-                if (!seen.Add(loc))
-                    return loc;
-                if (depth > LocationUtil.MaxRecursionDepth)
-                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(loc)}: {loc}\n{nameof(depth)}: {depth}\n\n{Environment.StackTrace}");
-
-                // handle mines
-                if (loc.Contains("UndergroundMine"))
-                    return GetMinesLocationName(loc);
-
-                // found root building
-                if (LocationContexts[loc].Type == LocationType.Building)
-                    return loc;
-                string building = LocationContexts[loc].Parent;
-                if (building == null)
-                    return null;
-                if (building == LocationContexts[loc].Root)
-                    return loc;
-
-                // scan recursively
-                return GetRecursively(building, seen, depth + 1);
-            }
-
-            return GetRecursively(loc, new HashSet<string>(), curRecursionDepth);
-        }
-
-        // Get Mines name from floor level
-        public static string GetMinesLocationName(string locationName)
-        {
-            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-            if (int.TryParse(mine, out int mineLevel))
-            {
-                return mineLevel > 120
-                    ? "SkullCave"
-                    : "Mine";
-            }
-
-            return null;
-        }
-
-        public static bool IsOutdoors(string locationName)
-        {
-            if (locationName == null)
-                return false;
-
-            if (LocationContexts.TryGetValue(locationName, out var locCtx))
-                return locCtx.Type == LocationType.Outdoors;
-
-            return false;
-        }
-
         /// <summary>Get a location instance from its name if it's not a procedurally generated location.</summary>
         /// <param name="name">The location name.</param>
-        public static GameLocation GetStaticLocation(string name)
+        private static GameLocation GetStaticLocation(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return null;
