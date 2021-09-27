@@ -1,6 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed error if a map sync happens mid-warp in multiplayer.
+* Fixed error when a location has invalid data.
+
 ## 2.6.6
 Released 24 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
 

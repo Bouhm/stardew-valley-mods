@@ -467,7 +467,7 @@ namespace NPCMapLocations
         // To initialize ModMap quicker for smoother rendering when opening map
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady)
+            if (!Context.IsPlayerFree) // don't try to update markers during warp transitions, etc
                 return;
 
             // Half-second tick
@@ -476,9 +476,7 @@ namespace NPCMapLocations
                 bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
 
                 if (updateForMinimap)
-                {
                     this.Minimap.Value.Update();
-                }
 
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
@@ -897,6 +895,9 @@ namespace NPCMapLocations
         {
             static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, bool isPlayer, ISet<string> seen, int depth)
             {
+                if (string.IsNullOrWhiteSpace(locationName))
+                    return Unknown;
+
                 // break infinite loops
                 if (!seen.Add(locationName))
                     return Unknown;
