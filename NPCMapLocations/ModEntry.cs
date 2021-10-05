@@ -154,7 +154,7 @@ namespace NPCMapLocations
                 if (depth > LocationUtil.MaxRecursionDepth)
                     throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
 
-                if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom"))
+                if (locationExclusions?.Contains(locationName) == true || locationName.Contains("WarpRoom"))
                     return Unknown;
 
                 if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
@@ -460,14 +460,12 @@ namespace NPCMapLocations
             if (!Context.IsPlayerFree) // don't try to update markers during warp transitions, etc
                 return;
 
-            // Half-second tick
+            // update and sync markers
             if (e.IsMultipleOf(30))
             {
                 bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
-
                 if (updateForMinimap)
                     this.Minimap.Value.Update();
-
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
 
                 // Sync multiplayer data
@@ -492,53 +490,51 @@ namespace NPCMapLocations
                 }
             }
 
-            // One-second tick
-            if (e.IsOneSecond)
+            // update for season change (for when it's changed via console)
+            if (e.IsOneSecond && Globals.UseSeasonalMaps && this.MapSeason != null && this.MapSeason != Game1.currentSeason && Game1.currentSeason != null)
             {
-                // Check season change (for when it's changed via console)
-                if (Globals.UseSeasonalMaps && (this.MapSeason != null && this.MapSeason != Game1.currentSeason) && Game1.currentSeason != null)
+                this.MapSeason = Game1.currentSeason;
+
+                // Force reload of map for season changes
+                try
                 {
-                    this.MapSeason = Game1.currentSeason;
-
-                    // Force reload of map for season changes
-                    try
-                    {
-                        this.Helper.Content.InvalidateCache(this.MapFilePath);
-                    }
-                    catch
-                    {
-                        this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
-                    }
-
-                    this.Minimap.Value?.UpdateMapForSeason();
+                    this.Helper.Content.InvalidateCache(this.MapFilePath);
+                }
+                catch
+                {
+                    this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
                 }
 
-                // Check if conditional NPCs have been talked to
+                this.Minimap.Value?.UpdateMapForSeason();
+            }
+
+            // enable conditional NPCs who've been talked to
+            if (e.IsOneSecond)
+            {
                 foreach (string npcName in ModConstants.ConditionalNpcs)
                 {
-                    if (this.ConditionalNpcs.Value[npcName]) continue;
+                    if (this.ConditionalNpcs.Value[npcName])
+                        continue;
 
                     this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
                 }
             }
 
-            // Update tick
-            if (Globals.ShowMinimap && this.Minimap.Value != null && this.Minimap.Value.IsHoveringDragZone() && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
-            {
+            // handle minimap drag
+            if (Globals.ShowMinimap && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
                 this.Minimap.Value.HandleMouseDrag();
-            }
 
-            if (Game1.activeClickableMenu == null || !(Game1.activeClickableMenu is GameMenu gameMenu))
-            {
+            // toggle mod map
+            if (Game1.activeClickableMenu is not GameMenu gameMenu)
                 this.IsModMapOpen.Value = false;
-                return;
+            else
+            {
+                this.HasOpenedMap.Value = gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
+                this.IsModMapOpen.Value = this.HasOpenedMap.Value ? this.IsModMapOpen.Value : this.HasOpenedMap.Value; // When vanilla MapPage is replaced by ModMap
+
+                if (this.HasOpenedMap.Value && !this.IsModMapOpen.Value) // Only run once on map open
+                    this.OpenModMap();
             }
-
-            this.HasOpenedMap.Value = gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
-            this.IsModMapOpen.Value = this.HasOpenedMap.Value ? this.IsModMapOpen.Value : this.HasOpenedMap.Value; // When vanilla MapPage is replaced by ModMap
-
-            if (this.HasOpenedMap.Value && !this.IsModMapOpen.Value) // Only run once on map open
-                this.OpenModMap();
         }
 
         private void Multiplayer_PeerConnected(object sender, PeerConnectedEventArgs e)
