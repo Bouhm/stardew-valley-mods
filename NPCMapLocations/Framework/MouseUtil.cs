@@ -67,7 +67,7 @@ namespace NPCMapLocations.Framework
         public static Rectangle GetRectangleOnMap(Rectangle rect)
         {
             Vector2 mapBounds = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
-            return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), (int)(EndMousePosition.X - BeginMousePosition.X), (int)(EndMousePosition.Y - BeginMousePosition.Y));
+            return new Rectangle((int)(rect.X - mapBounds.X), (int)(rect.Y - mapBounds.Y), rect.Width, rect.Height);
         }
     }
 }
