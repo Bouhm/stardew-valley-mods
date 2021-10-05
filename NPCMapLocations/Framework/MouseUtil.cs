@@ -8,9 +8,16 @@ namespace NPCMapLocations.Framework
     // based on the location of the cursor
     internal class MouseUtil
     {
+        /*********
+        ** Accessors
+        *********/
         public static Vector2 BeginMousePosition { get; set; }
         public static Vector2 EndMousePosition { get; set; }
 
+
+        /*********
+        ** Public methods
+        *********/
         public static void Reset()
         {
             BeginMousePosition = new Vector2(-1000, -1000);

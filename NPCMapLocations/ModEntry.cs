@@ -22,11 +22,9 @@ namespace NPCMapLocations
 {
     public class ModEntry : Mod, IAssetLoader
     {
-        public static PlayerConfig Config;
-        public static GlobalConfig Globals;
-        public static IModHelper StaticHelper;
-        public static Texture2D Map;
-        public static Vector2 Unknown = new(-9999, -9999);
+        /*********
+        ** Fields
+        *********/
         private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
 
         private readonly PerScreen<Texture2D> BuildingMarkers = new();
@@ -54,6 +52,43 @@ namespace NPCMapLocations
 
         // Debugging
         private bool DebugMode;
+
+
+        /*********
+        ** Accessors
+        *********/
+        public static PlayerConfig Config;
+        public static GlobalConfig Globals;
+        public static IModHelper StaticHelper;
+        public static Texture2D Map;
+        public static Vector2 Unknown = new(-9999, -9999);
+
+
+        /*********
+        ** Public methods
+        *********/
+        public override void Entry(IModHelper helper)
+        {
+            ModEntry.LocationUtil = new(this.Monitor);
+            StaticHelper = helper;
+            Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
+            this.Customizations = new ModCustomizations();
+
+            helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
+            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
+            helper.Events.World.BuildingListChanged += this.World_BuildingListChanged;
+            helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
+            helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
+            helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
+            helper.Events.Player.Warped += this.Player_Warped;
+            helper.Events.Display.MenuChanged += this.Display_MenuChanged;
+            helper.Events.Display.RenderingHud += this.Display_RenderingHud;
+            helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
+            helper.Events.Display.Rendered += this.Display_Rendered;
+            helper.Events.Display.WindowResized += this.Display_WindowResized;
+            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
+            helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
+        }
 
         // Replace game map with modified map
         public bool CanLoad<T>(IAssetInfo asset)
@@ -103,30 +138,146 @@ namespace NPCMapLocations
             return (T)asset;
         }
 
-
-        public override void Entry(IModHelper helper)
+        // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
+        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
+        // Requires MapModConstants and modified map page in /maps
+        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null)
         {
-            ModEntry.LocationUtil = new(this.Monitor);
-            StaticHelper = helper;
-            Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
-            this.Customizations = new ModCustomizations();
+            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)
+            {
+                if (string.IsNullOrWhiteSpace(locationName))
+                    return Unknown;
 
-            helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
-            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
-            helper.Events.World.BuildingListChanged += this.World_BuildingListChanged;
-            helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
-            helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
-            helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
-            helper.Events.Player.Warped += this.Player_Warped;
-            helper.Events.Display.MenuChanged += this.Display_MenuChanged;
-            helper.Events.Display.RenderingHud += this.Display_RenderingHud;
-            helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
-            helper.Events.Display.Rendered += this.Display_Rendered;
-            helper.Events.Display.WindowResized += this.Display_WindowResized;
-            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
-            helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
+                // break infinite loops
+                if (!seen.Add(locationName))
+                    return Unknown;
+                if (depth > LocationUtil.MaxRecursionDepth)
+                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
+
+                if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom"))
+                    return Unknown;
+
+                if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
+                    return mapLoc.Value;
+
+                if (locationName.StartsWith("UndergroundMine"))
+                {
+                    string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
+                    if (int.TryParse(mine, out int mineLevel))
+                        locationName = mineLevel > 120 ? "SkullCave" : "Mine";
+                }
+
+                // Get location of indoor location by its warp position in the outdoor location
+                if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
+                  && loc.Type != LocationType.Outdoors
+                  && loc.Root != null
+                  && locationName != "MovieTheater"         // Weird edge cases where the warps are off
+                )
+                {
+                    string building = LocationUtil.GetBuilding(locationName, depth + 1);
+
+                    if (building != null)
+                    {
+                        int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
+                        int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
+
+                        // Slightly adjust warp location to depict being inside the building 
+                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, seen, depth + 1);
+                        return new Vector2(warpPos.X + 1, warpPos.Y - 8);
+                    }
+                }
+
+                // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
+
+                MapVector[] locVectors;
+                bool locationNotFound = false;
+
+                if (locationName == "Farm")
+                {
+                    // Handle different farm types for custom vectors
+                    string[] farms = { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
+                    if (customMapVectors != null && (customMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
+                    {
+                        if (!customMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
+                            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+                    }
+                    else
+                    {
+                        if (!customMapVectors.TryGetValue("Farm", out locVectors))
+                        {
+                            locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
+                            if (locationNotFound)
+                                locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+                        }
+                    }
+                }
+                // If not in custom vectors, use default
+                else if (!(customMapVectors != null && customMapVectors.TryGetValue(locationName, out locVectors)))
+                    locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
+
+                if (locVectors == null || locationNotFound)
+                    return Unknown;
+
+                int x;
+                int y;
+
+                // Precise (static) regions and indoor locations
+                if (locVectors.Length == 1 || tileX == -1 || tileY == -1)
+                {
+                    x = locVectors.FirstOrDefault().MapX;
+                    y = locVectors.FirstOrDefault().MapY;
+                }
+                else
+                {
+                    // Sort map vectors by distance to point
+                    MapVector[] vectors = locVectors
+                        .OrderBy(vector => Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)))
+                        .ToArray();
+
+                    MapVector lower = null;
+                    MapVector upper = null;
+                    bool isSameAxis = false;
+
+                    // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
+                    foreach (var vector in vectors)
+                    {
+                        if (lower != null && upper != null)
+                        {
+                            if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
+                                isSameAxis = true;
+                            else
+                                break;
+                        }
+
+                        if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
+                        {
+                            lower = vector;
+                            continue;
+                        }
+
+                        if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
+                            upper = vector;
+                    }
+
+                    // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
+                    // Uses fallback strategy - get closest points such that lower != upper
+                    lower ??= upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
+                    upper ??= lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
+
+                    x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
+                    y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
+                }
+
+                return new Vector2(x, y);
+            }
+
+            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, new HashSet<string>(), 1);
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         // Load config and other one-off data
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
@@ -224,80 +375,6 @@ namespace NPCMapLocations
             }
         }
 
-        // Get only relevant villagers for map
-        private List<NPC> GetVillagers()
-        {
-            var villagers = new List<NPC>();
-
-            foreach (var location in Game1.locations)
-            {
-                foreach (var npc in location.characters)
-                {
-                    bool shouldTrack =
-                        npc != null
-                        && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
-                        && (
-                            npc.isVillager()
-                            || npc.isMarried()
-                            || (Globals.ShowHorse && npc is Horse)
-                            || (Globals.ShowChildren && npc is Child)
-                        );
-
-                    if (shouldTrack && !villagers.Contains(npc))
-                        villagers.Add(npc);
-                }
-            }
-
-            return villagers;
-        }
-
-        // For drawing farm buildings on the map 
-        // and getting positions relative to the farm 
-        private void UpdateFarmBuildingLocations()
-        {
-            FarmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
-
-            foreach (var building in Game1.getFarm().buildings)
-            {
-                if (building?.nameOfIndoorsWithoutUnique is null || building.nameOfIndoors is null or "null") // Some actually have value of "null"
-                    continue;
-
-                var locVector = LocationToMap(
-                    "Farm", // Get building position in farm
-                    building.tileX.Value,
-                    building.tileY.Value,
-                    this.Customizations.MapVectors,
-                    this.Customizations.LocationExclusions
-                );
-
-                // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
-                // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
-                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
-
-                if (commonName.Contains("Barn"))
-                    locVector.Y += 3;
-
-                // Format: { uniqueName: { commonName: positionOnFarm } }
-                // buildingType will match currentLocation.Name for commonName
-                FarmBuildings[building.nameOfIndoors] =
-                  new KeyValuePair<string, Vector2>(building.buildingType.Value, locVector);
-            }
-
-            // Greenhouse unlocked after pantry bundles completed
-            if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
-            {
-                var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
-                greenhouseLoc.X -= 5 / 2 * 3;
-                greenhouseLoc.Y -= 7 / 2 * 3;
-                FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greenhouseLoc);
-            }
-
-            // Add FarmHouse
-            var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
-            farmhouseLoc.X -= 6;
-            FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
-        }
-
         private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
         {
             if (e.Location.IsFarm)
@@ -355,37 +432,6 @@ namespace NPCMapLocations
             }
         }
 
-        // Handle keyboard/controller inputs
-        private void HandleInput(GameMenu menu, SButton input)
-        {
-            if (menu.currentTab != ModConstants.MapTabIndex)
-                return;
-
-            if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
-                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
-
-            if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
-                this.ChangeTooltipConfig();
-            else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder)
-                this.ChangeTooltipConfig(false);
-        }
-
-        private void ChangeTooltipConfig(bool increment = true)
-        {
-            if (increment)
-            {
-                if (++Globals.NameTooltipMode > 3) Globals.NameTooltipMode = 1;
-
-                this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
-            }
-            else
-            {
-                if (--Globals.NameTooltipMode < 1) Globals.NameTooltipMode = 3;
-
-                this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
-            }
-        }
-
         // Handle any checks that need to be made per day
         private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
         {
@@ -406,62 +452,6 @@ namespace NPCMapLocations
                 this.BuildingMarkers.Value,
                 this.Customizations
             );
-        }
-
-        private bool IsLocationExcluded(string location)
-        {
-            return Globals.ShowMinimap && Globals.MinimapExclusions.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-                     ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"));
-        }
-
-        private void ResetMarkers()
-        {
-            this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
-            this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
-
-            if (Context.IsMainPlayer)
-            {
-                foreach (var npc in this.GetVillagers())
-                {
-                    if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
-                        continue;
-
-                    var type = npc switch
-                    {
-                        Horse => CharacterType.Horse,
-                        Child => CharacterType.Child,
-                        _ => CharacterType.Villager
-                    };
-
-                    if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
-                        offset = 0;
-
-                    if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
-                    {
-                        var newMarker = new NpcMarker
-                        {
-                            DisplayName = npc.displayName ?? npc.Name,
-                            CropOffset = offset,
-                            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
-                            Type = type
-                        };
-
-                        try
-                        {
-                            newMarker.Sprite = new AnimatedSprite(npc.Sprite.textureName.Value, 0, 16, 32).Texture;
-                        }
-                        catch (Exception ex)
-                        {
-                            this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'; using the default sprite instead.", LogLevel.Warn);
-                            this.Monitor.Log(ex.ToString());
-
-                            newMarker.Sprite = new AnimatedSprite($@"Characters\{(npc.Gender == NPC.male ? "maleRival" : "femaleRival")}", 0, 16, 32).Texture;
-                        }
-
-                        this.NpcMarkers.Value.Add(npc.Name, newMarker);
-                    }
-                }
-            }
         }
 
         // To initialize ModMap quicker for smoother rendering when opening map
@@ -612,6 +602,229 @@ namespace NPCMapLocations
                             }
                         }
                         break;
+                }
+            }
+        }
+
+        private void Display_WindowResized(object sender, WindowResizedEventArgs e)
+        {
+            if (!Context.IsWorldReady) return;
+
+            this.UpdateMarkers(true);
+            this.UpdateFarmBuildingLocations();
+            this.Minimap.Value?.CheckOffsetForMap();
+
+            if (this.IsModMapOpen.Value)
+                this.OpenModMap();
+        }
+
+        private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (!Context.IsWorldReady) return;
+            MouseUtil.Reset();
+
+            // Check for resize after mod menu closed
+            if (e.OldMenu is ModMenu)
+                this.Minimap.Value?.Resize();
+        }
+
+        private void Player_Warped(object sender, WarpedEventArgs e)
+        {
+            if (e.IsLocalPlayer)
+            {
+                // Hide minimap in blacklisted locations with special case for Mines as usual
+                Globals.ShowMinimap = Globals.ShowMinimap && !this.IsLocationExcluded(e.NewLocation.Name);
+
+                // Check if map does not fill screen and adjust for black bars (ex. BusStop)
+                this.Minimap.Value?.CheckOffsetForMap();
+            }
+        }
+
+        private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
+        {
+            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
+                this.Minimap.Value?.DrawMiniMap();
+        }
+
+        private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
+        {
+            // Highlight tile for debug mode
+            if (this.DebugMode)
+            {
+                Game1.spriteBatch.Draw(Game1.mouseCursors,
+                  new Vector2(
+                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
+                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
+                  new Rectangle(448, 128, 64, 64), Color.White);
+            }
+        }
+
+        // DEBUG 
+        private void Display_Rendered(object sender, RenderedEventArgs e)
+        {
+            if (!Context.IsWorldReady || Game1.player == null) return;
+
+            if (this.DebugMode)
+                this.ShowDebugInfo();
+        }
+
+        // Get only relevant villagers for map
+        private List<NPC> GetVillagers()
+        {
+            var villagers = new List<NPC>();
+
+            foreach (var location in Game1.locations)
+            {
+                foreach (var npc in location.characters)
+                {
+                    bool shouldTrack =
+                        npc != null
+                        && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
+                        && (
+                            npc.isVillager()
+                            || npc.isMarried()
+                            || (Globals.ShowHorse && npc is Horse)
+                            || (Globals.ShowChildren && npc is Child)
+                        );
+
+                    if (shouldTrack && !villagers.Contains(npc))
+                        villagers.Add(npc);
+                }
+            }
+
+            return villagers;
+        }
+
+        // For drawing farm buildings on the map 
+        // and getting positions relative to the farm 
+        private void UpdateFarmBuildingLocations()
+        {
+            FarmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
+
+            foreach (var building in Game1.getFarm().buildings)
+            {
+                if (building?.nameOfIndoorsWithoutUnique is null || building.nameOfIndoors is null or "null") // Some actually have value of "null"
+                    continue;
+
+                var locVector = LocationToMap(
+                    "Farm", // Get building position in farm
+                    building.tileX.Value,
+                    building.tileY.Value,
+                    this.Customizations.MapVectors,
+                    this.Customizations.LocationExclusions
+                );
+
+                // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
+                // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
+                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
+
+                if (commonName.Contains("Barn"))
+                    locVector.Y += 3;
+
+                // Format: { uniqueName: { commonName: positionOnFarm } }
+                // buildingType will match currentLocation.Name for commonName
+                FarmBuildings[building.nameOfIndoors] =
+                  new KeyValuePair<string, Vector2>(building.buildingType.Value, locVector);
+            }
+
+            // Greenhouse unlocked after pantry bundles completed
+            if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+            {
+                var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
+                greenhouseLoc.X -= 5 / 2 * 3;
+                greenhouseLoc.Y -= 7 / 2 * 3;
+                FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greenhouseLoc);
+            }
+
+            // Add FarmHouse
+            var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
+            farmhouseLoc.X -= 6;
+            FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
+        }
+
+        // Handle keyboard/controller inputs
+        private void HandleInput(GameMenu menu, SButton input)
+        {
+            if (menu.currentTab != ModConstants.MapTabIndex)
+                return;
+
+            if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
+                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
+
+            if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
+                this.ChangeTooltipConfig();
+            else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder)
+                this.ChangeTooltipConfig(false);
+        }
+
+        private void ChangeTooltipConfig(bool increment = true)
+        {
+            if (increment)
+            {
+                if (++Globals.NameTooltipMode > 3) Globals.NameTooltipMode = 1;
+
+                this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+            }
+            else
+            {
+                if (--Globals.NameTooltipMode < 1) Globals.NameTooltipMode = 3;
+
+                this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+            }
+        }
+
+        private bool IsLocationExcluded(string location)
+        {
+            return Globals.ShowMinimap && Globals.MinimapExclusions.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
+                     ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"));
+        }
+
+        private void ResetMarkers()
+        {
+            this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
+            this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
+
+            if (Context.IsMainPlayer)
+            {
+                foreach (var npc in this.GetVillagers())
+                {
+                    if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
+                        continue;
+
+                    var type = npc switch
+                    {
+                        Horse => CharacterType.Horse,
+                        Child => CharacterType.Child,
+                        _ => CharacterType.Villager
+                    };
+
+                    if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
+                        offset = 0;
+
+                    if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
+                    {
+                        var newMarker = new NpcMarker
+                        {
+                            DisplayName = npc.displayName ?? npc.Name,
+                            CropOffset = offset,
+                            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
+                            Type = type
+                        };
+
+                        try
+                        {
+                            newMarker.Sprite = new AnimatedSprite(npc.Sprite.textureName.Value, 0, 16, 32).Texture;
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'; using the default sprite instead.", LogLevel.Warn);
+                            this.Monitor.Log(ex.ToString());
+
+                            newMarker.Sprite = new AnimatedSprite($@"Characters\{(npc.Gender == NPC.male ? "maleRival" : "femaleRival")}", 0, 16, 32).Texture;
+                        }
+
+                        this.NpcMarkers.Value.Add(npc.Name, newMarker);
+                    }
                 }
             }
         }
@@ -886,204 +1099,6 @@ namespace NPCMapLocations
                 this.FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
                 this.FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
             }
-        }
-
-        // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
-        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
-        // Requires MapModConstants and modified map page in /maps
-        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null)
-        {
-            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)
-            {
-                if (string.IsNullOrWhiteSpace(locationName))
-                    return Unknown;
-
-                // break infinite loops
-                if (!seen.Add(locationName))
-                    return Unknown;
-                if (depth > LocationUtil.MaxRecursionDepth)
-                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
-
-                if ((locationExclusions != null && locationExclusions.Contains(locationName)) || locationName.Contains("WarpRoom"))
-                    return Unknown;
-
-                if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
-                    return mapLoc.Value;
-
-                if (locationName.StartsWith("UndergroundMine"))
-                {
-                    string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-                    if (int.TryParse(mine, out int mineLevel))
-                        locationName = mineLevel > 120 ? "SkullCave" : "Mine";
-                }
-
-                // Get location of indoor location by its warp position in the outdoor location
-                if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
-                  && loc.Type != LocationType.Outdoors
-                  && loc.Root != null
-                  && locationName != "MovieTheater"         // Weird edge cases where the warps are off
-                )
-                {
-                    string building = LocationUtil.GetBuilding(locationName, depth + 1);
-
-                    if (building != null)
-                    {
-                        int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
-                        int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
-
-                        // Slightly adjust warp location to depict being inside the building 
-                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, seen, depth + 1);
-                        return new Vector2(warpPos.X + 1, warpPos.Y - 8);
-                    }
-                }
-
-                // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
-
-                MapVector[] locVectors;
-                bool locationNotFound = false;
-
-                if (locationName == "Farm")
-                {
-                    // Handle different farm types for custom vectors
-                    string[] farms = { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
-                    if (customMapVectors != null && (customMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
-                    {
-                        if (!customMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
-                            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-                    }
-                    else
-                    {
-                        if (!customMapVectors.TryGetValue("Farm", out locVectors))
-                        {
-                            locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
-                            if (locationNotFound)
-                                locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-                        }
-                    }
-                }
-                // If not in custom vectors, use default
-                else if (!(customMapVectors != null && customMapVectors.TryGetValue(locationName, out locVectors)))
-                    locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-
-                if (locVectors == null || locationNotFound)
-                    return Unknown;
-
-                int x;
-                int y;
-
-                // Precise (static) regions and indoor locations
-                if (locVectors.Length == 1 || tileX == -1 || tileY == -1)
-                {
-                    x = locVectors.FirstOrDefault().MapX;
-                    y = locVectors.FirstOrDefault().MapY;
-                }
-                else
-                {
-                    // Sort map vectors by distance to point
-                    MapVector[] vectors = locVectors
-                        .OrderBy(vector => Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)))
-                        .ToArray();
-
-                    MapVector lower = null;
-                    MapVector upper = null;
-                    bool isSameAxis = false;
-
-                    // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
-                    foreach (var vector in vectors)
-                    {
-                        if (lower != null && upper != null)
-                        {
-                            if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
-                                isSameAxis = true;
-                            else
-                                break;
-                        }
-
-                        if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
-                        {
-                            lower = vector;
-                            continue;
-                        }
-
-                        if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
-                            upper = vector;
-                    }
-
-                    // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
-                    // Uses fallback strategy - get closest points such that lower != upper
-                    lower ??= upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-                    upper ??= lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-
-                    x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
-                    y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
-                }
-
-                return new Vector2(x, y);
-            }
-
-            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, new HashSet<string>(), 1);
-        }
-
-        private void Display_WindowResized(object sender, WindowResizedEventArgs e)
-        {
-            if (!Context.IsWorldReady) return;
-
-            this.UpdateMarkers(true);
-            this.UpdateFarmBuildingLocations();
-            this.Minimap.Value?.CheckOffsetForMap();
-
-            if (this.IsModMapOpen.Value)
-                this.OpenModMap();
-        }
-
-        private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
-        {
-            if (!Context.IsWorldReady) return;
-            MouseUtil.Reset();
-
-            // Check for resize after mod menu closed
-            if (e.OldMenu is ModMenu)
-                this.Minimap.Value?.Resize();
-        }
-
-        private void Player_Warped(object sender, WarpedEventArgs e)
-        {
-            if (e.IsLocalPlayer)
-            {
-                // Hide minimap in blacklisted locations with special case for Mines as usual
-                Globals.ShowMinimap = Globals.ShowMinimap && !this.IsLocationExcluded(e.NewLocation.Name);
-
-                // Check if map does not fill screen and adjust for black bars (ex. BusStop)
-                this.Minimap.Value?.CheckOffsetForMap();
-            }
-        }
-
-        private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
-        {
-            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
-                this.Minimap.Value?.DrawMiniMap();
-        }
-
-        private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
-        {
-            // Highlight tile for debug mode
-            if (this.DebugMode)
-            {
-                Game1.spriteBatch.Draw(Game1.mouseCursors,
-                  new Vector2(
-                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
-                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
-                  new Rectangle(448, 128, 64, 64), Color.White);
-            }
-        }
-
-        // DEBUG 
-        private void Display_Rendered(object sender, RenderedEventArgs e)
-        {
-            if (!Context.IsWorldReady || Game1.player == null) return;
-
-            if (this.DebugMode)
-                this.ShowDebugInfo();
         }
 
         // Show debug info in top left corner

@@ -2,6 +2,9 @@
 {
     public class SyncedNpcMarker
     {
+        /*********
+        ** Accessors
+        *********/
         public string DisplayName { get; set; }
         public string LocationName { get; set; }
         public int MapX { get; set; }

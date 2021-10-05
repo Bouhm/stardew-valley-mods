@@ -16,6 +16,9 @@ namespace LocationCompass
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
     {
+        /*********
+        ** Fields
+        *********/
         private readonly int MaxProximity = 4800;
 
         private readonly bool DebugMode = false;
@@ -31,6 +34,10 @@ namespace LocationCompass
         /// <summary>Scans and maps locations in the game world.</summary>
         private LocationUtil LocationUtil;
 
+
+        /*********
+        ** Public methods
+        *********/
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
@@ -48,6 +55,10 @@ namespace LocationCompass
             helper.Events.Display.Rendered += this.Display_Rendered;
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         {
             this.Characters = new List<Character>();
@@ -142,32 +153,6 @@ namespace LocationCompass
                 this.SyncedLocationData = e.ReadAs<SyncedNpcLocationData>();
         }
 
-        // Get only relevant villagers for map
-        private List<NPC> GetVillagers()
-        {
-            var villagers = new List<NPC>();
-            var excludedNpcs = new List<string>
-      {
-        "Dwarf",
-        "Mister Qi",
-        "Bouncer",
-        "Henchman",
-        "Gunther",
-        "Krobus"
-      };
-
-            foreach (var location in Game1.locations)
-            {
-                foreach (var npc in location.characters)
-                {
-                    if (npc == null) continue;
-                    if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
-                        villagers.Add(npc);
-                }
-            }
-            return villagers;
-        }
-
         private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
@@ -215,6 +200,61 @@ namespace LocationCompass
 
                 this.UpdateLocators();
             }
+        }
+
+        private void Display_Rendered(object sender, RenderedEventArgs e)
+        {
+            //if (!Context.IsWorldReady || locators == null) return;
+
+            if (this.ShowLocators && Game1.activeClickableMenu == null)
+                this.DrawLocators();
+
+            if (!this.DebugMode)
+                return;
+
+            foreach (var locPair in this.Locators)
+            {
+                foreach (var locator in locPair.Value)
+                {
+                    if (!locator.IsOnScreen)
+                        continue;
+
+                    var npc = Game1.getCharacterFromName(locator.Name);
+                    float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float viewportY = Game1.player.position.Y - Game1.viewport.Y;
+                    float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float npcViewportY = npc.position.Y - Game1.viewport.Y;
+
+                    // Draw NPC sprite noodle connecting center of screen to NPC for debugging
+                    this.DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.Sprite.Texture);
+                }
+            }
+        }
+
+        // Get only relevant villagers for map
+        private List<NPC> GetVillagers()
+        {
+            var villagers = new List<NPC>();
+            var excludedNpcs = new List<string>
+            {
+                "Dwarf",
+                "Mister Qi",
+                "Bouncer",
+                "Henchman",
+                "Gunther",
+                "Krobus"
+            };
+
+            foreach (var location in Game1.locations)
+            {
+                foreach (var npc in location.characters)
+                {
+                    if (npc == null) continue;
+                    if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
+                        villagers.Add(npc);
+                }
+            }
+            return villagers;
         }
 
         private void GetSyncedLocationData()
@@ -805,8 +845,7 @@ namespace LocationCompass
         }
 
         // Draw outlined text
-        private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null,
-          float scale = 1f)
+        private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
         {
             //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
             //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
@@ -815,35 +854,6 @@ namespace LocationCompass
             Game1.spriteBatch.DrawString(font ?? Game1.tinyFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero,
               scale,
               SpriteEffects.None, 0f);
-        }
-
-        private void Display_Rendered(object sender, RenderedEventArgs e)
-        {
-            //if (!Context.IsWorldReady || locators == null) return;
-
-            if (this.ShowLocators && Game1.activeClickableMenu == null)
-                this.DrawLocators();
-
-            if (!this.DebugMode)
-                return;
-
-            foreach (var locPair in this.Locators)
-            {
-                foreach (var locator in locPair.Value)
-                {
-                    if (!locator.IsOnScreen)
-                        continue;
-
-                    var npc = Game1.getCharacterFromName(locator.Name);
-                    float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
-                    float viewportY = Game1.player.position.Y - Game1.viewport.Y;
-                    float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
-                    float npcViewportY = npc.position.Y - Game1.viewport.Y;
-
-                    // Draw NPC sprite noodle connecting center of screen to NPC for debugging
-                    this.DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.Sprite.Texture);
-                }
-            }
         }
     }
 }

@@ -8,11 +8,18 @@ namespace LocationCompass.Framework
     // there are multiple NPCs in a building
     internal class LocatorScroller
     {
+        /*********
+        ** Accessors
+        *********/
         public string Location { get; set; }
         public HashSet<string> Characters { get; set; }
         public int Index { get; set; }
         public Rectangle LocatorRect { get; set; }
 
+
+        /*********
+        ** Public methods
+        *********/
         public void ReceiveLeftClick()
         {
             if (this.LocatorRect.Contains(Game1.getMouseX(), Game1.getMouseY()))

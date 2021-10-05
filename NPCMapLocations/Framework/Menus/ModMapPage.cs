@@ -20,6 +20,9 @@ namespace NPCMapLocations.Framework.Menus
 {
     internal class ModMapPage : MapPage
     {
+        /*********
+        ** Fields
+        *********/
         private Dictionary<string, bool> ConditionalNpcs { get; }
         private Dictionary<string, NpcMarker> NpcMarkers { get; }
         private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
@@ -41,6 +44,10 @@ namespace NPCMapLocations.Framework.Menus
         /// <summary>Scans and maps locations in the game world.</summary>
         private readonly LocationUtil LocationUtil;
 
+
+        /*********
+        ** Public methods
+        *********/
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
           Dictionary<string, NpcMarker> npcMarkers,
@@ -314,8 +321,12 @@ namespace NPCMapLocations.Framework.Menus
                   Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         // Draw map to cover base rendering 
-        public void DrawMap(SpriteBatch b)
+        private void DrawMap(SpriteBatch b)
         {
             int boxY = this.MapY - 96;
             int mY = this.MapY;
@@ -394,7 +405,7 @@ namespace NPCMapLocations.Framework.Menus
 
         // Draw event
         // Subtractions within location vectors are to set the origin to the center of the sprite
-        public void DrawMarkers(SpriteBatch b)
+        private void DrawMarkers(SpriteBatch b)
         {
             if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
@@ -511,7 +522,7 @@ namespace NPCMapLocations.Framework.Menus
         }
 
         // Draw NPC name tooltips map page
-        public void DrawNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
+        private void DrawNames(SpriteBatch b, string names, int x, int y, int offsetY, int relocate, int nameTooltipMode)
         {
             if (this.HoveredNames.Equals("")) return;
 
@@ -863,6 +874,7 @@ namespace NPCMapLocations.Framework.Menus
             }
             return playerLocationName;
         }
+
         /// <summary>Get the ModMain.Map points to display on a map.</summary>
         /// vanilla locations that have to be tweaked to match modified map
         private Dictionary<string, Rectangle> RegionRects()

@@ -5,6 +5,9 @@ namespace NPCMapLocations.Framework
     // Class for map markers
     public class NpcMarker
     {
+        /*********
+        ** Accessors
+        *********/
         public string DisplayName { get; set; }
         public string LocationName { get; set; }
         public Texture2D Sprite { get; set; }
@@ -17,6 +20,10 @@ namespace NPCMapLocations.Framework
         public bool IsHidden { get; set; }
         public int Layer { get; set; }
 
+
+        /*********
+        ** Public methods
+        *********/
         public NpcMarker()
         {
             this.DisplayName = null;

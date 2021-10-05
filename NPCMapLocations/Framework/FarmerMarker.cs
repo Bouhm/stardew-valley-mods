@@ -3,6 +3,9 @@
     // Class for map markers
     public class FarmerMarker
     {
+        /*********
+        ** Accessors
+        *********/
         public string Name { get; set; }
         public int MapX { get; set; }
         public int MapY { get; set; }

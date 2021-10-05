@@ -5,6 +5,9 @@ namespace NPCMapLocations.Framework.Models
     /// <summary>The model for global config options.</summary>
     public class GlobalConfig
     {
+        /*********
+        ** Accessors
+        *********/
         public bool DebugMode { get; set; } = false;
 
         /// <summary>The key binding to open the options menu when on the map view.</summary>

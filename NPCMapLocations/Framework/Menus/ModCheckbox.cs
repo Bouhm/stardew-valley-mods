@@ -12,9 +12,16 @@ namespace NPCMapLocations.Framework.Menus
     // Mod checkbox for settings and npc blacklist
     internal class ModCheckbox : OptionsElement
     {
+        /*********
+        ** Fields
+        *********/
         private readonly KeyValuePair<string, NpcMarker>[] NpcMarkers;
-        public bool IsChecked;
+        private bool IsChecked;
 
+
+        /*********
+        ** Public methods
+        *********/
         public ModCheckbox(string label, int whichOption, int x, int y, KeyValuePair<string, NpcMarker>[] npcMarkers = null)
             : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {

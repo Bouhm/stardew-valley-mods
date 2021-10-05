@@ -9,11 +9,18 @@ namespace NPCMapLocations.Framework.Menus
     // Mod slider for heart level this.Config
     internal class MapModSlider : OptionsElement
     {
+        /*********
+        ** Fields
+        *********/
+        private readonly string ValueLabel;
         private readonly int Max;
-        private int Min;
+        private readonly int Min;
         private float Value;
-        public string ValueLabel;
 
+
+        /*********
+        ** Public methods
+        *********/
         public MapModSlider(string label, int whichOption, int x, int y, int min, int max)
             : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
         {

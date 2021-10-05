@@ -6,6 +6,18 @@ namespace NPCMapLocations.Framework.Models
     // Maps the tileX and tileY in a game location to the location on the map
     public class MapVector
     {
+        /*********
+        ** Accessors
+        *********/
+        public int TileX { get; set; } // tileX in a game location
+        public int TileY { get; set; } // tileY in a game location
+        public int MapX { get; set; } // Absolute position relative to map
+        public int MapY { get; set; } // Absolute position relative to map
+
+
+        /*********
+        ** Public methods
+        *********/
         [JsonConstructor]
         public MapVector(int x, int y)
         {
@@ -21,10 +33,5 @@ namespace NPCMapLocations.Framework.Models
             this.TileX = tileX;
             this.TileY = tileY;
         }
-
-        public int TileX { get; set; } // tileX in a game location
-        public int TileY { get; set; } // tileY in a game location
-        public int MapX { get; set; } // Absolute position relative to map
-        public int MapY { get; set; } // Absolute position relative to map
     }
 }

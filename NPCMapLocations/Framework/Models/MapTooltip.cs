@@ -5,6 +5,9 @@ namespace NPCMapLocations.Framework.Models
     // Class for custom map tooltips
     public class MapTooltip
     {
+        /*********
+        ** Accessors
+        *********/
         public int X { get; set; } // Absolute position relative to map
         public int Y { get; set; } // Absolute position relative to map
         public int Width { get; set; } // Width of area on map
@@ -12,6 +15,10 @@ namespace NPCMapLocations.Framework.Models
         public string PrimaryText { get; set; } // Primary text
         public string SecondaryText { get; set; } // Secondary text (second line)
 
+
+        /*********
+        ** Public methods
+        *********/
         public MapTooltip(int x, int y, int width, int height, string primaryText)
         {
             this.X = x;

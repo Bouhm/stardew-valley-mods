@@ -12,6 +12,9 @@ namespace NPCMapLocations.Framework
     // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
     public class ModCustomizations
     {
+        /*********
+        ** Accessors
+        *********/
         public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
 
         /// <summary>Maps NPCs' internal names to their translated or customized display names.</summary>
@@ -22,6 +25,10 @@ namespace NPCMapLocations.Framework
         public string MapsRootPath { get; } = "maps";
         public string MapsPath { get; set; }
 
+
+        /*********
+        ** Public methods
+        *********/
         public ModCustomizations()
         {
             this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
@@ -33,6 +40,10 @@ namespace NPCMapLocations.Framework
             this.LoadCustomNpcs(customNpcJson);
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
         {
             foreach (var locationData in customLocationJson)
