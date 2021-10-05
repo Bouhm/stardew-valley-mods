@@ -7,19 +7,9 @@
         *********/
         public string DisplayName { get; set; }
         public string LocationName { get; set; }
-        public int MapX { get; set; }
-        public int MapY { get; set; }
+        public int MapX { get; set; } = -9999;
+        public int MapY { get; set; } = -9999;
         public bool IsBirthday { get; set; }
-        public CharacterType Type { get; set; }
-
-        public SyncedNpcMarker()
-        {
-            this.DisplayName = null;
-            this.LocationName = null;
-            this.MapX = -9999;
-            this.MapY = -9999;
-            this.IsBirthday = false;
-            this.Type = CharacterType.Villager;
-        }
+        public CharacterType Type { get; set; } = CharacterType.Villager;
     }
 }
