@@ -502,8 +502,7 @@ namespace NPCMapLocations.Framework.Menus
             }
             else
             {
-                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(),
-                  Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions, true);
+                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
                   new Vector2(this.MapX + playerLoc.X - 16, this.MapY + playerLoc.Y - 15), 0.00011f, 2f, 1,

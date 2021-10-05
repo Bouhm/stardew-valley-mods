@@ -891,9 +891,9 @@ namespace NPCMapLocations
         // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
         // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
         // Requires MapModConstants and modified map page in /maps
-        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null, bool isPlayer = false)
+        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null)
         {
-            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, bool isPlayer, ISet<string> seen, int depth)
+            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)
             {
                 if (string.IsNullOrWhiteSpace(locationName))
                     return Unknown;
@@ -932,7 +932,7 @@ namespace NPCMapLocations
                         int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
 
                         // Slightly adjust warp location to depict being inside the building 
-                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, isPlayer, seen, depth + 1);
+                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, seen, depth + 1);
                         return new Vector2(warpPos.X + 1, warpPos.Y - 8);
                     }
                 }
@@ -1021,7 +1021,7 @@ namespace NPCMapLocations
                 return new Vector2(x, y);
             }
 
-            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, isPlayer, new HashSet<string>(), 1);
+            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, new HashSet<string>(), 1);
         }
 
         private void Display_WindowResized(object sender, WindowResizedEventArgs e)
