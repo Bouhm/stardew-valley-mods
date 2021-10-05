@@ -394,7 +394,8 @@ namespace NPCMapLocations
             {
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
-                    MouseUtil.HandleMouseDown(() => this.Minimap.Value.HandleMouseDown());
+                    MouseUtil.HandleMouseDown();
+                    this.Minimap.Value.HandleMouseDown();
                 }
             }
 
@@ -428,7 +429,10 @@ namespace NPCMapLocations
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                     this.Minimap.Value.Resize();
                 else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
-                    MouseUtil.HandleMouseRelease(() => this.Minimap.Value.HandleMouseRelease());
+                {
+                    MouseUtil.HandleMouseRelease();
+                    this.Minimap.Value.HandleMouseRelease();
+                }
             }
         }
 

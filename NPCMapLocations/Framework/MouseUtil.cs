@@ -39,18 +39,16 @@ namespace NPCMapLocations.Framework
 
         // Handle mouse down for beginning of drag and drop action
         // Accepts a callback function as an argument
-        public static void HandleMouseDown(Action fn = null)
+        public static void HandleMouseDown()
         {
             BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-            fn?.Invoke();
         }
 
         // Handle mouse release for end of drag and drop action
         // Accepts a callback function as an argument
-        public static void HandleMouseRelease(Action fn = null)
+        public static void HandleMouseRelease()
         {
             EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
-            fn?.Invoke();
         }
 
         // Return Rectangle of current dragging area
