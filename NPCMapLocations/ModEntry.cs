@@ -25,7 +25,7 @@ namespace NPCMapLocations
         /*********
         ** Fields
         *********/
-        private static Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings;
+        private static readonly Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings = new();
 
         private readonly PerScreen<Texture2D> BuildingMarkers = new();
         private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new();
@@ -699,7 +699,7 @@ namespace NPCMapLocations
         // and getting positions relative to the farm 
         private void UpdateFarmBuildingLocations()
         {
-            FarmBuildings = new Dictionary<string, KeyValuePair<string, Vector2>>();
+            FarmBuildings.Clear();
 
             foreach (var building in Game1.getFarm().buildings)
             {
@@ -933,13 +933,15 @@ namespace NPCMapLocations
                 }
 
                 // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-                npcMarker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
-                                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
-                                     || Globals.OnlySameLocation && !isSameLocation
-                                     || Config.ByHeartLevel
-                                     && !(Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
-                                          >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(npc.Name)
-                                          <= Config.HeartLevelMax);
+                npcMarker.IsHidden =
+                    Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
+                    || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
+                    || Globals.OnlySameLocation && !isSameLocation
+                    || Config.ByHeartLevel
+                    && !(
+                        Game1.player.getFriendshipHeartLevelForNPC(npc.Name) >= Config.HeartLevelMin
+                        && Game1.player.getFriendshipHeartLevelForNPC(npc.Name) <= Config.HeartLevelMax
+                    );
 
                 // Check for daily quests
                 foreach (var quest in Game1.player.questLog)

@@ -23,17 +23,13 @@ namespace NPCMapLocations.Framework
         public Dictionary<string, MapTooltip> Tooltips { get; set; } = new();
 
         public string MapsRootPath { get; } = "maps";
-        public string MapsPath { get; set; }
+
+        public string MapsPath { get; } = Path.Combine("maps", "_default");
 
 
         /*********
         ** Public methods
         *********/
-        public ModCustomizations()
-        {
-            this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
-        }
-
         public void LoadCustomData(Dictionary<string, JObject> customNpcJson, Dictionary<string, JObject> customLocationJson)
         {
             this.LoadCustomLocations(customLocationJson);
@@ -48,22 +44,16 @@ namespace NPCMapLocations.Framework
         {
             foreach (var locationData in customLocationJson)
             {
-                var location = locationData.Value;
+                JObject location = locationData.Value;
+
                 if (location.ContainsKey("MapVectors"))
-                {
                     this.AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
-                }
+
                 if (location.ContainsKey("MapTooltip"))
-                {
                     this.AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
-                }
-                if (location.ContainsKey("Exclude"))
-                {
-                    if ((bool)location.GetValue("Exclude"))
-                    {
-                        this.LocationExclusions.Add(locationData.Key);
-                    }
-                }
+
+                if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
+                    this.LocationExclusions.Add(locationData.Key);
             }
         }
 
@@ -82,20 +72,17 @@ namespace NPCMapLocations.Framework
                 {
                     var npc = npcData.Value;
 
-                    if (npc.ContainsKey("Exclude"))
+                    if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
                     {
-                        if ((bool)npc.GetValue("Exclude"))
-                        {
-                            exclusions.Add(npcData.Key);
-                            continue;
-                        }
+                        exclusions.Add(npcData.Key);
+                        continue;
                     }
 
                     if (npc.ContainsKey("MarkerCropOffset"))
                         markerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
                     else
                     {
-                        var gameNpc = Game1.getCharacterFromName(npcData.Key);
+                        NPC gameNpc = Game1.getCharacterFromName(npcData.Key);
                         if (gameNpc != null)
                         {
                             // If custom crop offset is not specified, default to 0
@@ -146,47 +133,49 @@ namespace NPCMapLocations.Framework
         private void AddTooltip(string locationName, JObject tooltip)
         {
             this.Tooltips[locationName] = new MapTooltip(
-              (int)tooltip.GetValue("X"),
-              (int)tooltip.GetValue("Y"),
-              (int)tooltip.GetValue("Width"),
-              (int)tooltip.GetValue("Height"),
-              (string)tooltip.GetValue("PrimaryText"),
-              (string)tooltip.GetValue("SecondaryText")
+                (int)tooltip.GetValue("X"),
+                (int)tooltip.GetValue("Y"),
+                (int)tooltip.GetValue("Width"),
+                (int)tooltip.GetValue("Height"),
+                (string)tooltip.GetValue("PrimaryText"),
+                (string)tooltip.GetValue("SecondaryText")
             );
 
             if (tooltip.ContainsKey("SecondaryText"))
-            {
                 this.Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
-            }
         }
 
         // Any custom locations with given location on the map
         private void AddCustomMapLocation(string locationName, JArray mapLocations)
         {
-            var mapVectors = mapLocations.ToObject<JObject[]>();
-            var mapVectorArr = new MapVector[mapVectors.Length];
-            for (int i = 0; i < mapVectors.Length; i++)
+            var rawVectors = mapLocations.ToObject<JObject[]>();
+            var parsedVectors = new MapVector[rawVectors.Length];
+            for (int i = 0; i < rawVectors.Length; i++)
             {
-                var mapVector = mapVectors[i];
+                JObject rawVector = rawVectors[i];
 
                 // Marker doesn't need to specify corresponding Tile position
-                if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
-                    mapVectorArr[i] = new MapVector(
-                      (int)mapVector.GetValue("MapX"),
-                      (int)mapVector.GetValue("MapY")
+                if (rawVector.GetValue("TileX") == null || rawVector.GetValue("TileY") == null)
+                {
+                    parsedVectors[i] = new MapVector(
+                        (int)rawVector.GetValue("MapX"),
+                        (int)rawVector.GetValue("MapY")
                     );
+                }
                 // Region must specify corresponding Tile positions for
                 // Calculations on movement within location
                 else
-                    mapVectorArr[i] = new MapVector(
-                      (int)mapVector.GetValue("MapX"),
-                      (int)mapVector.GetValue("MapY"),
-                      (int)mapVector.GetValue("TileX"),
-                      (int)mapVector.GetValue("TileY")
+                {
+                    parsedVectors[i] = new MapVector(
+                        (int)rawVector.GetValue("MapX"),
+                        (int)rawVector.GetValue("MapY"),
+                        (int)rawVector.GetValue("TileX"),
+                        (int)rawVector.GetValue("TileY")
                     );
+                }
             }
 
-            this.MapVectors[locationName] = mapVectorArr;
+            this.MapVectors[locationName] = parsedVectors;
         }
 
         /// <summary>Merge any number of dictionaries into a new dictionary.</summary>
