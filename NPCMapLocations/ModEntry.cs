@@ -457,11 +457,11 @@ namespace NPCMapLocations
         // To initialize ModMap quicker for smoother rendering when opening map
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsPlayerFree) // don't try to update markers during warp transitions, etc
+            if (!Context.IsWorldReady)
                 return;
 
             // update and sync markers
-            if (e.IsMultipleOf(30))
+            if (e.IsMultipleOf(30) && Game1.currentLocation != null && Game1.player?.currentLocation != null)
             {
                 bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
                 if (updateForMinimap)
@@ -865,7 +865,8 @@ namespace NPCMapLocations
         // Update NPC marker data and names on hover
         private void UpdateNpcs()
         {
-            if (this.NpcMarkers.Value == null) return;
+            if (this.NpcMarkers.Value == null)
+                return;
 
             List<NPC> npcList = this.GetVillagers();
 
