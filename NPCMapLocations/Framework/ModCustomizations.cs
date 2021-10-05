@@ -15,21 +15,33 @@ namespace NPCMapLocations.Framework
         /*********
         ** Accessors
         *********/
+        /// <summary>The in-world tile coordinates and map pixels which represent the same position, indexed by location name.</summary>
+        /// <remarks>These are used to map any in-game tile coordinate to the map by measuring the distance between the two closest map vectors.</remarks>
         public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
 
-        /// <summary>Maps NPCs' internal names to their translated or customized display names.</summary>
+        /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
         public Dictionary<string, string> Names { get; set; } = new();
+
+        /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
+        /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
         public HashSet<string> LocationExclusions { get; set; } = new();
+
+        /// <summary>The tooltips to show on the map, indexed by location name. If the location name matches a <strong>translated</strong> vanilla tooltip text (e.g. <c>Calico Desert</c>), that tooltip is removed.</summary>
         public Dictionary<string, MapTooltip> Tooltips { get; set; } = new();
 
+        /// <summary>The name of the folder containing map assets.</summary>
         public string MapsRootPath { get; } = "maps";
 
+        /// <summary>The folder path containing map assets relative to the mod folder.</summary>
         public string MapsPath { get; } = Path.Combine("maps", "_default");
 
 
         /*********
         ** Public methods
         *********/
+        /// <summary>Load customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customNpcJson">The custom NPC data.</param>
+        /// <param name="customLocationJson">The custom location data.</param>
         public void LoadCustomData(Dictionary<string, JObject> customNpcJson, Dictionary<string, JObject> customLocationJson)
         {
             this.LoadCustomLocations(customLocationJson);
@@ -40,6 +52,8 @@ namespace NPCMapLocations.Framework
         /*********
         ** Private methods
         *********/
+        /// <summary>Load location customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customLocationJson">The raw location asset data.</param>
         private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
         {
             foreach (var locationData in customLocationJson)
@@ -57,8 +71,8 @@ namespace NPCMapLocations.Framework
             }
         }
 
-        // Handles customizations for NPCs
-        // Custom NPCs and custom names or sprites for existing NPCs
+        /// <summary>Load NPC customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customNpcJson">The raw NPC asset data.</param>
         private void LoadCustomNpcs(Dictionary<string, JObject> customNpcJson)
         {
             // load custom NPC marker offsets and exclusions
@@ -130,6 +144,9 @@ namespace NPCMapLocations.Framework
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
+        /// <summary>Load a custom tooltip received from another mod through the content pipeline.</summary>
+        /// <param name="locationName">The location name on the map.</param>
+        /// <param name="tooltip">The map tooltip to add. See <see cref="Tooltips"/> for details.</param>
         private void AddTooltip(string locationName, JObject tooltip)
         {
             this.Tooltips[locationName] = new MapTooltip(
@@ -145,7 +162,9 @@ namespace NPCMapLocations.Framework
                 this.Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
         }
 
-        // Any custom locations with given location on the map
+        /// <summary>Override the map vectors for a custom location. See <see cref="MapVectors"/> for details.</summary>
+        /// <param name="locationName">The name of the location for which to add vectors.</param>
+        /// <param name="mapLocations">The array of custom vectors.</param>
         private void AddCustomMapLocation(string locationName, JArray mapLocations)
         {
             var rawVectors = mapLocations.ToObject<JObject[]>();

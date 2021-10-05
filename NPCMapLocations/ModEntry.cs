@@ -138,9 +138,12 @@ namespace NPCMapLocations
             return (T)asset;
         }
 
-        // MAIN METHOD FOR PINPOINTING CHARACTERS ON THE MAP
-        // Calculated from mapping of game tile positions to pixel coordinates of the map in MapModConstants. 
-        // Requires MapModConstants and modified map page in /maps
+        /// <summary>Get the pixel coordinates relative to the top-left corner of the map for an in-world tile position.</summary>
+        /// <param name="locationName">The in-world location name.</param>
+        /// <param name="tileX">The X tile position within the location, if known.</param>
+        /// <param name="tileY">The Y tile position within the location, if known.</param>
+        /// <param name="customMapVectors">The custom vectors which map specific in-game tile coordinates to their map pixels.</param>
+        /// <param name="locationExclusions">The locations to ignore when scanning locations for players and NPCs.</param>
         public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null)
         {
             static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)

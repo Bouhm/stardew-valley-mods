@@ -8,6 +8,7 @@ namespace NPCMapLocations.Framework.Models
         /*********
         ** Accessors
         *********/
+        /// <summary>Whether to enable debug features.</summary>
         public bool DebugMode { get; set; } = false;
 
         /// <summary>The key binding to open the options menu when on the map view.</summary>
