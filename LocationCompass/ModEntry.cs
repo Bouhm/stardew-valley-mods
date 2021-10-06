@@ -389,11 +389,14 @@ namespace LocationCompass
                     string indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                     if (this.Config.SameLocationOnly)
                     {
-                        if (indoor == null) continue;
-                        if (playerLocName != characterLocCtx.Root && playerLocName != indoor) continue;
+                        if (indoor == null)
+                            continue;
+                        if (playerLocName != characterLocCtx.Root && playerLocName != indoor)
+                            continue;
                     }
-                    charLocName = (isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room) ? indoor : charLocName;
-
+                    charLocName = isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room
+                        ? indoor
+                        : charLocName;
 
                     // Neighboring outdoor warps
                     if (!isPlayerLocOutdoors)
@@ -403,19 +406,11 @@ namespace LocationCompass
 
                         // Doors that lead to connected rooms to character
                         if (characterLocCtx.Parent == playerLocName)
-                        {
-                            characterPos = new Vector2(
-                                characterLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                                characterLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
-                        }
+                            characterPos = characterLocCtx.GetWarpPixelPosition();
                         else
                         {
                             LocationContext characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
-                            characterPos = new Vector2(
-                                characterParentContext.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                                characterParentContext.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
+                            characterPos = characterParentContext.GetWarpPixelPosition();
                         }
                     }
                     else
@@ -425,10 +420,7 @@ namespace LocationCompass
                             // Point locators to the neighboring outdoor warps and
                             // doors of buildings including nested rooms
                             LocationContext indoorContext = this.LocationUtil.TryGetContext(indoor);
-                            characterPos = new Vector2(
-                                indoorContext.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                                indoorContext.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
+                            characterPos = indoorContext.GetWarpPixelPosition();
                         }
                         else if (!this.Config.SameLocationOnly)
                         {
@@ -437,11 +429,7 @@ namespace LocationCompass
                             if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out Vector2 warpPos)) || charLocName != null && playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
                             {
                                 charLocName = characterLocCtx.Root;
-
-                                characterPos = new Vector2(
-                                    warpPos.X * Game1.tileSize + Game1.tileSize / 2,
-                                    warpPos.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                                );
+                                characterPos = LocationContext.GetWarpPixelPosition(warpPos);
                             }
                             else
                                 continue;

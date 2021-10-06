@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using StardewValley;
 
 namespace Bouhm.Shared.Locations
 {
@@ -24,7 +25,27 @@ namespace Bouhm.Shared.Locations
         /// <summary>The names of locations directly contained by this location.</summary>
         public List<string> Children { get; set; }
 
-        /// <summary>The default entry position for incoming warps to this location.</summary>
+        /// <summary>The default entry tile for incoming warps to this location.</summary>
         public Vector2 Warp { get; set; }
+
+
+        /*********
+        ** Public methods
+        *********/
+        /// <summary>Get the pixel position on which incoming players will warp based on the <see cref="Warp"/> tile.</summary>
+        public Vector2 GetWarpPixelPosition()
+        {
+            return LocationContext.GetWarpPixelPosition(this.Warp);
+        }
+
+        /// <summary>Get the pixel position on which incoming players will warp based on the given arrival tile.</summary>
+        /// <param name="warpTile">The warp tile on which players will arrive.</param>
+        public static Vector2 GetWarpPixelPosition(Vector2 warpTile)
+        {
+            return new(
+                warpTile.X * Game1.tileSize + Game1.tileSize / 2,
+                warpTile.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+            );
+        }
     }
 }
