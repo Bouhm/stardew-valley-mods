@@ -119,14 +119,14 @@ namespace LocationCompass
 
         private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
         {
-            this.LocationUtil.GetLocationContexts();
+            this.LocationUtil.ScanLocationContexts();
         }
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
             this.SyncedLocationData = new SyncedNpcLocationData();
-            this.LocationUtil.GetLocationContexts();
+            this.LocationUtil.ScanLocationContexts();
 
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
@@ -329,14 +329,14 @@ namespace LocationCompass
                     if (playerMineName != null && charMineName != null)
                     {
                         // Leave mine levels distinguished in name if player inside mine
-                        this.LocationUtil.LocationContexts.TryGetValue(playerMineName, out playerLocCtx);
-                        this.LocationUtil.LocationContexts.TryGetValue(charMineName, out characterLocCtx);
+                        playerLocCtx = this.LocationUtil.TryGetContext(playerMineName, mapGeneratedLevels: false);
+                        characterLocCtx = this.LocationUtil.TryGetContext(charMineName, mapGeneratedLevels: false);
                     }
                     else
                     {
-                        if (!this.LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx))
+                        if (!this.LocationUtil.TryGetContext(playerLocName, out playerLocCtx))
                             continue;
-                        if (!this.LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx))
+                        if (!this.LocationUtil.TryGetContext(charLocName, out characterLocCtx))
                             continue;
                     }
                 }
@@ -405,15 +405,16 @@ namespace LocationCompass
                         if (characterLocCtx.Parent == playerLocName)
                         {
                             characterPos = new Vector2(
-                              characterLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              characterLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                                characterLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                                characterLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                             );
                         }
                         else
                         {
+                            LocationContext characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
                             characterPos = new Vector2(
-                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                                characterParentContext.Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                                characterParentContext.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                             );
                         }
                     }
@@ -423,9 +424,10 @@ namespace LocationCompass
                         {
                             // Point locators to the neighboring outdoor warps and
                             // doors of buildings including nested rooms
+                            LocationContext indoorContext = this.LocationUtil.TryGetContext(indoor);
                             characterPos = new Vector2(
-                              this.LocationUtil.LocationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              this.LocationUtil.LocationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                                indoorContext.Warp.X * Game1.tileSize + Game1.tileSize / 2,
+                                indoorContext.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                             );
                         }
                         else if (!this.Config.SameLocationOnly)
@@ -437,8 +439,8 @@ namespace LocationCompass
                                 charLocName = characterLocCtx.Root;
 
                                 characterPos = new Vector2(
-                                  warpPos.X * Game1.tileSize + Game1.tileSize / 2,
-                                  warpPos.Y * Game1.tileSize - Game1.tileSize * 3 / 2
+                                    warpPos.X * Game1.tileSize + Game1.tileSize / 2,
+                                    warpPos.Y * Game1.tileSize - Game1.tileSize * 3 / 2
                                 );
                             }
                             else

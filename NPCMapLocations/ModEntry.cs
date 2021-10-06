@@ -167,7 +167,7 @@ namespace NPCMapLocations
                     return mapLoc.Value;
 
                 // Get location of indoor location by its warp position in the outdoor location
-                if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
+                if (LocationUtil.TryGetContext(locationName, out var loc)
                   && loc.Type != LocationType.Outdoors
                   && loc.Root != null
                   && locationName != "MovieTheater"         // Weird edge cases where the warps are off
@@ -177,8 +177,9 @@ namespace NPCMapLocations
 
                     if (building != null)
                     {
-                        int doorX = (int)LocationUtil.LocationContexts[building].Warp.X;
-                        int doorY = (int)LocationUtil.LocationContexts[building].Warp.Y;
+                        var buildingContext = LocationUtil.TryGetContext(building);
+                        int doorX = (int)buildingContext.Warp.X;
+                        int doorY = (int)buildingContext.Warp.Y;
 
                         // Slightly adjust warp location to depict being inside the building 
                         var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, seen, depth + 1);
@@ -326,7 +327,7 @@ namespace NPCMapLocations
                 this.MapVectors.Value[locVectors.Key] = locVectors.Value;
 
             // Get context of all locations (indoor, outdoor, relativity)
-            LocationUtil.GetLocationContexts();
+            LocationUtil.ScanLocationContexts();
 
             // Log any custom locations not handled in content.json
             try
@@ -379,7 +380,7 @@ namespace NPCMapLocations
             if (e.Location.IsFarm)
                 this.UpdateFarmBuildingLocations();
 
-            LocationUtil.GetLocationContexts();
+            LocationUtil.ScanLocationContexts();
         }
 
         // Handle opening mod menu and changing tooltip options
@@ -918,17 +919,11 @@ namespace NPCMapLocations
 
                 if (Globals.OnlySameLocation)
                 {
-                    string playerLocationName =
-                      Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+                    string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
                     if (locationName == playerLocationName)
-                    {
                         isSameLocation = true;
-                    }
-                    else if (LocationUtil.LocationContexts.TryGetValue(locationName, out var npcLocCtx) &&
-                             LocationUtil.LocationContexts.TryGetValue(playerLocationName, out var playerLocCtx))
-                    {
+                    else if (LocationUtil.TryGetContext(locationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
                         isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
-                    }
                 }
 
                 // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
@@ -995,17 +990,11 @@ namespace NPCMapLocations
                 bool isSameLocation = false;
                 if (Globals.OnlySameLocation)
                 {
-                    string playerLocationName =
-                      Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+                    string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
                     if (marker.LocationName == playerLocationName)
-                    {
                         isSameLocation = true;
-                    }
-                    else if (LocationUtil.LocationContexts.TryGetValue(marker.LocationName, out var npcLocCtx) &&
-                             LocationUtil.LocationContexts.TryGetValue(playerLocationName, out var playerLocCtx))
-                    {
+                    else if (LocationUtil.TryGetContext(marker.LocationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
                         isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
-                    }
                 }
 
                 // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked

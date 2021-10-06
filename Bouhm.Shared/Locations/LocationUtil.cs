@@ -37,23 +37,23 @@ namespace Bouhm.Shared.Locations
             this.Monitor = monitor;
         }
 
-        public Dictionary<string, LocationContext> GetLocationContexts()
+        public Dictionary<string, LocationContext> ScanLocationContexts()
         {
             foreach (var location in Game1.locations)
             {
                 // Get outdoor neighbors
                 if (location.IsOutdoors)
                 {
-                    if (!this.LocationContexts.ContainsKey(location.Name))
-                        this.LocationContexts.Add(location.Name, new LocationContext { Root = location.Name, Type = LocationType.Outdoors });
+                    if (!this.TryGetContext(location.Name, out var context))
+                        this.LocationContexts[location.Name] = context = new LocationContext { Root = location.Name, Type = LocationType.Outdoors };
 
                     foreach (var warp in location.warps)
                     {
                         GameLocation warpLocation = this.GetStaticLocation(warp?.TargetName);
                         if (warpLocation?.IsOutdoors == true)
                         {
-                            if (!this.LocationContexts[location.Name].Neighbors.ContainsKey(warp.TargetName))
-                                this.LocationContexts[location.Name].Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
+                            if (!context.Neighbors.ContainsKey(warp.TargetName))
+                                context.Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
                         }
                     }
                 }
@@ -89,12 +89,13 @@ namespace Bouhm.Shared.Locations
                 }
 
                 // found root building
-                if (this.LocationContexts[locationName].Type == LocationType.Building)
+                var context = this.TryGetContext(locationName);
+                if (context?.Type == LocationType.Building)
                     return locationName;
-                string building = this.LocationContexts[locationName].Parent;
+                string building = context?.Parent;
                 if (building == null)
                     return null;
-                if (building == this.LocationContexts[locationName].Root)
+                if (building == context?.Root)
                     return locationName;
 
                 // scan recursively
@@ -102,6 +103,33 @@ namespace Bouhm.Shared.Locations
             }
 
             return GetRecursively(startLocationName, new HashSet<string>(), curRecursionDepth);
+        }
+
+        /// <summary>Get the context metadata for a location, if known.</summary>
+        /// <param name="locationName">The location name.</param>
+        /// <param name="mapGeneratedLevels">Whether to automatically map mine levels to their static entrance location.</param>
+        /// <returns>Returns the context if found, else <c>null</c>.</returns>
+        public LocationContext TryGetContext(string locationName, bool mapGeneratedLevels = true)
+        {
+            if (mapGeneratedLevels)
+                locationName = this.GetLocationNameFromLevel(locationName) ?? locationName;
+
+            if (string.IsNullOrWhiteSpace(locationName))
+                return null;
+
+            return this.LocationContexts.TryGetValue(locationName, out LocationContext context)
+                ? context
+                : null;
+        }
+
+        /// <summary>Get the context metadata for a location, if known.</summary>
+        /// <param name="locationName">The location name.</param>
+        /// <param name="context">The location context, if found.</param>
+        /// <returns>Returns whether the context was found.</returns>
+        public bool TryGetContext(string locationName, out LocationContext context)
+        {
+            context = this.TryGetContext(locationName);
+            return context != null;
         }
 
         /// <summary>Get the name of the static entry location for a generated mine or dungeon level, if applicable.</summary>
@@ -136,13 +164,7 @@ namespace Bouhm.Shared.Locations
         /// <param name="locationName">The location name.</param>
         public bool IsOutdoors(string locationName)
         {
-            if (locationName == null)
-                return false;
-
-            if (this.LocationContexts.TryGetValue(locationName, out var locCtx))
-                return locCtx.Type == LocationType.Outdoors;
-
-            return false;
+            return this.TryGetContext(locationName)?.Type == LocationType.Outdoors;
         }
 
 
@@ -166,36 +188,40 @@ namespace Bouhm.Shared.Locations
                 // get location info
                 string curLocationName = location.NameOrUniqueName;
                 string prevLocationName = prevLocation?.NameOrUniqueName;
+                LocationContext prevContext = prevLocationName != null
+                    ? this.LocationContexts[prevLocationName]
+                    : null;
 
                 // track contexts
-                if (!this.LocationContexts.ContainsKey(curLocationName))
-                    this.LocationContexts.Add(curLocationName, new LocationContext());
-                if (prevLocation != null && !warpPosition.Equals(Vector2.Zero))
+                if (!this.TryGetContext(curLocationName, out var context))
+                    this.LocationContexts[curLocationName] = context = new LocationContext();
+
+                if (prevContext != null && !warpPosition.Equals(Vector2.Zero))
                 {
-                    this.LocationContexts[prevLocationName].Warp = warpPosition;
+                    prevContext.Warp = warpPosition;
                     if (root != curLocationName)
-                        this.LocationContexts[prevLocationName].Parent = curLocationName;
+                        prevContext.Parent = curLocationName;
                 }
 
                 // pass root location back recursively
                 if (root != null)
                 {
-                    this.LocationContexts[curLocationName].Root = root;
+                    context.Root = root;
                     return root;
                 }
 
                 // root location found, set as root and return
                 if (location.IsOutdoors)
                 {
-                    this.LocationContexts[curLocationName].Type = LocationType.Outdoors;
-                    this.LocationContexts[curLocationName].Root = curLocationName;
+                    context.Type = LocationType.Outdoors;
+                    context.Root = curLocationName;
 
                     if (prevLocation != null)
                     {
-                        if (this.LocationContexts[curLocationName].Children == null)
-                            this.LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
-                        else if (!this.LocationContexts[curLocationName].Children.Contains(prevLocationName))
-                            this.LocationContexts[curLocationName].Children.Add(prevLocationName);
+                        if (context.Children == null)
+                            context.Children = new List<string> { prevLocationName };
+                        else if (!context.Children.Contains(prevLocationName))
+                            context.Children.Add(prevLocationName);
                     }
 
                     return curLocationName;
@@ -218,20 +244,20 @@ namespace Bouhm.Shared.Locations
                         hasOutdoorWarp = true;
 
                     // if all warps are indoors, then the current location is a room
-                    this.LocationContexts[curLocationName].Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
+                    context.Type = hasOutdoorWarp ? LocationType.Building : LocationType.Room;
 
                     // update contexts
-                    if (prevLocation != null)
+                    if (prevContext != null)
                     {
-                        this.LocationContexts[prevLocationName].Parent = curLocationName;
+                        prevContext.Parent = curLocationName;
 
-                        if (this.LocationContexts[curLocationName].Children == null)
-                            this.LocationContexts[curLocationName].Children = new List<string> { prevLocationName };
-                        else if (!this.LocationContexts[curLocationName].Children.Contains(prevLocationName))
-                            this.LocationContexts[curLocationName].Children.Add(prevLocationName);
+                        if (context.Children == null)
+                            context.Children = new List<string> { prevLocationName };
+                        else if (!context.Children.Contains(prevLocationName))
+                            context.Children.Add(prevLocationName);
                     }
                     root = ScanRecursively(warpLocation, location, root, hasOutdoorWarp, new Vector2(warp.TargetX, warp.TargetY), seen, depth + 1);
-                    this.LocationContexts[curLocationName].Root = root;
+                    context.Root = root;
 
                     return root;
                 }
