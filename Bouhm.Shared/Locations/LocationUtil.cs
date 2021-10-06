@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Locations;
 
 namespace Bouhm.Shared.Locations
 {
@@ -72,26 +73,29 @@ namespace Bouhm.Shared.Locations
         /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
         public string GetBuilding(string startLocationName, int curRecursionDepth)
         {
-            string GetRecursively(string loc, ISet<string> seen, int depth)
+            string GetRecursively(string locationName, ISet<string> seen, int depth)
             {
                 // break infinite loops
-                if (!seen.Add(loc))
-                    return loc;
+                if (!seen.Add(locationName))
+                    return locationName;
                 if (depth > LocationUtil.MaxRecursionDepth)
-                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(loc)}: {loc}\n{nameof(depth)}: {depth}\n\n{Environment.StackTrace}");
+                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(depth)}: {depth}\n\n{Environment.StackTrace}");
 
-                // handle mines
-                if (loc.Contains("UndergroundMine"))
-                    return this.GetMinesLocationName(loc);
+                // handle generated levels
+                {
+                    string mineName = this.GetLocationNameFromLevel(locationName);
+                    if (mineName != null)
+                        return mineName;
+                }
 
                 // found root building
-                if (this.LocationContexts[loc].Type == LocationType.Building)
-                    return loc;
-                string building = this.LocationContexts[loc].Parent;
+                if (this.LocationContexts[locationName].Type == LocationType.Building)
+                    return locationName;
+                string building = this.LocationContexts[locationName].Parent;
                 if (building == null)
                     return null;
-                if (building == this.LocationContexts[loc].Root)
-                    return loc;
+                if (building == this.LocationContexts[locationName].Root)
+                    return locationName;
 
                 // scan recursively
                 return GetRecursively(building, seen, depth + 1);
@@ -100,20 +104,36 @@ namespace Bouhm.Shared.Locations
             return GetRecursively(startLocationName, new HashSet<string>(), curRecursionDepth);
         }
 
-        // Get Mines name from floor level
-        public string GetMinesLocationName(string locationName)
+        /// <summary>Get the name of the static entry location for a generated mine or dungeon level, if applicable.</summary>
+        /// <param name="locationName">The actual location name, like <c>UndergroundMine35</c>.</param>
+        /// <returns>Returns <c>Mine</c>, <c>SkullCave</c>, <c>VolcanoDungeon</c>, or <c>null</c>.</returns>
+        public string GetLocationNameFromLevel(string locationName)
         {
-            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-            if (int.TryParse(mine, out int mineLevel))
+            const string minePrefix = "UndergroundMine";
+            const string volcanoPrefix = "VolcanoDungeon";
+
+            // mines or skull cavern
+            if (locationName?.StartsWith(minePrefix) == true)
             {
-                return mineLevel > 120
-                    ? "SkullCave"
-                    : "Mine";
+                string rawLevel = locationName.Substring(minePrefix.Length, locationName.Length - minePrefix.Length);
+                if (int.TryParse(rawLevel, out int mineLevel))
+                {
+                    return mineLevel > 120 && mineLevel != MineShaft.quarryMineShaft
+                        ? "SkullCave"
+                        : "Mine";
+                }
             }
 
+            // volcano dungeon
+            if (locationName == "Caldera" || locationName?.StartsWith(volcanoPrefix) == true)
+                return "VolcanoDungeon0";
+
+            // not a generated level
             return null;
         }
 
+        /// <summary>Get whether a location is outdoors, if known.</summary>
+        /// <param name="locationName">The location name.</param>
         public bool IsOutdoors(string locationName)
         {
             if (locationName == null)
@@ -228,10 +248,7 @@ namespace Bouhm.Shared.Locations
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(name))
-                    return null;
-
-                if (name.StartsWith("UndergroundMine") || name.StartsWith("VolcanoDungeon"))
+                if (string.IsNullOrWhiteSpace(name) || this.GetLocationNameFromLevel(name) != null)
                     return null;
 
                 return Game1.getLocationFromName(name);

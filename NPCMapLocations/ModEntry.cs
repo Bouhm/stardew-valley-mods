@@ -148,6 +148,9 @@ namespace NPCMapLocations
         {
             static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)
             {
+                // special case: map generated level to single name
+                locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
+
                 if (string.IsNullOrWhiteSpace(locationName))
                     return Unknown;
 
@@ -162,13 +165,6 @@ namespace NPCMapLocations
 
                 if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
                     return mapLoc.Value;
-
-                if (locationName.StartsWith("UndergroundMine"))
-                {
-                    string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-                    if (int.TryParse(mine, out int mineLevel))
-                        locationName = mineLevel > 120 ? "SkullCave" : "Mine";
-                }
 
                 // Get location of indoor location by its warp position in the outdoor location
                 if (LocationUtil.LocationContexts.TryGetValue(locationName, out var loc)
@@ -1059,10 +1055,7 @@ namespace NPCMapLocations
                 if (farmer?.currentLocation == null) continue;
                 string locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
 
-                if (locationName.Contains("UndergroundMine"))
-                {
-                    locationName = LocationUtil.GetMinesLocationName(locationName);
-                }
+                locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
 
                 long farmerId = farmer.UniqueMultiplayerID;
                 var farmerLoc = LocationToMap(

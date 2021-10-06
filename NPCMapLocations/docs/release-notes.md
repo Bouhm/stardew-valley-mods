@@ -2,8 +2,10 @@
 
 # Release notes
 ## Upcoming release
+* Improved support for Volcano Dungeon.
 * Fixed error if a map sync happens mid-warp in multiplayer.
 * Fixed error when a location has invalid data.
+* Fixed various edge cases.
 
 ## 2.6.6
 Released 24 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.

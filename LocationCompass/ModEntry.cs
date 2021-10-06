@@ -266,26 +266,18 @@ namespace LocationCompass
             }
         }
 
-        private string GetMineName(string locationName)
-        {
-            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-            string mineName = locationName;
-
-            if (int.TryParse(mine, out int mineLevel))
-                mineName = mineLevel > 120 ? "SkullCave" : "Mine";
-
-            return mineName;
-        }
-
         private void UpdateLocators()
         {
             this.Locators = new Dictionary<string, List<Locator>>();
 
             foreach (var character in this.Characters)
             {
-                if (character.currentLocation == null) continue;
-                if (!this.Config.ShowHorses && character is Horse || this.Config.ShowFarmersOnly && (character is NPC && !(character is Horse))) continue;
-                if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
+                if (character.currentLocation == null)
+                    continue;
+                if (!this.Config.ShowHorses && character is Horse || this.Config.ShowFarmersOnly && (character is NPC && !(character is Horse)))
+                    continue;
+                if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC)
+                    continue;
                 if (character is NPC npc && this.Config.ShowQuestsAndBirthdaysOnly)
                 {
                     bool isBirthday = false;
@@ -324,21 +316,29 @@ namespace LocationCompass
                 LocationContext characterLocCtx;
 
                 // Manually handle mines
-                if (isPlayerLocOutdoors && charLocName.Contains("UndergroundMine"))
                 {
-                    // If inside either mine, show characters as inside same general mine to player outside
-                    charLocName = this.GetMineName(charLocName);
-                }
-                if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
-                {
-                    // Leave mine levels distinguished in name if player inside mine
-                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(playerLocName), out playerLocCtx);
-                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(charLocName), out characterLocCtx);
-                }
-                else
-                {
-                    if (!this.LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
-                    if (!this.LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+                    string charMineName = this.LocationUtil.GetLocationNameFromLevel(charLocName);
+                    string playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
+
+                    if (isPlayerLocOutdoors)
+                    {
+                        // If inside a generated level, show characters as inside same general mine to player outside
+                        charLocName = charMineName ?? charLocName;
+                    }
+
+                    if (playerMineName != null && charMineName != null)
+                    {
+                        // Leave mine levels distinguished in name if player inside mine
+                        this.LocationUtil.LocationContexts.TryGetValue(playerMineName, out playerLocCtx);
+                        this.LocationUtil.LocationContexts.TryGetValue(charMineName, out characterLocCtx);
+                    }
+                    else
+                    {
+                        if (!this.LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx))
+                            continue;
+                        if (!this.LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx))
+                            continue;
+                    }
                 }
 
                 if (this.Config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
