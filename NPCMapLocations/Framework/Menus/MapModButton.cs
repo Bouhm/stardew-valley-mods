@@ -8,9 +8,21 @@ namespace NPCMapLocations.Framework.Menus
     // Mod button for the three main modes
     internal class MapModButton : OptionsElement
     {
-        public bool IsActive;
-        public Rectangle Rect;
+        /*********
+        ** Fields
+        *********/
+        private bool IsActive;
 
+
+        /*********
+        ** Accessors
+        *********/
+        public Rectangle Rect { get; set; }
+
+
+        /*********
+        ** Public methods
+        *********/
         public MapModButton(string label, int whichOption, int x, int y, int width, int height)
             : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {

@@ -1,22 +1,27 @@
 ﻿namespace NPCMapLocations.Framework
 {
+    /// <summary>The base data for an NPC marker on the map synchronized from the host player.</summary>
     public class SyncedNpcMarker
     {
+        /*********
+        ** Accessors
+        *********/
+        /// <summary>The NPC's translated display name.</summary>
         public string DisplayName { get; set; }
-        public string LocationName { get; set; }
-        public int MapX { get; set; }
-        public int MapY { get; set; }
-        public bool IsBirthday { get; set; }
-        public CharacterType Type { get; set; }
 
-        public SyncedNpcMarker()
-        {
-            this.DisplayName = null;
-            this.LocationName = null;
-            this.MapX = -9999;
-            this.MapY = -9999;
-            this.IsBirthday = false;
-            this.Type = CharacterType.Villager;
-        }
+        /// <summary>The name of the location containing the NPC.</summary>
+        public string LocationName { get; set; }
+
+        /// <summary>The marker's pixel X coordinate relative to the top-left corner of the map.</summary>
+        public int MapX { get; set; } = -9999;
+
+        /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
+        public int MapY { get; set; } = -9999;
+
+        /// <summary>Whether the NPC's birthday is today.</summary>
+        public bool IsBirthday { get; set; }
+
+        /// <summary>The NPC's character type.</summary>
+        public CharacterType Type { get; set; } = CharacterType.Villager;
     }
 }

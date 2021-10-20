@@ -3,6 +3,9 @@
     /// <summary>The mod configuration model.</summary>
     internal class ModConfig
     {
+        /*********
+        ** Accessors
+        *********/
         /// <summary>Whether you need to hold the button to show icons (else the button toggles them).</summary>
         public bool HoldToToggle { get; set; } = true;
 

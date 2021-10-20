@@ -11,17 +11,24 @@ namespace NPCMapLocations.Framework.Menus
 {
     public class ModPlusMinus : OptionsElement
     {
-        public static bool SnapZoomPlus;
-        public static bool SnapZoomMinus;
-        public static Rectangle MinusButtonSource = new(177, 345, 7, 8);
-        public static Rectangle PlusButtonSource = new(184, 345, 7, 8);
-        public List<string> DisplayOptions;
-        private Rectangle MinusButton;
-        public List<int> Options;
-        private Rectangle PlusButton;
+        /*********
+        ** Fields
+        *********/
+        private static readonly Rectangle MinusButtonSource = new(177, 345, 7, 8);
+        private static readonly Rectangle PlusButtonSource = new(184, 345, 7, 8);
+        private readonly List<string> DisplayOptions;
+        private readonly List<int> Options;
         private readonly int TxtSize;
-        public int Selected;
+        private Rectangle MinusButton;
+        private Rectangle PlusButton;
+        private static bool SnapZoomPlus;
+        private static bool SnapZoomMinus;
+        private int Selected;
 
+
+        /*********
+        ** Public methods
+        *********/
         public ModPlusMinus(string label, int whichOption, List<int> options, int x = -1, int y = -1)
             : base(label, x, y, 28, 28, whichOption)
         {

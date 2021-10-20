@@ -16,6 +16,9 @@ namespace LocationCompass
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod
     {
+        /*********
+        ** Fields
+        *********/
         private readonly int MaxProximity = 4800;
 
         private readonly bool DebugMode = false;
@@ -31,6 +34,10 @@ namespace LocationCompass
         /// <summary>Scans and maps locations in the game world.</summary>
         private LocationUtil LocationUtil;
 
+
+        /*********
+        ** Public methods
+        *********/
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
@@ -48,6 +55,10 @@ namespace LocationCompass
             helper.Events.Display.Rendered += this.Display_Rendered;
         }
 
+
+        /*********
+        ** Private methods
+        *********/
         private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
         {
             this.Characters = new List<Character>();
@@ -108,14 +119,14 @@ namespace LocationCompass
 
         private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
         {
-            this.LocationUtil.GetLocationContexts();
+            this.LocationUtil.ScanLocationContexts();
         }
 
         private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
             this.SyncedLocationData = new SyncedNpcLocationData();
-            this.LocationUtil.GetLocationContexts();
+            this.LocationUtil.ScanLocationContexts();
 
             // Log warning if host does not have mod installed
             if (Context.IsMultiplayer)
@@ -140,32 +151,6 @@ namespace LocationCompass
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
                 this.SyncedLocationData = e.ReadAs<SyncedNpcLocationData>();
-        }
-
-        // Get only relevant villagers for map
-        private List<NPC> GetVillagers()
-        {
-            var villagers = new List<NPC>();
-            var excludedNpcs = new List<string>
-      {
-        "Dwarf",
-        "Mister Qi",
-        "Bouncer",
-        "Henchman",
-        "Gunther",
-        "Krobus"
-      };
-
-            foreach (var location in Game1.locations)
-            {
-                foreach (var npc in location.characters)
-                {
-                    if (npc == null) continue;
-                    if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
-                        villagers.Add(npc);
-                }
-            }
-            return villagers;
         }
 
         private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
@@ -217,6 +202,61 @@ namespace LocationCompass
             }
         }
 
+        private void Display_Rendered(object sender, RenderedEventArgs e)
+        {
+            //if (!Context.IsWorldReady || locators == null) return;
+
+            if (this.ShowLocators && Game1.activeClickableMenu == null)
+                this.DrawLocators();
+
+            if (!this.DebugMode)
+                return;
+
+            foreach (var locPair in this.Locators)
+            {
+                foreach (var locator in locPair.Value)
+                {
+                    if (!locator.IsOnScreen)
+                        continue;
+
+                    var npc = Game1.getCharacterFromName(locator.Name);
+                    float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float viewportY = Game1.player.position.Y - Game1.viewport.Y;
+                    float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
+                    float npcViewportY = npc.position.Y - Game1.viewport.Y;
+
+                    // Draw NPC sprite noodle connecting center of screen to NPC for debugging
+                    this.DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.Sprite.Texture);
+                }
+            }
+        }
+
+        // Get only relevant villagers for map
+        private List<NPC> GetVillagers()
+        {
+            var villagers = new List<NPC>();
+            var excludedNpcs = new List<string>
+            {
+                "Dwarf",
+                "Mister Qi",
+                "Bouncer",
+                "Henchman",
+                "Gunther",
+                "Krobus"
+            };
+
+            foreach (var location in Game1.locations)
+            {
+                foreach (var npc in location.characters)
+                {
+                    if (npc == null) continue;
+                    if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
+                        villagers.Add(npc);
+                }
+            }
+            return villagers;
+        }
+
         private void GetSyncedLocationData()
         {
             foreach (var npc in this.GetVillagers())
@@ -226,26 +266,18 @@ namespace LocationCompass
             }
         }
 
-        private string GetMineName(string locationName)
-        {
-            string mine = locationName.Substring("UndergroundMine".Length, locationName.Length - "UndergroundMine".Length);
-            string mineName = locationName;
-
-            if (int.TryParse(mine, out int mineLevel))
-                mineName = mineLevel > 120 ? "SkullCave" : "Mine";
-
-            return mineName;
-        }
-
         private void UpdateLocators()
         {
             this.Locators = new Dictionary<string, List<Locator>>();
 
             foreach (var character in this.Characters)
             {
-                if (character.currentLocation == null) continue;
-                if (!this.Config.ShowHorses && character is Horse || this.Config.ShowFarmersOnly && (character is NPC && !(character is Horse))) continue;
-                if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC) continue;
+                if (character.currentLocation == null)
+                    continue;
+                if (!this.Config.ShowHorses && character is Horse || this.Config.ShowFarmersOnly && (character is NPC && !(character is Horse)))
+                    continue;
+                if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC)
+                    continue;
                 if (character is NPC npc && this.Config.ShowQuestsAndBirthdaysOnly)
                 {
                     bool isBirthday = false;
@@ -284,21 +316,29 @@ namespace LocationCompass
                 LocationContext characterLocCtx;
 
                 // Manually handle mines
-                if (isPlayerLocOutdoors && charLocName.Contains("UndergroundMine"))
                 {
-                    // If inside either mine, show characters as inside same general mine to player outside
-                    charLocName = this.GetMineName(charLocName);
-                }
-                if (playerLocName.Contains("UndergroundMine") && charLocName.Contains("UndergroundMine"))
-                {
-                    // Leave mine levels distinguished in name if player inside mine
-                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(playerLocName), out playerLocCtx);
-                    this.LocationUtil.LocationContexts.TryGetValue(this.GetMineName(charLocName), out characterLocCtx);
-                }
-                else
-                {
-                    if (!this.LocationUtil.LocationContexts.TryGetValue(playerLocName, out playerLocCtx)) continue;
-                    if (!this.LocationUtil.LocationContexts.TryGetValue(charLocName, out characterLocCtx)) continue;
+                    string charMineName = this.LocationUtil.GetLocationNameFromLevel(charLocName);
+                    string playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
+
+                    if (isPlayerLocOutdoors)
+                    {
+                        // If inside a generated level, show characters as inside same general mine to player outside
+                        charLocName = charMineName ?? charLocName;
+                    }
+
+                    if (playerMineName != null && charMineName != null)
+                    {
+                        // Leave mine levels distinguished in name if player inside mine
+                        playerLocCtx = this.LocationUtil.TryGetContext(playerMineName, mapGeneratedLevels: false);
+                        characterLocCtx = this.LocationUtil.TryGetContext(charMineName, mapGeneratedLevels: false);
+                    }
+                    else
+                    {
+                        if (!this.LocationUtil.TryGetContext(playerLocName, out playerLocCtx))
+                            continue;
+                        if (!this.LocationUtil.TryGetContext(charLocName, out characterLocCtx))
+                            continue;
+                    }
                 }
 
                 if (this.Config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
@@ -349,11 +389,14 @@ namespace LocationCompass
                     string indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                     if (this.Config.SameLocationOnly)
                     {
-                        if (indoor == null) continue;
-                        if (playerLocName != characterLocCtx.Root && playerLocName != indoor) continue;
+                        if (indoor == null)
+                            continue;
+                        if (playerLocName != characterLocCtx.Root && playerLocName != indoor)
+                            continue;
                     }
-                    charLocName = (isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room) ? indoor : charLocName;
-
+                    charLocName = isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room
+                        ? indoor
+                        : charLocName;
 
                     // Neighboring outdoor warps
                     if (!isPlayerLocOutdoors)
@@ -363,18 +406,11 @@ namespace LocationCompass
 
                         // Doors that lead to connected rooms to character
                         if (characterLocCtx.Parent == playerLocName)
-                        {
-                            characterPos = new Vector2(
-                              characterLocCtx.Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              characterLocCtx.Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
-                        }
+                            characterPos = characterLocCtx.GetWarpPixelPosition();
                         else
                         {
-                            characterPos = new Vector2(
-                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              this.LocationUtil.LocationContexts[characterLocCtx.Parent].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
+                            LocationContext characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
+                            characterPos = characterParentContext.GetWarpPixelPosition();
                         }
                     }
                     else
@@ -383,10 +419,8 @@ namespace LocationCompass
                         {
                             // Point locators to the neighboring outdoor warps and
                             // doors of buildings including nested rooms
-                            characterPos = new Vector2(
-                              this.LocationUtil.LocationContexts[indoor].Warp.X * Game1.tileSize + Game1.tileSize / 2,
-                              this.LocationUtil.LocationContexts[indoor].Warp.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                            );
+                            LocationContext indoorContext = this.LocationUtil.TryGetContext(indoor);
+                            characterPos = indoorContext.GetWarpPixelPosition();
                         }
                         else if (!this.Config.SameLocationOnly)
                         {
@@ -395,11 +429,7 @@ namespace LocationCompass
                             if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out Vector2 warpPos)) || charLocName != null && playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
                             {
                                 charLocName = characterLocCtx.Root;
-
-                                characterPos = new Vector2(
-                                  warpPos.X * Game1.tileSize + Game1.tileSize / 2,
-                                  warpPos.Y * Game1.tileSize - Game1.tileSize * 3 / 2
-                                );
+                                characterPos = LocationContext.GetWarpPixelPosition(warpPos);
                             }
                             else
                                 continue;
@@ -805,8 +835,7 @@ namespace LocationCompass
         }
 
         // Draw outlined text
-        private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null,
-          float scale = 1f)
+        private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
         {
             //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
             //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
@@ -815,35 +844,6 @@ namespace LocationCompass
             Game1.spriteBatch.DrawString(font ?? Game1.tinyFont, text, pos, color ?? Color.White, 0f, origin ?? Vector2.Zero,
               scale,
               SpriteEffects.None, 0f);
-        }
-
-        private void Display_Rendered(object sender, RenderedEventArgs e)
-        {
-            //if (!Context.IsWorldReady || locators == null) return;
-
-            if (this.ShowLocators && Game1.activeClickableMenu == null)
-                this.DrawLocators();
-
-            if (!this.DebugMode)
-                return;
-
-            foreach (var locPair in this.Locators)
-            {
-                foreach (var locator in locPair.Value)
-                {
-                    if (!locator.IsOnScreen)
-                        continue;
-
-                    var npc = Game1.getCharacterFromName(locator.Name);
-                    float viewportX = Game1.player.position.X + Game1.pixelZoom * Game1.player.Sprite.SpriteWidth / 2 - Game1.viewport.X;
-                    float viewportY = Game1.player.position.Y - Game1.viewport.Y;
-                    float npcViewportX = npc.position.X + Game1.pixelZoom * npc.Sprite.SpriteWidth / 2 - Game1.viewport.X;
-                    float npcViewportY = npc.position.Y - Game1.viewport.Y;
-
-                    // Draw NPC sprite noodle connecting center of screen to NPC for debugging
-                    this.DrawLine(Game1.spriteBatch, new Vector2(viewportX, viewportY), new Vector2(npcViewportX, npcViewportY), npc.Sprite.Texture);
-                }
-            }
         }
     }
 }

@@ -17,6 +17,9 @@ namespace NPCMapLocations.Framework.Menus
 {
     public class ModMenu : IClickableMenu
     {
+        /*********
+        ** Fields
+        *********/
         private readonly ClickableTextureComponent DownArrow;
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
@@ -34,6 +37,10 @@ namespace NPCMapLocations.Framework.Menus
         private int OptionsSlotHeld = -1;
         private bool Scrolling;
 
+
+        /*********
+        ** Public methods
+        *********/
         public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs)
             : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
@@ -148,16 +155,6 @@ namespace NPCMapLocations.Framework.Menus
             return true;
         }
 
-        private void SetScrollBarToCurrentIndex()
-        {
-            if (this.Options.Any())
-            {
-                this.ScrollBar.bounds.Y = this.ScrollBarRunner.Height / Math.Max(1, this.Options.Count - 7 + 1) * this.CurrentItemIndex + this.UpArrow.bounds.Bottom + Game1.pixelZoom;
-                if (this.CurrentItemIndex == this.Options.Count - 7)
-                    this.ScrollBar.bounds.Y = this.DownArrow.bounds.Y - this.ScrollBar.bounds.Height - Game1.pixelZoom;
-            }
-        }
-
         public override void leftClickHeld(int x, int y)
         {
             if (GameMenu.forcePreventClose) return;
@@ -246,20 +243,6 @@ namespace NPCMapLocations.Framework.Menus
 
             this.OptionsSlotHeld = -1;
             this.Scrolling = false;
-        }
-
-        private void DownArrowPressed()
-        {
-            this.DownArrow.scale = this.DownArrow.baseScale;
-            this.CurrentItemIndex++;
-            this.SetScrollBarToCurrentIndex();
-        }
-
-        private void UpArrowPressed()
-        {
-            this.UpArrow.scale = this.UpArrow.baseScale;
-            this.CurrentItemIndex--;
-            this.SetScrollBarToCurrentIndex();
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -415,6 +398,34 @@ namespace NPCMapLocations.Framework.Menus
                     Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors,
                         Game1.options.gamepadControls ? 44 : 0, 16, 16), Color.White, 0f, Vector2.Zero,
                     Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
+        }
+
+
+        /*********
+        ** Private methods
+        *********/
+        private void SetScrollBarToCurrentIndex()
+        {
+            if (this.Options.Any())
+            {
+                this.ScrollBar.bounds.Y = this.ScrollBarRunner.Height / Math.Max(1, this.Options.Count - 7 + 1) * this.CurrentItemIndex + this.UpArrow.bounds.Bottom + Game1.pixelZoom;
+                if (this.CurrentItemIndex == this.Options.Count - 7)
+                    this.ScrollBar.bounds.Y = this.DownArrow.bounds.Y - this.ScrollBar.bounds.Height - Game1.pixelZoom;
+            }
+        }
+
+        private void DownArrowPressed()
+        {
+            this.DownArrow.scale = this.DownArrow.baseScale;
+            this.CurrentItemIndex++;
+            this.SetScrollBarToCurrentIndex();
+        }
+
+        private void UpArrowPressed()
+        {
+            this.UpArrow.scale = this.UpArrow.baseScale;
+            this.CurrentItemIndex--;
+            this.SetScrollBarToCurrentIndex();
         }
     }
 }

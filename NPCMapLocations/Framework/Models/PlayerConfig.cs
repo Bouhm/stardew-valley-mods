@@ -3,6 +3,9 @@
     /// <summary>The model for per-player config options.</summary>
     public class PlayerConfig
     {
+        /*********
+        ** Accessors
+        *********/
         /// <summary>Which NPCs to display. The possible values are <c>1</c> (all villagers), <c>2</c> (villagers player has talked to), and <c>3</c> (villagers player has not talked to).</summary>
         public int ImmersionOption { get; set; } = 1;
 

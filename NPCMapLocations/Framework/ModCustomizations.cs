@@ -9,55 +9,70 @@ using StardewValley.Characters;
 
 namespace NPCMapLocations.Framework
 {
-    // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
+    /// <summary>Manages customized map recolors, NPCs, sprites, names, etc.</summary>
     public class ModCustomizations
     {
+        /*********
+        ** Accessors
+        *********/
+        /// <summary>The in-world tile coordinates and map pixels which represent the same position, indexed by location name.</summary>
+        /// <remarks>These are used to map any in-game tile coordinate to the map by measuring the distance between the two closest map vectors.</remarks>
         public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
 
-        /// <summary>Maps NPCs' internal names to their translated or customized display names.</summary>
+        /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
         public Dictionary<string, string> Names { get; set; } = new();
+
+        /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
+        /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
         public HashSet<string> LocationExclusions { get; set; } = new();
+
+        /// <summary>The tooltips to show on the map, indexed by location name. If the location name matches a <strong>translated</strong> vanilla tooltip text (e.g. <c>Calico Desert</c>), that tooltip is removed.</summary>
         public Dictionary<string, MapTooltip> Tooltips { get; set; } = new();
 
+        /// <summary>The name of the folder containing map assets.</summary>
         public string MapsRootPath { get; } = "maps";
-        public string MapsPath { get; set; }
 
-        public ModCustomizations()
-        {
-            this.MapsPath = Path.Combine(this.MapsRootPath, "_default");
-        }
+        /// <summary>The folder path containing map assets relative to the mod folder.</summary>
+        public string MapsPath { get; } = Path.Combine("maps", "_default");
 
+
+        /*********
+        ** Public methods
+        *********/
+        /// <summary>Load customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customNpcJson">The custom NPC data.</param>
+        /// <param name="customLocationJson">The custom location data.</param>
         public void LoadCustomData(Dictionary<string, JObject> customNpcJson, Dictionary<string, JObject> customLocationJson)
         {
             this.LoadCustomLocations(customLocationJson);
             this.LoadCustomNpcs(customNpcJson);
         }
 
+
+        /*********
+        ** Private methods
+        *********/
+        /// <summary>Load location customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customLocationJson">The raw location asset data.</param>
         private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
         {
             foreach (var locationData in customLocationJson)
             {
-                var location = locationData.Value;
+                JObject location = locationData.Value;
+
                 if (location.ContainsKey("MapVectors"))
-                {
                     this.AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
-                }
+
                 if (location.ContainsKey("MapTooltip"))
-                {
                     this.AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
-                }
-                if (location.ContainsKey("Exclude"))
-                {
-                    if ((bool)location.GetValue("Exclude"))
-                    {
-                        this.LocationExclusions.Add(locationData.Key);
-                    }
-                }
+
+                if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
+                    this.LocationExclusions.Add(locationData.Key);
             }
         }
 
-        // Handles customizations for NPCs
-        // Custom NPCs and custom names or sprites for existing NPCs
+        /// <summary>Load NPC customizations received from other mods through the content pipeline.</summary>
+        /// <param name="customNpcJson">The raw NPC asset data.</param>
         private void LoadCustomNpcs(Dictionary<string, JObject> customNpcJson)
         {
             // load custom NPC marker offsets and exclusions
@@ -71,20 +86,17 @@ namespace NPCMapLocations.Framework
                 {
                     var npc = npcData.Value;
 
-                    if (npc.ContainsKey("Exclude"))
+                    if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
                     {
-                        if ((bool)npc.GetValue("Exclude"))
-                        {
-                            exclusions.Add(npcData.Key);
-                            continue;
-                        }
+                        exclusions.Add(npcData.Key);
+                        continue;
                     }
 
                     if (npc.ContainsKey("MarkerCropOffset"))
                         markerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
                     else
                     {
-                        var gameNpc = Game1.getCharacterFromName(npcData.Key);
+                        NPC gameNpc = Game1.getCharacterFromName(npcData.Key);
                         if (gameNpc != null)
                         {
                             // If custom crop offset is not specified, default to 0
@@ -132,50 +144,57 @@ namespace NPCMapLocations.Framework
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
+        /// <summary>Load a custom tooltip received from another mod through the content pipeline.</summary>
+        /// <param name="locationName">The location name on the map.</param>
+        /// <param name="tooltip">The map tooltip to add. See <see cref="Tooltips"/> for details.</param>
         private void AddTooltip(string locationName, JObject tooltip)
         {
             this.Tooltips[locationName] = new MapTooltip(
-              (int)tooltip.GetValue("X"),
-              (int)tooltip.GetValue("Y"),
-              (int)tooltip.GetValue("Width"),
-              (int)tooltip.GetValue("Height"),
-              (string)tooltip.GetValue("PrimaryText"),
-              (string)tooltip.GetValue("SecondaryText")
+                (int)tooltip.GetValue("X"),
+                (int)tooltip.GetValue("Y"),
+                (int)tooltip.GetValue("Width"),
+                (int)tooltip.GetValue("Height"),
+                (string)tooltip.GetValue("PrimaryText"),
+                (string)tooltip.GetValue("SecondaryText")
             );
 
             if (tooltip.ContainsKey("SecondaryText"))
-            {
                 this.Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
-            }
         }
 
-        // Any custom locations with given location on the map
+        /// <summary>Override the map vectors for a custom location. See <see cref="MapVectors"/> for details.</summary>
+        /// <param name="locationName">The name of the location for which to add vectors.</param>
+        /// <param name="mapLocations">The array of custom vectors.</param>
         private void AddCustomMapLocation(string locationName, JArray mapLocations)
         {
-            var mapVectors = mapLocations.ToObject<JObject[]>();
-            var mapVectorArr = new MapVector[mapVectors.Length];
-            for (int i = 0; i < mapVectors.Length; i++)
+            var rawVectors = mapLocations.ToObject<JObject[]>();
+            var parsedVectors = new MapVector[rawVectors.Length];
+            for (int i = 0; i < rawVectors.Length; i++)
             {
-                var mapVector = mapVectors[i];
+                JObject rawVector = rawVectors[i];
 
                 // Marker doesn't need to specify corresponding Tile position
-                if (mapVector.GetValue("TileX") == null || mapVector.GetValue("TileY") == null)
-                    mapVectorArr[i] = new MapVector(
-                      (int)mapVector.GetValue("MapX"),
-                      (int)mapVector.GetValue("MapY")
+                if (rawVector.GetValue("TileX") == null || rawVector.GetValue("TileY") == null)
+                {
+                    parsedVectors[i] = new MapVector(
+                        (int)rawVector.GetValue("MapX"),
+                        (int)rawVector.GetValue("MapY")
                     );
+                }
                 // Region must specify corresponding Tile positions for
                 // Calculations on movement within location
                 else
-                    mapVectorArr[i] = new MapVector(
-                      (int)mapVector.GetValue("MapX"),
-                      (int)mapVector.GetValue("MapY"),
-                      (int)mapVector.GetValue("TileX"),
-                      (int)mapVector.GetValue("TileY")
+                {
+                    parsedVectors[i] = new MapVector(
+                        (int)rawVector.GetValue("MapX"),
+                        (int)rawVector.GetValue("MapY"),
+                        (int)rawVector.GetValue("TileX"),
+                        (int)rawVector.GetValue("TileY")
                     );
+                }
             }
 
-            this.MapVectors[locationName] = mapVectorArr;
+            this.MapVectors[locationName] = parsedVectors;
         }
 
         /// <summary>Merge any number of dictionaries into a new dictionary.</summary>

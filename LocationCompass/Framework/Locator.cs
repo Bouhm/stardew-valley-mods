@@ -6,6 +6,9 @@ namespace LocationCompass.Framework
     // Class for locators AKA the 'needles' of the compass
     internal class Locator
     {
+        /*********
+        ** Accessors
+        *********/
         public string Name { get; set; }
         public Farmer Farmer { get; set; }
         public Texture2D Marker { get; set; }
