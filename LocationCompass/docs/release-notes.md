@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 1.3.7
+Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+
 * Improved support for Volcano Dungeon.
 * Fixed various edge cases.
 

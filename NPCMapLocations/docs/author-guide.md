@@ -110,7 +110,7 @@ creating a map for Grandpa's Grove farm by Jessebot. NOTE: This video guide is o
 method is still the same.
 
 ### Add map vectors
-##### Standard tracking
+#### Standard tracking
 If you add or customize an in-game **outdoor** location, you can define new [map
 vectors](#basic-concepts) which lets NPC Map Locations correlate tile positions within the location
 to pixels on the world map. There's no need to do this for indoor locations (see [location
@@ -159,7 +159,7 @@ Here's the recommended process to define map vectors:
 5. Optionally add multiple map vectors to better track positions (particularly if the area on the
    world map isn't drawn to scale).
 
-##### By farm type
+#### By farm type
 To customize map vectors for the farm, you can use one of these as the location name:
 * `Farm` (any farm type)
 * `Farm_Default`
@@ -170,7 +170,7 @@ To customize map vectors for the farm, you can use one of these as the location 
 * `Farm_FourCorners`
 * `Farm_Beach`
 
-##### Advanced: use a fixed map point
+#### Advanced: use a fixed map point
 NPC Map Locations normally correlates in-game tile positions to the equivalent map pixel, so you
 can see markers moving around within a location. That's recommended in most cases.
 

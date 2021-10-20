@@ -1,9 +1,12 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Improved support for Volcano Dungeon.
-* Added `npc_map_locations_summary` console command which shows a summary of the current state for troubleshooting.
+## 2.7.0
+Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+
+* Added `npc_map_locations_summary` console command, which shows a summary of the current state for troubleshooting.
+* Improved [mod author guide](author-guide.md).
+* Improved support for the Volcano Dungeon.
 * Fixed traveling cart marker never shown.
 * Fixed error if a map sync happens mid-warp in multiplayer.
 * Fixed error when a location has invalid data.
