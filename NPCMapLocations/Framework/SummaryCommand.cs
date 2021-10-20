@@ -146,25 +146,23 @@ namespace NPCMapLocations.Framework
 
                         output.Append(
                             SummaryCommand.BuildTable(
-                                typeGroup,
+                                typeGroup.OrderBy(p => p.Key),
                                 "      ",
-                                new[] { "name", "location", "map pixel", "notes" },
+                                new[] { "name", "location", "map pixel", "crop offset", "notes" },
 
                                 marker => marker.Value.DisplayName != marker.Key ? $"{marker.Key} ({marker.Value.DisplayName})" : marker.Key,
                                 marker => marker.Value.LocationName,
                                 marker => $"{marker.Value.MapX}, {marker.Value.MapY}",
+                                marker => marker.Value.CropOffset != 0 ? marker.Value.CropOffset.ToString() : "",
                                 marker =>
                                 {
                                     List<string> notes = new();
                                     if (marker.Value.IsHidden)
-                                        notes.Add("HIDDEN");
+                                        notes.Add(marker.Value.ReasonHidden ?? "hidden (reason unknown)");
                                     if (marker.Value.IsBirthday)
                                         notes.Add("birthday");
                                     if (marker.Value.HasQuest)
                                         notes.Add("quest");
-                                    if (marker.Value.CropOffset != 0)
-                                        notes.Add($"crop offset: {marker.Value.CropOffset}");
-
                                     return string.Join(", ", notes);
                                 }
                             )
@@ -191,7 +189,10 @@ namespace NPCMapLocations.Framework
                     var records = customizations.MapVectors
                         .SelectMany(group => group.Value
                             .Select(vector => new { Location = group.Key, Vector = vector })
-                        );
+                        )
+                        .OrderBy(p => p.Location)
+                        .ThenBy(p => p.Vector.TileX)
+                        .ThenBy(p => p.Vector.TileY);
 
                     output.Append(
                         SummaryCommand.BuildTable(

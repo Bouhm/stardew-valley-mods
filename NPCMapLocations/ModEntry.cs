@@ -930,15 +930,7 @@ namespace NPCMapLocations
                 }
 
                 // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-                npcMarker.IsHidden =
-                    Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(npc.Name)
-                    || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(npc.Name)
-                    || Globals.OnlySameLocation && !isSameLocation
-                    || Config.ByHeartLevel
-                    && !(
-                        Game1.player.getFriendshipHeartLevelForNPC(npc.Name) >= Config.HeartLevelMin
-                        && Game1.player.getFriendshipHeartLevelForNPC(npc.Name) <= Config.HeartLevelMax
-                    );
+                this.SetMarkerHiddenIfNeeded(npcMarker, npc.Name, isSameLocation);
 
                 // Check for daily quests
                 foreach (var quest in Game1.player.questLog)
@@ -982,7 +974,8 @@ namespace NPCMapLocations
         // Update npc marker properties only relevant to farmhand
         private void UpdateNpcsFarmhand()
         {
-            if (this.NpcMarkers.Value == null) return;
+            if (this.NpcMarkers.Value == null)
+                return;
 
             foreach (var npcMarker in this.NpcMarkers.Value)
             {
@@ -1001,13 +994,7 @@ namespace NPCMapLocations
                 }
 
                 // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-                marker.IsHidden = Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(name)
-                                     || Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(name)
-                                     || Globals.OnlySameLocation && !isSameLocation
-                                     || Config.ByHeartLevel
-                                     && !(Game1.player.getFriendshipHeartLevelForNPC(name)
-                                          >= Config.HeartLevelMin && Game1.player.getFriendshipHeartLevelForNPC(name)
-                                          <= Config.HeartLevelMax);
+                this.SetMarkerHiddenIfNeeded(marker, name, isSameLocation);
 
                 // Check for daily quests
                 foreach (var quest in Game1.player.questLog)
@@ -1037,6 +1024,39 @@ namespace NPCMapLocations
                 }
 
                 if (marker.HasQuest || marker.IsBirthday) marker.Layer++;
+            }
+        }
+
+        /// <summary>Set an NPC marker to hidden if applicable based on the current config.</summary>
+        /// <param name="marker">The NPC marker.</param>
+        /// <param name="name">The NPC name.</param>
+        /// <param name="isSameLocation">Whether the NPC is in the same location as the current player.</param>
+        private void SetMarkerHiddenIfNeeded(NpcMarker marker, string name, bool isSameLocation)
+        {
+            marker.IsHidden = false;
+            marker.ReasonHidden = null;
+
+            void Hide(string reason)
+            {
+                marker.IsHidden = true;
+                marker.ReasonHidden = reason;
+            }
+
+            if (Globals.NpcExclusions.Contains(name))
+                Hide("hidden per config (excluded in config or by a mod)");
+            else if (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(name))
+                Hide("hidden per config (didn't talk to them today)");
+            else if (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(name))
+                Hide("hidden per config (talked to them today)");
+            else if (Globals.OnlySameLocation && !isSameLocation)
+                Hide("hidden per config (not in same location)");
+            else if (Config.ByHeartLevel)
+            {
+                int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);
+                if (hearts < Config.HeartLevelMin)
+                    Hide($"hidden per config (less than {Config.HeartLevelMin} hearts)");
+                if (hearts > Config.HeartLevelMax)
+                    Hide($"hidden per config (more than {Config.HeartLevelMax} hearts)");
             }
         }
 
