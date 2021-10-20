@@ -76,9 +76,9 @@ namespace NPCMapLocations.Framework
                 output.AppendLine($"Map pixel: {(mapPixel != ModEntry.Unknown ? $"({mapPixel.X}, {mapPixel.Y})" : "unknown")}");
                 output.AppendLine();
 
+                output.AppendLine("Configured vectors:");
                 if (customizations.MapVectors.TryGetValue(locationName, out MapVector[] vectors) && vectors.Any())
                 {
-                    output.AppendLine("Configured vectors:");
                     output.Append(
                         SummaryCommand.BuildTable(
                             vectors,
@@ -88,8 +88,10 @@ namespace NPCMapLocations.Framework
                             vector => $"{vector.MapX}, {vector.MapY}"
                         )
                     );
-                    output.AppendLine();
                 }
+                else
+                    output.AppendLine("   (none)");
+                output.AppendLine();
 
                 if (context != null)
                 {
