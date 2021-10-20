@@ -443,10 +443,8 @@ namespace NPCMapLocations
         private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
         {
             // Check for traveling merchant day
-            if (this.ConditionalNpcs.Value != null && this.ConditionalNpcs.Value.ContainsKey("Merchant") && this.ConditionalNpcs.Value["Merchant"])
-            {
+            if (this.ConditionalNpcs.Value != null)
                 this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
-            }
 
             this.ResetMarkers();
             this.UpdateMarkers(true);
