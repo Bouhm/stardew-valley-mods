@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Improved support for Volcano Dungeon.
+* Added `npc_map_locations_summary` console command which shows a summary of the current state for troubleshooting.
 * Fixed error if a map sync happens mid-warp in multiplayer.
 * Fixed error when a location has invalid data.
 * Fixed various edge cases.

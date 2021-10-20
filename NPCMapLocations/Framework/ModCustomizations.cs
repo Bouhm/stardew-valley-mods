@@ -9,7 +9,7 @@ using StardewValley.Characters;
 
 namespace NPCMapLocations.Framework
 {
-    // Handles custom maps (recolors of the mod map), custom NPCs, custom sprites, custom names, etc.
+    /// <summary>Manages customized map recolors, NPCs, sprites, names, etc.</summary>
     public class ModCustomizations
     {
         /*********
