@@ -1,317 +1,308 @@
 ﻿﻿[← back to readme](README.md)
 
-## Adding custom locations
-This documentation is for adding support for custom locations with **NPC Map Locatons**. This includes any newly added locations or modified existing locations. These instructions are intended to be followed on a PC.
+This document is for mod authors who'd like their mods to automatically configure NPC Map Locations
+to support their custom locations or NPCs. **For players, see the [main readme](README.md) instead.**
 
-**For more information on other features and usage of the mod, check the [Nexus Mods page](https://www.nexusmods.com/stardewvalley/mods/239).**
+# Contents
+* [Basic concepts](#basic-concepts)
+  * [Terminology](#terminology)
+  * [Location tracking](#location-tracking)
+  * [Position tracking](#position-tracking)
+* [Customize a location](#customize-a-location)
+  * [Create an accurate map](#create-an-accurate-map)
+  * [Add map vectors](#add-map-vectors)
+  * [Add map tooltips](#add-map-tooltips)
+  * [Exclude location](#exclude-location)
+* [Customize an NPC](#customize-an-npc)
+  * [Set a custom crop offset](#set-a-custom-crop-offset)
+  * [Exclude NPC](#exclude-npc)
+* [Troubleshoot](#troubleshoot)
+  * [Validate and test](#validate-and-test)
+  * [Get more help](#get-more-help)
 
-## Contents
-- [How tracking works](#how-tracking-works)
-- [Creating an accurate map](#creating-an-accurate-map)
-  - [Video tutorial](#video-tutorial)
-  - [Seasonal maps](#seasonal-maps)
-- [Loading the custom map](#loading-the-custom-map)
-- [Unknown locations](#unknown-locations)
-- [Adding points](#adding-points)
-  - [Example](#example)
-  - [Farm types](#farm-types)
-  - [Single points](#single-points)
-  - [Adding location tooltips](#adding-location-tooltips)
-  - [Excluding locations](#excluding-locations)
-  - [Testing and validating](#testing-and-validating)
-- [Custom Npcs](#custom-npcs)
-  - [Excluding NPCs](#excluding-npcs)
-- [Get additional help](#get-additional-help)
+# Basic concepts
+### Terminology
+Mapping terms are often ambiguous. To avoid confusion, this document consistently uses these
+definitions:
 
-## How tracking works
-For any outdoor location in the game, the mod needs at least two pairs of points to calculate the map location. The two pairs of points are required to create a bounding box (top-left corner and bottom-right corner) with which we can calculate the pixel position on the map from the current tile position in the location. One pair is the top-left and bottom-right pixel points on the map. The second pair are the top-left and bottom-right tile positions in the location.
+term               | definition
+------------------ | ----------
+world map          | The stylized map of the world shown in the game's map menu.
+location           | An [in-game area](https://stardewvalleywiki.com/Modding:Modder_Guide/Game_Fundamentals#GameLocation_et_al), including every portion that can be reached without warping.
+tile position      | A position within a location, measured in tiles (i.e. 64×64 pixel blocks which match the map sprite size).
+map pixel position | A position within the world map, measured in pixels relative to the top-left corner of the map.
+map vector         | See _position tracking_ below.
 
-![Two-Points](https://i.imgur.com/J8Btvdj.png)
+### Location tracking
+The world map only shows outside locations, so NPC Map Locations scans all locations to build a
+tree based on warps (and it remembers the warp tile positions). This automatically adjusts for
+changes from other mods.
 
-Ideally, the custom location is drawn accurately in proportion onto the map such that only two points would be needed, for the tile position (0, 0) and (width, height) of the location tilemap. If the custom location is not proportionally accurate, more points will have to be added in order to increase accuracy. Splitting up the location logically into sections based on the landscape will be the most effective strategy to achieve this.
+For example, the `Mountain` location looks something like this:
+```
+                                 ┌──────────┐
+                                 │ Mountain │
+                                 └────┬─────┘
+          ┌─────────────────┬─────────┴─────────┬───────────────┐
+┌─────────┴────────┐ ┌──────┴──────┐ ┌──────────┴─────────┐ ┌───┴───┐
+│   Robin's house  │ │ Linus' tent │ │ Adventurer's guild │ │ Mines │
+└─────────┬────────┘ └─────────────┘ └────────────────────┘ └───────┘
+┌─────────┴────────┐
+│ Sebastian's room │
+└──────────────────┘
+```
 
-![Four-Points](https://i.imgur.com/kEkgn1A.png)
+So if Sebastian is in his room, NPC Map Locations can determine that he's in the mountain location on
+the world map, reachable from this specific outdoor tile:
+> <img src="doc-images/location-mapping.png" width="250px" />
 
-## Creating an accurate map
-Creating a custom map is recommended if you are looking to add/modify a lot of areas on the map or need to do a recolor of the map. Mod authors should **`"Replace"`** the map through Content Patcher:
+### Position tracking
+In the example above, NPC Map Locations now knows which outdoor tile Sebastian is (indirectly) on.
+However the world map is stylized; it's not drawn to scale and the map shape often doesn't closely
+match the actual locations.
+
+NPC Map Locations solves this with two parallel approaches:
+
+1. It [redraws the world map](screenshot-2.0.0-redesign.gif) to more accurately reflect the in-game locations.
+2. It adds known reference points called "map vectors". A map vector represents a single position
+   with two coordinates: the in-game tile position, and the pixel position on the redrawn world
+   map. Given these points, it can dynamically calculate the map pixel position for any in-game
+   tile position (with [lerping](https://en.wikipedia.org/wiki/Linear_interpolation)).
+
+In an ideal case where world map is drawn to scale, two map vectors at opposite diagonal corners
+are all that's needed:
+> <img src="doc-images/position-mapping-two.png" width="250px" />
+
+If it's not to scale, more map vectors are needed to increase accuracy. For example, four map
+vectors which split the location into local sections based on the landscape:
+> <img src="doc-images/position-mapping-four.png" width="250px" />
+
+# Customize a location
+### Create an accurate map
+Creating a custom world map is recommended if you're adding or modifying many areas on the map or
+recoloring the map. Mod authors should edit the world map using the `Replace` patch mode, either
+through [Content Patcher](https://stardewvalleywiki.com/Modding:Content_Patcher) or [SMAPI's
+content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Content):
 
 ```js
 {
-   "Action": "EditImage",
-   "Target": "LooseSprites/map",
-   "FromFile": "Assets/Maps/WorldMaps/{{Season}}_map.png",
-   "PatchMode": "Replace"
+    "Action": "EditImage",
+    "Target": "LooseSprites/map",
+    "FromFile": "assets/{{season}}_map.png",
+    "PatchMode": "Replace"
 }
 ```
 
-In order to draw a custom location accurately, the recommended method is to use the actual tilemap of the custom location and tracing it. Using the [Map Image Export mod](https://www.nexusmods.com/stardewvalley/mods/1073), you can get a render of the whole tilemap of the location. Using this as a reference, you can resize and overlay the tilemap to accurately trace it onto the map.
+To draw a custom location accurately, the recommended method is...
 
-Here are the steps I take to create accurate modifications:
+1. [Take a screenshot](https://stardewvalleywiki.com/Options#Screenshots) of the full in-game
+   location.
+2. Open the NPC Map Locations map (e.g. from `NPCMapLocations\maps\_default\spring_map.png`) in a
+   pixel editing app like [Paint.NET](https://www.getpaint.net/) or [GIMP](https://www.gimp.org/).
+3. Open your full location screenshot. Scale it down until it's approximately the size it should be
+   on the map.
+4. Overlay the resized screenshot onto the map, and then redraw that portion of the map accordingly.
+   You'll essentially be "tracing" the location onto the map to ensure accuracy.
+5. Repeat steps 1-4 for any other custom locations.
 
-1. Get a screenshot of the tilemap using Map Image Export.
-2. Open up a graphic editing software fit for pixel art ([Paint.NET](https://www.getpaint.net/) is great for Windows, [GIMP](https://www.gimp.org/) is another free cross-platform alternative).
-3. Open a NPC Map Locations map, from `"NPCMapLocations\maps\_default\spring_map.png"` for example.
-4. Open the tilemap from Map Image Export. Scale it down until it is approximately the size it should be on the map.
-5. Overlay the resized tilemap onto the map, and then redraw that portion of the map accordingly. You will be essentially "tracing" the tilemap onto the map to ensure accuracy.
-6. Repeat steps 1-5 for any other custom locations.
+[Here's a short video guide on the process](https://streamable.com/xzfnc). In this example I'm
+creating a map for Grandpa's Grove farm by Jessebot. NOTE: This video guide is outdated, but the
+method is still the same.
 
-### Video tutorial
-[Here is a short video guide on the process](https://streamable.com/xzfnc). In this example I am creating a map for Grandpa's Grove farm by Jessebot.
-NOTE: This video guide is outdated, but the method is still the same.
+### Add map vectors
+##### Standard tracking
+If you add or customize an in-game **outdoor** location, you can define new [map
+vectors](#basic-concepts) which lets NPC Map Locations correlate tile positions within the location
+to pixels on the world map. There's no need to do this for indoor locations (see [location
+tracking](#location-tracking)).
 
-### Seasonal maps
-NPC Map Locations also provides seasonal maps that dynamically load with the game season. If you choose not to create additional maps for different seasons, just create one for `spring_map.png` in the respective map folder and that will be the map used for all seasons, just like in the vanilla game.
+Here's the recommended process to define map vectors:
 
-## Loading the custom map
-NPC Map Locations provides its own default maps, however when in use with any mods that modify the world, the mod author should provide their owns maps using through Content Patcher.
+1. Enable `DebugMode` in NPC Map Location's `config\globals.json`.
 
-The folder should include the following files:
-- spring_map.png
-- fall_map.png (if adding seasonal maps)
-- summer_map.png (if adding seasonal maps)
-- winter_map.png (if adding seasonal maps)
-- buildings.png (use the provided and modify if desired)
+   This will show extra info about the current location in-game, including the exact location name,
+   its tile dimensions, and info about the selected box on the world map. It also lets you test the
+   position mapping by `Ctrl` + right-clicking the map to warp to the equivalent tile position.
+2. Load your save and go to the in-game location. (You can type `debug warp location-name` in the
+   SMAPI console to go there quickly.)
 
-If not using seasonal maps, just a "spring_map.png" map will suffice.
+   The top-left corner of the screen will show the location's name and tile size, and the tile
+   position of the cursor:
+   > <img src="doc-images/debug-mode-location.png" width="500" />
+3. Click the top-left corner of the location on the world map, drag to the bottom-right corner, and
+   release. (You always need go from top-left to bottom-right.)
 
-## Unknown locations
-NPC Map Locations will try its best to figure out where custom locations are. Each location is categorized into three types: outdoor, building, and room. Buildings exist within outdoor locations and rooms exist within indoor locations. The indoor locations are located on the map based on their warps in the outdoor map, so indoor locations within can be automatically located as long as the outdoor location has tracking (explained below). Indoor locations are single points on the map and do not require tracking. This leaves just custom outdoor locations (or sometimes indoor locations with ambiguous warps) for manual tracking. These unknown locations are identified by the mod and can be found as debug messages in the SMAPI console: 
+   In the top-left corner, this will show...
+   * the pixel position of the cursor;
+   * the pixel positions of the top-left and bottom-right corners of the selected area;
+   * the pixel width and height of the selected area.
 
-```
-[NPC Map Locations] Unknown location: WizardHouseBasement
-[NPC Map Locations] Unknown location: CrimsonBadlands
-[NPC Map Locations] Unknown location: DesertRailway
-[NPC Map Locations] Unknown location: IridiumQuarry
-[NPC Map Locations] Unknown location: TreasureCave
-```
+   > <img src="doc-images/debug-mode-map.png" width="500" />
+4. Now we can define the map vectors by editing the `Mods/Bouhm.NPCMapLocations/Locations` asset
+   (that **exact** name) using [Content Patcher](https://stardewvalleywiki.com/Modding:Content_Patcher)
+   or [SMAPI's content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Content):
 
-## Adding points
-Any custom locations that need tracking need to be included in the `content.json` of the mods that adds custom locations to the game.
-The target MUST be exactly as below.
+   ```js
+   {
+       "Action": "EditData",
+       "Target": "Mods/Bouhm.NPCMapLocations/Locations",
+       "Entries": {
+           "TownEast": { // location name from step 2
+               "MapVectors": [
+                   { MapX: 960, MapY: 337, TileX: 0, TileY: 0 }, // top-left map pixel from step 3
+                   { MapX: 1060, MapY: 413, TileX: 40, TileY: 30 } // bottom-right map pixel from step 3, and tile size from step 2
+               ]
+           }
+       }
+   }
+   ```
+5. Optionally add multiple map vectors to better track positions (particularly if the area on the
+   world map isn't drawn to scale).
+
+##### By farm type
+To customize map vectors for the farm, you can use one of these as the location name:
+* `Farm` (any farm type)
+* `Farm_Default`
+* `Farm_Riverland`
+* `Farm_Forest`
+* `Farm_Hills`
+* `Farm_Wilderness`
+* `Farm_FourCorners`
+* `Farm_Beach`
+
+##### Advanced: use a fixed map point
+NPC Map Locations normally correlates in-game tile positions to the equivalent map pixel, so you
+can see markers moving around within a location. That's recommended in most cases.
+
+However you can show markers in a fixed position within the location. You do this by adding a
+single map vector and omitting the tile coordinate:
 
 ```js
 {   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "[LocationName]": {
-      "MapVectors": [
-        {
-          MapX: 0,
-          MapY: 0,
-          TileX: 300,
-          TileY: 300
-        },
-        {
-          MapX: 100,
-          MapY: 80,
-          TileX: 500,
-          TileY: 450
+    "Action": "EditData",
+    "Target": "Mods/Bouhm.NPCMapLocations/Locations",
+    "Entries": {
+        "ExampleLocation": {
+            "MapVectors": [
+                { MapX: 36, MapY: 469 }
+            ]
         }
-      ]
     }
-  }
 }
 ```
 
-Where `[LocationName]` is the name of the location. Each field between the curly brackets represents one point that maps the tile position to the pixel position on the map.
+With the above example, characters in `ExampleLocation` will be shown at pixel (36, 469) on the
+world map no matter where they are within the location.
 
-**It is important to note that when getting the pixel positions on the map, you will need to upscale the map image (Nearest Neighbor) by 4 times since that is the zoom scale used in the game.**
-
-![Map](https://i.imgur.com/YgTyxKE.png)
-
-By turning on the `DEBUG_MODE` in the `config\globals.json` by setting `"DEBUG_MODE": true`, additional information and helpful tools about the current locaton will be displayed in the game, including the exact name of the location, dimensions of its tilemap, and information about the selected box on the map. It will also give the player more freedom to move around by teleporting the player to the cursor (Ctrl+RightClick) to test the tracking.
-
-### Example
-Let's look at an example using the custom location "TownEast" added on by the Stardew Valley Expanded mod.
-
-The first step would be to physically go to the location in-game with `DEBUG_MODE` on to gather information.
-
-![location-info](https://i.imgur.com/nNSyPZi.png)
-
-Then we can use the drag-and-drop tools to create the bounding box for tracking for that location on the map. To perform drag-and-drop, place the cursor at the corner for top-left, right-click with the mouse and hold, and drag it to the bottom-right corner and release. You must always go from top-left to bottom-right.
-
-![map-info](https://i.imgur.com/Z42LauO.png)
-
-From these two actions we have the following information: the LocationName "TownEast", the size of the tilemap (40 x 30), and the coordinates of the bounding box (960, 337) and (1060, 413).
-
-For tracking, we add an entry for `"TownEast"` in `"CustomMapLocations"`. We input the two points for the top-left corner of the bounding box and the bottom-right corner of the bounding box.
-
-```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "TownEast": {
-      "MapVectors": [
-        {
-          MapX: 960,
-          MapY: 337,
-          TileX: 0,
-          TileY: 0
-        },
-        {
-          MapX: 1060,
-          MapY: 413,
-          TileX: 40,
-          TileY: 30
-        }
-      ]
-    }
-  }
-}
-```
-
-Tips:
-- In config/globals.json, set "DEBUG_MODE" to true.
-- In the SMAPI console, use `debug warp [LocationName] to quickly move to the map.
-- Use control + right click to move the player around the map in debug mode.
-
-### Farm types
-Sometimes a mod will change a farm only based on the farm type. If you want to specify points for any farm, you can leave the location name as "Farm" but for specific farm types, you will need to use the following:
-- "Farm_Default"
-- "Farm_Riverland"
-- "Farm_Forest"
-- "Farm_Hills"
-- "Farm_Wilderness"
-- "Farm_FourCorners"
-- "Farm_Beach"
-
-### Single points
-Instead of an area with tracking, if you want to display the character in a location in a single point on the map, you only need to specify the `MapX` and `MapY` like so:
-
-```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "[LocationName]": {
-      "MapVectors": [
-        {
-          MapX: 36,
-          MapY: 469
-        }
-      ]
-    },
-  ...
-  }
-}
-```
-
-Other points are not needed because we're simply showing the character at (36, 469) on the map in that location without needing to do any calcualtions.
-
-**Note that you do NOT need to add any indoor locations. NPC Map Locations will automatically find indoor locations on the map, given that the tracking for its outdoor location is accurate and there exists a valid warp into the indoor location.**
-
-### Adding location tooltips
-Mod authors can add map tooltips when the player hovers the custom location if they choose to. The format includes the name of the location, the pixel position representng the top-left corner, the width and height of the bouding box where the tooltip hover should trigger, and the primary and secondary text that should display in the tooltip.
-
-![Tooltips](https://i.imgur.com/UJSgR6l.png)
+### Add map tooltips
+You can add tooltips when players point their cursor at the location in the world map, by adding a
+`MapTooltip` field to the same `Mods/Bouhm.NPCMapLocations/Locations` entry you used to set the
+[map vectors](#add-map-vectors). This includes the pixel area on the map which has the tooltip, and
+the tooltip text to show.
 
 For this we need the top-left corner and the width and height of the bounding box.
 
 ```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "TownEast": {
-      ...
-      "MapTooltip": {
-        "X": 960,
-        "Y": 337,
-        "Width": 100,
-        "Height": 76,
-        "PrimaryText": "Town East"
-      }
-    }
-  }
-}
-```
-
-For adding just this one location, our final JSON file will look like this:
-
-```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "TownEast": {
-      "MapVectors": [
-        {
-          MapX: 960,
-          MapY: 337,
-          TileX: 0,
-          TileY: 0
-        },
-        {
-          MapX: 1060,
-          MapY: 413,
-          TileX: 40,
-          TileY: 30
+{
+    "Action": "EditData",
+    "Target": "Mods/Bouhm.NPCMapLocations/Locations",
+    "Entries": {
+        "TownEast": {
+            ...
+            "MapTooltip": {
+                "X": 960,
+                "Y": 337,
+                "Width": 100,
+                "Height": 76,
+                "PrimaryText": "Town East",
+                "SecondaryText": null // optional second line under the primary text
+            }
         }
-      ],
-      "MapToolip": {
-        "X": 960,
-        "Y": 337,
-        "Width": 100,
-        "Height": 76,
-        "PrimaryText": "Town East"
-      }
     }
-  }
 }
 ```
 
-### Excluding locations
-For any custom locations that should be HIDDEN from the map (ex. when a character is in that location, they should not show up on the map), they need to be added to the LocationExclusions field.
+Here's how that would look in-game:
+> <img src="doc-images/map-tooltip.png" width="250" />
+
+### Exclude location
+You can completely hide a location from NPC Map Locations. Any characters or players in that
+location will vanish entirely from the world map. To do that, add an entry for the location name to
+the `Mods/Bouhm.NPCMapLocations/Locations` asset (that exact name) using [Content
+Patcher](https://stardewvalleywiki.com/Modding:Content_Patcher) or [SMAPI's content
+API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Content):
 
 ```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/Locations",
-  "Entries": {
-    "Claire_WarpRoom": {
-      "Exclude": true
+{
+    "Action": "EditData",
+    "Target": "Mods/Bouhm.NPCMapLocations/Locations",
+    "Entries": {
+        "Claire_WarpRoom": {
+            "Exclude": true
+        }
     }
-  }
 }
 ```
 
-## Custom NPCs
-For custom npcs that need the cropping adjusted for their markers on the map, we use the same method but with a different target:
-This time instead of the [LocationName], we use the name of the NPC for the key.
-Use the field "MarkerCropOffset" with an integer value. See https://www.nexusmods.com/stardewvalley/articles/99 for details.
+**This isn't recommended for most cases, since having markers disappear can be confusing.** You
+should only do this for locations which are outside the world map area.
+
+## Customize an NPC
+### Set a custom crop offset
+NPC Map Locations automatically creates the marker icon for any NPC by cropping the head from its
+sprite. However custom sprites might not always line up correctly:
+
+> <img src="doc-images/npc-crop-offset-before.png" width="500" />
+
+You can set a custom pixel offset to fix that. To do that, add an entry for the NPC name to the
+`Mods/Bouhm.NPCMapLocations/NPCs` asset (that exact name) using [Content
+Patcher](https://stardewvalleywiki.com/Modding:Content_Patcher) or [SMAPI's content
+API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Content):
 
 ```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
-  "Entries": {
-    "Andy": {
-      "MarkerCropOffset": -1
+{
+    "Action": "EditData",
+    "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
+    "Entries": {
+        "Alex": {
+            "MarkerCropOffset": -2
+        },
+        ...
     }
-  }
 }
 ```
 
-### Excluding NPCs
-For any NPCs that should be HIDDEN from the map, we use the field `Exclude` which can be value `true` or `false` (not including the field is effectively the same as `false`).
+And then you can check the map options to see the corrected result:
+
+> <img src="doc-images/npc-crop-offset-after.png" width="250" />
+
+### Exclude NPC
+You can completely hide an NPC from NPC Map Locations. They will vanish entirely from the world map.
+To do that, add an entry for the location name to the `Mods/Bouhm.NPCMapLocations/NPCs` asset (that
+exact name) using [Content Patcher](https://stardewvalleywiki.com/Modding:Content_Patcher) or
+[SMAPI's content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs/Content):
+
 ```js
-{   
-  "Action": "EditData",
-  "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
-  "Entries": {
-    "Claire_Joja": {
-      "Exclude": true
+{
+    "Action": "EditData",
+    "Target": "Mods/Bouhm.NPCMapLocations/NPCs",
+    "Entries": {
+        "Claire_Joja": {
+            "Exclude": true
+        }
     }
-  }
 }
 ```
 
-### Testing and validating
+**This isn't recommended for most cases, since having NPCs disappear can be confusing.** You
+should only do this for NPCs which players wouldn't normally go looking for.
 
-After making the changes to the config, make sure to use the [JSON validator](https://json.smapi.io/) to make sure the JSON does not contain any errors.
-If the JSON is valid, you can go into game and test the newly added custom locations on the map. If the JSON is not valid, SMAPI will throw an error and the game will crash.
+## Troubleshoot
+### Validate and test
+If your JSON isn't valid, SMAPI will throw an error and the game may crash. You can use the [JSON
+validator](https://json.smapi.io/) to make sure it's valid ahead of time. If it's valid, you can
+load the save and check the locations and NPCs on the world map.
 
-## Get additional help
-Visit [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#using-mods` channel.
+### Get more help
+Visit the [Stardew Valley Discord](https://discord.gg/stardewvalley) in the `#making-mods` channel
+if you have any questions!
