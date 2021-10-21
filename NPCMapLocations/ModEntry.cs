@@ -94,7 +94,8 @@ namespace NPCMapLocations
                 locationUtil: ModEntry.LocationUtil,
                 customizations: this.Customizations,
                 mapVectors: this.MapVectors.Value,
-                npcMarkers: this.NpcMarkers.Value
+                npcMarkers: this.NpcMarkers.Value,
+                locationsWithoutMapVectors: this.GetLocationsWithoutMapVectors()
             ));
         }
 
@@ -657,19 +658,17 @@ namespace NPCMapLocations
         /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
         private IEnumerable<LocationContext> GetLocationsWithoutMapVectors()
         {
-            foreach (var locCtx in LocationUtil.LocationContexts)
+            foreach (var entry in LocationUtil.LocationContexts)
             {
-                if (
-                    (locCtx.Value.Root == null && !this.MapVectors.Value.ContainsKey(locCtx.Key))
-                    || (locCtx.Value.Root != null && !this.MapVectors.Value.ContainsKey(locCtx.Value.Root))
-                    && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
-                )
-                {
-                    if (this.Customizations.LocationExclusions.Contains(locCtx.Key))
-                        continue;
+                string name = entry.Key;
+                LocationContext context = entry.Value;
 
-                    yield return locCtx.Value;
-                }
+                if (this.IsLocationExcluded(name))
+                    continue;
+
+                string outdoorName = context.Root ?? name;
+                if (!this.MapVectors.Value.ContainsKey(outdoorName) && context.Type is not (LocationType.Building or LocationType.Room))
+                    yield return entry.Value;
             }
         }
 

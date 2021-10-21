@@ -38,7 +38,8 @@ namespace NPCMapLocations.Framework
         /// <param name="customizations">Manages customized map recolors, NPCs, sprites, names, etc.</param>
         /// <param name="mapVectors">The in-world tile coordinates and map pixels which represent the same position for each location name.</param>
         /// <param name="npcMarkers">The tracked NPC markers.</param>
-        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, IDictionary<string, MapVector[]> mapVectors, Dictionary<string, NpcMarker> npcMarkers)
+        /// <param name="locationsWithoutMapVectors">The outdoor location contexts which don't have any map vectors.</param>
+        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, IDictionary<string, MapVector[]> mapVectors, Dictionary<string, NpcMarker> npcMarkers, IEnumerable<LocationContext> locationsWithoutMapVectors)
         {
             if (!Context.IsWorldReady)
             {
@@ -206,6 +207,37 @@ namespace NPCMapLocations.Framework
                             p => $"{p.Vector.TileX}, {p.Vector.TileY}",
                             p => $"{p.Vector.MapX}, {p.Vector.MapY}",
                             p => p.IsCustom ? "another mod" : "NPC Map Locations"
+                        )
+                    );
+                }
+                else
+                    output.AppendLine("   (none)");
+
+                output.AppendLine();
+                output.AppendLine();
+            }
+
+            // unknown locations
+            {
+                output.AppendLine("=========================");
+                output.AppendLine("==  Unknown Locations  ==");
+                output.AppendLine("=========================");
+                output.AppendLine("These locations have no map vectors defined, so NPCs and characters in that location won't appear on the world map.");
+                output.AppendLine("For location mod authors, see the pinned post at https://www.nexusmods.com/stardewvalley/mods/239?tab=posts.");
+                output.AppendLine();
+
+                locationsWithoutMapVectors = locationsWithoutMapVectors.OrderBy(p => p.Name).ToArray();
+
+                if (locationsWithoutMapVectors.Any())
+                {
+                    output.Append(
+                        SummaryCommand.BuildTable(
+                            locationsWithoutMapVectors,
+                            "",
+                            new[] { "name", "type", "root location" },
+                            p => p.Name,
+                            p => p.Type.ToString(),
+                            p => p.Root
                         )
                     );
                 }
