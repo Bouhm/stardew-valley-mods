@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming version
+* Fixed farm buildings not shown on load if any location without map vectors is also excluded.
+
 ## 2.7.0
 Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 

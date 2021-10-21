@@ -344,7 +344,7 @@ namespace NPCMapLocations
                     )
                     {
                         if (this.Customizations.LocationExclusions.Contains(locCtx.Key))
-                            return;
+                            continue;
                         alertStr += $" {locCtx.Key},";
                     }
                 }
