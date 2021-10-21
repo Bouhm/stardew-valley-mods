@@ -338,30 +338,9 @@ namespace NPCMapLocations
             LocationUtil.ScanLocationContexts();
 
             // Log any custom locations not handled in content.json
-            try
-            {
-                string alertStr = "Unknown locations:";
-                foreach (var locCtx in LocationUtil.LocationContexts)
-                {
-                    if (
-                      (locCtx.Value.Root == null && !this.MapVectors.Value.ContainsKey(locCtx.Key))
-                      || (locCtx.Value.Root != null && !this.MapVectors.Value.ContainsKey(locCtx.Value.Root))
-                      && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
-                    )
-                    {
-                        if (this.Customizations.LocationExclusions.Contains(locCtx.Key))
-                            continue;
-                        alertStr += $" {locCtx.Key},";
-                    }
-                }
-
-                this.Monitor.Log(alertStr.TrimEnd(',') + ".", LogLevel.Debug);
-            }
-            catch
-            {
-                this.Monitor.Log("Too many unknown locations; NPCs in unknown locations will not be visible.", LogLevel.Debug);
-            }
-
+            string[] unknownLocations = this.GetLocationsWithoutMapVectors().Select(p => p.Name).OrderBy(p => p).ToArray();
+            if (unknownLocations.Any())
+                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}", LogLevel.Debug);
 
             this.UpdateFarmBuildingLocations();
 
@@ -675,7 +654,26 @@ namespace NPCMapLocations
                 this.ShowDebugInfo();
         }
 
-        // Get only relevant villagers for map
+        /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
+        private IEnumerable<LocationContext> GetLocationsWithoutMapVectors()
+        {
+            foreach (var locCtx in LocationUtil.LocationContexts)
+            {
+                if (
+                    (locCtx.Value.Root == null && !this.MapVectors.Value.ContainsKey(locCtx.Key))
+                    || (locCtx.Value.Root != null && !this.MapVectors.Value.ContainsKey(locCtx.Value.Root))
+                    && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
+                )
+                {
+                    if (this.Customizations.LocationExclusions.Contains(locCtx.Key))
+                        continue;
+
+                    yield return locCtx.Value;
+                }
+            }
+        }
+
+        /// <summary>Get only relevant villagers for the world map.</summary>
         private List<NPC> GetVillagers()
         {
             var villagers = new List<NPC>();
