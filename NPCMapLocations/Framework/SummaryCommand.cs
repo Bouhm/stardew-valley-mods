@@ -36,8 +36,9 @@ namespace NPCMapLocations.Framework
         /// <param name="monitor">The monitor with which to write output..</param>
         /// <param name="locationUtil">Scans and maps locations in the game world.</param>
         /// <param name="customizations">Manages customized map recolors, NPCs, sprites, names, etc.</param>
+        /// <param name="mapVectors">The in-world tile coordinates and map pixels which represent the same position for each location name.</param>
         /// <param name="npcMarkers">The tracked NPC markers.</param>
-        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, Dictionary<string, NpcMarker> npcMarkers)
+        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, IDictionary<string, MapVector[]> mapVectors, Dictionary<string, NpcMarker> npcMarkers)
         {
             if (!Context.IsWorldReady)
             {
@@ -182,15 +183,15 @@ namespace NPCMapLocations.Framework
                 output.AppendLine("===================");
                 output.AppendLine("==  Map vectors  ==");
                 output.AppendLine("===================");
-                output.AppendLine("These map in-world tile coordinates and map pixels which represent the same position.");
-                output.AppendLine("NPC Map Locations uses these map any in-game tile to its map pixel by measuring the distance between the closest map vectors.");
+                output.AppendLine("A 'map vector' represents the same position both in-world (measured in tiles) and on the world map (measured in pixels).");
+                output.AppendLine("These are used to calculate where any in-world character should be drawn on the map.");
                 output.AppendLine();
 
-                if (customizations.MapVectors.Any())
+                if (mapVectors.Any())
                 {
-                    var records = customizations.MapVectors
+                    var records = mapVectors
                         .SelectMany(group => group.Value
-                            .Select(vector => new { Location = group.Key, Vector = vector })
+                            .Select(vector => new { Location = group.Key, Vector = vector, IsCustom = customizations.MapVectors.ContainsKey(group.Key) })
                         )
                         .OrderBy(p => p.Location)
                         .ThenBy(p => p.Vector.TileX)
@@ -200,19 +201,18 @@ namespace NPCMapLocations.Framework
                         SummaryCommand.BuildTable(
                             records,
                             "",
-                            new[] { "location", "tile", "map pixel" },
+                            new[] { "location", "tile", "map pixel", "source" },
                             p => p.Location,
                             p => $"{p.Vector.TileX}, {p.Vector.TileY}",
-                            p => $"{p.Vector.MapX}, {p.Vector.MapY}"
+                            p => $"{p.Vector.MapX}, {p.Vector.MapY}",
+                            p => p.IsCustom ? "another mod" : "NPC Map Locations"
                         )
                     );
                 }
                 else
-                {
                     output.AppendLine("   (none)");
-                    output.AppendLine();
-                }
 
+                output.AppendLine();
                 output.AppendLine();
             }
 
@@ -247,7 +247,7 @@ namespace NPCMapLocations.Framework
 
                     for (int i = 0; i < columnCount; i++)
                     {
-                        string value = getValues[i](record);
+                        string value = getValues[i](record) ?? "";
 
                         row[i] = value;
                         sizes[i] = Math.Max(sizes[i], value.Length);

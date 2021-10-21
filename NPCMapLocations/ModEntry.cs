@@ -89,7 +89,13 @@ namespace NPCMapLocations
             helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
 
-            helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(this.Monitor, ModEntry.LocationUtil, this.Customizations, this.NpcMarkers.Value));
+            helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(
+                monitor: this.Monitor,
+                locationUtil: ModEntry.LocationUtil,
+                customizations: this.Customizations,
+                mapVectors: this.MapVectors.Value,
+                npcMarkers: this.NpcMarkers.Value
+            ));
         }
 
         // Replace game map with modified map

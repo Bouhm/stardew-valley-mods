@@ -2,6 +2,8 @@
 
 # Release notes
 ## Upcoming version
+* Improved the new `npc_map_locations_summary` command:
+  * It now shows built-in map vectors too.
 * Fixed farm buildings not shown on load if any location without map vectors is also excluded.
 
 ## 2.7.0
