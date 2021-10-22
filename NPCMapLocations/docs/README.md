@@ -20,7 +20,8 @@ While the map is open, press `TAB` (or `Y` on a controller) to show the mod opti
 show/hide characters automatically based on various criteria (e.g. after they're talked to, when in
 same location, within a certain distance, quests and/or birthdays, etc). 
 
-You can optionally enable a minimap, and drag it by holding `CTRL`.
+You can optionally enable a minimap. You can move it by holding `CTRL` + right-click on the minimap,
+then dragging it to the new position.
 
 ### For mod authors
 See the [author guide](author-guide.md) for more info.
