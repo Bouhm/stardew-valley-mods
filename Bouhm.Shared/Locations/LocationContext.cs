@@ -28,7 +28,7 @@ namespace Bouhm.Shared.Locations
         /// <summary>The names of locations directly contained by this location.</summary>
         public List<string> Children { get; } = new();
 
-        /// <summary>The default entry tile for incoming warps to this location.</summary>
+        /// <summary>The warp tile in the parent location which leads to this location.</summary>
         public Vector2 Warp { get; set; }
 
 

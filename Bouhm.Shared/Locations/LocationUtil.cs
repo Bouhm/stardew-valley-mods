@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -47,7 +48,7 @@ namespace Bouhm.Shared.Locations
                     if (!this.TryGetContext(location.Name, out var context))
                         this.LocationContexts[location.Name] = context = new LocationContext(location) { Root = location.Name, Type = LocationType.Outdoors };
 
-                    foreach (var warp in location.warps)
+                    foreach (var warp in this.GetOutgoingWarpsForScanning(location))
                     {
                         GameLocation warpLocation = this.GetStaticLocation(warp?.TargetName);
                         if (warpLocation?.IsOutdoors == true)
@@ -226,7 +227,7 @@ namespace Bouhm.Shared.Locations
                 }
 
                 // recursively traverse warps from current location
-                foreach (var warp in location.warps)
+                foreach (var warp in this.GetOutgoingWarpsForScanning(location))
                 {
                     // avoid circular loop
                     if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName)
@@ -281,6 +282,24 @@ namespace Bouhm.Shared.Locations
                 this.Monitor.Log(ex.ToString());
                 return null;
             }
+        }
+
+        /// <summary>Get the outgoing warps for the purposes of location scanning in <see cref="MapRootLocations"/>.</summary>
+        /// <param name="location">The location whose warps to get.</param>
+        private IEnumerable<Warp> GetOutgoingWarpsForScanning(GameLocation location)
+        {
+            // special case: Caldera is separated from its root location by the generated Volcano
+            // Dungeon levels, which will be ignored.
+            if (location is Caldera)
+            {
+                var entrance = Game1.getLocationFromName("VolcanoDungeon0");
+                var exitWarp = entrance?.warps.FirstOrDefault(p => p.TargetName == "IslandNorth");
+                if (exitWarp != null)
+                    return new[] { exitWarp };
+            }
+
+            // normal case
+            return location.warps;
         }
     }
 }

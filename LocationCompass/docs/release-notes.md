@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming versions
+* Fixed Caldera not handled as part of the Volcano Dungeon.
+
 ## 1.3.7
 Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 

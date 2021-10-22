@@ -6,6 +6,7 @@
   * Added a table of location data.
   * The map vectors list now includes those bundled with NPC Map Locations.
 * Fixed farm buildings not shown on load if any location without map vectors is also excluded.
+* Fixed Caldera not handled as part of the Volcano Dungeon.
 
 ## 2.7.0
 Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
