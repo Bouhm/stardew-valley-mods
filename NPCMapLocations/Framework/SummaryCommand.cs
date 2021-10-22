@@ -116,20 +116,45 @@ namespace NPCMapLocations.Framework
 
             // excluded locations
             {
-                output.AppendLine("==========================");
-                output.AppendLine("==  Excluded locations  ==");
-                output.AppendLine("==========================");
-                output.AppendLine("These locations are completely excluded from NPC Map Locations. Players and NPCs in these locations will disappear from the map.");
-                output.AppendLine("These were all added by other mods editing the `Mods/Bouhm.NPCMapLocations/Locations` asset.");
+                output.AppendLine("=========================");
+                output.AppendLine("==  Tracked locations  ==");
+                output.AppendLine("=========================");
+                output.AppendLine("These are the NPCs currently being tracked by the mod.");
                 output.AppendLine();
-
                 if (customizations.LocationExclusions.Any())
                 {
-                    foreach (string name in customizations.LocationExclusions.OrderBy(p => p))
-                        output.AppendLine($"   - {name}");
+                    output.AppendLine("If a location is marked \"excluded\", it's completely hidden from NPC Map Locations; players and NPCs in that location will disappear from the map.");
+                    output.AppendLine("NPC Map Locations doesn't hide any locations itself, these are all excluded by other mods editing the `Mods/Bouhm.NPCMapLocations/Locations` asset.");
+                    output.AppendLine();
                 }
-                else
-                    output.AppendLine("   (none)");
+
+                // list locations by root
+                output.AppendLine("   Known locations:");
+                output.Append(
+                    SummaryCommand.BuildTable(
+                        records: locationUtil.LocationContexts.Values.OrderBy(p => p.Root ?? p.Name).ThenBy(p => p.Name),
+                        linePrefix: "      ",
+                        columnHeadings: new[] { "root", "name", "type", "notes" },
+                        p => p.Root ?? p.Name,
+                        p => p.Name,
+                        p => p.Type.ToString(),
+                        p => customizations.LocationExclusions.Contains(p.Name) ? "HIDDEN" : ""
+                    )
+                );
+
+                // list exclusions not listed above
+                if (customizations.LocationExclusions.Any())
+                {
+                    string[] otherExclusions = customizations.LocationExclusions.Where(name => !locationUtil.LocationContexts.ContainsKey(name)).OrderBy(p => p).ToArray();
+                    if (otherExclusions.Any())
+                    {
+                        output.AppendLine();
+                        output.AppendLine("These locations are excluded by mods, but don't match a known location:");
+                        foreach (string name in otherExclusions)
+                            output.AppendLine($"   - {name}");
+                    }
+                }
+
                 output.AppendLine();
                 output.AppendLine();
             }
