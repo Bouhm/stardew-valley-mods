@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming versions
+* Added option to keep the HUD visible while locator icons are shown.
 * Fixed Caldera not handled as part of the Volcano Dungeon.
 
 ## 1.3.7
