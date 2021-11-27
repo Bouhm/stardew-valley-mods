@@ -24,6 +24,7 @@ Hungarian  | [✓](NPCMapLocations/i18n/hu.json)
 Italian    | [✓](NPCMapLocations/i18n/it.json)
 Japanese   | [✓](NPCMapLocations/i18n/ja.json)
 Korean     | [✓](NPCMapLocations/i18n/ko.json)
+Polish¹    | [✓](NPCMapLocations/i18n/pl.json)
 Portuguese | [✓](NPCMapLocations/i18n/pt.json)
 Russian    | [✓](NPCMapLocations/i18n/ru.json)
 Spanish    | [✓](NPCMapLocations/i18n/es.json)
@@ -31,6 +32,8 @@ Turkish    | [✓](NPCMapLocations/i18n/tr.json)
 
 Contributions are welcome! See [Modding:Translations](https://stardewvalleywiki.com/Modding:Translations)
 on the wiki for help contributing translations.
+
+¹ This is a custom language provided by a mod (see [Polish](https://www.nexusmods.com/stardewvalley/mods/3616)).
 
 ## Compiling the mods
 Installing stable releases from Nexus Mods is recommended for most users. If you really want to
