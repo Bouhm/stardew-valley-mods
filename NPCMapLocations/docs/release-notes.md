@@ -1,8 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming version
-* Improved the new `npc_map_locations_summary` command:
+## 2.7.1
+Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+
+* Improved the `npc_map_locations_summary` command:
   * Added a table of location data.
   * The map vectors list now includes those bundled with NPC Map Locations.
 * Fixed farm buildings not shown on load if any location without map vectors is also excluded.
