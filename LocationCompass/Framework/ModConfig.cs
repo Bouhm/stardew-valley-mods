@@ -12,6 +12,9 @@
         /// <summary>The key binding to show/hide the locator icons.</summary>
         public string ToggleKeyCode { get; set; } = "LeftAlt";
 
+        /// <summary>Whether the game HUD is hidden when the locator icons are shown.</summary>
+        public bool HideHud { get; set; } = true;
+
         /// <summary>Whether to only show locations in the current location. If `false`, characters in neighboring locations will be shown in gray.</summary>
         public bool SameLocationOnly { get; set; } = true;
 

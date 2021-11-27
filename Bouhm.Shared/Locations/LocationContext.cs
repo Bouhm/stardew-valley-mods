@@ -10,6 +10,9 @@ namespace Bouhm.Shared.Locations
         /*********
         ** Accessors
         *********/
+        /// <summary>The internal location name.</summary>
+        public string Name { get; }
+
         /// <summary>The location type (e.g. outdoors, building, or room).</summary>
         public LocationType Type { get; set; }
 
@@ -20,18 +23,25 @@ namespace Bouhm.Shared.Locations
         public string Parent { get; set; }
 
         /// <summary>The names of locations directly reachable via outgoing warps from this location, with the target tile position for each warp.</summary>
-        public Dictionary<string, Vector2> Neighbors { get; set; } = new();
+        public Dictionary<string, Vector2> Neighbors { get; } = new();
 
         /// <summary>The names of locations directly contained by this location.</summary>
-        public List<string> Children { get; set; }
+        public List<string> Children { get; } = new();
 
-        /// <summary>The default entry tile for incoming warps to this location.</summary>
+        /// <summary>The warp tile in the parent location which leads to this location.</summary>
         public Vector2 Warp { get; set; }
 
 
         /*********
         ** Public methods
         *********/
+        /// <summary>Construct an instance.</summary>
+        /// <param name="location">The location represented by the context.</param>
+        public LocationContext(GameLocation location)
+        {
+            this.Name = location.Name;
+        }
+
         /// <summary>Get the pixel position on which incoming players will warp based on the <see cref="Warp"/> tile.</summary>
         public Vector2 GetWarpPixelPosition()
         {

@@ -1,37 +1,60 @@
-# StardewValleyMods
-A collection of Stardew Valley mods that improve player experience, quality of life, and add new content to the game.
+﻿﻿This repository contains my SMAPI mods for Stardew Valley. See the individual mods for
+documentation and release notes.
 
-Co-maintained by [@Pathoschild](https://github.com/Pathoschild)
+## Mods
+* **NPC Map Locations** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/239) | [source](NPCMapLocations))  
+  Shows character locations on the map. Uses a modified map page much more accurate to the game.
+* **Location Compass** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/3045) | [source](LocationCompass))  
+  Locates characters on the screen indicating direction and distance from player's current position.
+* **Pet Dogs Mod** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/570) | [source](PerDogMod))  
+  Replaces the pet dog with a Shiba Inu, Shepherd, or Husky.
 
-## Install
-1. [Install the latest version of SMAPI](https://smapi.io)
-2. Download mods and unzip them into *Stardew Valley/Mods*.
-3. Run the game using StardewModdingAPI (SMAPI).
+## Translating the mods
+The mods can be translated into any language supported by the game, and SMAPI will automatically
+use the right translations.
 
-### [NPC Map Locations Mod](https://www.nexusmods.com/stardewvalley/mods/239)
-Shows character locations on the map. Uses a modified map page much more accurate to the game.
+(❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-_[Adding custom locations](https://github.com/Bouhm/stardew-valley-mods/tree/master/NPCMapLocations)_
+&nbsp;     | NPC Map Locations
+---------- | :----------------------------------------
+Chinese    | [✓](NPCMapLocations/i18n/zh.json)
+French     | [✓](NPCMapLocations/i18n/fr.json)
+German     | [✓](NPCMapLocations/i18n/de.json)
+Hungarian  | [✓](NPCMapLocations/i18n/hu.json)
+Italian    | [✓](NPCMapLocations/i18n/it.json)
+Japanese   | [✓](NPCMapLocations/i18n/ja.json)
+Korean     | [✓](NPCMapLocations/i18n/ko.json)
+Polish¹    | [✓](NPCMapLocations/i18n/pl.json)
+Portuguese | [✓](NPCMapLocations/i18n/pt.json)
+Russian    | [✓](NPCMapLocations/i18n/ru.json)
+Spanish    | [✓](NPCMapLocations/i18n/es.json)
+Turkish    | [✓](NPCMapLocations/i18n/tr.json)
 
-### [Location Compass](https://www.nexusmods.com/stardewvalley/mods/3045)
-Locates characters on the screen indicating direction and distance from player's current position.
+Contributions are welcome! See [Modding:Translations](https://stardewvalleywiki.com/Modding:Translations)
+on the wiki for help contributing translations.
 
-### [Pet Dogs Mod](https://www.nexusmods.com/stardewvalley/mods/570)
-Replaces pet dog with a Shiba Inu, Shepherd, or Husky.
-Requires [Content Patcher]("https://www.nexusmods.com/stardewvalley/mods/1915").
+¹ This is a custom language provided by a mod (see [Polish](https://www.nexusmods.com/stardewvalley/mods/3616)).
 
-## Compiling
-To compile a SMAPI mod for testing, use the following instructions:
+## Compiling the mods
+Installing stable releases from Nexus Mods is recommended for most users. If you really want to
+compile the mod yourself, read on.
 
-1. Make sure to have the appropriate versions of the game and [SMAPI](https://smapi.io) installed.
-2. Open the solution with Visual Studio or MonoDevelop.
-3. Add the package [Stardew.ModBuildConfig](https://www.nuget.org/packages/Pathoschild.Stardew.ModBuildConfig) by Pathoschild to enable cross-platform compatibility.
-4. Re-build the solution and run the debugger to launch the project with SMAPI.
+These mods use the [crossplatform build config](https://smapi.io/package) so they can be built on
+Linux, Mac, and Windows without changes. See [the build config documentation](https://smapi.io/package)
+for troubleshooting.
 
-## Contributing
+### Compiling a mod for testing
+To compile a mod and add it to your game's `Mods` directory:
 
-Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process of submitting pull requests.
+1. Rebuild the project in [Visual Studio](https://www.visualstudio.com/vs/community/) or
+   [MonoDevelop](https://www.monodevelop.com/).  
+   <small>This will compile the code and package it into the mod directory.</small>
+2. Launch the project with debugging.  
+   <small>This will start the game through SMAPI and attach the Visual Studio debugger.</small>
 
-## License
+### Compiling a mod for release
+To package a mod for release:
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+1. Switch to `Release` build configuration.
+2. Recompile the mod per the previous section.
+3. Upload the generated `bin/Release/<mod name>-<version>.zip` file from the project folder.

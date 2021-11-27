@@ -36,8 +36,10 @@ namespace NPCMapLocations.Framework
         /// <param name="monitor">The monitor with which to write output..</param>
         /// <param name="locationUtil">Scans and maps locations in the game world.</param>
         /// <param name="customizations">Manages customized map recolors, NPCs, sprites, names, etc.</param>
+        /// <param name="mapVectors">The in-world tile coordinates and map pixels which represent the same position for each location name.</param>
         /// <param name="npcMarkers">The tracked NPC markers.</param>
-        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, Dictionary<string, NpcMarker> npcMarkers)
+        /// <param name="locationsWithoutMapVectors">The outdoor location contexts which don't have any map vectors.</param>
+        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, IDictionary<string, MapVector[]> mapVectors, Dictionary<string, NpcMarker> npcMarkers, IEnumerable<LocationContext> locationsWithoutMapVectors)
         {
             if (!Context.IsWorldReady)
             {
@@ -114,20 +116,45 @@ namespace NPCMapLocations.Framework
 
             // excluded locations
             {
-                output.AppendLine("==========================");
-                output.AppendLine("==  Excluded locations  ==");
-                output.AppendLine("==========================");
-                output.AppendLine("These locations are completely excluded from NPC Map Locations. Players and NPCs in these locations will disappear from the map.");
-                output.AppendLine("These were all added by other mods editing the `Mods/Bouhm.NPCMapLocations/Locations` asset.");
+                output.AppendLine("=========================");
+                output.AppendLine("==  Tracked locations  ==");
+                output.AppendLine("=========================");
+                output.AppendLine("These are the NPCs currently being tracked by the mod.");
                 output.AppendLine();
-
                 if (customizations.LocationExclusions.Any())
                 {
-                    foreach (string name in customizations.LocationExclusions.OrderBy(p => p))
-                        output.AppendLine($"   - {name}");
+                    output.AppendLine("If a location is marked \"excluded\", it's completely hidden from NPC Map Locations; players and NPCs in that location will disappear from the map.");
+                    output.AppendLine("NPC Map Locations doesn't hide any locations itself, these are all excluded by other mods editing the `Mods/Bouhm.NPCMapLocations/Locations` asset.");
+                    output.AppendLine();
                 }
-                else
-                    output.AppendLine("   (none)");
+
+                // list locations by root
+                output.AppendLine("   Known locations:");
+                output.Append(
+                    SummaryCommand.BuildTable(
+                        records: locationUtil.LocationContexts.Values.OrderBy(p => p.Root ?? p.Name).ThenBy(p => p.Name),
+                        linePrefix: "      ",
+                        columnHeadings: new[] { "root", "name", "type", "notes" },
+                        p => p.Root ?? p.Name,
+                        p => p.Name,
+                        p => p.Type.ToString(),
+                        p => customizations.LocationExclusions.Contains(p.Name) ? "HIDDEN" : ""
+                    )
+                );
+
+                // list exclusions not listed above
+                if (customizations.LocationExclusions.Any())
+                {
+                    string[] otherExclusions = customizations.LocationExclusions.Where(name => !locationUtil.LocationContexts.ContainsKey(name)).OrderBy(p => p).ToArray();
+                    if (otherExclusions.Any())
+                    {
+                        output.AppendLine();
+                        output.AppendLine("These locations are excluded by mods, but don't match a known location:");
+                        foreach (string name in otherExclusions)
+                            output.AppendLine($"   - {name}");
+                    }
+                }
+
                 output.AppendLine();
                 output.AppendLine();
             }
@@ -182,15 +209,15 @@ namespace NPCMapLocations.Framework
                 output.AppendLine("===================");
                 output.AppendLine("==  Map vectors  ==");
                 output.AppendLine("===================");
-                output.AppendLine("These map in-world tile coordinates and map pixels which represent the same position.");
-                output.AppendLine("NPC Map Locations uses these map any in-game tile to its map pixel by measuring the distance between the closest map vectors.");
+                output.AppendLine("A 'map vector' represents the same position both in-world (measured in tiles) and on the world map (measured in pixels).");
+                output.AppendLine("These are used to calculate where any in-world character should be drawn on the map.");
                 output.AppendLine();
 
-                if (customizations.MapVectors.Any())
+                if (mapVectors.Any())
                 {
-                    var records = customizations.MapVectors
+                    var records = mapVectors
                         .SelectMany(group => group.Value
-                            .Select(vector => new { Location = group.Key, Vector = vector })
+                            .Select(vector => new { Location = group.Key, Vector = vector, IsCustom = customizations.MapVectors.ContainsKey(group.Key) })
                         )
                         .OrderBy(p => p.Location)
                         .ThenBy(p => p.Vector.TileX)
@@ -200,19 +227,49 @@ namespace NPCMapLocations.Framework
                         SummaryCommand.BuildTable(
                             records,
                             "",
-                            new[] { "location", "tile", "map pixel" },
+                            new[] { "location", "tile", "map pixel", "source" },
                             p => p.Location,
                             p => $"{p.Vector.TileX}, {p.Vector.TileY}",
-                            p => $"{p.Vector.MapX}, {p.Vector.MapY}"
+                            p => $"{p.Vector.MapX}, {p.Vector.MapY}",
+                            p => p.IsCustom ? "another mod" : "NPC Map Locations"
                         )
                     );
                 }
                 else
-                {
                     output.AppendLine("   (none)");
-                    output.AppendLine();
-                }
 
+                output.AppendLine();
+                output.AppendLine();
+            }
+
+            // unknown locations
+            {
+                output.AppendLine("=========================");
+                output.AppendLine("==  Unknown Locations  ==");
+                output.AppendLine("=========================");
+                output.AppendLine("These locations have no map vectors defined, so NPCs and characters in that location won't appear on the world map.");
+                output.AppendLine("For location mod authors, see the pinned post at https://www.nexusmods.com/stardewvalley/mods/239?tab=posts.");
+                output.AppendLine();
+
+                locationsWithoutMapVectors = locationsWithoutMapVectors.OrderBy(p => p.Name).ToArray();
+
+                if (locationsWithoutMapVectors.Any())
+                {
+                    output.Append(
+                        SummaryCommand.BuildTable(
+                            locationsWithoutMapVectors,
+                            "",
+                            new[] { "name", "type", "root location" },
+                            p => p.Name,
+                            p => p.Type.ToString(),
+                            p => p.Root
+                        )
+                    );
+                }
+                else
+                    output.AppendLine("   (none)");
+
+                output.AppendLine();
                 output.AppendLine();
             }
 
@@ -247,7 +304,7 @@ namespace NPCMapLocations.Framework
 
                     for (int i = 0; i < columnCount; i++)
                     {
-                        string value = getValues[i](record);
+                        string value = getValues[i](record) ?? "";
 
                         row[i] = value;
                         sizes[i] = Math.Max(sizes[i], value.Length);

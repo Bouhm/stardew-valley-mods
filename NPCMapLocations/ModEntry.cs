@@ -89,7 +89,14 @@ namespace NPCMapLocations
             helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
 
-            helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(this.Monitor, ModEntry.LocationUtil, this.Customizations, this.NpcMarkers.Value));
+            helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(
+                monitor: this.Monitor,
+                locationUtil: ModEntry.LocationUtil,
+                customizations: this.Customizations,
+                mapVectors: this.MapVectors.Value,
+                npcMarkers: this.NpcMarkers.Value,
+                locationsWithoutMapVectors: this.GetLocationsWithoutMapVectors()
+            ));
         }
 
         // Replace game map with modified map
@@ -332,30 +339,9 @@ namespace NPCMapLocations
             LocationUtil.ScanLocationContexts();
 
             // Log any custom locations not handled in content.json
-            try
-            {
-                string alertStr = "Unknown locations:";
-                foreach (var locCtx in LocationUtil.LocationContexts)
-                {
-                    if (
-                      (locCtx.Value.Root == null && !this.MapVectors.Value.ContainsKey(locCtx.Key))
-                      || (locCtx.Value.Root != null && !this.MapVectors.Value.ContainsKey(locCtx.Value.Root))
-                      && (locCtx.Value.Type != LocationType.Building || locCtx.Value.Type != LocationType.Room)
-                    )
-                    {
-                        if (this.Customizations.LocationExclusions.Contains(locCtx.Key))
-                            return;
-                        alertStr += $" {locCtx.Key},";
-                    }
-                }
-
-                this.Monitor.Log(alertStr.TrimEnd(',') + ".", LogLevel.Debug);
-            }
-            catch
-            {
-                this.Monitor.Log("Too many unknown locations; NPCs in unknown locations will not be visible.", LogLevel.Debug);
-            }
-
+            string[] unknownLocations = this.GetLocationsWithoutMapVectors().Select(p => p.Name).OrderBy(p => p).ToArray();
+            if (unknownLocations.Any())
+                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}", LogLevel.Debug);
 
             this.UpdateFarmBuildingLocations();
 
@@ -669,7 +655,24 @@ namespace NPCMapLocations
                 this.ShowDebugInfo();
         }
 
-        // Get only relevant villagers for map
+        /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
+        private IEnumerable<LocationContext> GetLocationsWithoutMapVectors()
+        {
+            foreach (var entry in LocationUtil.LocationContexts)
+            {
+                string name = entry.Key;
+                LocationContext context = entry.Value;
+
+                if (this.IsLocationExcluded(name))
+                    continue;
+
+                string outdoorName = context.Root ?? name;
+                if (!this.MapVectors.Value.ContainsKey(outdoorName) && context.Type is not (LocationType.Building or LocationType.Room))
+                    yield return entry.Value;
+            }
+        }
+
+        /// <summary>Get only relevant villagers for the world map.</summary>
         private List<NPC> GetVillagers()
         {
             var villagers = new List<NPC>();

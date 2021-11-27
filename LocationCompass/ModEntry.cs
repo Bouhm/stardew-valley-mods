@@ -29,6 +29,8 @@ namespace LocationCompass
         private Dictionary<string, List<Locator>> Locators;
         private Dictionary<string, LocatorScroller> ActiveWarpLocators; // Active indices of locators of doors
         private ModConfig Config;
+
+        /// <summary>Whether locators are visible. (This should be set via <see cref="SetShowLocators"/> to toggle the HUD if needed.)</summary>
         private bool ShowLocators;
 
         /// <summary>Scans and maps locations in the game world.</summary>
@@ -75,19 +77,12 @@ namespace LocationCompass
                 return;
 
             // Handle toggle
-            if (e.Button.ToString().Equals(this.Config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null &&
-                !Game1.eventUp && Game1.activeClickableMenu == null)
+            if (e.Button.ToString().Equals(this.Config.ToggleKeyCode) && Context.IsPlayerFree)
             {
                 if (this.Config.HoldToToggle)
-                {
-                    // Hide HUD to show locators
-                    if (Game1.displayHUD)
-                        this.ShowLocators = true;
-                }
+                    this.SetShowLocators(true);
                 else
-                    this.ShowLocators = !this.ShowLocators;
-
-                Game1.displayHUD = !this.ShowLocators;
+                    this.SetShowLocators(!this.ShowLocators);
             }
 
             // Configs
@@ -155,16 +150,11 @@ namespace LocationCompass
 
         private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
-            if (e.Button.ToString().Equals(this.Config.ToggleKeyCode) && !Game1.paused && Game1.currentMinigame == null && !Game1.eventUp && Game1.activeClickableMenu == null)
-            {
-                if (this.Config.HoldToToggle)
-                {
-                    this.ShowLocators = false;
-                    Game1.displayHUD = true;
-                }
-            }
+            if (this.Config.HoldToToggle && e.Button.ToString().Equals(this.Config.ToggleKeyCode) && Context.IsPlayerFree)
+                this.SetShowLocators(false);
         }
 
         private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
@@ -264,6 +254,15 @@ namespace LocationCompass
                 if (npc?.currentLocation != null)
                     this.SyncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
             }
+        }
+
+        /// <summary>Set whether locators are visible.</summary>
+        /// <param name="enabled">Whether locators should be visible.</param>
+        private void SetShowLocators(bool enabled)
+        {
+            this.ShowLocators = enabled;
+            if (this.Config.HideHud)
+                Game1.displayHUD = !this.ShowLocators;
         }
 
         private void UpdateLocators()

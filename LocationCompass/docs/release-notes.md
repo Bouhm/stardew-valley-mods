@@ -1,6 +1,12 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 1.3.8
+Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+
+* Added option to keep the HUD visible while locator icons are shown.
+* Fixed Caldera not handled as part of the Volcano Dungeon.
+
 ## 1.3.7
 Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 

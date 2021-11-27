@@ -23,6 +23,7 @@ These are the available settings:
 setting                 | what it affects
 ----------------------- | ---------------
 `HoldToToggle`          | Whether you need to hold the button to show icons (else the button toggles them). Default `true`.
+`HideHud`               | Whether the game HUD is hidden when the locator icons are shown. Default `true`.
 `SameLocationOnly`      | Whether to only show locations in the current location. If `false`, characters in neighboring locations will be shown in gray. Default `true`.
 `ShowQuestsAndBirthdaysOnly` | Whether to only show characters with a quest or birthday today.
 `ShowFarmersOnly`       | Whether to only show players. Default `false`.
