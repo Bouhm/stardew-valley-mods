@@ -2,18 +2,18 @@
     "minimap.label": "Minimapa",
     "minimap.option1": "Włączona",
     "minimap.plusMinus1": "Szerokość minimapy",
-    "minimap.plusMinus2": "Wysokość minimapy",
+    "minimap.plusMinus2": "Długość minimapy",
     "immersion.label": "Ustawienia:",
-    "immersion.option1": "Zawsze pokazuj wszystkich mieszkańców",
+    "immersion.option1": "Pokaż wszystkich mieszkańców",
     "immersion.option2": "Pokaż mieszkańców, z którymi gracz rozmawiał",
     "immersion.option3": "Ukryj mieszkańców, z którymi gracz rozmawiał",
-    "immersion.option4": "Pokazuj tylko mieszkańców w lokacji gracza",
-    "immersion.option5": "Pokazuj tylko mieszkańców w obrębie poziomu relacji",
+    "immersion.option4": "Pokaż tylko mieszkańców w lokacji gracza",
+    "immersion.option5": "Pokaż tylko mieszkańców w obrębie poziomu relacji",
     "immersion.slider1": "Minimalny poziom relacji",
     "immersion.slider2": "Maksymalny poziom relacji",
     "extra.label": "Dodatkowe ustawienia:",
     "extra.option1": "Pokaż zadania lub urodziny",
     "extra.option2": "Pokaż ukrytych mieszkańców",
     "extra.option3": "Pokaż podróżującego handlarza",
-    "villagers.label": "Uwzględnij/wyklucz mieszkańców:"
+    "villagers.label": "Uwzględnij/Wyklucz mieszkańców:"
 }
