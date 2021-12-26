@@ -120,6 +120,8 @@ namespace NPCMapLocations.Framework.Menus
             this.Options.Add(new MapModSlider("immersion.slider1", 8, -1, -1, 0, 12));
             this.Options.Add(new MapModSlider("immersion.slider2", 9, -1, -1, 0, 12));
 
+            string extraLabel = ModEntry.StaticHelper.Translation.Get("extra.label");
+            this.Options.Add(new OptionsElement(extraLabel));
             this.Options.Add(new ModCheckbox("extra.option1", 10, -1, -1));
             this.Options.Add(new ModCheckbox("extra.option2", 11, -1, -1));
             this.Options.Add(new ModCheckbox("extra.option3", 12, -1, -1));
