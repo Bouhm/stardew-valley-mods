@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed upgraded sheds having no map icon.
+
 ## 2.7.1
 Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 
