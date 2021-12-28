@@ -1,8 +1,14 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimapa",
     "minimap.option1": "Włączona",
     "minimap.plusMinus1": "Szerokość minimapy",
     "minimap.plusMinus2": "Długość minimapy",
+
+    // immersion section
     "immersion.label": "Ustawienia:",
     "immersion.option1": "Pokaż wszystkich mieszkańców",
     "immersion.option2": "Pokaż mieszkańców, z którymi gracz rozmawiał",
@@ -11,9 +17,13 @@
     "immersion.option5": "Pokaż tylko mieszkańców w obrębie poziomu relacji",
     "immersion.slider1": "Minimalny poziom relacji",
     "immersion.slider2": "Maksymalny poziom relacji",
+
+    // extra settings section
     "extra.label": "Dodatkowe ustawienia:",
     "extra.option1": "Pokaż zadania lub urodziny",
     "extra.option2": "Pokaż ukrytych mieszkańców",
     "extra.option3": "Pokaż podróżującego handlarza",
+
+    // include/exclude villagers section
     "villagers.label": "Uwzględnij/Wyklucz mieszkańców:"
 }

@@ -1,8 +1,14 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimapa",
     "minimap.option1": "Activado",
     "minimap.plusMinus1": "Anchura del minimapa",
     "minimap.plusMinus2": "Altura del minimapa",
+
+    // immersion section
     "immersion.label": "Ajustes:",
     "immersion.option1": "Siempre mostrar aldeanos",
     "immersion.option2": "Mostrar aldeanos con los que se ha hablado",
@@ -11,9 +17,13 @@
     "immersion.option5": "Solo mostrar aldeanos dentro de nivel de corazones",
     "immersion.slider1": "Nivel mínimo de corazones",
     "immersion.slider2": "Nivel máximo de corazones",
+
+    // extra settings section
     "extra.label": "Ajustes Adicionales:",
     "extra.option1": "Mostrar misiones o cumpleaños",
     "extra.option2": "Mostrar aldeanos ocultos",
     "extra.option3": "Mostrar al comerciante ambulante",
+
+    // include/exclude villagers section
     "villagers.label": "Incluir/Excluir aldeanos:"
 }
