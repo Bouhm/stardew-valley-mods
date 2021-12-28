@@ -4,6 +4,8 @@
 ## Upcoming release
 * Updated for Stardew Valley 1.5.5.
 * Fixed upgraded sheds having no map icon.
+* Fixed missing section label in settings (thanks to Zangorr!).
+* Improved translations. Thanks to ellipszist (added Thai) and Zangorr (updated Polish)!
 
 ## 2.7.1
 Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.

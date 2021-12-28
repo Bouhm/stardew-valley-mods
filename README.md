@@ -13,6 +13,9 @@ documentation and release notes.
 The mods can be translated into any language supported by the game, and SMAPI will automatically
 use the right translations.
 
+Contributions are welcome! See [Modding:Translations](https://stardewvalleywiki.com/Modding:Translations)
+on the wiki for help contributing translations.
+
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
 &nbsp;     | NPC Map Locations
@@ -28,12 +31,11 @@ Polish¹    | [✓](NPCMapLocations/i18n/pl.json)
 Portuguese | [✓](NPCMapLocations/i18n/pt.json)
 Russian    | [✓](NPCMapLocations/i18n/ru.json)
 Spanish    | [✓](NPCMapLocations/i18n/es.json)
+Thai¹      | [✓](NPCMapLocations/i18n/th.json)
 Turkish    | [✓](NPCMapLocations/i18n/tr.json)
 
-Contributions are welcome! See [Modding:Translations](https://stardewvalleywiki.com/Modding:Translations)
-on the wiki for help contributing translations.
-
-¹ This is a custom language provided by a mod (see [Polish](https://www.nexusmods.com/stardewvalley/mods/3616)).
+¹ This is a custom language provided by a mod (see [Polish](https://www.nexusmods.com/stardewvalley/mods/3616)
+and [Thai](https://www.nexusmods.com/stardewvalley/mods/7052)).
 
 ## Compiling the mods
 Installing stable releases from Nexus Mods is recommended for most users. If you really want to
