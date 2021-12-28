@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Kistérkép",
-    "minimap.option1": "Engedélyezve",
-    "minimap.plusMinus1": "Kistérkép szélesség",
-    "minimap.plusMinus2": "Kistérkép magasság",
+    "minimap.enabled": "Engedélyezve",
+    "minimap.width": "Kistérkép szélesség",
+    "minimap.height": "Kistérkép magasság",
+
+    // immersion section
     "immersion.label": "Beállítások:",
-    "immersion.option1": "Mindig mutassa a falusiakat",
-    "immersion.option2": "A játékos által beszélt falusiak megjelenítése",
-    "immersion.option3": "A játékos által beszélt falusiak elrejtése",
-    "immersion.option4": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
-    "immersion.option5": "Csak a szívszinten belüli falusiak megjelenítése",
-    "immersion.slider1": "Minimális szívszint",
-    "immersion.slider2": "Maximális szívszint",
+    "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
+    "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
+    "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
+    "immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
+    "immersion.only-villagers-within-heart-level": "Csak a szívszinten belüli falusiak megjelenítése",
+    "immersion.min-heart-level": "Minimális szívszint",
+    "immersion.max-heart-level": "Maximális szívszint",
+
+    // extra settings section
     "extra.label": "További beállítások:",
-    "extra.option1": "Küldetések vagy születésnapok megjelenítése",
-    "extra.option2": "Rejtett falusiak megjelenítése",
-    "extra.option3": "Utazó kereskedő megjelenítése",
+    "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
+    "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
+    "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
+
+    // include/exclude villagers section
     "villagers.label": "Falusiak Engedélyezése/Kizárása:"
 }

@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "小地图",
-    "minimap.option1": "启用",
-    "minimap.plusMinus1": "小地图宽",
-    "minimap.plusMinus2": "小地图高",
+    "minimap.enabled": "启用",
+    "minimap.width": "小地图宽",
+    "minimap.height": "小地图高",
+
+    // immersion section
     "immersion.label": "设置:",
-    "immersion.option1": "展示所有村民",
-    "immersion.option2": "显示所有说话的村民",
-    "immersion.option3": "隐藏所有说话的村民",
-    "immersion.option4": "显示村民在玩家的位置",
-    "immersion.option5": "显示指定关系级别内的村民",
-    "immersion.slider1": "最小好感度",
-    "immersion.slider2": "最大好感度",
+    "immersion.always-show-villagers": "展示所有村民",
+    "immersion.only-villagers-talked-to": "显示所有说话的村民",
+    "immersion.hide-villagers-talked-to": "隐藏所有说话的村民",
+    "immersion.only-villagers-in-player-location": "显示村民在玩家的位置",
+    "immersion.only-villagers-within-heart-level": "显示指定关系级别内的村民",
+    "immersion.min-heart-level": "最小好感度",
+    "immersion.max-heart-level": "最大好感度",
+
+    // extra settings section
     "extra.label": "额外设定:",
-    "extra.option1": "显示任务或生日",
-    "extra.option2": "显示隐藏的村民",
-    "extra.option3": "显示旅行商人",
+    "extra.show-quests-or-birthdays": "显示任务或生日",
+    "extra.show-hidden-villagers": "显示隐藏的村民",
+    "extra.show-traveling-merchant": "显示旅行商人",
+
+    // include/exclude villagers section
     "villagers.label": "包含村民清单:"
 }

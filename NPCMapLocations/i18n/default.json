@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimap",
-    "minimap.option1": "Enabled",
-    "minimap.plusMinus1": "Minimap width",
-    "minimap.plusMinus2": "Minimap height",
+    "minimap.enabled": "Enabled",
+    "minimap.width": "Minimap width",
+    "minimap.height": "Minimap height",
+
+    // immersion section
     "immersion.label": "Settings:",
-    "immersion.option1": "Always show villagers",
-    "immersion.option2": "Show villagers player has talked to",
-    "immersion.option3": "Hide villagers player has talked to",
-    "immersion.option4": "Only show villagers in player's location",
-    "immersion.option5": "Only show villagers within heart level",
-    "immersion.slider1": "Minimum heart level",
-    "immersion.slider2": "Maximum heart level",
+    "immersion.always-show-villagers": "Always show villagers",
+    "immersion.only-villagers-talked-to": "Show villagers player has talked to",
+    "immersion.hide-villagers-talked-to": "Hide villagers player has talked to",
+    "immersion.only-villagers-in-player-location": "Only show villagers in player's location",
+    "immersion.only-villagers-within-heart-level": "Only show villagers within heart level",
+    "immersion.min-heart-level": "Minimum heart level",
+    "immersion.max-heart-level": "Maximum heart level",
+
+    // extra settings section
     "extra.label": "Extra Settings:",
-    "extra.option1": "Show quests or birthdays",
-    "extra.option2": "Show hidden villagers",
-    "extra.option3": "Show traveling merchant",
+    "extra.show-quests-or-birthdays": "Show quests or birthdays",
+    "extra.show-hidden-villagers": "Show hidden villagers",
+    "extra.show-traveling-merchant": "Show traveling merchant",
+
+    // include/exclude villagers section
     "villagers.label": "Include/Exclude villagers:"
 }

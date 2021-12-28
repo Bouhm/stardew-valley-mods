@@ -27,7 +27,7 @@ namespace NPCMapLocations.Framework.Menus
             this.Min = min;
             this.Max = max;
             if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
-            this.ValueLabel = ModEntry.StaticHelper.Translation.Get(label);
+            this.ValueLabel = label;
 
             this.Value = whichOption switch
             {

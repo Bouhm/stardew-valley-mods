@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimapa",
-    "minimap.option1": "Włączona",
-    "minimap.plusMinus1": "Szerokość minimapy",
-    "minimap.plusMinus2": "Wysokość minimapy",
+    "minimap.enabled": "Włączona",
+    "minimap.width": "Szerokość minimapy",
+    "minimap.height": "Długość minimapy",
+
+    // immersion section
     "immersion.label": "Ustawienia:",
-    "immersion.option1": "Zawsze pokazuj wszystkich mieszkańców",
-    "immersion.option2": "Pokaż mieszkańców, z którymi gracz rozmawiał",
-    "immersion.option3": "Ukryj mieszkańców, z którymi gracz rozmawiał",
-    "immersion.option4": "Pokazuj tylko mieszkańców w lokacji gracza",
-    "immersion.option5": "Pokazuj tylko mieszkańców w obrębie poziomu przyjaźni",
-    "immersion.slider1": "Minimalny poziom przyjaźni",
-    "immersion.slider2": "Maksymalny poziom przyjaźni",
+    "immersion.always-show-villagers": "Pokaż wszystkich mieszkańców",
+    "immersion.only-villagers-talked-to": "Pokaż mieszkańców, z którymi gracz rozmawiał",
+    "immersion.hide-villagers-talked-to": "Ukryj mieszkańców, z którymi gracz rozmawiał",
+    "immersion.only-villagers-in-player-location": "Pokaż tylko mieszkańców w lokacji gracza",
+    "immersion.only-villagers-within-heart-level": "Pokaż tylko mieszkańców w obrębie poziomu relacji",
+    "immersion.min-heart-level": "Minimalny poziom relacji",
+    "immersion.max-heart-level": "Maksymalny poziom relacji",
+
+    // extra settings section
     "extra.label": "Dodatkowe ustawienia:",
-    "extra.option1": "Pokaż zadania lub urodziny",
-    "extra.option2": "Pokaż ukrytych mieszkańców",
-    "extra.option3": "Pokaż podróżującego handlarza",
-    "villagers.label": "Uwzględnij/wyklucz mieszkańców:"
+    "extra.show-quests-or-birthdays": "Pokaż zadania lub urodziny",
+    "extra.show-hidden-villagers": "Pokaż ukrytych mieszkańców",
+    "extra.show-traveling-merchant": "Pokaż podróżującego handlarza",
+
+    // include/exclude villagers section
+    "villagers.label": "Uwzględnij/Wyklucz mieszkańców:"
 }

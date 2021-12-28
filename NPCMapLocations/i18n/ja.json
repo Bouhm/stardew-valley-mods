@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimap",
-    "minimap.option1": "Enabled",
-    "minimap.plusMinus1": "Minimap width",
-    "minimap.plusMinus2": "Minimap height",
+    "minimap.enabled": "Enabled",
+    "minimap.width": "Minimap width",
+    "minimap.height": "Minimap height",
+
+    // immersion section
     "immersion.label": "設定:",
-    "immersion.option1": "住人を常に表示する",
-    "immersion.option2": "プレイヤーと話した住人を表示する",
-    "immersion.option3": "プレイヤーと話した住人を非表示にする",
-    "immersion.option4": "プレイヤーがいる地区の住人だけを表示する",
-    "immersion.option5": "特定の好感度の住人だけを表示する",
-    "immersion.slider1": "最小好感度",
-    "immersion.slider2": "最大好感度",
+    "immersion.always-show-villagers": "住人を常に表示する",
+    "immersion.only-villagers-talked-to": "プレイヤーと話した住人を表示する",
+    "immersion.hide-villagers-talked-to": "プレイヤーと話した住人を非表示にする",
+    "immersion.only-villagers-in-player-location": "プレイヤーがいる地区の住人だけを表示する",
+    "immersion.only-villagers-within-heart-level": "特定の好感度の住人だけを表示する",
+    "immersion.min-heart-level": "最小好感度",
+    "immersion.max-heart-level": "最大好感度",
+
+    // extra settings section
     "extra.label": "その他の設定:",
-    "extra.option1": "クエストや誕生日を表示する",
-    "extra.option2": "隠された住人を表示する",
-    "extra.option3": "行商人を表示する",
+    "extra.show-quests-or-birthdays": "クエストや誕生日を表示する",
+    "extra.show-hidden-villagers": "隠された住人を表示する",
+    "extra.show-traveling-merchant": "行商人を表示する",
+
+    // include/exclude villagers section
     "villagers.label": "住人の表示/非表示:"
 }

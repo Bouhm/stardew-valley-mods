@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Мини-карта",
-    "minimap.option1": "Включено",
-    "minimap.plusMinus1": "Ширина мини-карты",
-    "minimap.plusMinus2": "Высота мини-карты",
+    "minimap.enabled": "Включено",
+    "minimap.width": "Ширина мини-карты",
+    "minimap.height": "Высота мини-карты",
+
+    // immersion section
     "immersion.label": "Настройки:",
-    "immersion.option1": "Всегда показывать жителей",
-    "immersion.option2": "Показывать жителей, с которыми общался игрок",
-    "immersion.option3": "Скрывать жителей, с которыми общался игрок",
-    "immersion.option4": "Показывать жителей только в текущей локации",
-    "immersion.option5": "Показывать жителей только в указанном диапазоне сердец",
-    "immersion.slider1": "Минимальный уровень сердец",
-    "immersion.slider2": "Максимальный уровень сердец",
+    "immersion.always-show-villagers": "Всегда показывать жителей",
+    "immersion.only-villagers-talked-to": "Показывать жителей, с которыми общался игрок",
+    "immersion.hide-villagers-talked-to": "Скрывать жителей, с которыми общался игрок",
+    "immersion.only-villagers-in-player-location": "Показывать жителей только в текущей локации",
+    "immersion.only-villagers-within-heart-level": "Показывать жителей только в указанном диапазоне сердец",
+    "immersion.min-heart-level": "Минимальный уровень сердец",
+    "immersion.max-heart-level": "Максимальный уровень сердец",
+
+    // extra settings section
     "extra.label": "Дополнительные настройки:",
-    "extra.option1": "Показать задания или дни рождения",
-    "extra.option2": "Показывать скрытых жителей",
-    "extra.option3": "Показывать странствующего торговца",
+    "extra.show-quests-or-birthdays": "Показать задания или дни рождения",
+    "extra.show-hidden-villagers": "Показывать скрытых жителей",
+    "extra.show-traveling-merchant": "Показывать странствующего торговца",
+
+    // include/exclude villagers section
     "villagers.label": "Добавить/исключить жителей:"
 }

@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Mini-Mapa",
-    "minimap.option1": "Ativo",
-    "minimap.plusMinus1": "Largura do Mini-Mapa",
-    "minimap.plusMinus2": "Altura do Mini-Mapa",
+    "minimap.enabled": "Ativo",
+    "minimap.width": "Largura do Mini-Mapa",
+    "minimap.height": "Altura do Mini-Mapa",
+
+    // immersion section
     "immersion.label": "Configurações:",
-    "immersion.option1": "Sempre Mostrar Moradores",
-    "immersion.option2": "Mostrar Moradores que o Jogador Já Interagiu",
-    "immersion.option3": "Esconder Moradores que O Jogador Já Interagiu",
-    "immersion.option4": "Mostrar Somente Moradores na Localização do Jogador",
-    "immersion.option5": "Mostrar Somente Moradores Dentro dos Limites de Nível de Relacionamento",
-    "immersion.slider1": "Nível Mínimo de Relacionamento",
-    "immersion.slider2": "Nível Máximo de Relacionamento",
+    "immersion.always-show-villagers": "Sempre Mostrar Moradores",
+    "immersion.only-villagers-talked-to": "Mostrar Moradores que o Jogador Já Interagiu",
+    "immersion.hide-villagers-talked-to": "Esconder Moradores que O Jogador Já Interagiu",
+    "immersion.only-villagers-in-player-location": "Mostrar Somente Moradores na Localização do Jogador",
+    "immersion.only-villagers-within-heart-level": "Mostrar Somente Moradores Dentro dos Limites de Nível de Relacionamento",
+    "immersion.min-heart-level": "Nível Mínimo de Relacionamento",
+    "immersion.max-heart-level": "Nível Máximo de Relacionamento",
+
+    // extra settings section
     "extra.label": "Configurações Extras:",
-    "extra.option1": "Mostrar Missões ou Aniversários",
-    "extra.option2": "Mostrar Moradores Escondidos",
-    "extra.option3": "Mostrar Mercador Viajante",
+    "extra.show-quests-or-birthdays": "Mostrar Missões ou Aniversários",
+    "extra.show-hidden-villagers": "Mostrar Moradores Escondidos",
+    "extra.show-traveling-merchant": "Mostrar Mercador Viajante",
+
+    // include/exclude villagers section
     "villagers.label": "Incluir/Excluir Moradores:"
 }

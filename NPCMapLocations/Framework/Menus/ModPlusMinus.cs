@@ -46,7 +46,6 @@ namespace NPCMapLocations.Framework.Menus
             }
 
             this.bounds = new Rectangle(x, y, (int)(1.5 * this.TxtSize), 32);
-            this.label = ModEntry.StaticHelper.Translation.Get(label);
             this.whichOption = whichOption;
             this.MinusButton = new Rectangle(x, 16, 28, 32);
             this.PlusButton = new Rectangle(this.bounds.Right - 96, 16, 28, 32);

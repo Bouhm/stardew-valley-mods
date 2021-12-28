@@ -1,19 +1,29 @@
 ﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
     "minimap.label": "Minimap",
-    "minimap.option1": "Eingeschaltet",
-    "minimap.plusMinus1": "Breite der Minimap ",
-    "minimap.plusMinus2": "Höhe der Minimap ",
+    "minimap.enabled": "Eingeschaltet",
+    "minimap.width": "Breite der Minimap ",
+    "minimap.height": "Höhe der Minimap ",
+
+    // immersion section
     "immersion.label": "Einstellungen:",
-    "immersion.option1": "Zeige Einwohner immer",
-    "immersion.option2": "Zeige Einwohner, mit denen gesprochen wurde",
-    "immersion.option3": "Verberge Einwohner, mit denen der Spieler gesprochen hat",
-    "immersion.option4": "Zeige nur Einwohner am selben Standort",
-    "immersion.option5": "Zeige nur Einwohner mit bestimmtem Herzstand",
-    "immersion.slider1": "Minimaler Herzstand",
-    "immersion.slider2": "Maximaler Herzstand",
+    "immersion.always-show-villagers": "Zeige Einwohner immer",
+    "immersion.only-villagers-talked-to": "Zeige Einwohner, mit denen gesprochen wurde",
+    "immersion.hide-villagers-talked-to": "Verberge Einwohner, mit denen der Spieler gesprochen hat",
+    "immersion.only-villagers-in-player-location": "Zeige nur Einwohner am selben Standort",
+    "immersion.only-villagers-within-heart-level": "Zeige nur Einwohner mit bestimmtem Herzstand",
+    "immersion.min-heart-level": "Minimaler Herzstand",
+    "immersion.max-heart-level": "Maximaler Herzstand",
+
+    // extra settings section
     "extra.label": "Zusätzliche Einstellungen:",
-    "extra.option1": "Zeige Aufträge oder Geburtstage",
-    "extra.option2": "Zeige verborgene Einwohnern",
-    "extra.option3": "Zeige fahrenden Händler ",
+    "extra.show-quests-or-birthdays": "Zeige Aufträge oder Geburtstage",
+    "extra.show-hidden-villagers": "Zeige verborgene Einwohnern",
+    "extra.show-traveling-merchant": "Zeige fahrenden Händler",
+
+    // include/exclude villagers section
     "villagers.label": "Ein-/Ausschließen von Einwohnern:"
 }

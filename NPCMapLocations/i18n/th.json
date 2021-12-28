@@ -1,0 +1,29 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
+    "minimap.label": "แผนที่ขนาดเล็ก",
+    "minimap.enabled": "เปิดใช้งาน",
+    "minimap.width": "ความกว้างของแผนที่",
+    "minimap.height": "ความสูงของแผนที่",
+
+    // immersion section
+    "immersion.label": "การตั้งค่า:",
+    "immersion.always-show-villagers": "แสดงชาวบ้านตลอดเวลา",
+    "immersion.only-villagers-talked-to": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "immersion.hide-villagers-talked-to": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "immersion.only-villagers-in-player-location": "แสดงเฉพาะชาวบ้านที่อยู่ในสถานที่เดียวกันกับผู้เล่น",
+    "immersion.only-villagers-within-heart-level": "แสดงเฉพาะชาวบ้านที่มีค่าหัวใจระหว่าง",
+    "immersion.min-heart-level": "ค่าหัวใจขั้นต่ำ",
+    "immersion.max-heart-level": "ค่าหัวใจสูงสุด",
+
+    // extra settings section
+    "extra.label": "การตั้งค่าพิเศษ:",
+    "extra.show-quests-or-birthdays": "แสดงเควสหรือวันเกิด",
+    "extra.show-hidden-villagers": "แสดงชาวบ้านที่ซ่อนอยู่",
+    "extra.show-traveling-merchant": "แสดงพ่อค้าเร่",
+
+    // include/exclude villagers section
+    "villagers.label": "แสดง/ซ่อน ชาวบ้าน:"
+}

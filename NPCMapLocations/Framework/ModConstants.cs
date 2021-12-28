@@ -258,22 +258,38 @@ namespace NPCMapLocations.Framework
         };
 
         /// <summary>Custom farm markers. Also used to do a quick check for currentLocation is farm building.</summary>
-        public static Dictionary<string, Rectangle> FarmBuildingRects => new()
+        public static Dictionary<string, Rectangle> FarmBuildingRects { get; } = GetFarmBuildingRects();
+
+
+        /*********
+        ** Private methods
+        *********/
+        /// <summary>Get the map icons each each farm building type.</summary>
+        private static Dictionary<string, Rectangle> GetFarmBuildingRects()
         {
-            ["Shed"] = new Rectangle(0, 0, 5, 7),
-            ["Coop"] = new Rectangle(5, 0, 5, 7),
-            ["Big Coop"] = new Rectangle(5, 0, 5, 7),
-            ["Deluxe Coop"] = new Rectangle(5, 0, 5, 7),
-            ["Barn"] = new Rectangle(10, 0, 6, 7),
-            ["Big Barn"] = new Rectangle(10, 0, 6, 7),
-            ["Deluxe Barn"] = new Rectangle(10, 0, 6, 7),
-            ["SlimeHutch"] = new Rectangle(16, 0, 7, 7),
-            ["Greenhouse"] = new Rectangle(23, 0, 5, 7),
-            ["FarmHouse"] = new Rectangle(28, 0, 5, 7),
-            ["Cabin"] = new Rectangle(33, 0, 4, 7),
-            ["Log Cabin"] = new Rectangle(33, 0, 4, 7),
-            ["Plank Cabin"] = new Rectangle(37, 0, 4, 7),
-            ["Stone Cabin"] = new Rectangle(41, 0, 4, 7)
-        };
+            // base source rects
+            var rects = new Dictionary<string, Rectangle>()
+            {
+                ["Shed"] = new Rectangle(0, 0, 5, 7),
+                ["Coop"] = new Rectangle(5, 0, 5, 7),
+                ["Barn"] = new Rectangle(10, 0, 6, 7),
+                ["SlimeHutch"] = new Rectangle(16, 0, 7, 7),
+                ["Greenhouse"] = new Rectangle(23, 0, 5, 7),
+                ["FarmHouse"] = new Rectangle(28, 0, 5, 7),
+                ["Cabin"] = new Rectangle(33, 0, 4, 7),
+                ["Log Cabin"] = new Rectangle(33, 0, 4, 7),
+                ["Plank Cabin"] = new Rectangle(37, 0, 4, 7),
+                ["Stone Cabin"] = new Rectangle(41, 0, 4, 7)
+            };
+
+            // use same texture for upgraded buildings
+            rects["Big Shed"] = rects["Shed"];
+            rects["Big Coop"] = rects["Coop"];
+            rects["Deluxe Coop"] = rects["Coop"];
+            rects["Big Barn"] = rects["Barn"];
+            rects["Deluxe Barn"] = rects["Barn"];
+
+            return rects;
+        }
     }
 }
