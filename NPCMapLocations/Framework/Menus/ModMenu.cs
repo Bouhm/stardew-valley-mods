@@ -100,28 +100,28 @@ namespace NPCMapLocations.Framework.Menus
                 heights.Add(45 + j * 15);
 
             this.Options.Add(new OptionsElement(I18n.Minimap_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Option1(), 0, -1, -1));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_PlusMinus1(), 1, widths));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_PlusMinus2(), 2, heights));
+            this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0, -1, -1));
+            this.Options.Add(new ModPlusMinus(I18n.Minimap_Width(), 1, widths));
+            this.Options.Add(new ModPlusMinus(I18n.Minimap_Height(), 2, heights));
 
             // Translate labels and initialize buttons to handle button press
             this.Options.Add(new OptionsElement(I18n.Immersion_Label()));
-            this.ImmersionButton1 = new MapModButton(I18n.Immersion_Option1(), 3, -1, -1, -1, -1);
-            this.ImmersionButton2 = new MapModButton(I18n.Immersion_Option2(), 4, -1, -1, -1, -1);
-            this.ImmersionButton3 = new MapModButton(I18n.Immersion_Option3(), 5, -1, -1, -1, -1);
+            this.ImmersionButton1 = new MapModButton(I18n.Immersion_AlwaysShowVillagers(), 3, -1, -1, -1, -1);
+            this.ImmersionButton2 = new MapModButton(I18n.Immersion_OnlyVillagersTalkedTo(), 4, -1, -1, -1, -1);
+            this.ImmersionButton3 = new MapModButton(I18n.Immersion_HideVillagersTalkedTo(), 5, -1, -1, -1, -1);
             this.Options.Add(this.ImmersionButton1);
             this.Options.Add(this.ImmersionButton2);
             this.Options.Add(this.ImmersionButton3);
 
-            this.Options.Add(new ModCheckbox(I18n.Immersion_Option4(), 6, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Immersion_Option5(), 7, -1, -1));
-            this.Options.Add(new MapModSlider(I18n.Immersion_Slider1(), 8, -1, -1, 0, 12));
-            this.Options.Add(new MapModSlider(I18n.Immersion_Slider2(), 9, -1, -1, 0, 12));
+            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7, -1, -1));
+            this.Options.Add(new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, 12));
+            this.Options.Add(new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, 12));
 
             this.Options.Add(new OptionsElement(I18n.Extra_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Extra_Option1(), 10, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_Option2(), 11, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_Option3(), 12, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12, -1, -1));
 
             this.Options.Add(new OptionsElement(I18n.Villagers_Label()));
 
@@ -342,7 +342,7 @@ namespace NPCMapLocations.Framework.Menus
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
             this.OkButton.draw(b);
-            int buttonWidth = (int)Game1.dialogueFont.MeasureString(I18n.Immersion_Option3()).X;
+            int buttonWidth = (int)Game1.dialogueFont.MeasureString(I18n.Immersion_HideVillagersTalkedTo()).X;
             if (!GameMenu.forcePreventClose)
             {
                 this.UpArrow.draw(b);
