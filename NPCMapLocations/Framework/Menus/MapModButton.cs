@@ -26,7 +26,6 @@ namespace NPCMapLocations.Framework.Menus
         public MapModButton(string label, int whichOption, int x, int y, int width, int height)
             : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            this.label = ModEntry.StaticHelper.Translation.Get(label);
             this.Rect = new Rectangle(x, y, width, height);
 
             this.greyedOut = ModEntry.Config.ImmersionOption != whichOption - 2;

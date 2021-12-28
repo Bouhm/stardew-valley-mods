@@ -26,7 +26,6 @@ namespace NPCMapLocations.Framework.Menus
             : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.NpcMarkers = npcMarkers;
-            this.label = ModEntry.StaticHelper.Translation.Get(label);
 
             // Villager names
             if (whichOption > 12 && npcMarkers != null)

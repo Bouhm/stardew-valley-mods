@@ -20,6 +20,7 @@ using StardewValley.Quests;
 
 namespace NPCMapLocations
 {
+    /// <summary>The mod entry class.</summary>
     public class ModEntry : Mod, IAssetLoader
     {
         /*********
@@ -67,8 +68,11 @@ namespace NPCMapLocations
         /*********
         ** Public methods
         *********/
+        /// <inheritdoc />
         public override void Entry(IModHelper helper)
         {
+            I18n.Init(helper.Translation);
+
             ModEntry.LocationUtil = new(this.Monitor);
             StaticHelper = helper;
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
