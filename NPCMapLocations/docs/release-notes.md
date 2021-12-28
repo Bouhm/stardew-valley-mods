@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.7.2
+Released 27 December 2021 for SMAPI 3.13.0. Updated by Pathoschild.
+
 * Updated for Stardew Valley 1.5.5, including custom farm type support.
 * Fixed upgraded sheds having no map icon.
 * Fixed missing section label in settings (thanks to Zangorr!).
