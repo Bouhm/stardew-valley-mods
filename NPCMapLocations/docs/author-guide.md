@@ -170,6 +170,10 @@ To customize map vectors for the farm, you can use one of these as the location 
 * `Farm_FourCorners`
 * `Farm_Beach`
 
+For a custom farm type, use `Farm_` with the farm type ID. For example, Small Beach Farm adds a
+farm with type ID `Pathoschild.SmallBeachFarm`, so the map vectors key would be
+`Farm_Pathoschild.SmallBeachFarm`.
+
 #### Advanced: use a fixed map point
 NPC Map Locations normally correlates in-game tile positions to the equivalent map pixel, so you
 can see markers moving around within a location. That's recommended in most cases.

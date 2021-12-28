@@ -2,7 +2,7 @@
 
 # Release notes
 ## Upcoming release
-* Updated for Stardew Valley 1.5.5.
+* Updated for Stardew Valley 1.5.5, including custom farm type support.
 * Fixed upgraded sheds having no map icon.
 * Fixed missing section label in settings (thanks to Zangorr!).
 * Improved translations. Thanks to ellipszist (added Thai) and Zangorr (updated Polish)!

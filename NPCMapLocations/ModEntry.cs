@@ -202,33 +202,8 @@ namespace NPCMapLocations
 
                 // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
 
-                MapVector[] locVectors;
-                bool locationNotFound = false;
-
-                if (locationName == "Farm")
-                {
-                    // Handle different farm types for custom vectors
-                    string[] farms = { "Farm_Default", "Farm_Riverland", "Farm_Forest", "Farm_Hills", "Farm_Wilderness", "Farm_FourCorners", "Farm_Beach" };
-                    if (customMapVectors != null && (customMapVectors.Keys.Any(locName => locName == farms.ElementAtOrDefault(Game1.whichFarm))))
-                    {
-                        if (!customMapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors))
-                            locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-                    }
-                    else
-                    {
-                        if (!customMapVectors.TryGetValue("Farm", out locVectors))
-                        {
-                            locationNotFound = !ModConstants.MapVectors.TryGetValue(farms.ElementAtOrDefault(Game1.whichFarm), out locVectors);
-                            if (locationNotFound)
-                                locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-                        }
-                    }
-                }
-                // If not in custom vectors, use default
-                else if (!(customMapVectors != null && customMapVectors.TryGetValue(locationName, out locVectors)))
-                    locationNotFound = !ModConstants.MapVectors.TryGetValue(locationName, out locVectors);
-
-                if (locVectors == null || locationNotFound)
+                MapVector[] locVectors = ModEntry.GetMapVectors(locationName, customMapVectors);
+                if (locVectors == null)
                     return Unknown;
 
                 int x;
@@ -701,6 +676,41 @@ namespace NPCMapLocations
             }
 
             return villagers;
+        }
+
+        /// <summary>Get the map vectors for a location name, if any.</summary>
+        /// <param name="locationName">The location name.</param>
+        /// <param name="customMapVectors">The custom vectors which map specific in-game tile coordinates to their map pixels.</param>
+        private static MapVector[] GetMapVectors(string locationName, IDictionary<string, MapVector[]> customMapVectors)
+        {
+            // get a key for the specific farm type if known
+            string farmKey = null;
+            if (locationName == "Farm")
+            {
+                farmKey = Game1.whichFarm switch
+                {
+                    Farm.default_layout => "Farm_Default",
+                    Farm.riverlands_layout => "Farm_Riverland",
+                    Farm.forest_layout => "Farm_Forest",
+                    Farm.mountains_layout => "Farm_Hills",
+                    Farm.combat_layout => "Farm_Wilderness",
+                    Farm.fourCorners_layout => "Farm_FourCorners",
+                    Farm.beach_layout => "Farm_Beach",
+                    Farm.mod_layout => "Farm_" + Game1.GetFarmTypeID(),
+                    _ => null
+                };
+            }
+
+            // get most specific vectors available
+            return
+                (
+                    from source in new[] { customMapVectors, ModConstants.MapVectors }
+                    from key in new[] { farmKey, locationName }
+
+                    where source != null && key != null && source.ContainsKey(key)
+                    select source[key]
+                )
+                .FirstOrDefault(p => p?.Any() == true);
         }
 
         // For drawing farm buildings on the map 
