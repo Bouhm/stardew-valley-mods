@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Improved translations. Thanks to ChulkyBow (added Ukrainian)!
+
 ## 2.7.2
 Released 27 December 2021 for SMAPI 3.13.0. Updated by Pathoschild.
 

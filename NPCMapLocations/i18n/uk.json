@@ -1,0 +1,29 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
+    "minimap.label": "Міні-мапа",
+    "minimap.enabled": "Ввімкнено",
+    "minimap.width": "Ширина міні-мапи",
+    "minimap.height": "Висота міні-мапи",
+
+    // immersion section
+    "immersion.label": "Налаштування:",
+    "immersion.always-show-villagers": "Завжди показувати містян(персонажів)",
+    "immersion.only-villagers-talked-to": "Показувати містян, з якими спілкувався гравець",
+    "immersion.hide-villagers-talked-to": "Приховувати містян, з якими спілкувався гравець",
+    "immersion.only-villagers-in-player-location": "Показувати містян тільки в поточній локації",
+    "immersion.only-villagers-within-heart-level": "Показувати містян тільки у вказаному діапазоні дружби",
+    "immersion.min-heart-level": "Мінімальний рівень дружби",
+    "immersion.max-heart-level": "Максимальний рівень дружби",
+
+    // extra settings section
+    "extra.label": "Додаткові налаштування:",
+    "extra.show-quests-or-birthdays": "Показувати завдання або дні народження",
+    "extra.show-hidden-villagers": "Показувати прихованих містян",
+    "extra.show-traveling-merchant": "Показувати мандрівного купця",
+
+    // include/exclude villagers section
+    "villagers.label": "Додати/Виключити містян:"
+}
