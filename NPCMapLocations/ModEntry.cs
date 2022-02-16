@@ -103,9 +103,10 @@ namespace NPCMapLocations
             ));
         }
 
-        // Replace game map with modified map
+        /// <inheritdoc />
         public bool CanLoad<T>(IAssetInfo asset)
         {
+            // Replace game map with modified map
             return (
               asset.AssetNameEquals(this.MapFilePath) ||
               asset.AssetNameEquals(this.NpcCustomizationsPath) ||
@@ -113,6 +114,7 @@ namespace NPCMapLocations
             );
         }
 
+        /// <inheritdoc />
         public T Load<T>(IAssetInfo asset)
         {
             if (asset.AssetNameEquals(this.MapFilePath))
@@ -260,6 +262,46 @@ namespace NPCMapLocations
             }
 
             return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, new HashSet<string>(), 1);
+        }
+
+        /// <summary>Get whether an NPC is configured to be excluded when rendering markers on the map.</summary>
+        /// <param name="name">The NPC name.</param>
+        /// <param name="ignoreConfig">Whether to ignore custom configuration from the player.</param>
+        public static bool ShouldExcludeNpc(string name, bool ignoreConfig = false)
+        {
+            return ModEntry.ShouldExcludeNpc(name, out _, ignoreConfig);
+        }
+
+        /// <summary>Get whether an NPC is configured to be excluded when rendering markers on the map.</summary>
+        /// <param name="name">The NPC name.</param>
+        /// <param name="reason">A phrase indicating why the NPC should be excluded, shown by the <see cref="SummaryCommand"/>.</param>
+        /// <param name="ignoreConfig">Whether to ignore custom configuration from the player.</param>
+        public static bool ShouldExcludeNpc(string name, out string reason, bool ignoreConfig = false)
+        {
+            // from config override
+            if (!ignoreConfig && ModEntry.Config.ForceNpcVisibility != null && ModEntry.Config.ForceNpcVisibility.TryGetValue(name, out bool forceVisible))
+            {
+                reason = !forceVisible ? "excluded in player settings" : null;
+                return forceVisible;
+            }
+
+            // from mod override
+            if (ModEntry.Globals.ModNpcExclusions.Contains(name))
+            {
+                reason = "excluded by mod override";
+                return true;
+            }
+
+            // from defaults
+            if (ModEntry.Globals.NpcExclusions.Contains(name))
+            {
+                reason = "excluded by default";
+                return true;
+            }
+
+            // not hidden
+            reason = null;
+            return false;
         }
 
 
@@ -1057,8 +1099,8 @@ namespace NPCMapLocations
                 marker.ReasonHidden = reason;
             }
 
-            if (Globals.NpcExclusions.Contains(name))
-                Hide("hidden per config (excluded in config or by a mod)");
+            if (ModEntry.ShouldExcludeNpc(name, out string reason))
+                Hide($"hidden per config ({reason})");
             else if (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(name))
                 Hide("hidden per config (didn't talk to them today)");
             else if (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(name))

@@ -2,6 +2,8 @@
 
 # Release notes
 ## Upcoming release
+* Improved summary console command to show why an NPC is hidden.
+* Fixed show/hide villager setting through the UI not persisted between game sessions.
 * Improved translations. Thanks to ChulkyBow (added Ukrainian)!
 
 ## 2.7.2

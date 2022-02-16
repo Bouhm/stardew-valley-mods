@@ -30,7 +30,7 @@ namespace NPCMapLocations.Framework.Menus
             // Villager names
             if (whichOption > 12 && npcMarkers != null)
             {
-                this.IsChecked = !ModEntry.Globals.NpcExclusions.Contains(npcMarkers.ElementAt(whichOption - 13).Key);
+                this.IsChecked = !ModEntry.ShouldExcludeNpc(npcMarkers.ElementAt(whichOption - 13).Key);
                 return;
             }
 
@@ -71,10 +71,13 @@ namespace NPCMapLocations.Framework.Menus
             // Show/hide villager options
             if (whichOption > 12 && this.NpcMarkers != null)
             {
-                if (this.IsChecked)
-                    ModEntry.Globals.NpcExclusions.Remove(this.NpcMarkers.ElementAt(whichOption - 13).Key);
+                string name = this.NpcMarkers.ElementAt(whichOption - 13).Key;
+                bool exclude = !this.IsChecked;
+
+                if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
+                    ModEntry.Config.ForceNpcVisibility.Remove(name);
                 else
-                    ModEntry.Globals.NpcExclusions.Add(this.NpcMarkers.ElementAt(whichOption - 13).Key);
+                    ModEntry.Config.ForceNpcVisibility[name] = exclude;
             }
             else
             {

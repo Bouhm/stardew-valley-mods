@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace NPCMapLocations.Framework.Models
 {
@@ -70,6 +71,10 @@ namespace NPCMapLocations.Framework.Models
 
         /// <summary>NPC names to hide from the map.</summary>
         public HashSet<string> NpcExclusions { get; set; } = new();
+
+        /// <summary>NPC names to hide from the map, specified by mods through the API.</summary>
+        [JsonIgnore]
+        public HashSet<string> ModNpcExclusions { get; } = new();
 
         /// <summary>Custom offsets when drawing vanilla NPCs.</summary>
         public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new();
