@@ -1,4 +1,4 @@
-﻿{
+{
     /*********
     ** Map options
     *********/
@@ -14,7 +14,7 @@
     "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
     "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
     "immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
-    "immersion.only-villagers-within-heart-level": "Csak a szívszinten belüli falusiak megjelenítése",
+    "immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
     "immersion.min-heart-level": "Minimális szívszint",
     "immersion.max-heart-level": "Maximális szívszint",
 
