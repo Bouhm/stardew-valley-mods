@@ -1,9 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Improved summary console command to show why an NPC is hidden.
-* Fixed show/hide villager setting through the UI not persisted between game sessions.
+## 2.8.0
+Released 26 February 2022 for SMAPI 3.13.0. Updated by Pathoschild.
+
+* The summary console command now shows why an NPC is hidden.
+* The show/hide villager map settings are now persisted between game sessions.
 * Improved translations. Thanks to ChulkyBow (added Ukrainian)!
 
 ## 2.7.2
