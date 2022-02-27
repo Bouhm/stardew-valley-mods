@@ -1,4 +1,6 @@
-﻿namespace NPCMapLocations.Framework.Models
+﻿using System.Collections.Generic;
+
+namespace NPCMapLocations.Framework.Models
 {
     /// <summary>The model for per-player config options.</summary>
     public class PlayerConfig
@@ -17,5 +19,8 @@
 
         /// <summary>The maximum heart level for <see cref="ByHeartLevel"/>.</summary>
         public int HeartLevelMax { get; set; } = 12;
+
+        /// <summary>The NPCs to show/hide on the map regardless of <see cref="GlobalConfig"/>, indexed by name.</summary>
+        public IDictionary<string, bool> ForceNpcVisibility { get; set; } = new Dictionary<string, bool>();
     }
 }

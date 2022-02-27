@@ -426,7 +426,7 @@ namespace NPCMapLocations.Framework.Menus
                     // Skip if no specified location
                     if (marker.Sprite == null
                         || !this.IsWithinMapArea(marker.MapX, marker.MapY)
-                        || ModEntry.Globals.NpcExclusions.Contains(name)
+                        || ModEntry.ShouldExcludeNpc(name)
                         || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
                         || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                     )

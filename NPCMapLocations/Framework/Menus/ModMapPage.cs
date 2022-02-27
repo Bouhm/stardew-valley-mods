@@ -450,7 +450,7 @@ namespace NPCMapLocations.Framework.Menus
 
                     // Skip if no specified location or should be hidden
                     if (marker.Sprite == null
-                      || ModEntry.Globals.NpcExclusions.Contains(name)
+                      || ModEntry.ShouldExcludeNpc(name)
                       || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
                       || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                     )

@@ -79,7 +79,6 @@ namespace NPCMapLocations.Framework
             {
                 // get defaults
                 var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
-                var exclusions = this.Merge(ModEntry.Globals.NpcExclusions);
 
                 // get custom data
                 foreach (var npcData in customNpcJson)
@@ -88,7 +87,7 @@ namespace NPCMapLocations.Framework
 
                     if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
                     {
-                        exclusions.Add(npcData.Key);
+                        ModEntry.Globals.ModNpcExclusions.Add(npcData.Key);
                         continue;
                     }
 
@@ -112,7 +111,6 @@ namespace NPCMapLocations.Framework
 
                 // Merge customizations into globals config
                 ModEntry.Globals.NpcMarkerOffsets = markerOffsets;
-                ModEntry.Globals.NpcExclusions = exclusions;
             }
 
             foreach (var character in Utility.getAllCharacters())
