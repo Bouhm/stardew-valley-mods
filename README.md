@@ -10,6 +10,12 @@ documentation and release notes.
   Replaces the pet dog with a Shiba Inu, Shepherd, or Husky.
 
 ## Translating the mods
+<!--
+
+    This section is auto-generated using a script, there's no need to edit it manually.
+    https://gist.github.com/Pathoschild/040ff6c8dc863ed2a7a828aa04447033
+
+-->
 The mods can be translated into any language supported by the game, and SMAPI will automatically
 use the right translations.
 
@@ -19,7 +25,7 @@ on the wiki for help contributing translations.
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
 &nbsp;      | NPC Map Locations
------------ | :----------------------------------------
+:---------- | :--------------------------------
 Chinese     | [✓](NPCMapLocations/i18n/zh.json)
 French      | [✓](NPCMapLocations/i18n/fr.json)
 German      | [✓](NPCMapLocations/i18n/de.json)
