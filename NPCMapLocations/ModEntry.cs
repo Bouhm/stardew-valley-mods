@@ -1110,9 +1110,9 @@ namespace NPCMapLocations
             else if (Config.ByHeartLevel)
             {
                 int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);
-                if (hearts < Config.HeartLevelMin)
+                if (Config.HeartLevelMin > 0 && hearts < Config.HeartLevelMin)
                     Hide($"hidden per config (less than {Config.HeartLevelMin} hearts)");
-                if (hearts > Config.HeartLevelMax)
+                if (Config.HeartLevelMax < PlayerConfig.MaxPossibleHeartLevel && hearts > Config.HeartLevelMax)
                     Hide($"hidden per config (more than {Config.HeartLevelMax} hearts)");
             }
         }

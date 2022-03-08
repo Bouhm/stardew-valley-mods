@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed _only show villagers within a certain heart level_ option always hiding spouses with more than 12 hearts of friendship.
 * Improved translations. Thanks to martin66789 (updated Hungarian)!
 
 ## 2.8.0
