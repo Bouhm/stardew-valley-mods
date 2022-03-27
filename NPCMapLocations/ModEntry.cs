@@ -78,20 +78,20 @@ namespace NPCMapLocations
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
 
-            helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
-            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
-            helper.Events.World.BuildingListChanged += this.World_BuildingListChanged;
-            helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
-            helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
-            helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
-            helper.Events.Player.Warped += this.Player_Warped;
-            helper.Events.Display.MenuChanged += this.Display_MenuChanged;
-            helper.Events.Display.RenderingHud += this.Display_RenderingHud;
-            helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
-            helper.Events.Display.Rendered += this.Display_Rendered;
-            helper.Events.Display.WindowResized += this.Display_WindowResized;
-            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
-            helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Input.ButtonReleased += this.OnButtonReleased;
+            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            helper.Events.Player.Warped += this.OnWarped;
+            helper.Events.Display.MenuChanged += this.OnMenuChanged;
+            helper.Events.Display.RenderingHud += this.OnRenderingHud;
+            helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
+            helper.Events.Display.Rendered += this.OnRendered;
+            helper.Events.Display.WindowResized += this.OnWindowResized;
+            helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
+            helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
 
             helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(
                 monitor: this.Monitor,
@@ -308,9 +308,15 @@ namespace NPCMapLocations
         /*********
         ** Private methods
         *********/
-        // Load config and other one-off data
-        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
+            //
+            // Load config and other one-off data
+            //
+
             Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
             // Initialize these early for multiplayer sync
@@ -385,7 +391,10 @@ namespace NPCMapLocations
             }
         }
 
-        private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
+        /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnBuildingListChanged(object sender, BuildingListChangedEventArgs e)
         {
             if (e.Location.IsFarm)
                 this.UpdateFarmBuildingLocations();
@@ -393,9 +402,15 @@ namespace NPCMapLocations
             LocationUtil.ScanLocationContexts();
         }
 
-        // Handle opening mod menu and changing tooltip options
-        private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
+            //
+            // Handle opening mod menu and changing tooltip options
+            //
+
             if (!Context.IsWorldReady)
                 return;
 
@@ -428,7 +443,10 @@ namespace NPCMapLocations
                 Game1.player.setTileLocation(Game1.currentCursorTile);
         }
 
-        private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
 
@@ -446,8 +464,10 @@ namespace NPCMapLocations
             }
         }
 
-        // Handle any checks that need to be made per day
-        private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
+        /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
         {
             // Check for traveling merchant day
             if (this.ConditionalNpcs.Value != null)
@@ -466,8 +486,10 @@ namespace NPCMapLocations
             );
         }
 
-        // To initialize ModMap quicker for smoother rendering when opening map
-        private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
@@ -549,13 +571,19 @@ namespace NPCMapLocations
             }
         }
 
-        private void Multiplayer_PeerConnected(object sender, PeerConnectedEventArgs e)
+        /// <inheritdoc cref="IMultiplayerEvents.PeerConnected"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
         {
             if (Context.IsMainPlayer)
                 this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { e.Peer.PlayerID });
         }
 
-        private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
             {
@@ -614,9 +642,13 @@ namespace NPCMapLocations
             }
         }
 
-        private void Display_WindowResized(object sender, WindowResizedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.WindowResized"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnWindowResized(object sender, WindowResizedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             this.UpdateMarkers(true);
             this.UpdateFarmBuildingLocations();
@@ -626,9 +658,14 @@ namespace NPCMapLocations
                 this.OpenModMap();
         }
 
-        private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
+
             MouseUtil.Reset();
 
             // Check for resize after mod menu closed
@@ -636,7 +673,10 @@ namespace NPCMapLocations
                 this.Minimap.Value?.Resize();
         }
 
-        private void Player_Warped(object sender, WarpedEventArgs e)
+        /// <inheritdoc cref="IPlayerEvents.Warped"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
             if (e.IsLocalPlayer)
             {
@@ -648,13 +688,19 @@ namespace NPCMapLocations
             }
         }
 
-        private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.RenderingHud"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
             if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
                 this.Minimap.Value?.DrawMiniMap();
         }
 
-        private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.RenderedWorld"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
         {
             // Highlight tile for debug mode
             if (this.DebugMode)
@@ -667,10 +713,13 @@ namespace NPCMapLocations
             }
         }
 
-        // DEBUG 
-        private void Display_Rendered(object sender, RenderedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.Rendered"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRendered(object sender, RenderedEventArgs e)
         {
-            if (!Context.IsWorldReady || Game1.player == null) return;
+            if (!Context.IsWorldReady || Game1.player == null)
+                return;
 
             if (this.DebugMode)
                 this.ShowDebugInfo();

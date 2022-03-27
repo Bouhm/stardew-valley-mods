@@ -47,21 +47,24 @@ namespace LocationCompass
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
             this.LocationUtil = new(this.Monitor);
 
-            helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
-            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
-            helper.Events.World.LocationListChanged += this.World_LocationListChanged;
-            helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
-            helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
-            helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
-            helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
-            helper.Events.Display.Rendered += this.Display_Rendered;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.World.LocationListChanged += this.OnLocationListChanged;
+            helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
+            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Input.ButtonReleased += this.OnButtonReleased;
+            helper.Events.Display.Rendered += this.OnRendered;
         }
 
 
         /*********
         ** Private methods
         *********/
-        private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnDayStarted(object sender, DayStartedEventArgs e)
         {
             this.Characters = new List<Character>();
 
@@ -71,7 +74,10 @@ namespace LocationCompass
             this.UpdateLocators();
         }
 
-        private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
@@ -112,12 +118,18 @@ namespace LocationCompass
             }
         }
 
-        private void World_LocationListChanged(object sender, LocationListChangedEventArgs e)
+        /// <inheritdoc cref="IWorldEvents.LocationListChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnLocationListChanged(object sender, LocationListChangedEventArgs e)
         {
             this.LocationUtil.ScanLocationContexts();
         }
 
-        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
             this.SyncedLocationData = new SyncedNpcLocationData();
@@ -142,13 +154,19 @@ namespace LocationCompass
             }
         }
 
-        private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
                 this.SyncedLocationData = e.ReadAs<SyncedNpcLocationData>();
         }
 
-        private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
@@ -157,7 +175,10 @@ namespace LocationCompass
                 this.SetShowLocators(false);
         }
 
-        private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
@@ -192,7 +213,10 @@ namespace LocationCompass
             }
         }
 
-        private void Display_Rendered(object sender, RenderedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.Rendered"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRendered(object sender, RenderedEventArgs e)
         {
             //if (!Context.IsWorldReady || locators == null) return;
 
