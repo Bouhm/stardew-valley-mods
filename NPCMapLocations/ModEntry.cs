@@ -21,7 +21,7 @@ using StardewValley.Quests;
 namespace NPCMapLocations
 {
     /// <summary>The mod entry class.</summary>
-    public class ModEntry : Mod, IAssetLoader
+    public class ModEntry : Mod
     {
         /*********
         ** Fields
@@ -78,6 +78,7 @@ namespace NPCMapLocations
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
 
+            helper.Events.Content.AssetRequested += this.OnAssetRequested;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
@@ -103,54 +104,50 @@ namespace NPCMapLocations
             ));
         }
 
-        /// <inheritdoc />
-        public bool CanLoad<T>(IAssetInfo asset)
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
             // Replace game map with modified map
-            return (
-              asset.AssetNameEquals(this.MapFilePath) ||
-              asset.AssetNameEquals(this.NpcCustomizationsPath) ||
-              asset.AssetNameEquals(this.LocationCustomizationsPath)
-            );
-        }
-
-        /// <inheritdoc />
-        public T Load<T>(IAssetInfo asset)
-        {
-            if (asset.AssetNameEquals(this.MapFilePath))
+            if (e.NameWithoutLocale.IsEquivalentTo(this.MapFilePath))
             {
-                if (this.MapSeason == null)
-                {
-                    this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-                    this.MapSeason = "spring";
-                }
+                e.LoadFrom(
+                    () =>
+                    {
+                        if (this.MapSeason == null)
+                        {
+                            this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
+                            this.MapSeason = "spring";
+                        }
 
-                if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
-                {
-                    this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
-                    this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
-                }
+                        if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
+                        {
+                            this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+                            this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
+                        }
 
-                // Replace map page
-                string defaultMapFile = File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
-                string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
+                        // Replace map page
+                        string defaultMapFile = File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
+                        string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
 
-                bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, filename));
-                T map = useRecolor
-                    ? this.Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsPath, filename))
-                    : this.Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsRootPath, "_default", filename));
+                        bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, filename));
+                        Texture2D map = useRecolor
+                            ? this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/{filename}")
+                            : this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsRootPath}/_default/{filename}");
 
-                if (useRecolor)
-                    this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.", LogLevel.Debug);
+                        if (useRecolor)
+                            this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.");
 
-                return map;
+                        return map;
+                    },
+                    AssetLoadPriority.Exclusive
+                );
             }
-            else if (asset.AssetNameEquals(this.LocationCustomizationsPath) || asset.AssetNameEquals(this.NpcCustomizationsPath))
+            else if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
             {
-                return (T)(object)new Dictionary<string, JObject>();
+                e.LoadFrom(() => new Dictionary<string, JObject>(), AssetLoadPriority.Exclusive);
             }
-
-            return (T)asset;
         }
 
         /// <summary>Get the pixel coordinates relative to the top-left corner of the map for an in-world tile position.</summary>
@@ -326,26 +323,26 @@ namespace NPCMapLocations
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
             {
                 // Load customizations
-                var npcSettings = this.Helper.Content.Load<Dictionary<string, JObject>>(this.NpcCustomizationsPath, ContentSource.GameContent);
-                var locationSettings = this.Helper.Content.Load<Dictionary<string, JObject>>(this.LocationCustomizationsPath, ContentSource.GameContent);
+                var npcSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>(this.NpcCustomizationsPath);
+                var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>(this.LocationCustomizationsPath);
                 this.Customizations.LoadCustomData(npcSettings, locationSettings);
             }
 
             // Load farm buildings
             try
             {
-                this.BuildingMarkers.Value = this.Helper.Content.Load<Texture2D>(Path.Combine(this.Customizations.MapsPath, "buildings.png"));
+                this.BuildingMarkers.Value = this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/buildings.png");
             }
             catch
             {
                 this.BuildingMarkers.Value = File.Exists(Path.Combine("maps/_default", "buildings.png"))
-                    ? this.Helper.Content.Load<Texture2D>(Path.Combine("maps/_default", "buildings.png"))
+                    ? this.Helper.ModContent.Load<Texture2D>("maps/_default/buildings.png")
                     : null;
             }
 
             // Get season for map
             this.MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
-            this.Helper.Content.InvalidateCache(this.MapFilePath);
+            this.Helper.GameContent.InvalidateCache(this.MapFilePath);
             Map = Game1.content.Load<Texture2D>(this.MapFilePath);
 
             // Disable for multiplayer for anti-cheat
@@ -532,7 +529,7 @@ namespace NPCMapLocations
                 // Force reload of map for season changes
                 try
                 {
-                    this.Helper.Content.InvalidateCache(this.MapFilePath);
+                    this.Helper.GameContent.InvalidateCache(this.MapFilePath);
                 }
                 catch
                 {

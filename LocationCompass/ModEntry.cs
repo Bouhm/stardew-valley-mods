@@ -43,7 +43,7 @@ namespace LocationCompass
         public override void Entry(IModHelper helper)
         {
             this.Config = helper.ReadConfig<ModConfig>();
-            this.Pointer = helper.Content.Load<Texture2D>("assets/locator.png"); // Load pointer tex
+            this.Pointer = helper.ModContent.Load<Texture2D>("assets/locator.png"); // Load pointer tex
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
             this.LocationUtil = new(this.Monitor);
 

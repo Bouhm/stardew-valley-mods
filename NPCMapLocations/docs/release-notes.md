@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Updated for the upcoming SMAPI 4.0.0.
 * Fixed _only show villagers within a certain heart level_ option always hiding spouses with more than 12 hearts of friendship.
 * Improved translations. Thanks to martin66789 (updated Hungarian)!
 
