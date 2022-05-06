@@ -412,7 +412,7 @@ namespace NPCMapLocations
                 return;
 
             // Minimap dragging
-            if (Globals.ShowMinimap && this.Minimap.Value != null)
+            if (Globals.ShowMinimap && !Globals.LockMinimapPosition && this.Minimap.Value != null)
             {
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
@@ -449,7 +449,7 @@ namespace NPCMapLocations
 
             if (this.DebugMode && e.Button == SButton.MouseRight && this.IsModMapOpen.Value)
                 MouseUtil.HandleMouseRelease();
-            else if (this.Minimap.Value != null)
+            else if (this.Minimap.Value != null && !ModEntry.Globals.LockMinimapPosition)
             {
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                     this.Minimap.Value.Resize();

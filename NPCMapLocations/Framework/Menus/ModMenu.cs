@@ -102,6 +102,7 @@ namespace NPCMapLocations.Framework.Menus
 
             this.Options.Add(new OptionsElement(I18n.Minimap_Label()));
             this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Minimap_Locked(), 5, -1, -1));
             this.Options.Add(new ModPlusMinus(I18n.Minimap_Width(), 1, widths));
             this.Options.Add(new ModPlusMinus(I18n.Minimap_Height(), 2, heights));
 

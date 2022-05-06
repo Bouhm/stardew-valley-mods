@@ -5,6 +5,7 @@
     // minimap section
     "minimap.label": "Kistérkép",
     "minimap.enabled": "Engedélyezve",
+    "minimap.locked": "Lock minimap position", // TODO
     "minimap.width": "Kistérkép szélesség",
     "minimap.height": "Kistérkép magasság",
 

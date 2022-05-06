@@ -29,33 +29,20 @@ namespace NPCMapLocations.Framework.Menus
 
             // Villager names
             if (whichOption > 12 && npcMarkers != null)
-            {
                 this.IsChecked = !ModEntry.ShouldExcludeNpc(npcMarkers.ElementAt(whichOption - 13).Key);
-                return;
-            }
-
-            switch (whichOption)
+            else
             {
-                case 0:
-                    this.IsChecked = ModEntry.Globals.ShowMinimap;
-                    return;
-                case 6:
-                    this.IsChecked = ModEntry.Globals.OnlySameLocation;
-                    return;
-                case 7:
-                    this.IsChecked = ModEntry.Config.ByHeartLevel;
-                    return;
-                case 10:
-                    this.IsChecked = ModEntry.Globals.ShowQuests;
-                    return;
-                case 11:
-                    this.IsChecked = ModEntry.Globals.ShowHiddenVillagers;
-                    return;
-                case 12:
-                    this.IsChecked = ModEntry.Globals.ShowTravelingMerchant;
-                    return;
-                default:
-                    return;
+                this.IsChecked = whichOption switch
+                {
+                    0 => ModEntry.Globals.ShowMinimap,
+                    5 => ModEntry.Globals.LockMinimapPosition,
+                    6 => ModEntry.Globals.OnlySameLocation,
+                    7 => ModEntry.Config.ByHeartLevel,
+                    10 => ModEntry.Globals.ShowQuests,
+                    11 => ModEntry.Globals.ShowHiddenVillagers,
+                    12 => ModEntry.Globals.ShowTravelingMerchant,
+                    _ => false
+                };
             }
         }
 
@@ -85,6 +72,9 @@ namespace NPCMapLocations.Framework.Menus
                 {
                     case 0:
                         ModEntry.Globals.ShowMinimap = this.IsChecked;
+                        break;
+                    case 5:
+                        ModEntry.Globals.LockMinimapPosition = this.IsChecked;
                         break;
                     case 6:
                         ModEntry.Globals.OnlySameLocation = this.IsChecked;

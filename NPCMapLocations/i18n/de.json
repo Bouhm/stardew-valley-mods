@@ -5,6 +5,7 @@
     // minimap section
     "minimap.label": "Minimap",
     "minimap.enabled": "Eingeschaltet",
+    "minimap.locked": "Lock minimap position", // TODO
     "minimap.width": "Breite der Minimap ",
     "minimap.height": "Höhe der Minimap ",
 

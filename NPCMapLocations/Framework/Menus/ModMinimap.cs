@@ -77,8 +77,11 @@ namespace NPCMapLocations.Framework.Menus
         // Check if cursor is hovering the drag zone (top of minimap)
         public bool IsHoveringDragZone()
         {
-            return (Game1.getMouseX() >= this.MmX - this.BorderWidth && Game1.getMouseX() <= this.MmX + this.MmWidth + this.BorderWidth &&
-                Game1.getMouseY() >= this.MmY - this.BorderWidth && Game1.getMouseY() < this.MmY + this.MmHeight + this.BorderWidth);
+            return
+                !ModEntry.Globals.LockMinimapPosition
+                && Game1.getMouseX() >= this.MmX - this.BorderWidth
+                && Game1.getMouseX() <= this.MmX + this.MmWidth + this.BorderWidth
+                && Game1.getMouseY() >= this.MmY - this.BorderWidth && Game1.getMouseY() < this.MmY + this.MmHeight + this.BorderWidth;
         }
 
         public void HandleMouseDown()

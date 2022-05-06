@@ -36,6 +36,9 @@ namespace NPCMapLocations.Framework.Models
         /// <summary>Whether to show the floating minimap.</summary>
         public bool ShowMinimap { get; set; } = false;
 
+        /// <summary>Whether to lock the minimap position, so the player can't right-click to drag it.</summary>
+        public bool LockMinimapPosition { get; set; } = false;
+
         /// <summary>Whether to show farm buildings on the map.</summary>
         public bool ShowFarmBuildings { get; set; } = true;
 
