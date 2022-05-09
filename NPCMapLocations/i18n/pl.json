@@ -5,7 +5,7 @@
     // minimap section
     "minimap.label": "Minimapa",
     "minimap.enabled": "Włączona",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "Zablokuj pozycję minimapy",
     "minimap.width": "Szerokość minimapy",
     "minimap.height": "Długość minimapy",
 
@@ -23,7 +23,7 @@
     "extra.label": "Dodatkowe ustawienia:",
     "extra.show-quests-or-birthdays": "Pokaż zadania lub urodziny",
     "extra.show-hidden-villagers": "Pokaż ukrytych mieszkańców",
-    "extra.show-traveling-merchant": "Pokaż podróżującego handlarza",
+    "extra.show-traveling-merchant": "Pokaż wędrownego handlarza",
 
     // include/exclude villagers section
     "villagers.label": "Uwzględnij/Wyklucz mieszkańców:"
