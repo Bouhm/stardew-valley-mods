@@ -3,14 +3,15 @@
     ** Map options
     *********/
     // minimap section
-    "minimap.label": "Міні-мапа",
+    "minimap.label": "Мінімапа",
     "minimap.enabled": "Ввімкнено",
-    "minimap.width": "Ширина міні-мапи",
-    "minimap.height": "Висота міні-мапи",
+    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.width": "Ширина мінімапи",
+    "minimap.height": "Висота мінімапи",
 
     // immersion section
     "immersion.label": "Налаштування:",
-    "immersion.always-show-villagers": "Завжди показувати містян(персонажів)",
+    "immersion.always-show-villagers": "Завжди показувати містян (персонажів)",
     "immersion.only-villagers-talked-to": "Показувати містян, з якими спілкувався гравець",
     "immersion.hide-villagers-talked-to": "Приховувати містян, з якими спілкувався гравець",
     "immersion.only-villagers-in-player-location": "Показувати містян тільки в поточній локації",

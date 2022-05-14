@@ -164,7 +164,7 @@ namespace NPCMapLocations.Framework
                 output.AppendLine("====================");
                 output.AppendLine("==  Tracked NPCs  ==");
                 output.AppendLine("====================");
-                output.AppendLine("These are the the NPCs currently being tracked by the mod.");
+                output.AppendLine("These are the NPCs currently being tracked by the mod.");
                 output.AppendLine();
 
                 if (npcMarkers.Any())

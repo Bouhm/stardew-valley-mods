@@ -5,6 +5,7 @@
     // minimap section
     "minimap.label": "แผนที่ขนาดเล็ก",
     "minimap.enabled": "เปิดใช้งาน",
+    "minimap.locked": "Lock minimap position", // TODO
     "minimap.width": "ความกว้างของแผนที่",
     "minimap.height": "ความสูงของแผนที่",
 

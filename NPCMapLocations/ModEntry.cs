@@ -21,7 +21,7 @@ using StardewValley.Quests;
 namespace NPCMapLocations
 {
     /// <summary>The mod entry class.</summary>
-    public class ModEntry : Mod, IAssetLoader
+    public class ModEntry : Mod
     {
         /*********
         ** Fields
@@ -78,20 +78,21 @@ namespace NPCMapLocations
             Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
             this.Customizations = new ModCustomizations();
 
-            helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
-            helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
-            helper.Events.World.BuildingListChanged += this.World_BuildingListChanged;
-            helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
-            helper.Events.Input.ButtonReleased += this.Input_ButtonReleased;
-            helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
-            helper.Events.Player.Warped += this.Player_Warped;
-            helper.Events.Display.MenuChanged += this.Display_MenuChanged;
-            helper.Events.Display.RenderingHud += this.Display_RenderingHud;
-            helper.Events.Display.RenderedWorld += this.Display_RenderedWorld;
-            helper.Events.Display.Rendered += this.Display_Rendered;
-            helper.Events.Display.WindowResized += this.Display_WindowResized;
-            helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
-            helper.Events.Multiplayer.ModMessageReceived += this.Multiplayer_ModMessageReceived;
+            helper.Events.Content.AssetRequested += this.OnAssetRequested;
+            helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
+            helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
+            helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+            helper.Events.Input.ButtonReleased += this.OnButtonReleased;
+            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+            helper.Events.Player.Warped += this.OnWarped;
+            helper.Events.Display.MenuChanged += this.OnMenuChanged;
+            helper.Events.Display.RenderingHud += this.OnRenderingHud;
+            helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
+            helper.Events.Display.Rendered += this.OnRendered;
+            helper.Events.Display.WindowResized += this.OnWindowResized;
+            helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
+            helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
 
             helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(
                 monitor: this.Monitor,
@@ -103,54 +104,50 @@ namespace NPCMapLocations
             ));
         }
 
-        /// <inheritdoc />
-        public bool CanLoad<T>(IAssetInfo asset)
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
             // Replace game map with modified map
-            return (
-              asset.AssetNameEquals(this.MapFilePath) ||
-              asset.AssetNameEquals(this.NpcCustomizationsPath) ||
-              asset.AssetNameEquals(this.LocationCustomizationsPath)
-            );
-        }
-
-        /// <inheritdoc />
-        public T Load<T>(IAssetInfo asset)
-        {
-            if (asset.AssetNameEquals(this.MapFilePath))
+            if (e.NameWithoutLocale.IsEquivalentTo(this.MapFilePath))
             {
-                if (this.MapSeason == null)
-                {
-                    this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-                    this.MapSeason = "spring";
-                }
+                e.LoadFrom(
+                    () =>
+                    {
+                        if (this.MapSeason == null)
+                        {
+                            this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
+                            this.MapSeason = "spring";
+                        }
 
-                if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
-                {
-                    this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
-                    this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
-                }
+                        if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
+                        {
+                            this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.");
+                            this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
+                        }
 
-                // Replace map page
-                string defaultMapFile = File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
-                string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
+                        // Replace map page
+                        string defaultMapFile = File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
+                        string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
 
-                bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, filename));
-                T map = useRecolor
-                    ? this.Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsPath, filename))
-                    : this.Helper.Content.Load<T>(Path.Combine(this.Customizations.MapsRootPath, "_default", filename));
+                        bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, filename));
+                        Texture2D map = useRecolor
+                            ? this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/{filename}")
+                            : this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsRootPath}/_default/{filename}");
 
-                if (useRecolor)
-                    this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.", LogLevel.Debug);
+                        if (useRecolor)
+                            this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.");
 
-                return map;
+                        return map;
+                    },
+                    AssetLoadPriority.Exclusive
+                );
             }
-            else if (asset.AssetNameEquals(this.LocationCustomizationsPath) || asset.AssetNameEquals(this.NpcCustomizationsPath))
+            else if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
             {
-                return (T)(object)new Dictionary<string, JObject>();
+                e.LoadFrom(() => new Dictionary<string, JObject>(), AssetLoadPriority.Exclusive);
             }
-
-            return (T)asset;
         }
 
         /// <summary>Get the pixel coordinates relative to the top-left corner of the map for an in-world tile position.</summary>
@@ -308,9 +305,15 @@ namespace NPCMapLocations
         /*********
         ** Private methods
         *********/
-        // Load config and other one-off data
-        private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
+            //
+            // Load config and other one-off data
+            //
+
             Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
 
             // Initialize these early for multiplayer sync
@@ -320,26 +323,26 @@ namespace NPCMapLocations
             if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
             {
                 // Load customizations
-                var npcSettings = this.Helper.Content.Load<Dictionary<string, JObject>>(this.NpcCustomizationsPath, ContentSource.GameContent);
-                var locationSettings = this.Helper.Content.Load<Dictionary<string, JObject>>(this.LocationCustomizationsPath, ContentSource.GameContent);
+                var npcSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>(this.NpcCustomizationsPath);
+                var locationSettings = this.Helper.GameContent.Load<Dictionary<string, JObject>>(this.LocationCustomizationsPath);
                 this.Customizations.LoadCustomData(npcSettings, locationSettings);
             }
 
             // Load farm buildings
             try
             {
-                this.BuildingMarkers.Value = this.Helper.Content.Load<Texture2D>(Path.Combine(this.Customizations.MapsPath, "buildings.png"));
+                this.BuildingMarkers.Value = this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/buildings.png");
             }
             catch
             {
                 this.BuildingMarkers.Value = File.Exists(Path.Combine("maps/_default", "buildings.png"))
-                    ? this.Helper.Content.Load<Texture2D>(Path.Combine("maps/_default", "buildings.png"))
+                    ? this.Helper.ModContent.Load<Texture2D>("maps/_default/buildings.png")
                     : null;
             }
 
             // Get season for map
             this.MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
-            this.Helper.Content.InvalidateCache(this.MapFilePath);
+            this.Helper.GameContent.InvalidateCache(this.MapFilePath);
             Map = Game1.content.Load<Texture2D>(this.MapFilePath);
 
             // Disable for multiplayer for anti-cheat
@@ -362,7 +365,7 @@ namespace NPCMapLocations
             // Log any custom locations not handled in content.json
             string[] unknownLocations = this.GetLocationsWithoutMapVectors().Select(p => p.Name).OrderBy(p => p).ToArray();
             if (unknownLocations.Any())
-                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}", LogLevel.Debug);
+                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
 
             this.UpdateFarmBuildingLocations();
 
@@ -381,11 +384,14 @@ namespace NPCMapLocations
                 }
 
                 if (!hostHasMod && !Context.IsMainPlayer)
-                    this.Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
+                    this.Monitor.Log("Since the server host doesn't have NPC Map Locations installed, NPC locations can't be synced.", LogLevel.Warn);
             }
         }
 
-        private void World_BuildingListChanged(object sender, BuildingListChangedEventArgs e)
+        /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnBuildingListChanged(object sender, BuildingListChangedEventArgs e)
         {
             if (e.Location.IsFarm)
                 this.UpdateFarmBuildingLocations();
@@ -393,14 +399,20 @@ namespace NPCMapLocations
             LocationUtil.ScanLocationContexts();
         }
 
-        // Handle opening mod menu and changing tooltip options
-        private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
+            //
+            // Handle opening mod menu and changing tooltip options
+            //
+
             if (!Context.IsWorldReady)
                 return;
 
             // Minimap dragging
-            if (Globals.ShowMinimap && this.Minimap.Value != null)
+            if (Globals.ShowMinimap && !Globals.LockMinimapPosition && this.Minimap.Value != null)
             {
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
@@ -428,13 +440,16 @@ namespace NPCMapLocations
                 Game1.player.setTileLocation(Game1.currentCursorTile);
         }
 
-        private void Input_ButtonReleased(object sender, ButtonReleasedEventArgs e)
+        /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
             if (!Context.IsWorldReady) return;
 
             if (this.DebugMode && e.Button == SButton.MouseRight && this.IsModMapOpen.Value)
                 MouseUtil.HandleMouseRelease();
-            else if (this.Minimap.Value != null)
+            else if (this.Minimap.Value != null && !ModEntry.Globals.LockMinimapPosition)
             {
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                     this.Minimap.Value.Resize();
@@ -446,8 +461,10 @@ namespace NPCMapLocations
             }
         }
 
-        // Handle any checks that need to be made per day
-        private void GameLoop_DayStarted(object sender = null, DayStartedEventArgs e = null)
+        /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
         {
             // Check for traveling merchant day
             if (this.ConditionalNpcs.Value != null)
@@ -466,8 +483,10 @@ namespace NPCMapLocations
             );
         }
 
-        // To initialize ModMap quicker for smoother rendering when opening map
-        private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+        /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
@@ -510,11 +529,12 @@ namespace NPCMapLocations
                 // Force reload of map for season changes
                 try
                 {
-                    this.Helper.Content.InvalidateCache(this.MapFilePath);
+                    this.Helper.GameContent.InvalidateCache(this.MapFilePath);
                 }
-                catch
+                catch (Exception ex)
                 {
                     this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
+                    this.Monitor.Log(ex.ToString());
                 }
 
                 this.Minimap.Value?.UpdateMapForSeason();
@@ -549,13 +569,19 @@ namespace NPCMapLocations
             }
         }
 
-        private void Multiplayer_PeerConnected(object sender, PeerConnectedEventArgs e)
+        /// <inheritdoc cref="IMultiplayerEvents.PeerConnected"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
         {
             if (Context.IsMainPlayer)
                 this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { e.Peer.PlayerID });
         }
 
-        private void Multiplayer_ModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+        /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
         {
             if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
             {
@@ -614,9 +640,13 @@ namespace NPCMapLocations
             }
         }
 
-        private void Display_WindowResized(object sender, WindowResizedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.WindowResized"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnWindowResized(object sender, WindowResizedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
             this.UpdateMarkers(true);
             this.UpdateFarmBuildingLocations();
@@ -626,9 +656,14 @@ namespace NPCMapLocations
                 this.OpenModMap();
         }
 
-        private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
+
             MouseUtil.Reset();
 
             // Check for resize after mod menu closed
@@ -636,7 +671,10 @@ namespace NPCMapLocations
                 this.Minimap.Value?.Resize();
         }
 
-        private void Player_Warped(object sender, WarpedEventArgs e)
+        /// <inheritdoc cref="IPlayerEvents.Warped"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnWarped(object sender, WarpedEventArgs e)
         {
             if (e.IsLocalPlayer)
             {
@@ -648,13 +686,19 @@ namespace NPCMapLocations
             }
         }
 
-        private void Display_RenderingHud(object sender, RenderingHudEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.RenderingHud"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
             if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
                 this.Minimap.Value?.DrawMiniMap();
         }
 
-        private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.RenderedWorld"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
         {
             // Highlight tile for debug mode
             if (this.DebugMode)
@@ -667,10 +711,13 @@ namespace NPCMapLocations
             }
         }
 
-        // DEBUG 
-        private void Display_Rendered(object sender, RenderedEventArgs e)
+        /// <inheritdoc cref="IDisplayEvents.Rendered"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnRendered(object sender, RenderedEventArgs e)
         {
-            if (!Context.IsWorldReady || Game1.player == null) return;
+            if (!Context.IsWorldReady || Game1.player == null)
+                return;
 
             if (this.DebugMode)
                 this.ShowDebugInfo();
@@ -1110,9 +1157,9 @@ namespace NPCMapLocations
             else if (Config.ByHeartLevel)
             {
                 int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);
-                if (hearts < Config.HeartLevelMin)
+                if (Config.HeartLevelMin > 0 && hearts < Config.HeartLevelMin)
                     Hide($"hidden per config (less than {Config.HeartLevelMin} hearts)");
-                if (hearts > Config.HeartLevelMax)
+                if (Config.HeartLevelMax < PlayerConfig.MaxPossibleHeartLevel && hearts > Config.HeartLevelMax)
                     Hide($"hidden per config (more than {Config.HeartLevelMax} hearts)");
             }
         }

@@ -5,6 +5,7 @@
     // minimap section
     "minimap.label": "Mini-Mapa",
     "minimap.enabled": "Ativo",
+    "minimap.locked": "Lock minimap position", // TODO
     "minimap.width": "Largura do Mini-Mapa",
     "minimap.height": "Altura do Mini-Mapa",
 

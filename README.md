@@ -10,6 +10,12 @@ documentation and release notes.
   Replaces the pet dog with a Shiba Inu, Shepherd, or Husky.
 
 ## Translating the mods
+<!--
+
+    This section is auto-generated using a script, there's no need to edit it manually.
+    https://gist.github.com/Pathoschild/040ff6c8dc863ed2a7a828aa04447033
+
+-->
 The mods can be translated into any language supported by the game, and SMAPI will automatically
 use the right translations.
 
@@ -19,21 +25,21 @@ on the wiki for help contributing translations.
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
 &nbsp;      | NPC Map Locations
------------ | :----------------------------------------
-Chinese     | [✓](NPCMapLocations/i18n/zh.json)
-French      | [✓](NPCMapLocations/i18n/fr.json)
-German      | [✓](NPCMapLocations/i18n/de.json)
-Hungarian   | [✓](NPCMapLocations/i18n/hu.json)
-Italian     | [✓](NPCMapLocations/i18n/it.json)
-Japanese    | [✓](NPCMapLocations/i18n/ja.json)
-Korean      | [✓](NPCMapLocations/i18n/ko.json)
+:---------- | :--------------------------------
+Chinese     | [↻](NPCMapLocations/i18n/zh.json)
+French      | [↻](NPCMapLocations/i18n/fr.json)
+German      | [↻](NPCMapLocations/i18n/de.json)
+Hungarian   | [↻](NPCMapLocations/i18n/hu.json)
+Italian     | [↻](NPCMapLocations/i18n/it.json)
+Japanese    | [↻](NPCMapLocations/i18n/ja.json)
+Korean      | [↻](NPCMapLocations/i18n/ko.json)
 [Polish]    | [✓](NPCMapLocations/i18n/pl.json)
-Portuguese  | [✓](NPCMapLocations/i18n/pt.json)
-Russian     | [✓](NPCMapLocations/i18n/ru.json)
-Spanish     | [✓](NPCMapLocations/i18n/es.json)
-[Thai]      | [✓](NPCMapLocations/i18n/th.json)
-Turkish     | [✓](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [✓](NPCMapLocations/i18n/uk.json)
+Portuguese  | [↻](NPCMapLocations/i18n/pt.json)
+Russian     | [↻](NPCMapLocations/i18n/ru.json)
+Spanish     | [↻](NPCMapLocations/i18n/es.json)
+[Thai]      | [↻](NPCMapLocations/i18n/th.json)
+Turkish     | [↻](NPCMapLocations/i18n/tr.json)
+[Ukrainian] | [↻](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052
