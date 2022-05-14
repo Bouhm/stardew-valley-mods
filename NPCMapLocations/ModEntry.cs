@@ -123,7 +123,7 @@ namespace NPCMapLocations
 
                         if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
                         {
-                            this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.", LogLevel.Debug);
+                            this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.");
                             this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
                         }
 
@@ -365,7 +365,7 @@ namespace NPCMapLocations
             // Log any custom locations not handled in content.json
             string[] unknownLocations = this.GetLocationsWithoutMapVectors().Select(p => p.Name).OrderBy(p => p).ToArray();
             if (unknownLocations.Any())
-                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}", LogLevel.Debug);
+                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
 
             this.UpdateFarmBuildingLocations();
 
@@ -384,7 +384,7 @@ namespace NPCMapLocations
                 }
 
                 if (!hostHasMod && !Context.IsMainPlayer)
-                    this.Monitor.Log("Since the server host does not have NPCMapLocations installed, NPC locations cannot be synced.", LogLevel.Warn);
+                    this.Monitor.Log("Since the server host doesn't have NPC Map Locations installed, NPC locations can't be synced.", LogLevel.Warn);
             }
         }
 
