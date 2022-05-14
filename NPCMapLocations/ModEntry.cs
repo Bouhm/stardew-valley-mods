@@ -531,9 +531,10 @@ namespace NPCMapLocations
                 {
                     this.Helper.GameContent.InvalidateCache(this.MapFilePath);
                 }
-                catch
+                catch (Exception ex)
                 {
                     this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
+                    this.Monitor.Log(ex.ToString());
                 }
 
                 this.Minimap.Value?.UpdateMapForSeason();
