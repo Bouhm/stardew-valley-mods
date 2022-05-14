@@ -26,20 +26,20 @@ on the wiki for help contributing translations.
 
 &nbsp;      | NPC Map Locations
 :---------- | :--------------------------------
-Chinese     | [✓](NPCMapLocations/i18n/zh.json)
-French      | [✓](NPCMapLocations/i18n/fr.json)
-German      | [✓](NPCMapLocations/i18n/de.json)
-Hungarian   | [✓](NPCMapLocations/i18n/hu.json)
-Italian     | [✓](NPCMapLocations/i18n/it.json)
-Japanese    | [✓](NPCMapLocations/i18n/ja.json)
-Korean      | [✓](NPCMapLocations/i18n/ko.json)
+Chinese     | [↻](NPCMapLocations/i18n/zh.json)
+French      | [↻](NPCMapLocations/i18n/fr.json)
+German      | [↻](NPCMapLocations/i18n/de.json)
+Hungarian   | [↻](NPCMapLocations/i18n/hu.json)
+Italian     | [↻](NPCMapLocations/i18n/it.json)
+Japanese    | [↻](NPCMapLocations/i18n/ja.json)
+Korean      | [↻](NPCMapLocations/i18n/ko.json)
 [Polish]    | [✓](NPCMapLocations/i18n/pl.json)
-Portuguese  | [✓](NPCMapLocations/i18n/pt.json)
-Russian     | [✓](NPCMapLocations/i18n/ru.json)
-Spanish     | [✓](NPCMapLocations/i18n/es.json)
-[Thai]      | [✓](NPCMapLocations/i18n/th.json)
-Turkish     | [✓](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [✓](NPCMapLocations/i18n/uk.json)
+Portuguese  | [↻](NPCMapLocations/i18n/pt.json)
+Russian     | [↻](NPCMapLocations/i18n/ru.json)
+Spanish     | [↻](NPCMapLocations/i18n/es.json)
+[Thai]      | [↻](NPCMapLocations/i18n/th.json)
+Turkish     | [↻](NPCMapLocations/i18n/tr.json)
+[Ukrainian] | [↻](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052
