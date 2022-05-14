@@ -1,8 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Updated for the upcoming SMAPI 4.0.0.
+## 2.9.0
+Released 13 May 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+
+* Updated for SMAPI 3.14.0.
 * Added option to lock the minimap position.
 * Fixed _only show villagers within a certain heart level_ option always hiding spouses with more than 12 hearts of friendship.
 * Reduced log verbosity.

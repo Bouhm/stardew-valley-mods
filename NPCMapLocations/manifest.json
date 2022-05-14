@@ -1,8 +1,8 @@
 ﻿{
     "Name": "NPC Map Locations",
     "Author": "Bouhm",
-    "Version": "2.8.0",
-    "MinimumApiVersion": "3.13.0",
+    "Version": "2.9.0",
+    "MinimumApiVersion": "3.14.0",
     "Description": "Shows NPCs and farmers on a modified map page for accurate tracking.",
     "UniqueID": "Bouhm.NPCMapLocations",
     "EntryDll": "NPCMapLocations.dll",
