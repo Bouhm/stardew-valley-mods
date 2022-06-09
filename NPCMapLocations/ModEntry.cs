@@ -745,7 +745,7 @@ namespace NPCMapLocations
         {
             var villagers = new List<NPC>();
 
-            foreach (var location in Game1.locations)
+            foreach (GameLocation location in ModEntry.LocationUtil.GetAllStaticLocations())
             {
                 foreach (var npc in location.characters)
                 {
