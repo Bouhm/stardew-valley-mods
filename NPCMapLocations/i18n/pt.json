@@ -5,7 +5,7 @@
     // minimap section
     "minimap.label": "Mini-Mapa",
     "minimap.enabled": "Ativo",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "Travar a Posição do Mini-Mapa",
     "minimap.width": "Largura do Mini-Mapa",
     "minimap.height": "Altura do Mini-Mapa",
 
@@ -13,7 +13,7 @@
     "immersion.label": "Configurações:",
     "immersion.always-show-villagers": "Sempre Mostrar Moradores",
     "immersion.only-villagers-talked-to": "Mostrar Moradores que o Jogador Já Interagiu",
-    "immersion.hide-villagers-talked-to": "Esconder Moradores que O Jogador Já Interagiu",
+    "immersion.hide-villagers-talked-to": "Esconder Moradores que o Jogador Já Interagiu",
     "immersion.only-villagers-in-player-location": "Mostrar Somente Moradores na Localização do Jogador",
     "immersion.only-villagers-within-heart-level": "Mostrar Somente Moradores Dentro dos Limites de Nível de Relacionamento",
     "immersion.min-heart-level": "Nível Mínimo de Relacionamento",
