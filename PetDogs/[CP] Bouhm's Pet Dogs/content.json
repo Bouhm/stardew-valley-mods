@@ -8,66 +8,20 @@
     },
 
     "Changes": [
-        //Cursors for Portraits
+        // portrait
         {
             "Action": "EditImage",
-            "PatchMode": "Replace",
             "Target": "LooseSprites/Cursors",
-            "FromFile": "assets/shibainu.png",
-            "When": {
-                "Dog": "shibainu"
-            },
+            "FromFile": "assets/{{Dog}}.png",
             "FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
             "ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 }
         },
+
+        // sprite
         {
             "Action": "EditImage",
-            "PatchMode": "Replace",
-            "Target": "LooseSprites/Cursors",
-            "FromFile": "assets/shepherd.png",
-            "When": {
-                "Dog": "shepherd"
-            },
-            "FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
-            "ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 }
-        },
-        {
-            "Action": "EditImage",
-            "PatchMode": "Replace",
-            "Target": "LooseSprites/Cursors",
-            "FromFile": "assets/husky.png",
-            "When": {
-                "Dog": "husky"
-            },
-            "FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
-            "ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 }
-        },
-        {
-            "Action": "EditImage",
-            "PatchMode": "Replace",
             "Target": "Animals/dog",
-            "FromFile": "assets/shibainu.png",
-            "When": {
-                "Dog": "shibainu"
-            }
-        },
-        {
-            "Action": "EditImage",
-            "PatchMode": "Replace",
-            "Target": "Animals/dog",
-            "FromFile": "assets/shepherd.png",
-            "When": {
-                "Dog": "shepherd"
-            }
-        },
-        {
-            "Action": "EditImage",
-            "PatchMode": "Replace",
-            "Target": "Animals/dog",
-            "FromFile": "assets/husky.png",
-            "When": {
-                "Dog": "husky"
-            }
+            "FromFile": "assets/{{Dog}}.png"
         }
     ]
 }
