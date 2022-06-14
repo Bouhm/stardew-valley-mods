@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.9.1
+Released 13 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+
 * Fixed NPCs in farmhand cabins not shown on the map.
 
 ## 2.9.0

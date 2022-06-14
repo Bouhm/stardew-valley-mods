@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 1.3.11
+Released 13 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+
 * Fixed markers not shown for NPCs in a farmhand cabin.
 
 ## 1.3.10

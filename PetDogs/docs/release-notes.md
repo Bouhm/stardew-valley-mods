@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.0.0
+Released 13 June 2022 for Content Patcher 1.19 or later. Updated by Pathoschild.
+
 * You can now replace each in-game dog breed through the [config UI](README.md#configure).
 * Added translation file for config UI.
 * Fixed dog portraits not changed.
