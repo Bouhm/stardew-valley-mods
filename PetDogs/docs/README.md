@@ -22,9 +22,9 @@ file in a text editor to configure the mod.
 
 Here's what you can change:
 
-setting | default    | what it affects
-:-------| :--------- | :------------------
-`Dog`   | `shibainu` | Which dog breed you want to see in-game. The possible values are `husky`, `shepherd`, or `shibainu`.
+setting  | default    | what it affects
+:------- | :--------- | :------------------
+`Breed1`<br />`Breed2`<br />`Breed3` | `shibainu`<br />`shepherd`</br >`husky` | The dog breed to use for each of the three breed slots. The possible values are `husky`, `shepherd`, `shibainu`, or `none` (to leave the base-game breed unchanged).
 
 ## Compatibility
 Compatible with Stardew Valley 1.4 and 1.5+ on Linux/macOS/Windows, both single-player and
