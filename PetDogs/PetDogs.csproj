@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>1.2.2</Version>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+
+    <EnableGameDebugging>false</EnableGameDebugging>
+    <EnableModDeploy>false</EnableModDeploy>
+    <EnableModZip>false</EnableModZip>
+
+    <ContentPackFolderName>[CP] Bouhm's Pet Dogs</ContentPackFolderName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="$(ContentPackFolderName)\**\*" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <Target Name="DeployMod" AfterTargets="AfterBuild">
+    <!--get content pack folder-->
+    <ItemGroup>
+      <ContentPackFolder Include="$(TargetDir)\$(ContentPackFolderName)\**\*" />
+    </ItemGroup>
+
+    <!--update Mods folder-->
+    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(GameModsPath)\$(ContentPackFolderName)\%(RecursiveDir)" />
+
+    <!--create release zip-->
+    <Delete Files="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
+    <ZipDirectory SourceDirectory="$(TargetDir)\$(ContentPackFolderName)" DestinationFile="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
+  </Target>
+</Project>

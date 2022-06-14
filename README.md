@@ -6,7 +6,7 @@ documentation and release notes.
   Shows character locations on the map. Uses a modified map page much more accurate to the game.
 * **Location Compass** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/3045) | [source](LocationCompass))  
   Locates characters on the screen indicating direction and distance from player's current position.
-* **Pet Dogs Mod** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/570) | [source](PerDogMod))  
+* **Pet Dogs Mod** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/570) | [source](PetDogs))  
   Replaces the pet dog with a Shiba Inu, Shepherd, or Husky.
 
 ## Translating the mods
