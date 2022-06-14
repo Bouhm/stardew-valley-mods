@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Improved translations. Thanks to ellipszist (updated Thai), Gaelhaine (updated Spanish), Hacktix (updated German), and juliowh (updated Portuguese)!
+
 ## 2.9.1
 Released 13 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
 
