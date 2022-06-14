@@ -1,0 +1,10 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    "config.dog.name": "Dog breed",
+    "config.dog.description": "The dog breed you want to see in-game.",
+    "config.dog.values.shibainu": "Shiba Inu",
+    "config.dog.values.shepherd": "German Shepherd",
+    "config.dog.values.husky": "Husky"
+}

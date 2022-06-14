@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Added translation file for config UI.
 * Updated to Content Patcher 1.19.0+.
 * Fixed dog portrait not changed.
 
