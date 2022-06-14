@@ -6,7 +6,7 @@ documentation and release notes.
   Shows character locations on the map. Uses a modified map page much more accurate to the game.
 * **Location Compass** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/3045) | [source](LocationCompass))  
   Locates characters on the screen indicating direction and distance from player's current position.
-* **Pet Dogs Mod** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/570) | [source](PerDogMod))  
+* **Pet Dogs Mod** ([Nexus](https://www.nexusmods.com/stardewvalley/mods/570) | [source](PetDogs))  
   Replaces the pet dog with a Shiba Inu, Shepherd, or Husky.
 
 ## Translating the mods
@@ -24,22 +24,22 @@ on the wiki for help contributing translations.
 
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-&nbsp;      | NPC Map Locations
-:---------- | :--------------------------------
-Chinese     | [↻](NPCMapLocations/i18n/zh.json)
-French      | [↻](NPCMapLocations/i18n/fr.json)
-German      | [↻](NPCMapLocations/i18n/de.json)
-Hungarian   | [↻](NPCMapLocations/i18n/hu.json)
-Italian     | [↻](NPCMapLocations/i18n/it.json)
-Japanese    | [↻](NPCMapLocations/i18n/ja.json)
-Korean      | [↻](NPCMapLocations/i18n/ko.json)
-[Polish]    | [✓](NPCMapLocations/i18n/pl.json)
-Portuguese  | [↻](NPCMapLocations/i18n/pt.json)
-Russian     | [↻](NPCMapLocations/i18n/ru.json)
-Spanish     | [↻](NPCMapLocations/i18n/es.json)
-[Thai]      | [↻](NPCMapLocations/i18n/th.json)
-Turkish     | [↻](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [↻](NPCMapLocations/i18n/uk.json)
+&nbsp;      | Bouhm's Pet Dogs                                  | NPC Map Locations
+:---------- | :------------------------------------------------ | :--------------------------------
+Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/zh.json)
+French      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/fr.json)
+German      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/de.json)
+Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/hu.json)
+Italian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/it.json)
+Japanese    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/ja.json)
+Korean      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/ko.json)
+[Polish]    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [✓](NPCMapLocations/i18n/pl.json)
+Portuguese  | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/pt.json)
+Russian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/ru.json)
+Spanish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/es.json)
+[Thai]      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/th.json)
+Turkish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/tr.json)
+[Ukrainian] | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n) | [↻](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052

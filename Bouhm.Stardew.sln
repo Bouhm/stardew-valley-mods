@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{72FF8D2F-9C10-4FF8-A11C-D789DA903B23}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,12 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NPCMapLocations", "NPCMapLo
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bouhm.Shared", "Bouhm.Shared\Bouhm.Shared.shproj", "{A77ED09B-6BA5-4890-B0D0-3CCD9B7DA9B3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetDogs", "PetDogs\PetDogs.csproj", "{90B3E949-BB9D-445B-BDD2-5B840A82C91F}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Bouhm.Shared\Bouhm.Shared.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
-		Bouhm.Shared\Bouhm.Shared.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
-		Bouhm.Shared\Bouhm.Shared.projitems*{a77ed09b-6ba5-4890-b0d0-3ccd9b7da9b3}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
@@ -46,11 +43,24 @@ Global
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.ActiveCfg = Release|Any CPU
 		{657A6295-99BE-4E58-A6B8-D5557FC1B46F}.Release|x86.Build.0 = Release|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Debug|x86.Build.0 = Debug|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Release|x86.ActiveCfg = Release|Any CPU
+		{90B3E949-BB9D-445B-BDD2-5B840A82C91F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4DFF28DD-B9AB-4A9D-83B7-8B615D36F754}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Bouhm.Shared\Bouhm.Shared.projitems*{657a6295-99be-4e58-a6b8-d5557fc1b46f}*SharedItemsImports = 5
+		Bouhm.Shared\Bouhm.Shared.projitems*{8dba97c7-8e77-4fbf-a717-5ad30b4df50d}*SharedItemsImports = 5
+		Bouhm.Shared\Bouhm.Shared.projitems*{a77ed09b-6ba5-4890-b0d0-3ccd9b7da9b3}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

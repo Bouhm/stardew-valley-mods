@@ -259,11 +259,13 @@ namespace LocationCompass
                 "Krobus"
             };
 
-            foreach (var location in Game1.locations)
+            foreach (GameLocation location in this.LocationUtil.GetAllStaticLocations())
             {
-                foreach (var npc in location.characters)
+                foreach (NPC npc in location.characters)
                 {
-                    if (npc == null) continue;
+                    if (npc == null)
+                        continue;
+
                     if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
                         villagers.Add(npc);
                 }

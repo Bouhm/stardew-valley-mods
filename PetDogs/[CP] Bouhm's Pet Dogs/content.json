@@ -1,0 +1,83 @@
+﻿{
+    "Format": "1.19.0",
+    "ConfigSchema": {
+        "Breed1": {
+            "AllowValues": "shibainu, shepherd, husky, none",
+            "Default": "shibainu"
+        },
+        "Breed2": {
+            "AllowValues": "shibainu, shepherd, husky, none",
+            "Default": "shepherd"
+        },
+        "Breed3": {
+            "AllowValues": "shibainu, shepherd, husky, none",
+            "Default": "husky"
+        }
+    },
+
+    "Changes": [
+        // portrait
+        {
+            "LogName": "Portrait (dog breed 1)",
+            "Action": "EditImage",
+            "Target": "LooseSprites/Cursors",
+            "FromFile": "assets/{{Breed1}}.png",
+            "FromArea": { "X": 104, "Y": 264, "Width": 16, "Height": 16 },
+            "ToArea": { "X": 208, "Y": 208, "Width": 16, "Height": 16 },
+            "When": {
+                "Breed1 |contains=none": false
+            }
+        },
+        {
+            "LogName": "Portrait (dog breed 2)",
+            "Action": "EditImage",
+            "Target": "LooseSprites/Cursors",
+            "FromFile": "assets/{{Breed2}}.png",
+            "FromArea": { "X": 104, "Y": 264, "Width": 16, "Height": 16 },
+            "ToArea": { "X": 224, "Y": 208, "Width": 16, "Height": 16 },
+            "When": {
+                "Breed2 |contains=none": false
+            }
+        },
+        {
+            "LogName": "Portrait (dog breed 3)",
+            "Action": "EditImage",
+            "Target": "LooseSprites/Cursors",
+            "FromFile": "assets/{{Breed3}}.png",
+            "FromArea": { "X": 104, "Y": 264, "Width": 16, "Height": 16 },
+            "ToArea": { "X": 240, "Y": 208, "Width": 16, "Height": 16 },
+            "When": {
+                "Breed3 |contains=none": false
+            }
+        },
+
+        // sprite
+        {
+            "LogName": "Sprite (dog breed 1)",
+            "Action": "EditImage",
+            "Target": "Animals/dog",
+            "FromFile": "assets/{{Breed1}}.png",
+            "When": {
+                "Breed1 |contains=none": false
+            }
+        },
+        {
+            "LogName": "Sprite (dog breed 2)",
+            "Action": "EditImage",
+            "Target": "Animals/dog1",
+            "FromFile": "assets/{{Breed2}}.png",
+            "When": {
+                "Breed2 |contains=none": false
+            }
+        },
+        {
+            "LogName": "Sprite (dog breed 3)",
+            "Action": "EditImage",
+            "Target": "Animals/dog2",
+            "FromFile": "assets/{{Breed3}}.png",
+            "When": {
+                "Breed3 |contains=none": false
+            }
+        }
+    ]
+}
