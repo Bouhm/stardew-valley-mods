@@ -13,8 +13,8 @@
             "Action": "EditImage",
             "Target": "LooseSprites/Cursors",
             "FromFile": "assets/{{Dog}}.png",
-            "FromArea": { "X": 105, "Y": 265, "Width": 15, "Height": 15 },
-            "ToArea": { "X": 177, "Y": 193, "Width": 15, "Height": 15 }
+            "FromArea": { "X": 104, "Y": 264, "Width": 16, "Height": 16 },
+            "ToArea": { "X": 208, "Y": 208, "Width": 16, "Height": 16 }
         },
 
         // sprite

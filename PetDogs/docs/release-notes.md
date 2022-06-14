@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Updated to Content Patcher 1.19.0+.
+* Fixed dog portrait not changed.
 
 ## 1.2.2
 Released 28 November 2018 for Content Patcher 1.3.0 or later.
