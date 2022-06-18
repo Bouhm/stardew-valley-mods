@@ -117,7 +117,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             ModEntry.Globals.MinimapX = this.ScreenBounds.X;
             ModEntry.Globals.MinimapY = this.ScreenBounds.Y;
-            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
             this.DragStarted = false;
 
             // Delay drawing on minimap after it's moved
