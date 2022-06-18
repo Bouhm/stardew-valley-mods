@@ -5,7 +5,7 @@
 * Fixed minimap markers sometimes drawn far outside the minimap area.
 
 ## 2.9.2
-Released 17 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+Released 17 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
 * Fixed minimap's position not saved after dragging it.
 * Fixed minimap sometimes drawn off-screen (e.g. if you resize the window after positioning it).
@@ -13,12 +13,12 @@ Released 17 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
 * Improved translations. Thanks to ellipszist (updated Thai), Gaelhaine (updated Spanish), Hacktix (updated German), and juliowh (updated Portuguese)!
 
 ## 2.9.1
-Released 13 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+Released 13 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
 * Fixed NPCs in farmhand cabins not shown on the map.
 
 ## 2.9.0
-Released 13 May 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+Released 13 May 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
 * Updated for SMAPI 3.14.0.
 * Added option to lock the minimap position.
@@ -27,14 +27,14 @@ Released 13 May 2022 for SMAPI 3.14.0. Updated by Pathoschild.
 * Improved translations. Thanks to ChulkyBow (updated Ukrainian), martin66789 (updated Hungarian), and Zangorr (updated Polish)!
 
 ## 2.8.0
-Released 26 February 2022 for SMAPI 3.13.0. Updated by Pathoschild.
+Released 26 February 2022 for SMAPI 3.13.0 or later. Updated by Pathoschild.
 
 * The summary console command now shows why an NPC is hidden.
 * The show/hide villager map settings are now persisted between game sessions.
 * Improved translations. Thanks to ChulkyBow (added Ukrainian)!
 
 ## 2.7.2
-Released 27 December 2021 for SMAPI 3.13.0. Updated by Pathoschild.
+Released 27 December 2021 for SMAPI 3.13.0 or later. Updated by Pathoschild.
 
 * Updated for Stardew Valley 1.5.5, including custom farm type support.
 * Fixed upgraded sheds having no map icon.
@@ -42,7 +42,7 @@ Released 27 December 2021 for SMAPI 3.13.0. Updated by Pathoschild.
 * Improved translations. Thanks to ellipszist (added Thai) and Zangorr (updated Polish)!
 
 ## 2.7.1
-Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+Released 26 November 2021 for SMAPI 3.12.5 or later. Updated by Pathoschild.
 
 * Improved the `npc_map_locations_summary` command:
   * Added a table of location data.
@@ -52,7 +52,7 @@ Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 * Improved translations. Thanks to Zangorr (added Polish)!
 
 ## 2.7.0
-Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+Released 20 October 2021 for SMAPI 3.12.5 or later. Updated by Pathoschild.
 
 * Added `npc_map_locations_summary` console command, which shows a summary of the current state for troubleshooting.
 * Improved [mod author guide](author-guide.md).
@@ -63,19 +63,19 @@ Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
 * Fixed various edge cases.
 
 ## 2.6.6
-Released 24 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 24 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed mod not working correctly if a location couldn't be loaded.
 * Fixed error loading map info for the Volcano Dungeon. That area is now ignored.
 
 ## 2.6.5
-Released 20 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 20 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed possible errors when scanning locations.
 * Improved translations. Thanks to Aulberon (updated Portuguese) and Evelyon (updated Spanish)!
 
 ## 2.6.4
-Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 06 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed crash when scanning locations in some cases.
 * Fixed NPC markers not working when the multiplayer host is non-English.
@@ -85,7 +85,7 @@ Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
 * Improved translations. Thanks to martin66789 (added Hungarian)!
 
 ## 2.6.3
-Released 17 July 2021 for SMAPI 3.11.0. Updated by Pathoschild.
+Released 17 July 2021 for SMAPI 3.11.0 or later. Updated by Pathoschild.
 
 * Fixed crash when a location has circular warps in some cases.
 * Fixed error when a location has invalid warp targets.
@@ -95,7 +95,7 @@ Released 17 July 2021 for SMAPI 3.11.0. Updated by Pathoschild.
 * Internal refactoring and optimizations.
 
 ## 2.6.2
-Released 28 February 2021 for Stardew Valley 1.5 and SMAPI 3.9.
+Released 28 February 2021 for Stardew Valley 1.5 and SMAPI 3.9.0 or later.
 
 * Updated for the new Stardew Valley 1.5 content.
 * Fixed most bugs related to multiplayer and the new game update (thanks to boleanly for most of these!).
@@ -108,15 +108,15 @@ Custom maps are no longer bundled with NPC Map Locations. Instead mod authors sh
 Map Locations data from their mod](author-guide.md).
 
 ## 2.6.0
-Released 22 February 2021 for Stardew Valley 1.5 and SMAPI 3.9.
+Released 22 February 2021 for Stardew Valley 1.5 and SMAPI 3.9.0 or later.
 
 ## 2.5.12
-Released 22 December 2020 for Stardew Valley 1.5 and SMAPI 3.8.
+Released 22 December 2020 for Stardew Valley 1.5 and SMAPI 3.8.0 or later.
 
 * Partially updated for Stardew Valley 1.5.
 
 ## 2.5.11
-Released 15 August 2020 for Stardew Valley 1.4 and SMAPI 3.5.
+Released 15 August 2020 for Stardew Valley 1.4 and SMAPI 3.5.0 or later.
 
 * Added compatibility with custom quest mods (thanks to Esca!).
 * Fixed map only updating when host opens map in multiplayer.

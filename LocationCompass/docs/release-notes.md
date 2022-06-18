@@ -2,70 +2,70 @@
 
 # Release notes
 ## 1.3.11
-Released 13 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+Released 13 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
 * Fixed markers not shown for NPCs in a farmhand cabin.
 
 ## 1.3.10
-Released 13 May 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+Released 13 May 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
 * Updated for SMAPI 3.14.0.
 
 ## 1.3.9
-Released 27 December 2021 for SMAPI 3.13.0. Updated by Pathoschild.
+Released 27 December 2021 for SMAPI 3.13.0 or later. Updated by Pathoschild.
 
 * Updated for Stardew Valley 1.5.5.
 
 ## 1.3.8
-Released 26 November 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+Released 26 November 2021 for SMAPI 3.12.5 or later. Updated by Pathoschild.
 
 * Added option to keep the HUD visible while locator icons are shown.
 * Fixed Caldera not handled as part of the Volcano Dungeon.
 
 ## 1.3.7
-Released 20 October 2021 for SMAPI 3.12.5. Updated by Pathoschild.
+Released 20 October 2021 for SMAPI 3.12.5 or later. Updated by Pathoschild.
 
 * Improved support for Volcano Dungeon.
 * Fixed various edge cases.
 
 ## 1.3.6
-Released 24 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 24 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed mod not working correctly if a location couldn't be loaded.
 * Fixed error loading map info for the Volcano Dungeon. That area is now ignored.
 
 ## 1.3.5
-Released 20 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 20 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed possible errors when scanning locations.
 
 ## 1.3.4
-Released 06 August 2021 for SMAPI 3.12.2. Updated by Pathoschild.
+Released 06 August 2021 for SMAPI 3.12.2 or later. Updated by Pathoschild.
 
 * Fixed crash when scanning locations in some cases.
 
 ## 1.3.3
-Released 17 July 2021 for SMAPI 3.11.0. Updated by Pathoschild.
+Released 17 July 2021 for SMAPI 3.11.0 or later. Updated by Pathoschild.
 
 * Fixed crash when a location has circular warps in some cases.
 * Fixed error when a location has invalid warp targets.
 * Internal refactoring.
 
 ## 1.3.2
-Released 02 March 2021 for Stardew Valley 1.4 and SMAPI 3.0.
+Released 02 March 2021 for Stardew Valley 1.4 and SMAPI 3.0.0 or later.
 
 * Increased update rate in multiplayer.
 * Internal refactoring.
 
 ## 1.3.1
-Released 19 January 2019 for Stardew Valley 1.4 and SMAPI 3.0.
+Released 19 January 2019 for Stardew Valley 1.4 and SMAPI 3.0.0 or later.
 
 * Added warning if host player doesn't have Location Compass installed in multiplayer.
 * Fixed compatibility with MTN2.
 * Fixed other minor bugs.
 
 ## 1.3.0
-Released 16 December 2018 for Stardew Valley 1.4 and SMAPI 2.9.
+Released 16 December 2018 for Stardew Valley 1.4 and SMAPI 2.9.0 or later.
 
 * Updated for SMAPI 3.0.
 * Fixed issue where NPC locations weren't always updating in multiplayer.  
@@ -73,7 +73,7 @@ Released 16 December 2018 for Stardew Valley 1.4 and SMAPI 2.9.
 * Fixed bugs.
 
 ## 1.2.0
-Released 19 November 2018 for Stardew Valley 1.3.32 and SMAPI 2.8.
+Released 19 November 2018 for Stardew Valley 1.3.32 and SMAPI 2.8.0 or later.
 
 * Now works for all players who have it installed in multiplayer.
 * Added new config options:
@@ -84,6 +84,6 @@ Released 19 November 2018 for Stardew Valley 1.3.32 and SMAPI 2.8.
   * Option to show horses (toggle with `L` while showing locators).
 
 ## 1.0.0
-Released 09 November 2018 for Stardew Valley 1.3.28 and SMAPI 2.7.
+Released 09 November 2018 for Stardew Valley 1.3.28 and SMAPI 2.7.0 or later.
 
 * Initial release. NPCs only show for host players.
