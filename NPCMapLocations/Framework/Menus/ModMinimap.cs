@@ -86,20 +86,30 @@ namespace NPCMapLocations.Framework.Menus
 
         public void HandleMouseDown()
         {
-            this.PrevMmX = this.ScreenBounds.X;
-            this.PrevMmY = this.ScreenBounds.Y;
-            this.DragStarted = true;
+            if (Context.IsPlayerFree)
+            {
+                this.PrevMmX = this.ScreenBounds.X;
+                this.PrevMmY = this.ScreenBounds.Y;
+                this.DragStarted = true;
+            }
         }
 
         public void HandleMouseDrag()
         {
             if (this.DragStarted)
             {
-                // Move minimap with mouse on drag
-                this.ScreenBounds.SetDesiredBounds(
-                    x: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmX + Game1.getMouseX() - MouseUtil.BeginMousePosition.X, this.BorderWidth, Game1.viewport.Width - this.ScreenBounds.Width - this.BorderWidth)),
-                    y: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, this.BorderWidth, Game1.viewport.Height - this.ScreenBounds.Height - this.BorderWidth))
-                );
+                // stop if dragging should no longer be allowed
+                if (!Context.IsPlayerFree)
+                    this.HandleMouseRelease();
+
+                // else move minimap
+                else
+                {
+                    this.ScreenBounds.SetDesiredBounds(
+                        x: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmX + Game1.getMouseX() - MouseUtil.BeginMousePosition.X, this.BorderWidth, Game1.viewport.Width - this.ScreenBounds.Width - this.BorderWidth)),
+                        y: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, this.BorderWidth, Game1.viewport.Height - this.ScreenBounds.Height - this.BorderWidth))
+                    );
+                }
             }
         }
 

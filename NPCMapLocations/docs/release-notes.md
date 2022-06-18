@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed minimap sometimes drawn off-screen (e.g. if you resize the window after positioning it).
+* Fixed minimap snapping to an unexpected position if you accidentally open a menu mid-drag.
 * Improved translations. Thanks to ellipszist (updated Thai), Gaelhaine (updated Spanish), Hacktix (updated German), and juliowh (updated Portuguese)!
 
 ## 2.9.1
