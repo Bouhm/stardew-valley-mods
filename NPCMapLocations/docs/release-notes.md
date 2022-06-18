@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed minimap sometimes drawn off-screen (e.g. if you resize the window after positioning it).
 * Improved translations. Thanks to ellipszist (updated Thai), Gaelhaine (updated Spanish), Hacktix (updated German), and juliowh (updated Portuguese)!
 
 ## 2.9.1
