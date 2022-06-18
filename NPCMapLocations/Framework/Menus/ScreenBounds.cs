@@ -93,6 +93,14 @@ namespace NPCMapLocations.Framework.Menus
             return this.ActualBounds.Contains(position);
         }
 
+        /// <summary>Get whether the adjusted screen bounds contain the given pixel position.</summary>
+        /// <param name="x">The pixel X position.</param>
+        /// <param name="y">The pixel Y position.</param>
+        public bool Contains(int x, int y)
+        {
+            return this.ActualBounds.Contains(x, y);
+        }
+
         /// <summary>Reset the calculated screen bounds.</summary>
         public void Recalculate()
         {

@@ -352,16 +352,22 @@ namespace NPCMapLocations.Framework.Menus
             if (this.DrawPamHouseUpgrade)
             {
                 var houseLoc = ModEntry.LocationToMap("Trailer_Big");
-                if (this.IsWithinMapArea(houseLoc.X, houseLoc.Y))
-                    b.Draw(ModEntry.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16), this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11)), new Rectangle(263, 181, 8, 8), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                int screenX = this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16);
+                int screenY = this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11);
+
+                if (this.ScreenBounds.Contains(screenX, screenY))
+                    b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(263, 181, 8, 8), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
             }
 
             if (this.DrawMovieTheater || this.DrawMovieTheaterJoja)
             {
                 var theaterLoc = ModEntry.LocationToMap("JojaMart");
-                if (this.IsWithinMapArea(theaterLoc.X, theaterLoc.Y))
+                int screenX = this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20);
+                int screenY = this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11);
+
+                if (this.ScreenBounds.Contains(screenX, screenY))
                 {
-                    b.Draw(ModEntry.Map, new Vector2(this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20), this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11)), new Rectangle(275, 181, 15, 11), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(275, 181, 15, 11), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
                 }
             }
 
@@ -415,23 +421,11 @@ namespace NPCMapLocations.Framework.Menus
                 {
                     if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out var buildingRect))
                     {
-                        if (this.IsWithinMapArea(building.Value.Value.X - buildingRect.Width / 2,
-                          building.Value.Value.Y - buildingRect.Height / 2))
-                        {
-                            //  if (Customizations.MapName == "starblue_map")
-                            //   buildingRect.Y = 7;
-                            //  else if (Customizations.MapName == "eemie_recolour_map")
-                            //    buildingRect.Y = 14;
+                        int screenX = this.NormalizeToMap(offsetMmLoc.X + building.Value.Value.X - (float)Math.Floor(buildingRect.Width / 2.0));
+                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.Value.Value.Y - (float)Math.Floor(buildingRect.Height / 2.0));
 
-                            b.Draw(
-                                this.BuildingMarkers,
-                                new Vector2(
-                                    this.NormalizeToMap(offsetMmLoc.X + building.Value.Value.X - (float)Math.Floor(buildingRect.Width / 2.0)),
-                                    this.NormalizeToMap(offsetMmLoc.Y + building.Value.Value.Y - (float)Math.Floor(buildingRect.Height / 2.0))
-                              ),
-                              buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
-                            );
-                        }
+                        if (this.ScreenBounds.Contains(screenX, screenY))
+                            b.Draw(this.BuildingMarkers, new Vector2(screenX, screenY), buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
                     }
                 }
             }
@@ -442,8 +436,11 @@ namespace NPCMapLocations.Framework.Menus
             if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
-                if (this.IsWithinMapArea(merchantLoc.X - 16, merchantLoc.Y - 16))
-                    b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(offsetMmLoc.X + merchantLoc.X - 16), this.NormalizeToMap(offsetMmLoc.Y + merchantLoc.Y - 15)), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
+                int screenX = this.NormalizeToMap(offsetMmLoc.X + merchantLoc.X - 16);
+                int screenY = this.NormalizeToMap(offsetMmLoc.Y + merchantLoc.Y - 15);
+
+                if (this.ScreenBounds.Contains(screenX, screenY))
+                    b.Draw(Game1.mouseCursors, new Vector2(screenX, screenY), new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None, 1f);
             }
 
             //
@@ -460,9 +457,13 @@ namespace NPCMapLocations.Framework.Menus
                     string name = npcMarker.Key;
                     var marker = npcMarker.Value;
 
+                    Vector2 rawPos = new(offsetMmLoc.X + marker.MapX, offsetMmLoc.Y + marker.MapY);
+                    Point screenPos = new(this.NormalizeToMap(rawPos.X), this.NormalizeToMap(rawPos.Y));
+
                     // Skip if no specified location
-                    if (marker.Sprite == null
-                        || !this.IsWithinMapArea(marker.MapX, marker.MapY)
+                    if (
+                        marker.Sprite == null
+                        || !this.ScreenBounds.Contains(screenPos)
                         || ModEntry.ShouldExcludeNpc(name)
                         || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
                         || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
@@ -473,24 +474,16 @@ namespace NPCMapLocations.Framework.Menus
 
                     // Draw NPC marker
                     var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
-
-                    if (marker.Type == CharacterType.Horse)
-                    {
-                        b.Draw(marker.Sprite, new Rectangle(this.NormalizeToMap(offsetMmLoc.X + marker.MapX), this.NormalizeToMap(offsetMmLoc.Y + marker.MapY), 30, 32), spriteRect, markerColor);
-                    }
-                    else
-                    {
-                        b.Draw(marker.Sprite, new Rectangle(this.NormalizeToMap(offsetMmLoc.X + marker.MapX), this.NormalizeToMap(offsetMmLoc.Y + marker.MapY), 30, 32), spriteRect, markerColor);
-                    }
+                    b.Draw(marker.Sprite, new Rectangle(screenPos.X, screenPos.Y, 30, 32), spriteRect, markerColor);
 
                     // Icons for birthday/quest
                     if (ModEntry.Globals.ShowQuests)
                     {
                         if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
-                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(offsetMmLoc.X + marker.MapX + 20), this.NormalizeToMap(offsetMmLoc.Y + marker.MapY)), new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(rawPos.X + 20), screenPos.Y), new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
 
                         if (marker.HasQuest)
-                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(offsetMmLoc.X + marker.MapX + 22), this.NormalizeToMap(offsetMmLoc.Y + marker.MapY - 3)), new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
+                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(rawPos.X + 22), this.NormalizeToMap(rawPos.Y - 3)), new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
                     }
                 }
             }
@@ -502,10 +495,11 @@ namespace NPCMapLocations.Framework.Menus
                     // Temporary solution to handle desync of farmhand location/tile position when changing location
                     if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
                     {
-                        if (this.IsWithinMapArea(farMarker.MapX - 16, farMarker.MapY - 15) && farMarker.DrawDelay == 0)
-                        {
-                            farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.NormalizeToMap(offsetMmLoc.X + farMarker.MapX - 16), this.NormalizeToMap(offsetMmLoc.Y + farMarker.MapY - 15)), 0.00011f, 2f, 1, farmer);
-                        }
+                        int screenX = this.NormalizeToMap(offsetMmLoc.X + farMarker.MapX - 16);
+                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + farMarker.MapY - 15);
+
+                        if (this.ScreenBounds.Contains(screenX, screenY) && farMarker.DrawDelay == 0)
+                            farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(screenX, screenY), 0.00011f, 2f, 1, farmer);
                     }
                 }
             }
@@ -520,19 +514,6 @@ namespace NPCMapLocations.Framework.Menus
         private int NormalizeToMap(float n)
         {
             return (int)Math.Floor(n / Game1.pixelZoom) * Game1.pixelZoom;
-        }
-
-        // Check if within map
-        private bool IsWithinMapArea(float x, float y)
-        {
-            float width = this.ScreenBounds.Width;
-            float height = this.ScreenBounds.Width;
-
-            return
-                x > this.Center.X - width / 2 - (Game1.tileSize / 4)
-                && x < this.Center.X + width / 2 - (Game1.tileSize / 4)
-                && y > this.Center.Y - height / 2 - (Game1.tileSize / 4)
-                && y < this.Center.Y + height / 2 - (Game1.tileSize / 4);
         }
 
         // For borders

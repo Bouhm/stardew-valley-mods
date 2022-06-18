@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed minimap markers sometimes drawn far outside the minimap area.
+
 ## 2.9.2
 Released 17 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
 
