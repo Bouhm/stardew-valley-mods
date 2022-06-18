@@ -27,5 +27,9 @@
 
     "config.breed1.values.husky": "Husky",
     "config.breed2.values.husky": "Husky",
-    "config.breed3.values.husky": "Husky"
+    "config.breed3.values.husky": "Husky",
+
+    "config.breed1.values.none": "None",
+    "config.breed2.values.none": "None",
+    "config.breed3.values.none": "None"
 }
