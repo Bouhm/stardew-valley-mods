@@ -650,6 +650,7 @@ namespace NPCMapLocations
 
             this.UpdateMarkers(true);
             this.UpdateFarmBuildingLocations();
+            this.Minimap.Value?.OnWindowResized();
             this.Minimap.Value?.CheckOffsetForMap();
 
             if (this.IsModMapOpen.Value)
