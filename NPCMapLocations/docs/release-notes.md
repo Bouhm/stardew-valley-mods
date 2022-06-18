@@ -1,8 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Fixed minimap's new position not applied on reload after you drag it.
+## 2.9.2
+Released 17 June 2022 for SMAPI 3.14.0. Updated by Pathoschild.
+
+* Fixed minimap's position not saved after dragging it.
 * Fixed minimap sometimes drawn off-screen (e.g. if you resize the window after positioning it).
 * Fixed minimap snapping to an unexpected position if you accidentally open a menu mid-drag.
 * Improved translations. Thanks to ellipszist (updated Thai), Gaelhaine (updated Spanish), Hacktix (updated German), and juliowh (updated Portuguese)!
