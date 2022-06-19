@@ -13,6 +13,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
@@ -812,36 +813,26 @@ namespace NPCMapLocations
 
             foreach (var building in Game1.getFarm().buildings)
             {
-                if (building?.nameOfIndoorsWithoutUnique is null || building.nameOfIndoors is null or "null") // Some actually have value of "null"
+                // get building interior
+                GameLocation indoors = building?.indoors.Value;
+                if (indoors is null && building is GreenhouseBuilding && Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
+                    indoors = Game1.getLocationFromName("Greenhouse");
+                if (indoors is null)
                     continue;
 
-                var locVector = LocationToMap(
+                // get map marker position
+                Vector2 locVector = LocationToMap(
                     "Farm", // Get building position in farm
                     building.tileX.Value,
                     building.tileY.Value,
                     this.Customizations.MapVectors,
                     this.Customizations.LocationExclusions
                 );
-
-                // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
-                // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
-                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
-
-                if (commonName.Contains("Barn"))
+                if (building.buildingType.Value.Contains("Barn"))
                     locVector.Y += 3;
 
-                // Format: { uniqueName: { commonName: positionOnFarm } }
-                // buildingType will match currentLocation.Name for commonName
-                FarmBuildings[building.nameOfIndoors] = new(building.buildingType.Value, locVector);
-            }
-
-            // Greenhouse unlocked after pantry bundles completed
-            if (Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
-            {
-                var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
-                greenhouseLoc.X -= 5 / 2 * 3;
-                greenhouseLoc.Y -= 7 / 2 * 3;
-                FarmBuildings["Greenhouse"] = new("Greenhouse", greenhouseLoc);
+                // track marker
+                FarmBuildings[indoors.NameOrUniqueName] = new BuildingMarker(building.buildingType.Value, locVector);
             }
 
             // Add FarmHouse

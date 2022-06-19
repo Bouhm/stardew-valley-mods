@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed marker position for the greenhouse when it's moved.
+
 ## 2.9.3
 Released 18 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
