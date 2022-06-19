@@ -25,7 +25,7 @@ namespace NPCMapLocations.Framework.Menus
         private Dictionary<string, bool> ConditionalNpcs { get; }
         private Dictionary<string, NpcMarker> NpcMarkers { get; }
         private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
-        private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
+        private Dictionary<string, BuildingMarker> FarmBuildings { get; }
 
         private readonly Texture2D BuildingMarkers;
         private readonly ModCustomizations Customizations;
@@ -52,7 +52,7 @@ namespace NPCMapLocations.Framework.Menus
           Dictionary<string, NpcMarker> npcMarkers,
           Dictionary<string, bool> conditionalNpcs,
           Dictionary<long, FarmerMarker> farmerMarkers,
-          Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
+          Dictionary<string, BuildingMarker> farmBuildings,
           Texture2D buildingMarkers,
           ModCustomizations customizations,
           LocationUtil locationUtil
@@ -408,18 +408,15 @@ namespace NPCMapLocations.Framework.Menus
         {
             if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
-                var sortedBuildings = this.FarmBuildings.ToList();
-                sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
-
-                foreach (KeyValuePair<string, KeyValuePair<string, Vector2>> building in sortedBuildings)
+                foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.MapPosition.Y))
                 {
-                    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out Rectangle buildingRect))
+                    if (ModConstants.FarmBuildingRects.TryGetValue(building.CommonName, out Rectangle buildingRect))
                     {
                         b.Draw(
                             this.BuildingMarkers,
                             new Vector2(
-                                this.MapX + building.Value.Value.X - buildingRect.Width / 2,
-                                this.MapY + building.Value.Value.Y - buildingRect.Height / 2
+                                this.MapX + building.MapPosition.X - buildingRect.Width / 2,
+                                this.MapY + building.MapPosition.Y - buildingRect.Height / 2
                             ),
                             buildingRect, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
                         );

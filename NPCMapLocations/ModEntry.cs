@@ -26,7 +26,8 @@ namespace NPCMapLocations
         /*********
         ** Fields
         *********/
-        private static readonly Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings = new();
+        /// <summary>The map markers for farm buildings, indexed by the interior unique name.</summary>
+        private static readonly Dictionary<string, BuildingMarker> FarmBuildings = new();
 
         private readonly PerScreen<Texture2D> BuildingMarkers = new();
         private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new();
@@ -175,8 +176,8 @@ namespace NPCMapLocations
                 if (locationExclusions?.Contains(locationName) == true || locationName.Contains("WarpRoom"))
                     return Unknown;
 
-                if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
-                    return mapLoc.Value;
+                if (FarmBuildings.TryGetValue(locationName, out BuildingMarker marker))
+                    return marker.MapPosition;
 
                 // Get location of indoor location by its warp position in the outdoor location
                 if (LocationUtil.TryGetContext(locationName, out var loc)
@@ -831,8 +832,7 @@ namespace NPCMapLocations
 
                 // Format: { uniqueName: { commonName: positionOnFarm } }
                 // buildingType will match currentLocation.Name for commonName
-                FarmBuildings[building.nameOfIndoors] =
-                  new KeyValuePair<string, Vector2>(building.buildingType.Value, locVector);
+                FarmBuildings[building.nameOfIndoors] = new(building.buildingType.Value, locVector);
             }
 
             // Greenhouse unlocked after pantry bundles completed
@@ -841,13 +841,13 @@ namespace NPCMapLocations
                 var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
                 greenhouseLoc.X -= 5 / 2 * 3;
                 greenhouseLoc.Y -= 7 / 2 * 3;
-                FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greenhouseLoc);
+                FarmBuildings["Greenhouse"] = new("Greenhouse", greenhouseLoc);
             }
 
             // Add FarmHouse
             var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
             farmhouseLoc.X -= 6;
-            FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
+            FarmBuildings["FarmHouse"] = new("FarmHouse", farmhouseLoc);
         }
 
         // Handle keyboard/controller inputs
