@@ -836,7 +836,7 @@ namespace NPCMapLocations
             }
 
             // Greenhouse unlocked after pantry bundles completed
-            if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
+            if (Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
             {
                 var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
                 greenhouseLoc.X -= 5 / 2 * 3;
