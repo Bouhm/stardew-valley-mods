@@ -1,0 +1,35 @@
+{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Field names & tooltips
+    ****/
+    "config.breed1.name": "Rasa psa nr. 1",
+    "config.breed1.description": "Rasa psa, która będzie wyświetlana w grze jako pierwsza.",
+
+    "config.breed2.name": "Rasa psa nr. 2",
+    "config.breed2.description": "Rasa psa, która będzie wyświetlana w grze jako druga.",
+
+    "config.breed3.name": "Rasa psa nr. 3",
+    "config.breed3.description": "Rasa psa, która będzie wyświetlana w grze jako trzecia.",
+
+    /****
+    ** Dropdown values
+    ****/
+    "config.breed1.values.shibainu": "Shiba Inu",
+    "config.breed2.values.shibainu": "Shiba Inu",
+    "config.breed3.values.shibainu": "Shiba Inu",
+
+    "config.breed1.values.shepherd": "Owczarek niemiecki",
+    "config.breed2.values.shepherd": "Owczarek niemiecki",
+    "config.breed3.values.shepherd": "Owczarek niemiecki",
+
+    "config.breed1.values.husky": "Husky syberyjski",
+    "config.breed2.values.husky": "Husky syberyjski",
+    "config.breed3.values.husky": "Husky syberyjski",
+
+    "config.breed1.values.none": "Żadna",
+    "config.breed2.values.none": "Żadna",
+    "config.breed3.values.none": "Żadna"
+}
