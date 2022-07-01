@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed marker position for the greenhouse when it's moved.
+* Fixed `npc_map_locations_summary` showing locations where the minimap is excluded as having no map vectors.
 
 ## 2.9.3
 Released 18 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.

@@ -682,7 +682,7 @@ namespace NPCMapLocations
             if (e.IsLocalPlayer)
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
-                Globals.ShowMinimap = Globals.ShowMinimap && !this.IsLocationExcluded(e.NewLocation.Name);
+                Globals.ShowMinimap = Globals.ShowMinimap && this.IsMinimapEnabledIn(e.NewLocation.Name);
 
                 // Check if map does not fill screen and adjust for black bars (ex. BusStop)
                 this.Minimap.Value?.CheckOffsetForMap();
@@ -733,9 +733,6 @@ namespace NPCMapLocations
             {
                 string name = entry.Key;
                 LocationContext context = entry.Value;
-
-                if (this.IsLocationExcluded(name))
-                    continue;
 
                 string outdoorName = context.Root ?? name;
                 if (!this.MapVectors.Value.ContainsKey(outdoorName) && context.Type is not (LocationType.Building or LocationType.Room))
@@ -872,10 +869,20 @@ namespace NPCMapLocations
             }
         }
 
-        private bool IsLocationExcluded(string location)
+        /// <summary>Get whether the minimap is enabled in the given location.</summary>
+        /// <param name="location">The location name.</param>
+        private bool IsMinimapEnabledIn(string location)
         {
-            return Globals.ShowMinimap && Globals.MinimapExclusions.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-                     ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"));
+            if (!Globals.ShowMinimap)
+                return false;
+
+            if (Globals.MinimapExclusions.Any(loc => loc is "Farm" ? location == loc : location.StartsWith(loc)))
+                return false;
+
+            if ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"))
+                return false;
+
+            return true;
         }
 
         private void ResetMarkers()
