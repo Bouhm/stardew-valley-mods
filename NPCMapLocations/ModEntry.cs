@@ -38,6 +38,9 @@ namespace NPCMapLocations
         private readonly PerScreen<bool> HasOpenedMap = new();
         private readonly PerScreen<bool> IsModMapOpen = new();
 
+        /// <summary>Whether to show the minimap.</summary>
+        private readonly PerScreen<bool> ShowMinimap = new();
+
         /// <summary>Scans and maps locations in the game world.</summary>
         private static LocationUtil LocationUtil;
 
@@ -388,6 +391,9 @@ namespace NPCMapLocations
                 if (!hostHasMod && !Context.IsMainPlayer)
                     this.Monitor.Log("Since the server host doesn't have NPC Map Locations installed, NPC locations can't be synced.", LogLevel.Warn);
             }
+
+            // enable minimap
+            this.UpdateMinimapVisibility();
         }
 
         /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
@@ -414,7 +420,7 @@ namespace NPCMapLocations
                 return;
 
             // Minimap dragging
-            if (Globals.ShowMinimap && !Globals.LockMinimapPosition && this.Minimap.Value != null)
+            if (this.ShowMinimap.Value && !Globals.LockMinimapPosition && this.Minimap.Value != null)
             {
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
@@ -431,6 +437,7 @@ namespace NPCMapLocations
             if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
             {
                 Globals.ShowMinimap = !Globals.ShowMinimap;
+                this.UpdateMinimapVisibility();
                 this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
             }
 
@@ -496,7 +503,7 @@ namespace NPCMapLocations
             // update and sync markers
             if (e.IsMultipleOf(30) && Game1.currentLocation != null && Game1.player?.currentLocation != null)
             {
-                bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
+                bool updateForMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
                 if (updateForMinimap)
                     this.Minimap.Value.Update();
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
@@ -555,7 +562,7 @@ namespace NPCMapLocations
             }
 
             // handle minimap drag
-            if (Globals.ShowMinimap && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
+            if (this.ShowMinimap.Value && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
                 this.Minimap.Value.HandleMouseDrag();
 
             // toggle mod map
@@ -682,7 +689,7 @@ namespace NPCMapLocations
             if (e.IsLocalPlayer)
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
-                Globals.ShowMinimap = Globals.ShowMinimap && this.IsMinimapEnabledIn(e.NewLocation.Name);
+                this.UpdateMinimapVisibility(e.NewLocation);
 
                 // Check if map does not fill screen and adjust for black bars (ex. BusStop)
                 this.Minimap.Value?.CheckOffsetForMap();
@@ -694,7 +701,7 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
-            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
+            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
                 this.Minimap.Value?.DrawMiniMap();
         }
 
@@ -867,6 +874,13 @@ namespace NPCMapLocations
 
                 this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
             }
+        }
+
+        /// <summary>Update the <see cref="ShowMinimap"/> value for the current location.</summary>
+        /// <param name="location">The location for which to check visibility, or <c>null</c> for the player's current location.</param>
+        private void UpdateMinimapVisibility(GameLocation location = null)
+        {
+            this.ShowMinimap.Value = this.IsMinimapEnabledIn((location ?? Game1.currentLocation).Name);
         }
 
         /// <summary>Get whether the minimap is enabled in the given location.</summary>
