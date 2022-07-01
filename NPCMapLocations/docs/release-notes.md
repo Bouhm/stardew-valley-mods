@@ -9,6 +9,7 @@
   * not applied to the farmhouse immediately after loading a save;
   * marking the location as having no map vectors in `npc_map_locations_summary`;
   * temporarily disabling the `ShowMinimap` option, which could result in that option being saved if you changed any other config values.
+* Fixed NPC names in settings being case-sensitive.
 
 ## 2.9.3
 Released 18 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
