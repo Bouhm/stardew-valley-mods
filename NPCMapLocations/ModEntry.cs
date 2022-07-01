@@ -880,20 +880,28 @@ namespace NPCMapLocations
         /// <param name="location">The location for which to check visibility, or <c>null</c> for the player's current location.</param>
         private void UpdateMinimapVisibility(GameLocation location = null)
         {
-            this.ShowMinimap.Value = this.IsMinimapEnabledIn((location ?? Game1.currentLocation).Name);
+            location ??= Game1.currentLocation;
+
+            this.ShowMinimap.Value = this.IsMinimapEnabledIn(location.Name, location.IsOutdoors);
         }
 
         /// <summary>Get whether the minimap is enabled in the given location.</summary>
         /// <param name="location">The location name.</param>
-        private bool IsMinimapEnabledIn(string location)
+        /// <param name="isOutdoors">Whether the location is outdoors.</param>
+        private bool IsMinimapEnabledIn(string location, bool isOutdoors)
         {
             if (!Globals.ShowMinimap)
                 return false;
 
-            if (Globals.MinimapExclusions.Any(loc => loc is "Farm" ? location == loc : location.StartsWith(loc)))
+            if (Globals.MinimapExclusions.Contains(location))
                 return false;
 
-            if ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"))
+            if (location.StartsWith("UndergroundMine") && int.TryParse(location.Substring("UndergroundMine".Length), out int mineLevel))
+            {
+                if (Globals.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
+                    return false;
+            }
+            else if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
                 return false;
 
             return true;

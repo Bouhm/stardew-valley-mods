@@ -50,7 +50,7 @@ setting            | what it affects
 `UseDetailedIsland`| Whether to replace the stylized Ginger Island in the bottom-right corner of the map with a more detailed and accurate map. Default false.
 `ShowMinimap`      | Whether to show the floating minimap. Default `false`.
 `MinimapX`<br />`MinimapY`<br />`MinimapWidth`<br />`MinimapHeight` | The minimap's pixel position and size on screen, if it's enabled. Default `x=12`, `y=12`, `width=75`, `height=45`.
-`MinimapExclusions`| Location names in which the minimap should be disabled. Default empty.
+`MinimapExclusions`| Where the minimap should be disabled (not case-sensitive). Each value can be...<ul><li>an exact location name (as shown by [Debug Mode](https://www.nexusmods.com/stardewvalley/mods/679));</li><li>[`"Mines"`](https://stardewvalleywiki.com/The_Mines);</li><li>[`"SkullCavern"`](https://stardewvalleywiki.com/Skull_Cavern);</li><li>[`"VolcanoDungeon"`](https://stardewvalleywiki.com/Volcano_Dungeon);</li><li>`"Indoors"`;</li><li>or `"Outdoors"`.</li></ul> Default empty.
 `NpcExclusions`    | NPC names to hide from the map. default empty.
 `NpcMarkerOffsets` | Custom offsets when drawing vanilla NPCs. You generally shouldn't change this.
 `MenuKey`          | The [key binding](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) to open the options menu when on the map view. Default `"Tab"`.

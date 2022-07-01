@@ -2,11 +2,12 @@
 
 # Release notes
 ## Upcoming release
-* Fixed marker position for the greenhouse when it's moved.
-* Fixed `npc_map_locations_summary` showing locations where the minimap is excluded as having no map vectors.
+* Reworked the `MinimapExclusions` option to allow more flexible exclusions (see the [updated docs](README.md#configure)).
+* Fixed the greenhouse marker not updated when the greenhouse is moved.
 * Fixed the `MinimapExclusions` option...
-  * not applied to the farmhouse immediately after loading a save;
   * keeping the minimap hidden after leaving an excluded location;
+  * not applied to the farmhouse immediately after loading a save;
+  * marking the location as having no map vectors in `npc_map_locations_summary`;
   * temporarily disabling the `ShowMinimap` option, which could result in that option being saved if you changed any other config values.
 
 ## 2.9.3
