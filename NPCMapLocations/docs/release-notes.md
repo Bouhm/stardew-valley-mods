@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.10.0
+Released 18 August 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
 * Reworked the `MinimapExclusions` option to allow more flexible exclusions (see the [updated docs](README.md#configure)).
 * Fixed the greenhouse marker not updated when the greenhouse is moved.
 * Fixed the `MinimapExclusions` option...
