@@ -1,6 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 2.0.2
+Released 18 August 2022 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
+
+* Fixed folder structure for compatibility with Vortex.
+
 ## 2.0.1
 Released 18 June 2022 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
 

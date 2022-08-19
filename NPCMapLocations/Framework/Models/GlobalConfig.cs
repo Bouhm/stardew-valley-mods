@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace NPCMapLocations.Framework.Models
@@ -58,7 +61,7 @@ namespace NPCMapLocations.Framework.Models
         public int MinimapHeight { get; set; } = 45;
 
         /// <summary>Location names in which the minimap should be disabled.</summary>
-        public HashSet<string> MinimapExclusions { get; set; } = new();
+        public HashSet<string> MinimapExclusions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Whether to show seasonal variations of the map.</summary>
         public bool UseSeasonalMaps { get; set; } = true;
@@ -73,13 +76,28 @@ namespace NPCMapLocations.Framework.Models
         public bool ShowHorse { get; set; } = true;
 
         /// <summary>NPC names to hide from the map.</summary>
-        public HashSet<string> NpcExclusions { get; set; } = new();
+        public HashSet<string> NpcExclusions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>NPC names to hide from the map, specified by mods through the API.</summary>
         [JsonIgnore]
-        public HashSet<string> ModNpcExclusions { get; } = new();
+        public HashSet<string> ModNpcExclusions { get; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Custom offsets when drawing vanilla NPCs.</summary>
-        public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new();
+        public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+
+        /*********
+        ** Public methods
+        *********/
+        // <summary>Normalize the model after it's deserialized.</summary>
+        /// <param name="context">The deserialization context.</param>
+        [OnDeserialized]
+        internal void OnDeserializedMethod(StreamingContext context)
+        {
+            // make values case-insensitive
+            this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            this.NpcExclusions = new HashSet<string>(this.NpcExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            this.NpcMarkerOffsets = new Dictionary<string, int>(this.NpcMarkerOffsets ?? new(), StringComparer.OrdinalIgnoreCase);
+        }
     }
 }

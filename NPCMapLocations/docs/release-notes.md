@@ -1,6 +1,18 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 2.10.0
+Released 18 August 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
+* Reworked the `MinimapExclusions` option to allow more flexible exclusions (see the [updated docs](README.md#configure)).
+* Fixed the greenhouse marker not updated when the greenhouse is moved.
+* Fixed the `MinimapExclusions` option...
+  * keeping the minimap hidden after leaving an excluded location;
+  * not applied to the farmhouse immediately after loading a save;
+  * marking the location as having no map vectors in `npc_map_locations_summary`;
+  * temporarily disabling the `ShowMinimap` option, which could result in that option being saved if you changed any other config values.
+* Fixed NPC names in settings being case-sensitive.
+
 ## 2.9.3
 Released 18 June 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 

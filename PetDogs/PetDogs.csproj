@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
@@ -28,8 +28,12 @@
     <!--update Mods folder-->
     <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(GameModsPath)\$(ContentPackFolderName)\%(RecursiveDir)" />
 
+    <!--create release folder-->
+    <RemoveDir Directories="$(TargetDir)\packaged" />
+    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(TargetDir)\packaged\$(ContentPackFolderName)\%(RecursiveDir)" />
+
     <!--create release zip-->
     <Delete Files="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
-    <ZipDirectory SourceDirectory="$(TargetDir)\$(ContentPackFolderName)" DestinationFile="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
+    <ZipDirectory SourceDirectory="$(TargetDir)\packaged" DestinationFile="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
   </Target>
 </Project>

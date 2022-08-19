@@ -28,7 +28,7 @@ namespace NPCMapLocations.Framework.Menus
         private float CropY; // Top-left position of crop on map
 
         /// <summary>The pixel position and size of the minimap, adjusted automatically to fit on the screen.</summary>
-        private ScreenBounds ScreenBounds;
+        private readonly ScreenBounds ScreenBounds;
 
         private Vector2 MmLoc; // minimap location relative to map location
         private int Offset; // offset for minimap if viewport changed
@@ -40,7 +40,7 @@ namespace NPCMapLocations.Framework.Menus
         private bool DragStarted;
 
         private Dictionary<string, bool> ConditionalNpcs { get; }
-        private Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings { get; }
+        private Dictionary<string, BuildingMarker> FarmBuildings { get; }
 
 
         /*********
@@ -50,7 +50,7 @@ namespace NPCMapLocations.Framework.Menus
           Dictionary<string, NpcMarker> npcMarkers,
           Dictionary<string, bool> conditionalNpcs,
           Dictionary<long, FarmerMarker> farmerMarkers,
-          Dictionary<string, KeyValuePair<string, Vector2>> farmBuildings,
+          Dictionary<string, BuildingMarker> farmBuildings,
           Texture2D buildingMarkers,
           ModCustomizations customizations
         )
@@ -414,15 +414,12 @@ namespace NPCMapLocations.Framework.Menus
             //
             if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
-                var sortedBuildings = this.FarmBuildings.ToList();
-                sortedBuildings.Sort((x, y) => x.Value.Value.Y.CompareTo(y.Value.Value.Y));
-
-                foreach (var building in sortedBuildings)
+                foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.MapPosition.Y))
                 {
-                    if (ModConstants.FarmBuildingRects.TryGetValue(building.Value.Key, out var buildingRect))
+                    if (ModConstants.FarmBuildingRects.TryGetValue(building.CommonName, out var buildingRect))
                     {
-                        int screenX = this.NormalizeToMap(offsetMmLoc.X + building.Value.Value.X - (float)Math.Floor(buildingRect.Width / 2.0));
-                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.Value.Value.Y - (float)Math.Floor(buildingRect.Height / 2.0));
+                        int screenX = this.NormalizeToMap(offsetMmLoc.X + building.MapPosition.X - (float)Math.Floor(buildingRect.Width / 2.0));
+                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.MapPosition.Y - (float)Math.Floor(buildingRect.Height / 2.0));
 
                         if (this.ScreenBounds.Contains(screenX, screenY))
                             b.Draw(this.BuildingMarkers, new Vector2(screenX, screenY), buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);

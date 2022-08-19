@@ -13,6 +13,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
@@ -26,7 +27,8 @@ namespace NPCMapLocations
         /*********
         ** Fields
         *********/
-        private static readonly Dictionary<string, KeyValuePair<string, Vector2>> FarmBuildings = new();
+        /// <summary>The map markers for farm buildings, indexed by the interior unique name.</summary>
+        private static readonly Dictionary<string, BuildingMarker> FarmBuildings = new();
 
         private readonly PerScreen<Texture2D> BuildingMarkers = new();
         private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new();
@@ -35,6 +37,9 @@ namespace NPCMapLocations
         private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new();
         private readonly PerScreen<bool> HasOpenedMap = new();
         private readonly PerScreen<bool> IsModMapOpen = new();
+
+        /// <summary>Whether to show the minimap.</summary>
+        private readonly PerScreen<bool> ShowMinimap = new();
 
         /// <summary>Scans and maps locations in the game world.</summary>
         private static LocationUtil LocationUtil;
@@ -175,8 +180,8 @@ namespace NPCMapLocations
                 if (locationExclusions?.Contains(locationName) == true || locationName.Contains("WarpRoom"))
                     return Unknown;
 
-                if (FarmBuildings.TryGetValue(locationName, out var mapLoc))
-                    return mapLoc.Value;
+                if (FarmBuildings.TryGetValue(locationName, out BuildingMarker marker))
+                    return marker.MapPosition;
 
                 // Get location of indoor location by its warp position in the outdoor location
                 if (LocationUtil.TryGetContext(locationName, out var loc)
@@ -386,6 +391,9 @@ namespace NPCMapLocations
                 if (!hostHasMod && !Context.IsMainPlayer)
                     this.Monitor.Log("Since the server host doesn't have NPC Map Locations installed, NPC locations can't be synced.", LogLevel.Warn);
             }
+
+            // enable minimap
+            this.UpdateMinimapVisibility();
         }
 
         /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
@@ -412,7 +420,7 @@ namespace NPCMapLocations
                 return;
 
             // Minimap dragging
-            if (Globals.ShowMinimap && !Globals.LockMinimapPosition && this.Minimap.Value != null)
+            if (this.ShowMinimap.Value && !Globals.LockMinimapPosition && this.Minimap.Value != null)
             {
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
@@ -429,6 +437,7 @@ namespace NPCMapLocations
             if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
             {
                 Globals.ShowMinimap = !Globals.ShowMinimap;
+                this.UpdateMinimapVisibility();
                 this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
             }
 
@@ -494,7 +503,7 @@ namespace NPCMapLocations
             // update and sync markers
             if (e.IsMultipleOf(30) && Game1.currentLocation != null && Game1.player?.currentLocation != null)
             {
-                bool updateForMinimap = Globals.ShowMinimap && this.Minimap.Value != null;
+                bool updateForMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
                 if (updateForMinimap)
                     this.Minimap.Value.Update();
                 this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
@@ -553,7 +562,7 @@ namespace NPCMapLocations
             }
 
             // handle minimap drag
-            if (Globals.ShowMinimap && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
+            if (this.ShowMinimap.Value && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
                 this.Minimap.Value.HandleMouseDrag();
 
             // toggle mod map
@@ -680,7 +689,7 @@ namespace NPCMapLocations
             if (e.IsLocalPlayer)
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
-                Globals.ShowMinimap = Globals.ShowMinimap && !this.IsLocationExcluded(e.NewLocation.Name);
+                this.UpdateMinimapVisibility(e.NewLocation);
 
                 // Check if map does not fill screen and adjust for black bars (ex. BusStop)
                 this.Minimap.Value?.CheckOffsetForMap();
@@ -692,7 +701,7 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
-            if (Context.IsWorldReady && Globals.ShowMinimap && Game1.displayHUD)
+            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
                 this.Minimap.Value?.DrawMiniMap();
         }
 
@@ -731,9 +740,6 @@ namespace NPCMapLocations
             {
                 string name = entry.Key;
                 LocationContext context = entry.Value;
-
-                if (this.IsLocationExcluded(name))
-                    continue;
 
                 string outdoorName = context.Root ?? name;
                 if (!this.MapVectors.Value.ContainsKey(outdoorName) && context.Type is not (LocationType.Building or LocationType.Room))
@@ -811,43 +817,32 @@ namespace NPCMapLocations
 
             foreach (var building in Game1.getFarm().buildings)
             {
-                if (building?.nameOfIndoorsWithoutUnique is null || building.nameOfIndoors is null or "null") // Some actually have value of "null"
+                // get building interior
+                GameLocation indoors = building?.indoors.Value;
+                if (indoors is null && building is GreenhouseBuilding && Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
+                    indoors = Game1.getLocationFromName("Greenhouse");
+                if (indoors is null)
                     continue;
 
-                var locVector = LocationToMap(
+                // get map marker position
+                Vector2 locVector = LocationToMap(
                     "Farm", // Get building position in farm
                     building.tileX.Value,
                     building.tileY.Value,
                     this.Customizations.MapVectors,
                     this.Customizations.LocationExclusions
                 );
-
-                // Using buildingType instead of nameOfIndoorsWithoutUnique because it is a better subset of currentLocation.Name 
-                // since nameOfIndoorsWithoutUnique for Barn/Coop does not use Big/Deluxe but rather the upgrade level
-                string commonName = building.buildingType.Value ?? building.nameOfIndoorsWithoutUnique;
-
-                if (commonName.Contains("Barn"))
+                if (building.buildingType.Value.Contains("Barn"))
                     locVector.Y += 3;
 
-                // Format: { uniqueName: { commonName: positionOnFarm } }
-                // buildingType will match currentLocation.Name for commonName
-                FarmBuildings[building.nameOfIndoors] =
-                  new KeyValuePair<string, Vector2>(building.buildingType.Value, locVector);
-            }
-
-            // Greenhouse unlocked after pantry bundles completed
-            if (((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).areasComplete[CommunityCenter.AREA_Pantry])
-            {
-                var greenhouseLoc = LocationToMap("Greenhouse", customMapVectors: this.Customizations.MapVectors);
-                greenhouseLoc.X -= 5 / 2 * 3;
-                greenhouseLoc.Y -= 7 / 2 * 3;
-                FarmBuildings["Greenhouse"] = new KeyValuePair<string, Vector2>("Greenhouse", greenhouseLoc);
+                // track marker
+                FarmBuildings[indoors.NameOrUniqueName] = new BuildingMarker(building.buildingType.Value, locVector);
             }
 
             // Add FarmHouse
             var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
             farmhouseLoc.X -= 6;
-            FarmBuildings["FarmHouse"] = new KeyValuePair<string, Vector2>("FarmHouse", farmhouseLoc);
+            FarmBuildings["FarmHouse"] = new("FarmHouse", farmhouseLoc);
         }
 
         // Handle keyboard/controller inputs
@@ -881,10 +876,35 @@ namespace NPCMapLocations
             }
         }
 
-        private bool IsLocationExcluded(string location)
+        /// <summary>Update the <see cref="ShowMinimap"/> value for the current location.</summary>
+        /// <param name="location">The location for which to check visibility, or <c>null</c> for the player's current location.</param>
+        private void UpdateMinimapVisibility(GameLocation location = null)
         {
-            return Globals.ShowMinimap && Globals.MinimapExclusions.Any(loc => loc != "Farm" && location.StartsWith(loc) || loc == "Farm" && location == "Farm") ||
-                     ((Globals.MinimapExclusions.Contains("Mine") || Globals.MinimapExclusions.Contains("UndergroundMine")) && location.Contains("Mine"));
+            location ??= Game1.currentLocation;
+
+            this.ShowMinimap.Value = this.IsMinimapEnabledIn(location.Name, location.IsOutdoors);
+        }
+
+        /// <summary>Get whether the minimap is enabled in the given location.</summary>
+        /// <param name="location">The location name.</param>
+        /// <param name="isOutdoors">Whether the location is outdoors.</param>
+        private bool IsMinimapEnabledIn(string location, bool isOutdoors)
+        {
+            if (!Globals.ShowMinimap)
+                return false;
+
+            if (Globals.MinimapExclusions.Contains(location))
+                return false;
+
+            if (location.StartsWith("UndergroundMine") && int.TryParse(location.Substring("UndergroundMine".Length), out int mineLevel))
+            {
+                if (Globals.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
+                    return false;
+            }
+            else if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
+                return false;
+
+            return true;
         }
 
         private void ResetMarkers()
