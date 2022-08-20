@@ -915,6 +915,10 @@ namespace NPCMapLocations
                     return false;
             }
 
+            // Deep Woods mod
+            if ((location == "DeepWoods" || location.StartsWith("DeepWoods_")) && Globals.MinimapExclusions.Contains("DeepWoods"))
+                return false;
+
             // indoors/outdoors
             if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
                 return false;
