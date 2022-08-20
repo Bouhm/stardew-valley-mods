@@ -893,14 +893,29 @@ namespace NPCMapLocations
             if (!Globals.ShowMinimap)
                 return false;
 
+            // by exact name
             if (Globals.MinimapExclusions.Contains(location))
                 return false;
 
+            // mine entrances
+            switch (location.ToLower())
+            {
+                case "mine" when Globals.MinimapExclusions.Contains("Mines"):
+                    return false;
+
+                // skull cavern entrance
+                case "skullcave" when Globals.MinimapExclusions.Contains("SkullCavern"):
+                    return false;
+            }
+
+            // mine levels
             if (location.StartsWith("UndergroundMine") && int.TryParse(location.Substring("UndergroundMine".Length), out int mineLevel))
             {
                 if (Globals.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
                     return false;
             }
+
+            // indoors/outdoors
             else if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
                 return false;
 
