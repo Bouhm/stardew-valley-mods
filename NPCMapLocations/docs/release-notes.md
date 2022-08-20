@@ -3,7 +3,8 @@
 # Release notes
 ## Upcoming release
 * Fixed `MinimapExclusions` option...
-  * not applying `Mines` or `SkullCavern` values to their entrances.
+  * not applying `Mines` or `SkullCavern` values to their entrances;
+  * not applying `Indoors` to mine levels.
 
 ## 2.10.1
 Released 18 August 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.

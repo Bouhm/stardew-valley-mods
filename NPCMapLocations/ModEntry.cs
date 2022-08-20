@@ -916,7 +916,7 @@ namespace NPCMapLocations
             }
 
             // indoors/outdoors
-            else if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
+            if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
                 return false;
 
             return true;
