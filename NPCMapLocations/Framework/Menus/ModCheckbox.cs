@@ -22,8 +22,8 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Public methods
         *********/
-        public ModCheckbox(string label, int whichOption, int x, int y, KeyValuePair<string, NpcMarker>[] npcMarkers = null)
-            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public ModCheckbox(string label, int whichOption, KeyValuePair<string, NpcMarker>[] npcMarkers = null)
+            : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
             this.NpcMarkers = npcMarkers;
 

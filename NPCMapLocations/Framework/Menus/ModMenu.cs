@@ -101,8 +101,8 @@ namespace NPCMapLocations.Framework.Menus
                 heights.Add(45 + j * 15);
 
             this.Options.Add(new OptionsElement(I18n.Minimap_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Locked(), 5, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0));
+            this.Options.Add(new ModCheckbox(I18n.Minimap_Locked(), 5));
             this.Options.Add(new ModPlusMinus(I18n.Minimap_Width(), 1, widths));
             this.Options.Add(new ModPlusMinus(I18n.Minimap_Height(), 2, heights));
 
@@ -115,15 +115,15 @@ namespace NPCMapLocations.Framework.Menus
             this.Options.Add(this.ImmersionButton2);
             this.Options.Add(this.ImmersionButton3);
 
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6));
+            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7));
             this.Options.Add(new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
             this.Options.Add(new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
 
             this.Options.Add(new OptionsElement(I18n.Extra_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12, -1, -1));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11));
+            this.Options.Add(new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12));
 
             this.Options.Add(new OptionsElement(I18n.Villagers_Label()));
 
@@ -138,13 +138,13 @@ namespace NPCMapLocations.Framework.Menus
                 if (conditionalNpcs.ContainsKey(npcMarker.Key))
                 {
                     if (conditionalNpcs[npcMarker.Key])
-                        this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
+                        this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, orderedMarkers));
                     else
                         idx++;
                 }
                 else
                 {
-                    this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
+                    this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, orderedMarkers));
                 }
             }
         }
