@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Added value to exclude the [Deep Woods](https://www.nexusmods.com/stardewvalley/mods/2571) via `MinimapExclusions` (see the [updated docs](README.md#configure)).
+* Fixed minimap visibility not updated immediately when it's toggled through the options.
 * Fixed `MinimapExclusions` option...
   * not applying `Mines` or `SkullCavern` values to their entrances;
   * not applying `Indoors` to mine levels.

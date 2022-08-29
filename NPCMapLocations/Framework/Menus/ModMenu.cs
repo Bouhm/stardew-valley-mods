@@ -22,6 +22,7 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Fields
         *********/
+        private readonly Action OnMinimapToggled;
         private readonly ClickableTextureComponent DownArrow;
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
@@ -43,9 +44,11 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Public methods
         *********/
-        public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs)
+        public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs, Action onMinimapToggled)
             : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
+            this.OnMinimapToggled = onMinimapToggled;
+
             var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom);
             this.MapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.MapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -108,7 +111,16 @@ namespace NPCMapLocations.Framework.Menus
                 new OptionsElement("NPC Map Locations"),
 
                 new OptionsElement(I18n.Minimap_Label()),
-                new ModCheckbox(I18n.Minimap_Enabled(), () => ModEntry.Globals.ShowMinimap, value => ModEntry.Globals.ShowMinimap = value, this.UpdateConfig),
+                new ModCheckbox(
+                    I18n.Minimap_Enabled(),
+                    () => ModEntry.Globals.ShowMinimap,
+                    value =>
+                    {
+                        ModEntry.Globals.ShowMinimap = value;
+                        this.OnMinimapToggled();
+                    },
+                    this.UpdateConfig
+                ),
                 new ModCheckbox(I18n.Minimap_Locked(), () => ModEntry.Globals.LockMinimapPosition, value => ModEntry.Globals.LockMinimapPosition = value, this.UpdateConfig),
                 new ModPlusMinus(I18n.Minimap_Width(), 1, widths),
                 new ModPlusMinus(I18n.Minimap_Height(), 2, heights),

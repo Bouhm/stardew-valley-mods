@@ -852,7 +852,7 @@ namespace NPCMapLocations
                 return;
 
             if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
-                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
+                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value, onMinimapToggled: () => this.UpdateMinimapVisibility());
 
             if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
                 this.ChangeTooltipConfig();
