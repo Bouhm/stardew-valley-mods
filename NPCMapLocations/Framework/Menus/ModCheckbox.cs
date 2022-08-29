@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -15,21 +14,21 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Fields
         *********/
-        private readonly KeyValuePair<string, NpcMarker>[] NpcMarkers;
+        private readonly KeyValuePair<string, NpcMarker>? NpcMarker;
         private bool IsChecked;
 
 
         /*********
         ** Public methods
         *********/
-        public ModCheckbox(string label, int whichOption, KeyValuePair<string, NpcMarker>[] npcMarkers = null)
+        public ModCheckbox(string label, int whichOption, KeyValuePair<string, NpcMarker>? npcMarker = null)
             : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
         {
-            this.NpcMarkers = npcMarkers;
+            this.NpcMarker = npcMarker;
 
             // Villager names
-            if (whichOption > 12 && npcMarkers != null)
-                this.IsChecked = !ModEntry.ShouldExcludeNpc(npcMarkers.ElementAt(whichOption - 13).Key);
+            if (whichOption > 12 && npcMarker != null)
+                this.IsChecked = !ModEntry.ShouldExcludeNpc(npcMarker.Value.Key);
             else
             {
                 this.IsChecked = whichOption switch
@@ -56,9 +55,9 @@ namespace NPCMapLocations.Framework.Menus
             int whichOption = this.whichOption;
 
             // Show/hide villager options
-            if (whichOption > 12 && this.NpcMarkers != null)
+            if (whichOption > 12 && this.NpcMarker != null)
             {
-                string name = this.NpcMarkers.ElementAt(whichOption - 13).Key;
+                string name = this.NpcMarker.Value.Key;
                 bool exclude = !this.IsChecked;
 
                 if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
@@ -104,9 +103,9 @@ namespace NPCMapLocations.Framework.Menus
                 this.IsChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
                 Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
                 0.4f);
-            if (this.whichOption > 12 && this.NpcMarkers != null)
+            if (this.whichOption > 12 && this.NpcMarker != null)
             {
-                var marker = this.NpcMarkers.ElementAt(this.whichOption - 13).Value;
+                var marker = this.NpcMarker.Value.Value;
 
                 if (this.IsChecked)
                     Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY),

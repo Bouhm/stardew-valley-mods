@@ -90,8 +90,6 @@ namespace NPCMapLocations.Framework.Menus
                 ));
             }
 
-            this.Options.Add(new OptionsElement("NPC Map Locations"));
-
             var widths = new List<int>();
             for (int i = 0; i < 16; i++)
                 widths.Add(75 + i * 15);
@@ -100,53 +98,53 @@ namespace NPCMapLocations.Framework.Menus
             for (int j = 0; j < 10; j++)
                 heights.Add(45 + j * 15);
 
-            this.Options.Add(new OptionsElement(I18n.Minimap_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Locked(), 5));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_Width(), 1, widths));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_Height(), 2, heights));
-
-            // Translate labels and initialize buttons to handle button press
-            this.Options.Add(new OptionsElement(I18n.Immersion_Label()));
             this.ImmersionButton1 = new MapModButton(I18n.Immersion_AlwaysShowVillagers(), 3, -1, -1, -1, -1);
             this.ImmersionButton2 = new MapModButton(I18n.Immersion_OnlyVillagersTalkedTo(), 4, -1, -1, -1, -1);
             this.ImmersionButton3 = new MapModButton(I18n.Immersion_HideVillagersTalkedTo(), 5, -1, -1, -1, -1);
-            this.Options.Add(this.ImmersionButton1);
-            this.Options.Add(this.ImmersionButton2);
-            this.Options.Add(this.ImmersionButton3);
 
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6));
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7));
-            this.Options.Add(new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
-            this.Options.Add(new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
-
-            this.Options.Add(new OptionsElement(I18n.Extra_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12));
-
-            this.Options.Add(new OptionsElement(I18n.Villagers_Label()));
-
-            var orderedMarkers = npcMarkers
-              .Where(p => p.Value.Sprite != null && p.Value.Type == CharacterType.Villager)
-              .OrderBy(p => p.Value.DisplayName)
-              .ToArray();
-
-            int idx = 13;
-            foreach (var npcMarker in orderedMarkers)
+            this.Options.AddRange(new[]
             {
-                if (conditionalNpcs.ContainsKey(npcMarker.Key))
-                {
-                    if (conditionalNpcs[npcMarker.Key])
-                        this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, orderedMarkers));
-                    else
-                        idx++;
-                }
-                else
-                {
-                    this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, orderedMarkers));
-                }
-            }
+                new OptionsElement("NPC Map Locations"),
+
+                new OptionsElement(I18n.Minimap_Label()),
+                new ModCheckbox(I18n.Minimap_Enabled(), 0),
+                new ModCheckbox(I18n.Minimap_Locked(), 5),
+                new ModPlusMinus(I18n.Minimap_Width(), 1, widths),
+                new ModPlusMinus(I18n.Minimap_Height(), 2, heights),
+
+                new OptionsElement(I18n.Immersion_Label()),
+                this.ImmersionButton1,
+                this.ImmersionButton2,
+                this.ImmersionButton3,
+
+                new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6),
+                new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7),
+                new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
+                new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
+
+                new OptionsElement(I18n.Extra_Label()),
+                new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10),
+                new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11),
+                new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12),
+
+                new OptionsElement(I18n.Villagers_Label())
+            });
+
+            int markerOption = 13;
+            this.Options.AddRange(
+                from entry in npcMarkers
+                let name = entry.Key
+                let marker = entry.Value
+
+                where
+                    marker.Sprite != null
+                    && marker.Type == CharacterType.Villager
+                    && (!conditionalNpcs.TryGetValue(name, out bool enabled) || enabled)
+
+                orderby marker.DisplayName
+
+                select new ModCheckbox(marker.DisplayName, markerOption++, entry)
+            );
         }
 
         // Override snappy controls on controller
