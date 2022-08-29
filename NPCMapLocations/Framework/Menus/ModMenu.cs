@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NPCMapLocations.Framework.Models;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -107,8 +108,8 @@ namespace NPCMapLocations.Framework.Menus
                 new OptionsElement("NPC Map Locations"),
 
                 new OptionsElement(I18n.Minimap_Label()),
-                new ModCheckbox(I18n.Minimap_Enabled(), 0),
-                new ModCheckbox(I18n.Minimap_Locked(), 5),
+                new ModCheckbox(I18n.Minimap_Enabled(), () => ModEntry.Globals.ShowMinimap, value => ModEntry.Globals.ShowMinimap = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Minimap_Locked(), () => ModEntry.Globals.LockMinimapPosition, value => ModEntry.Globals.LockMinimapPosition = value, this.UpdateConfig),
                 new ModPlusMinus(I18n.Minimap_Width(), 1, widths),
                 new ModPlusMinus(I18n.Minimap_Height(), 2, heights),
 
@@ -117,15 +118,15 @@ namespace NPCMapLocations.Framework.Menus
                 this.ImmersionButton2,
                 this.ImmersionButton3,
 
-                new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6),
-                new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7),
+                new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), () => ModEntry.Globals.OnlySameLocation, value => ModEntry.Globals.OnlySameLocation = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), () => ModEntry.Config.ByHeartLevel, value => ModEntry.Config.ByHeartLevel = value, this.UpdateConfig),
                 new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
                 new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
 
                 new OptionsElement(I18n.Extra_Label()),
-                new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10),
-                new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11),
-                new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12),
+                new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), () => ModEntry.Globals.ShowQuests, value => ModEntry.Globals.ShowQuests = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), () => ModEntry.Globals.ShowHiddenVillagers, value => ModEntry.Globals.ShowHiddenVillagers = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), () => ModEntry.Globals.ShowTravelingMerchant, value => ModEntry.Globals.ShowTravelingMerchant = value, this.UpdateConfig),
 
                 new OptionsElement(I18n.Villagers_Label())
             });
@@ -143,7 +144,19 @@ namespace NPCMapLocations.Framework.Menus
 
                 orderby marker.DisplayName
 
-                select new ModCheckbox(marker.DisplayName, markerOption++, entry)
+                select new ModCheckbox(
+                    marker.DisplayName,
+                    () => !ModEntry.ShouldExcludeNpc(name),
+                    value =>
+                    {
+                        bool exclude = !value;
+                        if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
+                            ModEntry.Config.ForceNpcVisibility.Remove(name);
+                        else
+                            ModEntry.Config.ForceNpcVisibility[name] = exclude;
+                    },
+                    this.UpdateConfig
+                )
             );
         }
 
@@ -402,6 +415,13 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Private methods
         *********/
+        /// <summary>Update the mod config files.</summary>
+        private void UpdateConfig()
+        {
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        }
+
         private void SetScrollBarToCurrentIndex()
         {
             if (this.Options.Any())

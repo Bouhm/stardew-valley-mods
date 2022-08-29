@@ -1,129 +1,85 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework.Menus
 {
-    // Mod checkbox for settings and npc blacklist
+    /// <summary>A checkbox nod option.</summary>
     internal class ModCheckbox : OptionsElement
     {
         /*********
         ** Fields
         *********/
-        private readonly KeyValuePair<string, NpcMarker>? NpcMarker;
+        /// <summary>Get the current option value.</summary>
+        private readonly Func<bool> GetValue;
+
+        /// <summary>Set the new option value.</summary>
+        private readonly Action<bool> SetValue;
+
+        /// <summary>Update the configuration after the checkbox value changes.</summary>
+        private readonly Action UpdateConfig;
+
+        /// <summary>The NPC marker and name to draw, if applicable.</summary>
+        private readonly NpcMarker NpcMarker;
+
+        /// <summary>Whether the checkbox is toggled true.</summary>
         private bool IsChecked;
 
 
         /*********
         ** Public methods
         *********/
-        public ModCheckbox(string label, int whichOption, KeyValuePair<string, NpcMarker>? npcMarker = null)
-            : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        /// <summary>Construct an instance.</summary>
+        /// <param name="label">The display text.</param>
+        /// <param name="getValue">Get the current option value.</param>
+        /// <param name="setValue">Set the new option value.</param>
+        /// <param name="updateConfig">Update the configuration after the checkbox value changes.</param>
+        /// <param name="npcMarker">The NPC marker and name to draw, if applicable.</param>
+        public ModCheckbox(string label, Func<bool> getValue, Action<bool> setValue, Action updateConfig, NpcMarker npcMarker = null)
+            : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, 0)
         {
+            this.GetValue = getValue;
+            this.SetValue = setValue;
+            this.UpdateConfig = updateConfig;
             this.NpcMarker = npcMarker;
 
-            // Villager names
-            if (whichOption > 12 && npcMarker != null)
-                this.IsChecked = !ModEntry.ShouldExcludeNpc(npcMarker.Value.Key);
-            else
-            {
-                this.IsChecked = whichOption switch
-                {
-                    0 => ModEntry.Globals.ShowMinimap,
-                    5 => ModEntry.Globals.LockMinimapPosition,
-                    6 => ModEntry.Globals.OnlySameLocation,
-                    7 => ModEntry.Config.ByHeartLevel,
-                    10 => ModEntry.Globals.ShowQuests,
-                    11 => ModEntry.Globals.ShowHiddenVillagers,
-                    12 => ModEntry.Globals.ShowTravelingMerchant,
-                    _ => false
-                };
-            }
+            this.IsChecked = getValue();
         }
 
+        /// <inheritdoc />
         public override void receiveLeftClick(int x, int y)
         {
             if (this.greyedOut)
                 return;
 
             base.receiveLeftClick(x, y);
-            this.IsChecked = !this.IsChecked;
-            int whichOption = this.whichOption;
 
-            // Show/hide villager options
-            if (whichOption > 12 && this.NpcMarker != null)
-            {
-                string name = this.NpcMarker.Value.Key;
-                bool exclude = !this.IsChecked;
+            this.SetValue(!this.IsChecked);
+            this.IsChecked = this.GetValue();
 
-                if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
-                    ModEntry.Config.ForceNpcVisibility.Remove(name);
-                else
-                    ModEntry.Config.ForceNpcVisibility[name] = exclude;
-            }
-            else
-            {
-                switch (whichOption)
-                {
-                    case 0:
-                        ModEntry.Globals.ShowMinimap = this.IsChecked;
-                        break;
-                    case 5:
-                        ModEntry.Globals.LockMinimapPosition = this.IsChecked;
-                        break;
-                    case 6:
-                        ModEntry.Globals.OnlySameLocation = this.IsChecked;
-                        break;
-                    case 7:
-                        ModEntry.Config.ByHeartLevel = this.IsChecked;
-                        break;
-                    case 10:
-                        ModEntry.Globals.ShowQuests = this.IsChecked;
-                        break;
-                    case 11:
-                        ModEntry.Globals.ShowHiddenVillagers = this.IsChecked;
-                        break;
-                    case 12:
-                        ModEntry.Globals.ShowTravelingMerchant = this.IsChecked;
-                        break;
-                }
-            }
-
-            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+            this.UpdateConfig();
         }
 
+        /// <inheritdoc />
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.bounds.X, slotY + this.bounds.Y),
-                this.IsChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
-                Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
-                0.4f);
-            if (this.whichOption > 12 && this.NpcMarker != null)
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + this.bounds.X, slotY + this.bounds.Y), this.IsChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked, Color.White * (this.greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+
+            if (this.NpcMarker != null)
             {
-                var marker = this.NpcMarker.Value.Value;
+                var marker = this.NpcMarker;
 
-                if (this.IsChecked)
-                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY),
-                        new Rectangle(0, marker.CropOffset, 16, 15), Color.White, 0f, Vector2.Zero,
-                        Game1.pixelZoom, SpriteEffects.None, 0.4f);
-                else
-                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY),
-                        new Rectangle(0, marker.CropOffset, 16, 15), Color.White * 0.33f, 0f, Vector2.Zero,
-                        Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                // draw icon
+                Color color = this.IsChecked
+                    ? Color.White
+                    : Color.White * 0.33f;
+                Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle(0, marker.CropOffset, 16, 15), color, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
 
-                // Draw names
+                // Draw name
                 slotX += 75;
-                if (this.whichOption == -1)
-                    SpriteText.drawString(b, this.label, slotX + this.bounds.X, slotY + this.bounds.Y + 12, 999, -1, 999, 1f, 0.1f);
-                else
-                    Utility.drawTextWithShadow(b, marker.DisplayName, Game1.dialogueFont,
-                        new Vector2(slotX + this.bounds.X + this.bounds.Width + 8, slotY + this.bounds.Y),
-                        this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f);
+                Utility.drawTextWithShadow(b, marker.DisplayName, Game1.dialogueFont, new Vector2(slotX + this.bounds.X + this.bounds.Width + 8, slotY + this.bounds.Y), this.greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f);
             }
             else
             {
