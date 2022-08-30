@@ -852,7 +852,7 @@ namespace NPCMapLocations
                 return;
 
             if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
-                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value);
+                Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value, onMinimapToggled: () => this.UpdateMinimapVisibility());
 
             if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
                 this.ChangeTooltipConfig();
@@ -893,15 +893,34 @@ namespace NPCMapLocations
             if (!Globals.ShowMinimap)
                 return false;
 
+            // by exact name
             if (Globals.MinimapExclusions.Contains(location))
                 return false;
 
+            // mine entrances
+            switch (location.ToLower())
+            {
+                case "mine" when Globals.MinimapExclusions.Contains("Mines"):
+                    return false;
+
+                // skull cavern entrance
+                case "skullcave" when Globals.MinimapExclusions.Contains("SkullCavern"):
+                    return false;
+            }
+
+            // mine levels
             if (location.StartsWith("UndergroundMine") && int.TryParse(location.Substring("UndergroundMine".Length), out int mineLevel))
             {
                 if (Globals.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
                     return false;
             }
-            else if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
+
+            // Deep Woods mod
+            if ((location == "DeepWoods" || location.StartsWith("DeepWoods_")) && Globals.MinimapExclusions.Contains("DeepWoods"))
+                return false;
+
+            // indoors/outdoors
+            if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
                 return false;
 
             return true;

@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NPCMapLocations.Framework.Models;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -21,6 +22,7 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Fields
         *********/
+        private readonly Action OnMinimapToggled;
         private readonly ClickableTextureComponent DownArrow;
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
@@ -42,9 +44,11 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Public methods
         *********/
-        public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs)
+        public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs, Action onMinimapToggled)
             : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
+            this.OnMinimapToggled = onMinimapToggled;
+
             var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom);
             this.MapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.MapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -90,8 +94,6 @@ namespace NPCMapLocations.Framework.Menus
                 ));
             }
 
-            this.Options.Add(new OptionsElement("NPC Map Locations"));
-
             var widths = new List<int>();
             for (int i = 0; i < 16; i++)
                 widths.Add(75 + i * 15);
@@ -100,53 +102,74 @@ namespace NPCMapLocations.Framework.Menus
             for (int j = 0; j < 10; j++)
                 heights.Add(45 + j * 15);
 
-            this.Options.Add(new OptionsElement(I18n.Minimap_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Enabled(), 0, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Minimap_Locked(), 5, -1, -1));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_Width(), 1, widths));
-            this.Options.Add(new ModPlusMinus(I18n.Minimap_Height(), 2, heights));
-
-            // Translate labels and initialize buttons to handle button press
-            this.Options.Add(new OptionsElement(I18n.Immersion_Label()));
             this.ImmersionButton1 = new MapModButton(I18n.Immersion_AlwaysShowVillagers(), 3, -1, -1, -1, -1);
             this.ImmersionButton2 = new MapModButton(I18n.Immersion_OnlyVillagersTalkedTo(), 4, -1, -1, -1, -1);
             this.ImmersionButton3 = new MapModButton(I18n.Immersion_HideVillagersTalkedTo(), 5, -1, -1, -1, -1);
-            this.Options.Add(this.ImmersionButton1);
-            this.Options.Add(this.ImmersionButton2);
-            this.Options.Add(this.ImmersionButton3);
 
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), 6, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), 7, -1, -1));
-            this.Options.Add(new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
-            this.Options.Add(new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel));
-
-            this.Options.Add(new OptionsElement(I18n.Extra_Label()));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), 10, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), 11, -1, -1));
-            this.Options.Add(new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), 12, -1, -1));
-
-            this.Options.Add(new OptionsElement(I18n.Villagers_Label()));
-
-            var orderedMarkers = npcMarkers
-              .Where(p => p.Value.Sprite != null && p.Value.Type == CharacterType.Villager)
-              .OrderBy(p => p.Value.DisplayName)
-              .ToArray();
-
-            int idx = 13;
-            foreach (var npcMarker in orderedMarkers)
+            this.Options.AddRange(new[]
             {
-                if (conditionalNpcs.ContainsKey(npcMarker.Key))
-                {
-                    if (conditionalNpcs[npcMarker.Key])
-                        this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
-                    else
-                        idx++;
-                }
-                else
-                {
-                    this.Options.Add(new ModCheckbox(npcMarker.Value.DisplayName, idx++, -1, -1, orderedMarkers));
-                }
-            }
+                new OptionsElement("NPC Map Locations"),
+
+                new OptionsElement(I18n.Minimap_Label()),
+                new ModCheckbox(
+                    I18n.Minimap_Enabled(),
+                    () => ModEntry.Globals.ShowMinimap,
+                    value =>
+                    {
+                        ModEntry.Globals.ShowMinimap = value;
+                        this.OnMinimapToggled();
+                    },
+                    this.UpdateConfig
+                ),
+                new ModCheckbox(I18n.Minimap_Locked(), () => ModEntry.Globals.LockMinimapPosition, value => ModEntry.Globals.LockMinimapPosition = value, this.UpdateConfig),
+                new ModPlusMinus(I18n.Minimap_Width(), 1, widths),
+                new ModPlusMinus(I18n.Minimap_Height(), 2, heights),
+
+                new OptionsElement(I18n.Immersion_Label()),
+                this.ImmersionButton1,
+                this.ImmersionButton2,
+                this.ImmersionButton3,
+
+                new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), () => ModEntry.Globals.OnlySameLocation, value => ModEntry.Globals.OnlySameLocation = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), () => ModEntry.Config.ByHeartLevel, value => ModEntry.Config.ByHeartLevel = value, this.UpdateConfig),
+                new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
+                new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
+
+                new OptionsElement(I18n.Extra_Label()),
+                new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), () => ModEntry.Globals.ShowQuests, value => ModEntry.Globals.ShowQuests = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), () => ModEntry.Globals.ShowHiddenVillagers, value => ModEntry.Globals.ShowHiddenVillagers = value, this.UpdateConfig),
+                new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), () => ModEntry.Globals.ShowTravelingMerchant, value => ModEntry.Globals.ShowTravelingMerchant = value, this.UpdateConfig),
+
+                new OptionsElement(I18n.Villagers_Label())
+            });
+
+            int markerOption = 13;
+            this.Options.AddRange(
+                from entry in npcMarkers
+                let name = entry.Key
+                let marker = entry.Value
+
+                where
+                    marker.Sprite != null
+                    && marker.Type == CharacterType.Villager
+                    && (!conditionalNpcs.TryGetValue(name, out bool enabled) || enabled)
+
+                orderby marker.DisplayName
+
+                select new ModCheckbox(
+                    marker.DisplayName,
+                    () => !ModEntry.ShouldExcludeNpc(name),
+                    value =>
+                    {
+                        bool exclude = !value;
+                        if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
+                            ModEntry.Config.ForceNpcVisibility.Remove(name);
+                        else
+                            ModEntry.Config.ForceNpcVisibility[name] = exclude;
+                    },
+                    this.UpdateConfig
+                )
+            );
         }
 
         // Override snappy controls on controller
@@ -404,6 +427,13 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Private methods
         *********/
+        /// <summary>Update the mod config files.</summary>
+        private void UpdateConfig()
+        {
+            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        }
+
         private void SetScrollBarToCurrentIndex()
         {
             if (this.Options.Any())
