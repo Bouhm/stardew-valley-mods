@@ -1,8 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
-* Added value to exclude the [Deep Woods](https://www.nexusmods.com/stardewvalley/mods/2571) via `MinimapExclusions` (see the [updated docs](README.md#configure)).
+## 2.11.0
+Released 29 August 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
+* Added `DeepWoods` option to `MinimapExclusions` which excludes all areas in the the [Deep Woods](https://www.nexusmods.com/stardewvalley/mods/2571).
 * Fixed minimap visibility not updated immediately when it's toggled through the options.
 * Fixed `MinimapExclusions` option...
   * not applying `Mines` or `SkullCavern` values to their entrances;
