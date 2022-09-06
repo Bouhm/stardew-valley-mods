@@ -5,7 +5,7 @@
     // minimap section
     "minimap.label": "Mini harita",
     "minimap.enabled": "Etkin",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "Mini harita konumunu kilitle",
     "minimap.width": "Mini harita genişliği",
     "minimap.height": "Mini harita uzunluğu",
 
