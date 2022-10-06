@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed support for UI scaling.
 * Improved translations. Thanks to salihnayc (updated Turkish)!
 
 ## 2.11.0

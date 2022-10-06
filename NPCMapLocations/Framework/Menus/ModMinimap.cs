@@ -81,7 +81,7 @@ namespace NPCMapLocations.Framework.Menus
         {
             return
                 !ModEntry.Globals.LockMinimapPosition
-                && this.ScreenBounds.Contains(Game1.getMousePosition());
+                && this.ScreenBounds.Contains(MouseUtil.GetScreenPoint());
         }
 
         public void HandleMouseDown()
@@ -105,9 +105,10 @@ namespace NPCMapLocations.Framework.Menus
                 // else move minimap
                 else
                 {
+                    var mousePos = MouseUtil.GetScreenPosition();
                     this.ScreenBounds.SetDesiredBounds(
-                        x: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmX + Game1.getMouseX() - MouseUtil.BeginMousePosition.X, this.BorderWidth, Game1.viewport.Width - this.ScreenBounds.Width - this.BorderWidth)),
-                        y: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmY + Game1.getMouseY() - MouseUtil.BeginMousePosition.Y, this.BorderWidth, Game1.viewport.Height - this.ScreenBounds.Height - this.BorderWidth))
+                        x: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmX + mousePos.X - MouseUtil.BeginMousePosition.X, this.BorderWidth, Game1.uiViewport.Width - this.ScreenBounds.Width - this.BorderWidth)),
+                        y: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmY + mousePos.Y - MouseUtil.BeginMousePosition.Y, this.BorderWidth, Game1.uiViewport.Height - this.ScreenBounds.Height - this.BorderWidth))
                     );
                 }
             }
@@ -141,7 +142,7 @@ namespace NPCMapLocations.Framework.Menus
             // When ModMain.Map is smaller than viewport (ex. Bus Stop)
             if (Game1.isOutdoorMapSmallerThanViewport())
             {
-                this.Offset = (Game1.viewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
+                this.Offset = (Game1.uiViewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
 
                 if (this.ScreenBounds.X > Math.Max(12, this.Offset))
                     this.Offset = 0;
