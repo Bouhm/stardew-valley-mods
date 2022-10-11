@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.11.1
+Released 10 October 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
 * Fixed support for UI scaling.
 * Improved translations. Thanks to salihnayc (updated Turkish)!
 
