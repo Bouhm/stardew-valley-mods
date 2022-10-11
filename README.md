@@ -38,7 +38,7 @@ Portuguese  | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓
 Russian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ru.json)
 Spanish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/es.json)
 [Thai]      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/th.json) | [✓](NPCMapLocations/i18n/th.json)
-Turkish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/tr.json)
+Turkish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/tr.json)
 [Ukrainian] | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/uk.json) | [✓](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616

@@ -36,27 +36,44 @@ namespace NPCMapLocations.Framework
         /// <summary>Get the pixel position of the cursor on the map, relative to the top-left corner of the map.</summary>
         public static Vector2 GetMapPositionAtCursor()
         {
+            Vector2 mousePos = MouseUtil.GetScreenPosition();
             Vector2 mapPos = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
-            return new Vector2((int)(Math.Ceiling(Game1.getMousePosition().X - mapPos.X)), (int)(Math.Ceiling(Game1.getMousePosition().Y - mapPos.Y)));
+            return new Vector2((int)(Math.Ceiling(mousePos.X - mapPos.X)), (int)(Math.Ceiling(mousePos.Y - mapPos.Y)));
         }
 
         /// <summary>Track the start of a possible mouse click &amp; drag.</summary>
         public static void HandleMouseDown()
         {
-            BeginMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+            BeginMousePosition = MouseUtil.GetScreenPosition();
         }
 
         /// <summary>Track the end of a possible mouse click &amp; drag.</summary>
         public static void HandleMouseRelease()
         {
-            EndMousePosition = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+            EndMousePosition = MouseUtil.GetScreenPosition();
+        }
+
+        /// <summary>Get the current mouse position on the screen as a vector.</summary>
+        /// <param name="uiScale">Whether to apply UI scaling to the position.</param>
+        public static Vector2 GetScreenPosition(bool uiScale = true)
+        {
+            return new Vector2(Game1.getMouseX(uiScale), Game1.getMouseY(uiScale));
+        }
+
+        /// <summary>Get the current mouse position on the screen as a point.</summary>
+        /// <param name="uiScale">Whether to apply UI scaling to the position.</param>
+        public static Point GetScreenPoint(bool uiScale = true)
+        {
+            return Game1.getMousePosition(uiScale);
         }
 
         /// <summary>Get the area which the player is currently clicking &amp; dragging.</summary>
         /// <remarks>This assumes <see cref="HandleMouseDown"/> was called and the player is still dragging.</remarks>
         public static Rectangle GetCurrentDraggingArea()
         {
-            return new((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(Game1.getMouseX() - BeginMousePosition.X), (int)(Game1.getMouseY() - BeginMousePosition.Y));
+            var mousePos = MouseUtil.GetScreenPosition();
+
+            return new((int)BeginMousePosition.X, (int)BeginMousePosition.Y, (int)(mousePos.X - BeginMousePosition.X), (int)(mousePos.Y - BeginMousePosition.Y));
         }
 
         /// <summary>Get the area which the player last clicked &amp; dragged.</summary>

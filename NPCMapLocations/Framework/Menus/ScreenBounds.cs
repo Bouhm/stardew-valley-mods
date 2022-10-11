@@ -116,8 +116,8 @@ namespace NPCMapLocations.Framework.Menus
         private Rectangle GetActualBounds(Rectangle configured)
         {
             // get screen size
-            int screenWidth = Game1.viewport.Width;
-            int screenHeight = Game1.viewport.Height;
+            int screenWidth = Game1.uiViewport.Width;
+            int screenHeight = Game1.uiViewport.Height;
 
             // get valid position & size values
             Rectangle bounds = new(
