@@ -1,0 +1,35 @@
+{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Field names & tooltips
+    ****/
+    "config.breed1.name": "Raça de cachorro 1",
+    "config.breed1.description": "A raça de cachorro a ser mostrada no jogo para a primeira raça de cachorro.",
+
+    "config.breed2.name": "Raça de cachorro 2",
+    "config.breed2.description": "A raça de cachorro a ser mostrada no jogo para a segunda raça de cachorro.",
+
+    "config.breed3.name": "Raça de cachorro 3",
+    "config.breed3.description": "A raça de cachorro a ser mostrada no jogo para a terceira raça de cachorro.",
+
+    /****
+    ** Dropdown values
+    ****/
+    "config.breed1.values.shibainu": "Shiba Inu",
+    "config.breed2.values.shibainu": "Shiba Inu",
+    "config.breed3.values.shibainu": "Shiba Inu",
+
+    "config.breed1.values.shepherd": "Pastor Alemão",
+    "config.breed2.values.shepherd": "Pastor Alemão",
+    "config.breed3.values.shepherd": "Pastor Alemão",
+
+    "config.breed1.values.husky": "Husky",
+    "config.breed2.values.husky": "Husky",
+    "config.breed3.values.husky": "Husky",
+
+    "config.breed1.values.Nenhuma": "Nenhuma",
+    "config.breed2.values.Nenhuma": "Nenhuma",
+    "config.breed3.values.Nenhuma": "Nenhuma"
+}
