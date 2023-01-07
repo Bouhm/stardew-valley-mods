@@ -26,7 +26,7 @@ on the wiki for help contributing translations.
 
 &nbsp;      | Bouhm's Pet Dogs                                          | NPC Map Locations
 :---------- | :-------------------------------------------------------- | :--------------------------------
-Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/zh.json)
+Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/zh.json)
 French      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/fr.json) | [✓](NPCMapLocations/i18n/fr.json)
 German      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/de.json)
 Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
