@@ -1,11 +1,13 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.0.4
+Released 09 January 2023 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
+
 * Improved translations. Thanks to axellslade (added Portuguese)!
 
 ## 2.0.3
-Released 18 August 2022 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+Released 18 August 2022 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
 
 * Improved translations. Thanks to ChulkyBow (added Ukrainian), JoachimBrasier (added French), and Patrxgt (added Polish)!
 
