@@ -64,10 +64,6 @@ setting            | what it affects
   are options in UI Info Suite and Foxyfficiency to disable just the NPC tracking (look at the
   respective mod pages for more info).
 
-* **Why does the game freeze or show a black screen on Linux/macOS?**  
-  You can [update or reinstall Mono](https://www.mono-project.com/download/stable) to fix that.
-  Mono is a SMAPI prerequisite on Linux/macOS.
-
 * **Does the redrawn map work with map recolors?**  
   Yep, the mod has compatibility patches included for most of the popular recolors.
 
@@ -76,7 +72,8 @@ setting            | what it affects
 them. See the [author guide](author-guide.md) for more info.
 
 ## Compatibility
-Compatible with Stardew Valley 1.5+ on Linux/macOS/Windows, both single-player and multiplayer.
+Compatible with Stardew Valley 1.5.6+ on Linux/macOS/Windows, both single-player and multiplayer.
+
 The mod is compatible with **lots** of NPC/map mods with futureproofing.
 
 **In multiplayer, the mod will only work if the host player has it installed.**
