@@ -1,15 +1,15 @@
 ﻿{
     /*********
-    ** Map options
+    ** Map options (地图选项)
     *********/
-    // minimap section
+    // minimap section (小地图选项)
     "minimap.label": "小地图",
     "minimap.enabled": "启用",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "锁定小地图位置",
     "minimap.width": "小地图宽",
     "minimap.height": "小地图高",
 
-    // immersion section
+    // immersion section (拟真体验选项)
     "immersion.label": "设置:",
     "immersion.always-show-villagers": "展示所有村民",
     "immersion.only-villagers-talked-to": "显示所有说话的村民",
@@ -19,12 +19,12 @@
     "immersion.min-heart-level": "最小好感度",
     "immersion.max-heart-level": "最大好感度",
 
-    // extra settings section
+    // extra settings section (额外设置选项)
     "extra.label": "额外设定:",
     "extra.show-quests-or-birthdays": "显示任务或生日",
     "extra.show-hidden-villagers": "显示隐藏的村民",
     "extra.show-traveling-merchant": "显示旅行商人",
 
-    // include/exclude villagers section
+    // include/exclude villagers section (包含/排除 村民选项)
     "villagers.label": "包含村民清单:"
 }
