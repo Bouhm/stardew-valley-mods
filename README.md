@@ -29,7 +29,7 @@ on the wiki for help contributing translations.
 Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/zh.json)
 French      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/fr.json) | [✓](NPCMapLocations/i18n/fr.json)
 German      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/de.json)
-Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
+Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/hu.json)
 Italian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/it.json)
 Japanese    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ja.json)
 Korean      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ko.json)

@@ -1,15 +1,15 @@
 ﻿{
     /*********
-    ** Map options
+    ** Map options (Térkép beállítások)
     *********/
-    // minimap section
+    // minimap section (Kistárkép szakasz)
     "minimap.label": "Kistérkép",
     "minimap.enabled": "Engedélyezve",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "Kistérkép pozíció zárolás",
     "minimap.width": "Kistérkép szélesség",
     "minimap.height": "Kistérkép magasság",
 
-    // immersion section
+    // immersion section (Merülő szakasz)
     "immersion.label": "Beállítások:",
     "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
     "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
@@ -19,12 +19,12 @@
     "immersion.min-heart-level": "Minimális szívszint",
     "immersion.max-heart-level": "Maximális szívszint",
 
-    // extra settings section
+    // extra settings section (Extra beállítások szakasz)
     "extra.label": "További beállítások:",
     "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
     "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
     "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
 
-    // include/exclude villagers section
+    // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
     "villagers.label": "Falusiak Engedélyezése/Kizárása:"
 }
