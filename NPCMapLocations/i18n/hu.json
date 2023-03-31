@@ -1,30 +1,30 @@
-{
-	/*********
-	** Térkép beállítások
-	*********/
-	// Kistárkép szakasz
-	"minimap.label": "Kistérkép",
-	"minimap.enabled": "Engedélyezve",
-	"minimap.locked": "Kistérkép pozíció zárolás",
-	"minimap.width": "Kistérkép szélesség",
-	"minimap.height": "Kistérkép magasság",
+﻿{
+    /*********
+    ** Map options (Térkép beállítások)
+    *********/
+    // minimap section (Kistárkép szakasz)
+    "minimap.label": "Kistérkép",
+    "minimap.enabled": "Engedélyezve",
+    "minimap.locked": "Kistérkép pozíció zárolás",
+    "minimap.width": "Kistérkép szélesség",
+    "minimap.height": "Kistérkép magasság",
 
-	// Merülő szakasz
-	"immersion.label": "Beállítások:",
-	"immersion.always-show-villagers": "Mindig mutassa a falusiakat",
-	"immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
-	"immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
-	"immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
-	"immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
-	"immersion.min-heart-level": "Minimális szívszint",
-	"immersion.max-heart-level": "Maximális szívszint",
+    // immersion section (Merülő szakasz)
+    "immersion.label": "Beállítások:",
+    "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
+    "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
+    "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
+    "immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
+    "immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
+    "immersion.min-heart-level": "Minimális szívszint",
+    "immersion.max-heart-level": "Maximális szívszint",
 
-	// Extra beállítások szakasz
-	"extra.label": "További beállítások:",
-	"extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
-	"extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
-	"extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
+    // extra settings section (Extra beállítások szakasz)
+    "extra.label": "További beállítások:",
+    "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
+    "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
+    "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
 
-	// Falusiak engedélyezése/kizárása szakasz
-	"villagers.label": "Falusiak Engedélyezése/Kizárása:"
+    // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
+    "villagers.label": "Falusiak Engedélyezése/Kizárása:"
 }
