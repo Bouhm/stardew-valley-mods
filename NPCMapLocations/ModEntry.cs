@@ -660,7 +660,6 @@ namespace NPCMapLocations
             this.UpdateMarkers(true);
             this.UpdateFarmBuildingLocations();
             this.Minimap.Value?.OnWindowResized();
-            this.Minimap.Value?.CheckOffsetForMap();
 
             if (this.IsModMapOpen.Value)
                 this.OpenModMap();
@@ -690,9 +689,6 @@ namespace NPCMapLocations
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
                 this.UpdateMinimapVisibility(e.NewLocation);
-
-                // Check if map does not fill screen and adjust for black bars (ex. BusStop)
-                this.Minimap.Value?.CheckOffsetForMap();
             }
         }
 

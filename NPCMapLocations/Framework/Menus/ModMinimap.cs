@@ -31,7 +31,6 @@ namespace NPCMapLocations.Framework.Menus
         private readonly ScreenBounds ScreenBounds;
 
         private Vector2 MmLoc; // minimap location relative to map location
-        private int Offset; // offset for minimap if viewport changed
         private readonly Dictionary<string, NpcMarker> NpcMarkers;
         private Vector2 PlayerLoc;
         private int PrevMmX;
@@ -137,20 +136,6 @@ namespace NPCMapLocations.Framework.Menus
             this.ScreenBounds.Recalculate();
         }
 
-        public void CheckOffsetForMap()
-        {
-            // When ModMain.Map is smaller than viewport (ex. Bus Stop)
-            if (Game1.isOutdoorMapSmallerThanViewport())
-            {
-                this.Offset = (Game1.uiViewport.Width - Game1.currentLocation.map.Layers[0].LayerWidth * Game1.tileSize) / 2;
-
-                if (this.ScreenBounds.X > Math.Max(12, this.Offset))
-                    this.Offset = 0;
-            }
-            else
-                this.Offset = 0;
-        }
-
         public void Resize()
         {
             this.ScreenBounds.SetDesiredBounds(
@@ -229,7 +214,6 @@ namespace NPCMapLocations.Framework.Menus
 
             var b = Game1.spriteBatch;
             bool isHoveringMinimap = this.IsHoveringDragZone();
-            int offsetMmX = x + this.Offset;
 
             // Make transparent on hover
             var color = isHoveringMinimap
@@ -248,7 +232,7 @@ namespace NPCMapLocations.Framework.Menus
                 width: width / Game1.pixelZoom + 2,
                 height: height / Game1.pixelZoom + 2
             );
-            b.Draw(ModEntry.Map, new Vector2(offsetMmX, y), drawBounds, color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
+            b.Draw(ModEntry.Map, new Vector2(x, y), drawBounds, color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
 
             // Don't draw markers while being dragged
             if (!(this.IsHoveringDragZone() && ModEntry.StaticHelper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
@@ -266,25 +250,25 @@ namespace NPCMapLocations.Framework.Menus
             // Border around minimap that will also help mask markers outside of the minimap
             // Which gives more padding for when they are considered within the minimap area
             // Draw border
-            this.DrawLine(b, new Vector2(offsetMmX, y - this.BorderWidth), new Vector2(offsetMmX + width - 2, y - this.BorderWidth), this.BorderWidth,
+            this.DrawLine(b, new Vector2(x, y - this.BorderWidth), new Vector2(x + width - 2, y - this.BorderWidth), this.BorderWidth,
               Game1.menuTexture, new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(offsetMmX + width + this.BorderWidth, y),
-              new Vector2(offsetMmX + width + this.BorderWidth, y + height - 2), this.BorderWidth, Game1.menuTexture,
+            this.DrawLine(b, new Vector2(x + width + this.BorderWidth, y),
+              new Vector2(x + width + this.BorderWidth, y + height - 2), this.BorderWidth, Game1.menuTexture,
               new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(offsetMmX + width, y + height + this.BorderWidth),
-              new Vector2(offsetMmX + 2, y + height + this.BorderWidth), this.BorderWidth, Game1.menuTexture,
+            this.DrawLine(b, new Vector2(x + width, y + height + this.BorderWidth),
+              new Vector2(x + 2, y + height + this.BorderWidth), this.BorderWidth, Game1.menuTexture,
               new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(offsetMmX - this.BorderWidth, height + y), new Vector2(offsetMmX - this.BorderWidth, y + 2), this.BorderWidth,
+            this.DrawLine(b, new Vector2(x - this.BorderWidth, height + y), new Vector2(x - this.BorderWidth, y + 2), this.BorderWidth,
               Game1.menuTexture, new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
 
             // Draw the border corners
-            b.Draw(Game1.menuTexture, new Rectangle(offsetMmX - this.BorderWidth, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
+            b.Draw(Game1.menuTexture, new Rectangle(x - this.BorderWidth, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
               new Rectangle(0, 256, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(offsetMmX + width, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
+            b.Draw(Game1.menuTexture, new Rectangle(x + width, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
               new Rectangle(48, 256, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(offsetMmX + width, y + height, this.BorderWidth, this.BorderWidth),
+            b.Draw(Game1.menuTexture, new Rectangle(x + width, y + height, this.BorderWidth, this.BorderWidth),
               new Rectangle(48, 304, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(offsetMmX - this.BorderWidth, y + height, this.BorderWidth, this.BorderWidth),
+            b.Draw(Game1.menuTexture, new Rectangle(x - this.BorderWidth, y + height, this.BorderWidth, this.BorderWidth),
               new Rectangle(0, 304, this.BorderWidth, this.BorderWidth), color * 1.5f);
         }
 
@@ -301,8 +285,7 @@ namespace NPCMapLocations.Framework.Menus
 
             var b = Game1.spriteBatch;
             var color = Color.White;
-            int offsetMmX = x + this.Offset;
-            var offsetMmLoc = new Vector2(this.MmLoc.X + this.Offset + 2, this.MmLoc.Y + 2);
+            var offsetMmLoc = new Vector2(this.MmLoc.X + x + 2, this.MmLoc.Y + 2);
 
             //
             // ===== Farm types =====
@@ -312,13 +295,13 @@ namespace NPCMapLocations.Framework.Menus
             // When any part of the cropped farm is outside of the minimap as player moves
             int farmWidth = 131;
             int farmHeight = 61;
-            int farmX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, offsetMmX, offsetMmX + width));
+            int farmX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, x, x + width));
             int farmY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, y, y + height) + 2);
-            int farmCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
+            int farmCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
             int farmCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
 
             // Check if farm crop extends outside of minimap
-            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (offsetMmX + width) / Game1.pixelZoom) ? (offsetMmX + width - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
+            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (x + width) / Game1.pixelZoom) ? (x + width - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
             int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (y + height) / Game1.pixelZoom) ? (y + height - farmY) / Game1.pixelZoom : farmHeight - farmCropY;
 
             // Check if farm crop extends beyond farm size
@@ -391,13 +374,13 @@ namespace NPCMapLocations.Framework.Menus
                     mapY = 560;
                 }
 
-                int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, offsetMmX, offsetMmX + width));
+                int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, x, x + width));
                 int islandY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, y, y + height) + 2);
-                int islandCropX = (int)MathHelper.Clamp((offsetMmX - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
+                int islandCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
                 int islandCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
 
                 // Check if island crop extends outside of minimap
-                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (offsetMmX + width) / Game1.pixelZoom) ? (offsetMmX + width - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
+                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (x + width) / Game1.pixelZoom) ? (x + width - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
                 int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (y + height) / Game1.pixelZoom) ? (y + height - islandY) / Game1.pixelZoom : islandHeight - islandCropY;
 
                 // Check if island crop extends beyond island size
