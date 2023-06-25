@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>2.0.4</Version>
+    <Version>2.0.5</Version>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.0" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bouhm.Shared;
 using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -77,6 +78,7 @@ namespace NPCMapLocations
         public override void Entry(IModHelper helper)
         {
             I18n.Init(helper.Translation);
+            CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
 
             ModEntry.LocationUtil = new(this.Monitor);
             StaticHelper = helper;
@@ -660,7 +662,6 @@ namespace NPCMapLocations
             this.UpdateMarkers(true);
             this.UpdateFarmBuildingLocations();
             this.Minimap.Value?.OnWindowResized();
-            this.Minimap.Value?.CheckOffsetForMap();
 
             if (this.IsModMapOpen.Value)
                 this.OpenModMap();
@@ -690,9 +691,6 @@ namespace NPCMapLocations
             {
                 // Hide minimap in blacklisted locations with special case for Mines as usual
                 this.UpdateMinimapVisibility(e.NewLocation);
-
-                // Check if map does not fill screen and adjust for black bars (ex. BusStop)
-                this.Minimap.Value?.CheckOffsetForMap();
             }
         }
 
