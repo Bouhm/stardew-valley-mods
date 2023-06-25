@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Bouhm.Shared;
 using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -77,6 +78,7 @@ namespace NPCMapLocations
         public override void Entry(IModHelper helper)
         {
             I18n.Init(helper.Translation);
+            CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
 
             ModEntry.LocationUtil = new(this.Monitor);
             StaticHelper = helper;
