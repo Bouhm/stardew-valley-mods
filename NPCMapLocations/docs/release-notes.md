@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 2.11.4
+Released 25 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
 * The minimap is no longer shifted to avoid being drawn over viewport black bars (e.g. at the bus stop).
 * Embedded `.pdb` data into the DLL, which fixes error line numbers in Linux/macOS logs.
 

@@ -1,7 +1,7 @@
 ﻿{
     "Name": "NPC Location Compass",
     "Author": "Bouhm",
-    "Version": "1.3.11",
+    "Version": "1.3.12",
     "MinimumApiVersion": "3.14.0",
     "Description": "Locates villagers and farmers on the screen",
     "UniqueID": "Bouhm.LocationCompass",
