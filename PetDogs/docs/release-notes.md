@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Improved translations. Thanks to Hacktix (added German)!
+
 ## 2.0.4
 Released 09 January 2023 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
 

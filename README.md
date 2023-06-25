@@ -13,7 +13,7 @@ documentation and release notes.
 <!--
 
     This section is auto-generated using a script, there's no need to edit it manually.
-    https://gist.github.com/Pathoschild/040ff6c8dc863ed2a7a828aa04447033
+    https://github.com/Pathoschild/StardewScripts/tree/main/create-translation-summary
 
 -->
 The mods can be translated into any language supported by the game, and SMAPI will automatically
@@ -28,7 +28,7 @@ on the wiki for help contributing translations.
 :---------- | :-------------------------------------------------------- | :--------------------------------
 Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/zh.json)
 French      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/fr.json) | [✓](NPCMapLocations/i18n/fr.json)
-German      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/de.json)
+German      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/de.json) | [✓](NPCMapLocations/i18n/de.json)
 Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/hu.json)
 Italian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/it.json)
 Japanese    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ja.json)
