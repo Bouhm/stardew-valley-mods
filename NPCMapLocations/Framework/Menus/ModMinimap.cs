@@ -285,7 +285,7 @@ namespace NPCMapLocations.Framework.Menus
 
             var b = Game1.spriteBatch;
             var color = Color.White;
-            var offsetMmLoc = new Vector2(this.MmLoc.X + x + 2, this.MmLoc.Y + 2);
+            var offsetMmLoc = new Vector2(this.MmLoc.X + 2, this.MmLoc.Y + 2);
 
             //
             // ===== Farm types =====
