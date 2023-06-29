@@ -1,6 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 2.11.5
+Released 29 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+
+* Fixed minimap misplacing NPC markers in 2.11.4 when it's not left-aligned.
+
 ## 2.11.4
 Released 25 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 
