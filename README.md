@@ -35,7 +35,7 @@ Japanese    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻
 Korean      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ko.json)
 [Polish]    | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/pl.json) | [✓](NPCMapLocations/i18n/pl.json)
 Portuguese  | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/pt.json) | [✓](NPCMapLocations/i18n/pt.json)
-Russian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ru.json)
+Russian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/ru.json)
 Spanish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/es.json)
 [Thai]      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/th.json) | [✓](NPCMapLocations/i18n/th.json)
 Turkish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/tr.json)
