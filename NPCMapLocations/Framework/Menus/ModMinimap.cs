@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -8,64 +7,45 @@ using StardewValley;
 
 namespace NPCMapLocations.Framework.Menus
 {
+    /// <summary>A minimap UI drawn to the screen.</summary>
     internal class ModMinimap
     {
         /*********
         ** Fields
         *********/
-        private readonly Texture2D BuildingMarkers;
-        private readonly int BorderWidth = 12;
-        private readonly bool DrawPamHouseUpgrade;
-        private readonly bool DrawMovieTheaterJoja;
-        private readonly bool DrawMovieTheater;
-        private readonly bool DrawIsland;
-        private readonly Dictionary<long, FarmerMarker> FarmerMarkers;
-        private readonly ModCustomizations Customizations;
+        /// <summary>The pixel width of the border drawn around the minimap, before pixel zoom.</summary>
+        private const int BorderWidth = 12;
 
-        private Vector2 PrevCenter;
-        private Vector2 Center; // Center position of minimap
-        private float CropX; // Top-left position of crop on map
-        private float CropY; // Top-left position of crop on map
+        private readonly Rectangle BorderSourceRect = new(8, 256, 3, BorderWidth);
 
         /// <summary>The pixel position and size of the minimap, adjusted automatically to fit on the screen.</summary>
         private readonly ScreenBounds ScreenBounds;
 
-        private Vector2 MmLoc; // minimap location relative to map location
-        private readonly Dictionary<string, NpcMarker> NpcMarkers;
-        private Vector2 PlayerLoc;
-        private int PrevMmX;
-        private int PrevMmY;
-        private int DrawDelay;
-        private bool DragStarted;
+        /// <summary>Create the map view to show in the minimap for the current location and position.</summary>
+        private readonly Func<ModMapPage> CreateMapPage;
 
-        private Dictionary<string, bool> ConditionalNpcs { get; }
-        private Dictionary<string, BuildingMarker> FarmBuildings { get; }
+        /// <summary>The minimap's pixel position on screen before the player started dragging it.</summary>
+        private Point PositionBeforeDrag;
+
+        /// <summary>Whether the player is currently dragging the minimap to a new position.</summary>
+        private bool IsDragging;
+
+        /// <summary>The region for which the <see cref="MapPage"/> was opened.</summary>
+        /// <remarks>We deliberately don't check <see cref="StardewValley.Menus.MapPage.mapRegion"/> here, to avoid an infinite loop if the opened map sets a different region for some reason.</remarks>
+        private string MapRegionId;
+
+        /// <summary>The underlying map view to show in the minimap area.</summary>
+        private ModMapPage MapPage;
 
 
         /*********
         ** Public methods
         *********/
-        public ModMinimap(
-          Dictionary<string, NpcMarker> npcMarkers,
-          Dictionary<string, bool> conditionalNpcs,
-          Dictionary<long, FarmerMarker> farmerMarkers,
-          Dictionary<string, BuildingMarker> farmBuildings,
-          Texture2D buildingMarkers,
-          ModCustomizations customizations
-        )
+        /// <summary>Construct an instance.</summary>
+        /// <param name="createMapPage">Create the map view to show in the minimap for the current location and position.</param>
+        public ModMinimap(Func<ModMapPage> createMapPage)
         {
-            // renderTarget = new RenderTarget2D(Game1.graphics.GraphicsDevice,Game1.viewport.Width, Game1.viewport.Height);
-            this.NpcMarkers = npcMarkers;
-            this.ConditionalNpcs = conditionalNpcs;
-            this.FarmerMarkers = farmerMarkers;
-            this.FarmBuildings = farmBuildings;
-            this.BuildingMarkers = buildingMarkers;
-            this.Customizations = customizations;
-
-            this.DrawPamHouseUpgrade = Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade");
-            this.DrawMovieTheaterJoja = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
-            this.DrawMovieTheater = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater");
-            this.DrawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
+            this.CreateMapPage = createMapPage;
 
             this.ScreenBounds = new(
                 x: ModEntry.Globals.MinimapX,
@@ -75,7 +55,7 @@ namespace NPCMapLocations.Framework.Menus
             );
         }
 
-        // Check if cursor is hovering the drag zone (top of minimap)
+        /// <summary>Get whether dragging the minimap is allowed and the cursor is hovering on top of the minimap.</summary>
         public bool IsHoveringDragZone()
         {
             return
@@ -83,51 +63,46 @@ namespace NPCMapLocations.Framework.Menus
                 && this.ScreenBounds.Contains(MouseUtil.GetScreenPoint());
         }
 
-        public void HandleMouseDown()
+        /// <summary>Handle the player starting to press the right mouse button.</summary>
+        public void HandleMouseRightDown()
         {
             if (Context.IsPlayerFree)
             {
-                this.PrevMmX = this.ScreenBounds.X;
-                this.PrevMmY = this.ScreenBounds.Y;
-                this.DragStarted = true;
+                this.PositionBeforeDrag = new Point(this.ScreenBounds.X, this.ScreenBounds.Y);
+                this.IsDragging = true;
             }
         }
 
-        public void HandleMouseDrag()
+        /// <summary>Handle the player holding the right mouse button.</summary>
+        public void HandleMouseRightDrag()
         {
-            if (this.DragStarted)
+            if (this.IsDragging)
             {
                 // stop if dragging should no longer be allowed
                 if (!Context.IsPlayerFree)
-                    this.HandleMouseRelease();
+                    this.HandleMouseRightRelease();
 
                 // else move minimap
                 else
                 {
-                    var mousePos = MouseUtil.GetScreenPosition();
+                    int borderWidth = ModMinimap.BorderWidth;
+                    Vector2 mousePos = MouseUtil.GetScreenPosition();
+
                     this.ScreenBounds.SetDesiredBounds(
-                        x: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmX + mousePos.X - MouseUtil.BeginMousePosition.X, this.BorderWidth, Game1.uiViewport.Width - this.ScreenBounds.Width - this.BorderWidth)),
-                        y: this.NormalizeToMap(MathHelper.Clamp(this.PrevMmY + mousePos.Y - MouseUtil.BeginMousePosition.Y, this.BorderWidth, Game1.uiViewport.Height - this.ScreenBounds.Height - this.BorderWidth))
+                        x: (int)MathHelper.Clamp(this.PositionBeforeDrag.X + mousePos.X - MouseUtil.BeginMousePosition.X, borderWidth, Game1.uiViewport.Width - this.ScreenBounds.Width - borderWidth),
+                        y: (int)MathHelper.Clamp(this.PositionBeforeDrag.Y + mousePos.Y - MouseUtil.BeginMousePosition.Y, borderWidth, Game1.uiViewport.Height - this.ScreenBounds.Height - borderWidth)
                     );
                 }
             }
         }
 
-        public void HandleMouseRelease()
+        /// <summary>Handle the player releasing the right mouse button.</summary>
+        public void HandleMouseRightRelease()
         {
             ModEntry.Globals.MinimapX = this.ScreenBounds.X;
             ModEntry.Globals.MinimapY = this.ScreenBounds.Y;
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
-            this.DragStarted = false;
-
-            // Delay drawing on minimap after it's moved
-            if (this.IsHoveringDragZone())
-                this.DrawDelay = 30;
-        }
-
-        public void UpdateMapForSeason()
-        {
-            ModEntry.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+            this.IsDragging = false;
         }
 
         /// <summary>Adjust the minimap draw bounds to fit on-screen when the window size changes.</summary>
@@ -144,77 +119,29 @@ namespace NPCMapLocations.Framework.Menus
             );
         }
 
+        /// <summary>Update the minimap data if needed. Calls to this method are throttled.</summary>
         public void Update()
         {
-            int x = this.ScreenBounds.X;
-            int y = this.ScreenBounds.Y;
-            int width = this.ScreenBounds.Width;
-            int height = this.ScreenBounds.Height;
+            if (this.MapPage is null || this.MapRegionId != this.GetRegionId())
+                this.UpdateMapPage();
 
-            // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
-            // Positions relative to the map are not.
-
-            WorldMapPosition mapPos = ModEntry.GetWorldMapPosition(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
-
-            this.Center = new Vector2(mapPos.X, mapPos.Y);
-
-            // Player in unknown location, use previous location as center
-            if (mapPos.IsEmpty && this.PrevCenter != null)
-                this.Center = this.PrevCenter;
-            else
-                this.PrevCenter = this.Center;
-            this.PlayerLoc = this.PrevCenter;
-
-            this.Center.X = this.NormalizeToMap(this.Center.X);
-            this.Center.Y = this.NormalizeToMap(this.Center.Y);
-
-            // Top-left offset for markers, relative to the minimap
-            this.MmLoc = new Vector2(x - this.Center.X + (float)Math.Floor(width / 2.0), y - this.Center.Y + (float)Math.Floor(height / 2.0));
-
-            // Top-left corner of minimap cropped from the whole map
-            // Centered around the player's location on the map
-            this.CropX = this.Center.X - (float)Math.Floor(width / 2.0);
-            this.CropY = this.Center.Y - (float)Math.Floor(height / 2.0);
-
-            // Handle cases when reaching edge of map 
-            // Change offsets accordingly when player is no longer centered
-            if (this.CropX < 0)
-            {
-                this.Center.X = width / 2;
-                this.MmLoc.X = x;
-                this.CropX = 0;
-            }
-            else if (this.CropX + width > 1200)
-            {
-                this.Center.X = 1200 - width / 2;
-                this.MmLoc.X = x - (1200 - width);
-                this.CropX = 1200 - width;
-            }
-
-            if (this.CropY < 0)
-            {
-                this.Center.Y = height / 2;
-                this.MmLoc.Y = y;
-                this.CropY = 0;
-            }
-            // Actual map is 1200x720 but map.Height includes the farms
-            else if (this.CropY + height > 720)
-            {
-                this.Center.Y = 720 - height / 2;
-                this.MmLoc.Y = y - (720 - height);
-                this.CropY = 720 - height;
-            }
+            this.UpdateMapPosition();
         }
 
-        // Center or the player's position is used as reference; player is not center when reaching edge of map
-        public void DrawMiniMap()
+        /// <summary>Draw the minimap to the screen.</summary>
+        public void Draw()
         {
-            int x = this.ScreenBounds.X;
-            int y = this.ScreenBounds.Y;
-            int width = this.ScreenBounds.Width;
-            int height = this.ScreenBounds.Height;
+            // update map if needed
+            if (this.MapPage.mapRegion.Id != this.MapRegionId)
+            {
+                this.UpdateMapPage();
+                this.UpdateMapPosition();
+            }
 
-            var b = Game1.spriteBatch;
+            // get minimap dimensions
+            var screenBounds = this.ScreenBounds;
+            var mapArea = new Rectangle(screenBounds.X, screenBounds.Y, screenBounds.Width, screenBounds.Height);
+
             bool isHoveringMinimap = this.IsHoveringDragZone();
 
             // Make transparent on hover
@@ -225,271 +152,146 @@ namespace NPCMapLocations.Framework.Menus
             if (isHoveringMinimap)
                 Game1.mouseCursor = 2;
 
-            if (ModEntry.Map == null)
-                return;
-
-            Rectangle drawBounds = new Rectangle(
-                x: (int)Math.Floor(this.CropX / Game1.pixelZoom),
-                y: (int)Math.Floor(this.CropY / Game1.pixelZoom),
-                width: width / Game1.pixelZoom + 2,
-                height: height / Game1.pixelZoom + 2
-            );
-            b.Draw(ModEntry.Map, new Vector2(x, y), drawBounds, color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
-
-            // Don't draw markers while being dragged
-            if (!(this.IsHoveringDragZone() && ModEntry.StaticHelper.Input.GetState(SButton.MouseRight) == SButtonState.Held))
+            // draw map
+            var spriteBatch = Game1.spriteBatch;
             {
-                // When minimap is moved, redraw markers after recalculating & repositioning
-                if (this.DrawDelay == 0)
+                GraphicsDevice device = spriteBatch.GraphicsDevice;
+                Rectangle oldScissorRect = device.ScissorRectangle;
+
+                try
                 {
-                    if (!isHoveringMinimap)
-                        this.DrawMarkers();
+                    device.ScissorRectangle = mapArea;
+                    using SpriteBatch clippedBatch = new SpriteBatch(device);
+
+                    clippedBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, new RasterizerState { ScissorTestEnable = true });
+
+                    clippedBatch.Draw(Game1.staminaRect, mapArea, new Rectangle(0, 0, 1, 1), Color.Black); // black background in case map doesn't fill minimap view
+
+                    if (!(this.IsHoveringDragZone() && ModEntry.StaticHelper.Input.GetState(SButton.MouseRight) == SButtonState.Held)) // don't draw map while it's being dragged
+                    {
+                        this.MapPage.drawMap(clippedBatch, false);
+                        this.MapPage.drawMiniPortraits(clippedBatch);
+                    }
+
+                    clippedBatch.End();
                 }
-                else
-                    this.DrawDelay--;
+                finally
+                {
+                    device.ScissorRectangle = oldScissorRect;
+                }
             }
 
-            // Border around minimap that will also help mask markers outside of the minimap
-            // Which gives more padding for when they are considered within the minimap area
-            // Draw border
-            this.DrawLine(b, new Vector2(x, y - this.BorderWidth), new Vector2(x + width - 2, y - this.BorderWidth), this.BorderWidth,
-              Game1.menuTexture, new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(x + width + this.BorderWidth, y),
-              new Vector2(x + width + this.BorderWidth, y + height - 2), this.BorderWidth, Game1.menuTexture,
-              new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(x + width, y + height + this.BorderWidth),
-              new Vector2(x + 2, y + height + this.BorderWidth), this.BorderWidth, Game1.menuTexture,
-              new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
-            this.DrawLine(b, new Vector2(x - this.BorderWidth, height + y), new Vector2(x - this.BorderWidth, y + 2), this.BorderWidth,
-              Game1.menuTexture, new Rectangle(8, 256, 3, this.BorderWidth), color * 1.5f);
+            // draw frame
+            {
+                int x = mapArea.X;
+                int y = mapArea.Y;
+                int width = mapArea.Width;
+                int height = mapArea.Height;
 
-            // Draw the border corners
-            b.Draw(Game1.menuTexture, new Rectangle(x - this.BorderWidth, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
-              new Rectangle(0, 256, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(x + width, y - this.BorderWidth, this.BorderWidth, this.BorderWidth),
-              new Rectangle(48, 256, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(x + width, y + height, this.BorderWidth, this.BorderWidth),
-              new Rectangle(48, 304, this.BorderWidth, this.BorderWidth), color * 1.5f);
-            b.Draw(Game1.menuTexture, new Rectangle(x - this.BorderWidth, y + height, this.BorderWidth, this.BorderWidth),
-              new Rectangle(0, 304, this.BorderWidth, this.BorderWidth), color * 1.5f);
+                // draw edges
+                int borderWidth = ModMinimap.BorderWidth;
+                this.DrawLine(spriteBatch, new Vector2(x, y - borderWidth), new Vector2(x + width - 2, y - borderWidth), borderWidth, Game1.menuTexture, this.BorderSourceRect, color * 1.5f);
+                this.DrawLine(spriteBatch, new Vector2(x + width + borderWidth, y), new Vector2(x + width + borderWidth, y + height - 2), borderWidth, Game1.menuTexture, this.BorderSourceRect, color * 1.5f);
+                this.DrawLine(spriteBatch, new Vector2(x + width, y + height + borderWidth), new Vector2(x + 2, y + height + borderWidth), borderWidth, Game1.menuTexture, this.BorderSourceRect, color * 1.5f);
+                this.DrawLine(spriteBatch, new Vector2(x - borderWidth, height + y), new Vector2(x - borderWidth, y + 2), borderWidth, Game1.menuTexture, this.BorderSourceRect, color * 1.5f);
+
+                // Draw corners
+                spriteBatch.Draw(Game1.menuTexture, new Rectangle(x - borderWidth, y - borderWidth, borderWidth, borderWidth), new Rectangle(0, 256, borderWidth, borderWidth), color * 1.5f);
+                spriteBatch.Draw(Game1.menuTexture, new Rectangle(x + width, y - borderWidth, borderWidth, borderWidth), new Rectangle(48, 256, borderWidth, borderWidth), color * 1.5f);
+                spriteBatch.Draw(Game1.menuTexture, new Rectangle(x + width, y + height, borderWidth, borderWidth), new Rectangle(48, 304, borderWidth, borderWidth), color * 1.5f);
+                spriteBatch.Draw(Game1.menuTexture, new Rectangle(x - borderWidth, y + height, borderWidth, borderWidth), new Rectangle(0, 304, borderWidth, borderWidth), color * 1.5f);
+            }
         }
 
 
         /*********
         ** Private methods
         *********/
-        private void DrawMarkers()
+        /// <summary>Recreate the underlying map view.</summary>
+        [MemberNotNull(nameof(MapPage))]
+        private void UpdateMapPage()
         {
-            string regionId = ModEntry.GetWorldMapRegion();
-
-            int x = this.ScreenBounds.X;
-            int y = this.ScreenBounds.Y;
-            int width = this.ScreenBounds.Width;
-            int height = this.ScreenBounds.Height;
-
-            var b = Game1.spriteBatch;
-            var color = Color.White;
-            var offsetMmLoc = new Vector2(this.MmLoc.X + 2, this.MmLoc.Y + 2);
-
-            if (regionId == "Valley")
-            {
-                //
-                // ===== Farm types =====
-                //
-                // The farms are always overlayed at (0, 43) on the map
-                // The crop position, dimensions, and overlay position must all be adjusted accordingly
-                // When any part of the cropped farm is outside of the minimap as player moves
-                int farmWidth = 131;
-                int farmHeight = 61;
-                int farmX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, x, x + width));
-                int farmY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, y, y + height) + 2);
-                int farmCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
-                int farmCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
-
-                // Check if farm crop extends outside of minimap
-                int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (x + width) / Game1.pixelZoom) ? (x + width - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
-                int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (y + height) / Game1.pixelZoom) ? (y + height - farmY) / Game1.pixelZoom : farmHeight - farmCropY;
-
-                // Check if farm crop extends beyond farm size
-                if (farmCropX + farmCropWidth > farmWidth)
-                    farmCropWidth = farmWidth - farmCropX;
-
-                if (farmCropY + farmCropHeight > farmHeight)
-                    farmCropHeight = farmHeight - farmCropY;
-
-                switch (Game1.whichFarm)
-                {
-                    case 1:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                    case 2:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                    case 3:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                    case 4:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                    case 5:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                    case 6:
-                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                        break;
-                }
-
-                if (this.DrawPamHouseUpgrade)
-                {
-                    var houseLoc = ModEntry.GetWorldMapPosition("Trailer_Big");
-                    int screenX = this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16);
-                    int screenY = this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11);
-
-                    if (this.ScreenBounds.Contains(screenX, screenY))
-                        b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(263, 181, 8, 8), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                }
-
-                if (this.DrawMovieTheater || this.DrawMovieTheaterJoja)
-                {
-                    var theaterLoc = ModEntry.GetWorldMapPosition("JojaMart");
-                    int screenX = this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20);
-                    int screenY = this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11);
-
-                    if (this.ScreenBounds.Contains(screenX, screenY))
-                    {
-                        b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(275, 181, 15, 11), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    }
-                }
-
-                if (this.DrawIsland)
-                {
-                    int islandWidth = 40;
-                    int islandHeight = 30;
-                    int islandImageX = 208;
-                    int islandImageY = 363;
-                    int mapX = 1040;
-                    int mapY = 600;
-
-                    int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, x, x + width));
-                    int islandY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, y, y + height) + 2);
-                    int islandCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
-                    int islandCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
-
-                    // Check if island crop extends outside of minimap
-                    int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (x + width) / Game1.pixelZoom) ? (x + width - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
-                    int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (y + height) / Game1.pixelZoom) ? (y + height - islandY) / Game1.pixelZoom : islandHeight - islandCropY;
-
-                    // Check if island crop extends beyond island size
-                    if (islandCropX + islandCropWidth > islandWidth)
-                        islandCropWidth = islandWidth - islandCropX;
-
-                    if (islandCropY + islandCropHeight > islandHeight)
-                        islandCropHeight = islandHeight - islandCropY;
-
-                    b.Draw(ModEntry.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                }
-
-                //
-                // ===== Farm buildings =====
-                //
-                if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
-                {
-                    foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.WorldMapPosition.Y))
-                    {
-                        if (ModConstants.FarmBuildingRects.TryGetValue(building.CommonName, out var buildingRect))
-                        {
-                            int screenX = this.NormalizeToMap(offsetMmLoc.X + building.WorldMapPosition.X - (float)Math.Floor(buildingRect.Width / 2.0));
-                            int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.WorldMapPosition.Y - (float)Math.Floor(buildingRect.Height / 2.0));
-
-                            if (this.ScreenBounds.Contains(screenX, screenY))
-                                b.Draw(this.BuildingMarkers, new Vector2(screenX, screenY), buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
-                        }
-                    }
-                }
-            }
-
-            //
-            // ===== NPCs =====
-            //
-            // Sort by drawing order
-            if (this.NpcMarkers != null)
-            {
-                var sortedMarkers = this.NpcMarkers
-                    .Where(p => p.Value.WorldMapPosition.RegionId == regionId)
-                    .OrderBy(p => p.Value.Layer);
-
-                foreach (var npcMarker in sortedMarkers)
-                {
-                    string name = npcMarker.Key;
-                    var marker = npcMarker.Value;
-
-                    Vector2 rawPos = new(offsetMmLoc.X + marker.WorldMapPosition.X, offsetMmLoc.Y + marker.WorldMapPosition.Y);
-                    Point screenPos = new(this.NormalizeToMap(rawPos.X), this.NormalizeToMap(rawPos.Y));
-
-                    // Skip if no specified location
-                    if (
-                        marker.Sprite == null
-                        || !this.ScreenBounds.Contains(screenPos)
-                        || ModEntry.ShouldExcludeNpc(name)
-                        || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
-                        || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
-                    )
-                        continue;
-
-                    var markerColor = marker.IsHidden ? Color.DarkGray * 0.7f : Color.White;
-
-                    // Draw NPC marker
-                    Rectangle spriteRect = marker.GetSpriteSourceRect();
-                    b.Draw(marker.Sprite, new Rectangle(screenPos.X, screenPos.Y, 30, 32), spriteRect, markerColor);
-
-                    // Icons for birthday/quest
-                    if (ModEntry.Globals.ShowQuests)
-                    {
-                        if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
-                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(rawPos.X + 20), screenPos.Y), new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-
-                        if (marker.HasQuest)
-                            b.Draw(Game1.mouseCursors, new Vector2(this.NormalizeToMap(rawPos.X + 22), this.NormalizeToMap(rawPos.Y - 3)), new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f, SpriteEffects.None, 0f);
-                    }
-                }
-            }
-
-            if (Context.IsMultiplayer)
-            {
-                foreach (var farmer in Game1.getOnlineFarmers())
-                {
-                    // Temporary solution to handle desync of farmhand location/tile position when changing location
-                    if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker) && farMarker.WorldMapPosition.RegionId == regionId)
-                    {
-                        int screenX = this.NormalizeToMap(offsetMmLoc.X + farMarker.WorldMapPosition.X - 16);
-                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + farMarker.WorldMapPosition.Y - 15);
-
-                        if (this.ScreenBounds.Contains(screenX, screenY) && farMarker.DrawDelay == 0)
-                            farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(screenX, screenY), 0.00011f, 2f, 1, farmer);
-                    }
-                }
-            }
-            else
-            {
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.NormalizeToMap(offsetMmLoc.X + this.PlayerLoc.X - 16), this.NormalizeToMap(offsetMmLoc.Y + this.PlayerLoc.Y - 15)), 0.00011f, 2f, 1, Game1.player);
-            }
+            this.MapPage = this.CreateMapPage();
+            this.MapRegionId = this.MapPage.mapRegion.Id;
         }
 
-        // Normalize offset differences caused by map being 4x less precise than ModMain.Map markers 
-        // Makes the map and markers move together instead of markers moving more precisely (moving when minimap does not shift)
-        private int NormalizeToMap(float n)
+        /// <summary>Get the player's current world map position.</summary>
+        private WorldMapPosition GetWorldMapPosition()
         {
-            return (int)Math.Floor(n / Game1.pixelZoom) * Game1.pixelZoom;
+            return ModEntry.GetWorldMapPosition(
+                Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name,
+                Math.Max(0, Game1.player.TilePoint.X),
+                Math.Max(0, Game1.player.TilePoint.Y)
+            );
         }
 
-        // For borders
-        private void DrawLine(SpriteBatch b, Vector2 begin, Vector2 end, int width, Texture2D tex, Rectangle srcRect, Color color)
+        /// <summary>Get the world map region which contains the player.</summary>
+        private string GetRegionId()
         {
-            var r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + 2, width);
-            var v = Vector2.Normalize(begin - end);
-            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
-            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
-            b.Draw(tex, r, srcRect, color, angle, Vector2.Zero, SpriteEffects.None, 0);
+            return this.GetWorldMapPosition()?.RegionId ?? "Valley";
+        }
+
+        /// <summary>Update the position of the underlying map view so the player is centered within the minimap.</summary>
+        private void UpdateMapPosition()
+        {
+            // get view dimensions
+            var screenBounds = this.ScreenBounds;
+            int viewX = screenBounds.X;
+            int viewY = screenBounds.Y;
+            int viewWidth = screenBounds.Width;
+            int viewHeight = screenBounds.Height;
+            var viewCenter = new Point(
+                viewX + (viewWidth / 2),
+                viewX + (viewHeight / 2)
+            );
+
+            // calculate top-left position of full map which would center player within the minimap
+            WorldMapPosition mapPos = this.GetWorldMapPosition();
+            var mapBounds = this.MapPage.mapBounds;
+            int mapX = viewCenter.X - mapPos.X;
+            int mapY = viewCenter.Y - mapPos.Y;
+            int mapWidth = mapBounds.Width * Game1.pixelZoom;
+            int mapHeight = mapBounds.Height * Game1.pixelZoom;
+
+            // don't slide past edge of map if possible
+            if (mapHeight > viewHeight)
+            {
+                if (mapY > viewY)
+                    mapY = viewY;
+                else if ((mapY + mapHeight) < (viewY + viewHeight))
+                    mapY = viewY - mapHeight + viewHeight;
+            }
+            if (mapWidth > viewWidth)
+            {
+                if (mapX > viewX)
+                    mapX = viewX;
+                else if ((mapX + mapWidth) < (viewX + viewWidth))
+                    mapX = viewX - mapWidth + viewWidth;
+            }
+
+            // update map bounds
+            if (mapBounds.X != mapX || mapBounds.Y != mapY)
+                this.MapPage.mapBounds = mapBounds with { X = mapX, Y = mapY };
+        }
+
+        /// <summary>Draw a minimap border.</summary>
+        /// <param name="b">The sprite batch being drawn.</param>
+        /// <param name="begin">The pixel coordinate for the line's starting endpoint.</param>
+        /// <param name="end">The pixel coordinate for the line's ending endpoint.</param>
+        /// <param name="width">The pixel width of the line.</param>
+        /// <param name="texture">The texture to draw.</param>
+        /// <param name="sourceRect">The pixel area within the <paramref name="texture"/> to draw.</param>
+        /// <param name="color">The color to draw.</param>
+        private void DrawLine(SpriteBatch b, Vector2 begin, Vector2 end, int width, Texture2D texture, Rectangle sourceRect, Color color)
+        {
+            var destRect = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + 2, width);
+            var length = Vector2.Normalize(begin - end);
+
+            float angle = (float)Math.Acos(Vector2.Dot(length, -Vector2.UnitX));
+            if (begin.Y > end.Y)
+                angle = MathHelper.TwoPi - angle;
+
+            b.Draw(texture, destRect, sourceRect, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }

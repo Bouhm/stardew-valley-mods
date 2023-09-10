@@ -117,22 +117,6 @@ namespace NPCMapLocations
             }
         }
 
-        /// <summary>Get the ID of the world map region which contains the current player.</summary>
-        public static string GetWorldMapRegion()
-        {
-            return ModEntry.GetWorldMapRegion(Game1.currentLocation, Game1.player.TilePoint);
-        }
-
-        /// <summary>Get the ID of the world map region which contains a given position.</summary>
-        /// <param name="location">The in-world location to match.</param>
-        /// <param name="tile">The tile position within the <paramref name="location"/> to match.</param>
-        public static string GetWorldMapRegion(GameLocation location, Point tile)
-        {
-            return
-                WorldMapManager.GetPositionData(location, tile)?.Region?.Id
-                ?? "Valley";
-        }
-
         /// <summary>Get the world map position which matches an in-world tile coordinate.</summary>
         /// <param name="locationName">The in-world location name.</param>
         /// <param name="tileX">The X tile position within the location to match.</param>
@@ -332,7 +316,7 @@ namespace NPCMapLocations
                 if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
                 {
                     MouseUtil.HandleMouseDown();
-                    this.Minimap.Value.HandleMouseDown();
+                    this.Minimap.Value.HandleMouseRightDown();
                 }
             }
 
@@ -372,7 +356,7 @@ namespace NPCMapLocations
                 else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
                 {
                     MouseUtil.HandleMouseRelease();
-                    this.Minimap.Value.HandleMouseRelease();
+                    this.Minimap.Value.HandleMouseRightRelease();
                 }
             }
         }
@@ -388,16 +372,10 @@ namespace NPCMapLocations
 
             this.ResetMarkers();
             this.UpdateMarkers(true);
-            this.Minimap.Value?.UpdateMapForSeason();
 
-            this.Minimap.Value = new ModMinimap(
-                this.NpcMarkers.Value,
-                this.ConditionalNpcs.Value,
-                this.FarmerMarkers.Value,
-                FarmBuildings,
-                this.BuildingMarkers.Value,
-                this.Customizations
-            );
+            ModEntry.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
+
+            this.Minimap.Value = new ModMinimap(this.CreateMapPage);
         }
 
         /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
@@ -451,7 +429,7 @@ namespace NPCMapLocations
 
             // handle minimap drag
             if (this.ShowMinimap.Value && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
-                this.Minimap.Value.HandleMouseDrag();
+                this.Minimap.Value.HandleMouseRightDrag();
 
             // toggle mod map
             if (Game1.activeClickableMenu is not GameMenu gameMenu)
@@ -585,7 +563,7 @@ namespace NPCMapLocations
         private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
             if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
-                this.Minimap.Value?.DrawMiniMap();
+                this.Minimap.Value?.Draw();
         }
 
         /// <inheritdoc cref="IDisplayEvents.RenderedWorld"/>
@@ -849,11 +827,18 @@ namespace NPCMapLocations
 
             // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
             // allows for better compatibility with other mods that use MapPage
-            pages[ModConstants.MapTabIndex] = new ModMapPage(
-                gameMenu.xPositionOnScreen,
-                gameMenu.yPositionOnScreen,
-                gameMenu.width,
-                gameMenu.height,
+            pages[ModConstants.MapTabIndex] = this.CreateMapPage(gameMenu);
+        }
+
+        /// <summary>Create the map page for a menu instance.</summary>
+        /// <param name="menu">The game menu for which to create a map view.</param>
+        private ModMapPage CreateMapPage(GameMenu menu)
+        {
+            return new ModMapPage(
+                menu.xPositionOnScreen,
+                menu.yPositionOnScreen,
+                menu.width,
+                menu.height,
 
                 this.NpcMarkers.Value,
                 this.ConditionalNpcs.Value,
@@ -863,6 +848,13 @@ namespace NPCMapLocations
                 this.Customizations,
                 LocationUtil
             );
+        }
+
+        /// <summary>Create a standalone map page.</summary>
+        private ModMapPage CreateMapPage()
+        {
+            GameMenu menu = new GameMenu(playOpeningSound: false);
+            return this.CreateMapPage(menu);
         }
 
         private void UpdateMarkers(bool forceUpdate = false)
