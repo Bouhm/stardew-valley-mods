@@ -1,6 +1,5 @@
 ﻿**NPC Map Locations** is a [Stardew Valley](http://stardewvalley.net/) mod which shows the
-locations of NPC and farmers on the map page and on a minimap, and makes the map positioning much
-more accurate to the game.
+locations of NPC and farmers on the world map and on a minimap.
 
 ![](screenshot.png)
 
@@ -11,10 +10,8 @@ more accurate to the game.
 
 ## Use
 ### For players
-Open the in-game map to see the positions for all NPCs, horses, players, and buildings. The map is
-redrawn to match the in-game layout and positioning much more closely, and the player position will
-also be much more accurate. The map will change for each season automatically, and adjusts
-tracking automatically for larger custom map sizes. The map supports custom NPC outfits automatically.
+Open the in-game map to see the positions for all NPCs, horses, players, and buildings. The map
+supports custom locations and NPCs automatically.
 
 While the map is open, press `TAB` (or `Y` on a controller) to show the mod options. You can
 show/hide characters automatically based on various criteria (e.g. after they're talked to, when in
@@ -46,8 +43,6 @@ setting            | what it affects
 `ShowHorse`             | Whether to show horses on the map. Default `false`.
 `ShowTravelingMerchant` | Whether to show the Traveling Merchant when she's in the forest. Default `true`.
 `NpcBlacklist`     | The list of NPCs that should be hidden. Default empty.
-`UseSeasonalMaps`  | Whether to show seasonal variations of the map. Default `true`.
-`UseDetailedIsland`| Whether to replace the stylized Ginger Island in the bottom-right corner of the map with a more detailed and accurate map. Default false.
 `ShowMinimap`      | Whether to show the floating minimap. Default `false`.
 `MinimapX`<br />`MinimapY`<br />`MinimapWidth`<br />`MinimapHeight` | The minimap's pixel position and size on screen, if it's enabled. Default `x=12`, `y=12`, `width=75`, `height=45`.
 `MinimapExclusions`| Where the minimap should be disabled (not case-sensitive). Each value can be...<ul><li>an exact location name (as shown by [Debug Mode](https://www.nexusmods.com/stardewvalley/mods/679));</li><li>[`"Mines"`](https://stardewvalleywiki.com/The_Mines), [`"SkullCavern"`](https://stardewvalleywiki.com/Skull_Cavern), or [`"VolcanoDungeon"`](https://stardewvalleywiki.com/Volcano_Dungeon) for any level in those areas;</li><li>`"Indoors"` or `"Outdoors"`;</li><li>`"DeepWoods"` for any area in the [Deep Woods](https://www.nexusmods.com/stardewvalley/mods/2571) mod.</li></ul> Default empty.
@@ -58,23 +53,20 @@ setting            | what it affects
 `MinimapToggleKey` | The [key binding](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) to toggle the floating minimap. Default `"OemPipe"` (i.e. the `|` button).
 
 ## FAQs
-* **Why do I see duplicate villagers on the map with UI Info Suite or Foxyfficiency?**  
-  UI Info Suite and Foxyfficiency have a feature to show villagers, and as a result having it
-  installed along with this mod will show duplicate villagers. To continue using this mod, there
-  are options in UI Info Suite and Foxyfficiency to disable just the NPC tracking (look at the
-  respective mod pages for more info).
+* **Why do I see duplicate villagers on the map with UI Info Suite?**  
+  UI Info Suite has a feature to show villagers, so having it installed alongside this mod will
+  show duplicate villagers. To continue using this mod, see the UI Info Suite options to disable
+  its NPC tracking.
 
-* **Does the redrawn map work with map recolors?**  
-  Yep, the mod has compatibility patches included for most of the popular recolors.
+* **Does the map work with map recolors and custom maps?**  
+  Yep. The mod doesn't change the world map itself, so it's compatible with all recolors and custom
+  world maps.
 
 * **Does the mod support custom locations/NPCs?**  
-  Yes, but the mod adding the custom locations/NPCs needs to tell NPC Map Locations how to handle
-them. See the [author guide](author-guide.md) for more info.
+  Yep. For mod authors, see the [author guide](author-guide.md) for more info on how this works.
 
 ## Compatibility
-Compatible with Stardew Valley 1.5.6+ on Linux/macOS/Windows, both single-player and multiplayer.
-
-The mod is compatible with **lots** of NPC/map mods with futureproofing.
+Compatible with Stardew Valley 1.6+ on Linux/macOS/Windows, both single-player and multiplayer.
 
 **In multiplayer, the mod will only work if the host player has it installed.**
 

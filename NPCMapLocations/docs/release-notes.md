@@ -2,7 +2,17 @@
 
 # Release notes
 ## Upcoming release
+* Updated for Stardew Valley 1.6.
+* Added support for the new `Data/WorldMap` asset in 1.6 (including custom world regions).
+* Rewrote minimap to dynamically render part of the main map.
+* Removed custom map textures.
+* Fixed minimap markers popping in/out near the edge.
+* Fixed farmhands not seeing custom world maps added by other mods.
 * Improved translations. Thanks to MakinDay (updated Italian) and Timur13240 (updated Russian)!
+
+**Breaking changes:**
+* The mod is now automatically compatible with custom world maps, overlays, and recolors from other mods. Compatibility patches are no longer needed.
+* Mod authors can no longer add custom tooltips/vectors via NPC Map Locations. You should add them to the new [world map data in 1.6](https://stardewvalleywiki.com/Modding:World_map) instead (see the updated [author guide](author-guide.md)).
 
 ## 2.11.5
 Released 29 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
