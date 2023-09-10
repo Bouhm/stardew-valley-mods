@@ -23,9 +23,9 @@ namespace NPCMapLocations.Framework.Menus
         ** Fields
         *********/
         private readonly ClickableTextureComponent DownArrow;
-        private readonly MapModButton ImmersionButton1;
-        private readonly MapModButton ImmersionButton2;
-        private readonly MapModButton ImmersionButton3;
+        private readonly VillagerVisibilityButton ImmersionAllButton;
+        private readonly VillagerVisibilityButton ImmersionTalkedToButton;
+        private readonly VillagerVisibilityButton ImmersionNotTalkedToButton;
         private readonly ClickableTextureComponent OkButton;
         private readonly List<OptionsElement> Options = new();
         private readonly List<ClickableComponent> OptionSlots = new();
@@ -93,9 +93,9 @@ namespace NPCMapLocations.Framework.Menus
             for (int j = 0; j < 10; j++)
                 heights.Add(45 + j * 15);
 
-            this.ImmersionButton1 = new MapModButton(I18n.Immersion_AlwaysShowVillagers(), 3, -1, -1, -1, -1);
-            this.ImmersionButton2 = new MapModButton(I18n.Immersion_OnlyVillagersTalkedTo(), 4, -1, -1, -1, -1);
-            this.ImmersionButton3 = new MapModButton(I18n.Immersion_HideVillagersTalkedTo(), 5, -1, -1, -1, -1);
+            this.ImmersionAllButton = new VillagerVisibilityButton(I18n.Immersion_AlwaysShowVillagers(), VillagerVisibility.All, -1, -1, -1, -1);
+            this.ImmersionTalkedToButton = new VillagerVisibilityButton(I18n.Immersion_OnlyVillagersTalkedTo(), VillagerVisibility.TalkedTo, -1, -1, -1, -1);
+            this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(I18n.Immersion_HideVillagersTalkedTo(), VillagerVisibility.NotTalkedTo, -1, -1, -1, -1);
 
             this.Options.AddRange(new[]
             {
@@ -117,9 +117,9 @@ namespace NPCMapLocations.Framework.Menus
                 new ModPlusMinus(I18n.Minimap_Height(), 2, heights),
 
                 new OptionsElement(I18n.Immersion_Label()),
-                this.ImmersionButton1,
-                this.ImmersionButton2,
-                this.ImmersionButton3,
+                this.ImmersionAllButton,
+                this.ImmersionTalkedToButton,
+                this.ImmersionNotTalkedToButton,
 
                 new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), () => ModEntry.Globals.OnlySameLocation, value => ModEntry.Globals.OnlySameLocation = value, this.UpdateConfig),
                 new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), () => ModEntry.Config.ByHeartLevel, value => ModEntry.Config.ByHeartLevel = value, this.UpdateConfig),
@@ -284,23 +284,23 @@ namespace NPCMapLocations.Framework.Menus
                 this.Scrolling = true;
                 this.leftClickHeld(x, y);
             }
-            else if (this.ImmersionButton1.Rect.Contains(x, y))
+            else if (this.ImmersionAllButton.Rect.Contains(x, y))
             {
-                this.ImmersionButton1.receiveLeftClick(x, y);
-                this.ImmersionButton2.GreyOut();
-                this.ImmersionButton3.GreyOut();
+                this.ImmersionAllButton.receiveLeftClick(x, y);
+                this.ImmersionTalkedToButton.GreyOut();
+                this.ImmersionNotTalkedToButton.GreyOut();
             }
-            else if (this.ImmersionButton2.Rect.Contains(x, y))
+            else if (this.ImmersionTalkedToButton.Rect.Contains(x, y))
             {
-                this.ImmersionButton2.receiveLeftClick(x, y);
-                this.ImmersionButton1.GreyOut();
-                this.ImmersionButton3.GreyOut();
+                this.ImmersionTalkedToButton.receiveLeftClick(x, y);
+                this.ImmersionAllButton.GreyOut();
+                this.ImmersionNotTalkedToButton.GreyOut();
             }
-            else if (this.ImmersionButton3.Rect.Contains(x, y))
+            else if (this.ImmersionNotTalkedToButton.Rect.Contains(x, y))
             {
-                this.ImmersionButton3.receiveLeftClick(x, y);
-                this.ImmersionButton1.GreyOut();
-                this.ImmersionButton2.GreyOut();
+                this.ImmersionNotTalkedToButton.receiveLeftClick(x, y);
+                this.ImmersionAllButton.GreyOut();
+                this.ImmersionTalkedToButton.GreyOut();
             }
 
             if (this.OkButton.containsPoint(x, y))
@@ -374,25 +374,12 @@ namespace NPCMapLocations.Framework.Menus
                     int y = this.OptionSlots[i].bounds.Y + Game1.tileSize / 4;
                     if (this.CurrentItemIndex >= 0 && this.CurrentItemIndex + i < this.Options.Count)
                     {
-                        if (this.Options[this.CurrentItemIndex + i] is MapModButton)
+                        if (this.Options[this.CurrentItemIndex + i] is VillagerVisibilityButton visibilityButton)
                         {
                             var bounds = new Rectangle(x + 28, y, buttonWidth + Game1.tileSize + 8, Game1.tileSize + 8);
-                            switch (this.Options[this.CurrentItemIndex + i].whichOption)
-                            {
-                                case 3:
-                                    this.ImmersionButton1.Rect = bounds;
-                                    break;
-                                case 4:
-                                    this.ImmersionButton2.Rect = bounds;
-                                    break;
-                                case 5:
-                                    this.ImmersionButton3.Rect = bounds;
-                                    break;
-                            }
+                            visibilityButton.Rect = bounds;
 
-                            drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y,
-                                bounds.Width, bounds.Height, Color.White * (this.Options[this.CurrentItemIndex + i].greyedOut ? 0.33f : 1f),
-                                1f, false);
+                            drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), bounds.X, bounds.Y, bounds.Width, bounds.Height, Color.White * (visibilityButton.greyedOut ? 0.33f : 1f), 1f, false);
                         }
 
                         if (this.CurrentItemIndex + i == 0)

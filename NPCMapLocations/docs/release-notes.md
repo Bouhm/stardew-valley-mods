@@ -4,6 +4,7 @@
 ## Upcoming release
 * Updated for Stardew Valley 1.6.
 * Added support for the new `Data/WorldMap` asset in 1.6 (including custom world regions).
+* Added enum for villager visibility config.
 * Increased minimap update rate.
 * Rewrote minimap to dynamically render part of the main map.
 * Removed custom map textures.

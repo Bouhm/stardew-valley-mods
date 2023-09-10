@@ -1005,9 +1005,9 @@ namespace NPCMapLocations
 
             if (ModEntry.ShouldExcludeNpc(name, out string reason))
                 Hide($"hidden per config ({reason})");
-            else if (Config.ImmersionOption == 2 && !Game1.player.hasTalkedToFriendToday(name))
+            else if (Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
                 Hide("hidden per config (didn't talk to them today)");
-            else if (Config.ImmersionOption == 3 && Game1.player.hasTalkedToFriendToday(name))
+            else if (Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
                 Hide("hidden per config (talked to them today)");
             else if (Globals.OnlySameLocation && !isSameLocation)
                 Hide("hidden per config (not in same location)");

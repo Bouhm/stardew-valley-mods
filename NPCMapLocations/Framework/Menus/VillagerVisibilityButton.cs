@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NPCMapLocations.Framework.Models;
 using StardewValley;
 using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework.Menus
 {
     // Mod button for the three main modes
-    internal class MapModButton : OptionsElement
+    internal class VillagerVisibilityButton : OptionsElement
     {
         /*********
         ** Fields
@@ -19,30 +20,30 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         public Rectangle Rect { get; set; }
 
+        public VillagerVisibility Value { get; }
+
 
         /*********
         ** Public methods
         *********/
-        public MapModButton(string label, int whichOption, int x, int y, int width, int height)
-            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, whichOption)
+        public VillagerVisibilityButton(string label, VillagerVisibility value, int x, int y, int width, int height)
+            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, (int)value + 2)
         {
             this.Rect = new Rectangle(x, y, width, height);
 
-            this.greyedOut = ModEntry.Config.ImmersionOption != whichOption - 2;
+            this.Value = value;
+            this.greyedOut = ModEntry.Config.ImmersionOption != value;
         }
 
         public override void receiveLeftClick(int x, int y)
         {
             if (!this.IsActive)
             {
-                if (this.whichOption == 3 || this.whichOption == 4 || this.whichOption == 5)
-                {
-                    Game1.playSound("drumkit6");
-                    base.receiveLeftClick(x, y);
-                    this.IsActive = true;
-                    this.greyedOut = false;
-                    ModEntry.Config.ImmersionOption = this.whichOption - 2;
-                }
+                Game1.playSound("drumkit6");
+                base.receiveLeftClick(x, y);
+                this.IsActive = true;
+                this.greyedOut = false;
+                ModEntry.Config.ImmersionOption = this.Value;
             }
         }
 

@@ -11,8 +11,8 @@ namespace NPCMapLocations.Framework.Models
         /// <summary>The maximum heart level that can be configured for <see cref="HeartLevelMin"/> or <see cref="HeartLevelMax"/>.</summary>
         internal const int MaxPossibleHeartLevel = 12;
 
-        /// <summary>Which NPCs to display. The possible values are <c>1</c> (all villagers), <c>2</c> (villagers player has talked to), and <c>3</c> (villagers player has not talked to).</summary>
-        public int ImmersionOption { get; set; } = 1;
+        /// <summary>Which NPCs to display.</summary>
+        public VillagerVisibility ImmersionOption { get; set; } = VillagerVisibility.All;
 
         /// <summary>Whether to only show villagers whose hearts with the player is between <see cref="HeartLevelMin"/> and <see cref="HeartLevelMax"/>.</summary>
         public bool ByHeartLevel { get; set; } = false;

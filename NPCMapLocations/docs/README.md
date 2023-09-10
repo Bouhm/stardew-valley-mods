@@ -33,7 +33,7 @@ These are the available settings (most configurable through the in-game menu _ex
 setting            | what it affects
 ------------------ | ---------------
 `NameTooltipMode`  | The tooltip position when pointing at something on the map. You can cycle this in-game using the `TooltipKey` option below. Default `1`.
-`ImmersionOption`  | Which NPCs to display. The possible values are `1` (all villagers), `2` (villagers player has talked to), and `3` (villagers player has not talked to). Default `1`.
+`ImmersionOption`  | Which NPCs to display. The possible values are `All` (all villagers), `TalkedTo` (villagers you talked to today), and `NotTalkedTo` (villagers you didn't talked today). Default `All`.
 `ByHeartLevel`<br />`HeartLevelMin`<br />`HeartLevelMax` | Whether to only show villagers whose hearts with the player is between `HeartLevelMin` and `HeartLevelMax`. Default `false`, `0`, and `12`.
 `OnlySameLocation` | Whether to only show villagers in the same location as the player. Default `false`.
 `MarkQuests`       | Whether to mark NPCs with quests or birthdays today. Default `true`.
