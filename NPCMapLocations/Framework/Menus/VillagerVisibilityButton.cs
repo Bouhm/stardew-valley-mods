@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NPCMapLocations.Framework.Models;
 using StardewValley;
@@ -14,25 +15,31 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         private bool IsActive;
 
+        /// <summary>Get the current option value.</summary>
+        private readonly Func<VillagerVisibility> GetValue;
+
+        /// <summary>Set the new option value.</summary>
+        private readonly Action<VillagerVisibility> SetValue;
+
 
         /*********
         ** Accessors
         *********/
         public Rectangle Rect { get; set; }
 
-        public VillagerVisibility Value { get; }
+        /// <summary>The value selected by this button.</summary>
+        public VillagerVisibility Id { get; }
 
 
         /*********
         ** Public methods
         *********/
-        public VillagerVisibilityButton(string label, VillagerVisibility value, int x, int y, int width, int height)
-            : base(label, x, y, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, (int)value + 2)
+        public VillagerVisibilityButton(string label, VillagerVisibility id, Func<VillagerVisibility> get, Action<VillagerVisibility> set)
+            : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, 1)
         {
-            this.Rect = new Rectangle(x, y, width, height);
-
-            this.Value = value;
-            this.greyedOut = ModEntry.Config.ImmersionOption != value;
+            this.Id = id;
+            this.GetValue = get;
+            this.SetValue = set;
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -41,20 +48,23 @@ namespace NPCMapLocations.Framework.Menus
             {
                 Game1.playSound("drumkit6");
                 base.receiveLeftClick(x, y);
-                this.IsActive = true;
-                this.greyedOut = false;
-                ModEntry.Config.ImmersionOption = this.Value;
+
+                this.SetValue(this.Id);
             }
         }
 
-        public void GreyOut()
+        public void UpdateState()
         {
-            this.IsActive = false;
-            this.greyedOut = true;
+            bool shouldBeActive = this.GetValue() == this.Id;
+
+            this.IsActive = shouldBeActive;
+            this.greyedOut = !shouldBeActive;
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
+            this.UpdateState();
+
             base.draw(b, slotX - 32, slotY, context);
         }
     }

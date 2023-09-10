@@ -85,56 +85,121 @@ namespace NPCMapLocations.Framework.Menus
                 ));
             }
 
-            var widths = new List<int>();
-            for (int i = 0; i < 16; i++)
-                widths.Add(75 + i * 15);
-
-            var heights = new List<int>();
-            for (int j = 0; j < 10; j++)
-                heights.Add(45 + j * 15);
-
-            this.ImmersionAllButton = new VillagerVisibilityButton(I18n.Immersion_AlwaysShowVillagers(), VillagerVisibility.All, -1, -1, -1, -1);
-            this.ImmersionTalkedToButton = new VillagerVisibilityButton(I18n.Immersion_OnlyVillagersTalkedTo(), VillagerVisibility.TalkedTo, -1, -1, -1, -1);
-            this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(I18n.Immersion_HideVillagersTalkedTo(), VillagerVisibility.NotTalkedTo, -1, -1, -1, -1);
+            this.ImmersionAllButton = new VillagerVisibilityButton(
+                label: I18n.Immersion_AlwaysShowVillagers(),
+                id: VillagerVisibility.All,
+                get: () => ModEntry.Config.ImmersionOption,
+                set: value => ModEntry.Config.ImmersionOption = value
+            );
+            this.ImmersionTalkedToButton = new VillagerVisibilityButton(
+                label: I18n.Immersion_OnlyVillagersTalkedTo(),
+                id: VillagerVisibility.TalkedTo,
+                get: () => ModEntry.Config.ImmersionOption,
+                set: value => ModEntry.Config.ImmersionOption = value
+            );
+            this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(
+                label: I18n.Immersion_HideVillagersTalkedTo(),
+                id: VillagerVisibility.NotTalkedTo,
+                get: () => ModEntry.Config.ImmersionOption,
+                set: value => ModEntry.Config.ImmersionOption = value
+            );
 
             this.Options.AddRange(new[]
             {
                 new OptionsElement("NPC Map Locations"),
 
+                // minimap enabled
                 new OptionsElement(I18n.Minimap_Label()),
                 new ModCheckbox(
-                    I18n.Minimap_Enabled(),
-                    () => ModEntry.Globals.ShowMinimap,
-                    value =>
+                    label: I18n.Minimap_Enabled(),
+                    value: ModEntry.Globals.ShowMinimap,
+                    set: value =>
                     {
                         ModEntry.Globals.ShowMinimap = value;
                         onMinimapToggled();
-                    },
-                    this.UpdateConfig
+                    }
                 ),
-                new ModCheckbox(I18n.Minimap_Locked(), () => ModEntry.Globals.LockMinimapPosition, value => ModEntry.Globals.LockMinimapPosition = value, this.UpdateConfig),
-                new ModPlusMinus(I18n.Minimap_Width(), 1, widths),
-                new ModPlusMinus(I18n.Minimap_Height(), 2, heights),
 
+                // minimap size
+                new ModCheckbox(
+                    label: I18n.Minimap_Locked(),
+                    value: ModEntry.Globals.LockMinimapPosition,
+                    set: value => ModEntry.Globals.LockMinimapPosition = value
+                ),
+                new ModPlusMinus(
+                    label: I18n.Minimap_Width(),
+                    value: ModEntry.Globals.MinimapWidth,
+                    min: 75,
+                    max: 300,
+                    step: 15,
+                    set: value => ModEntry.Globals.MinimapWidth = value,
+                    format: value => $"{value}px",
+                    shouldGrayOut: () => !ModEntry.Globals.ShowMinimap
+                ),
+                new ModPlusMinus(
+                    label: I18n.Minimap_Height(),
+                    value: ModEntry.Globals.MinimapHeight,
+                    min: 45,
+                    max: 180,
+                    step: 15,
+                    set: value => ModEntry.Globals.MinimapHeight = value,
+                    format: value => $"{value}px",
+                    shouldGrayOut: () => !ModEntry.Globals.ShowMinimap
+                ),
+
+                // NPC visibility
                 new OptionsElement(I18n.Immersion_Label()),
                 this.ImmersionAllButton,
                 this.ImmersionTalkedToButton,
                 this.ImmersionNotTalkedToButton,
+                new ModCheckbox(
+                    label: I18n.Immersion_OnlyVillagersInPlayerLocation(),
+                    value: ModEntry.Globals.OnlySameLocation,
+                    set: value => ModEntry.Globals.OnlySameLocation = value
+                ),
+                new ModCheckbox(
+                    label: I18n.Immersion_OnlyVillagersWithinHeartLevel(),
+                    value: ModEntry.Config.ByHeartLevel,
+                    set: value => ModEntry.Config.ByHeartLevel = value
+                ),
+                new MapModSlider(
+                    label: I18n.Immersion_MinHeartLevel(),
+                    value: ModEntry.Config.HeartLevelMin,
+                    min: 0,
+                    max: PlayerConfig.MaxPossibleHeartLevel,
+                    set: value => ModEntry.Config.HeartLevelMin = value,
+                    shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
+                ),
+                new MapModSlider(
+                    label: I18n.Immersion_MaxHeartLevel(),
+                    value: ModEntry.Config.HeartLevelMax,
+                    min: 0,
+                    max: PlayerConfig.MaxPossibleHeartLevel,
+                    set: value => ModEntry.Config.HeartLevelMax = value,
+                    shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
+                ),
 
-                new ModCheckbox(I18n.Immersion_OnlyVillagersInPlayerLocation(), () => ModEntry.Globals.OnlySameLocation, value => ModEntry.Globals.OnlySameLocation = value, this.UpdateConfig),
-                new ModCheckbox(I18n.Immersion_OnlyVillagersWithinHeartLevel(), () => ModEntry.Config.ByHeartLevel, value => ModEntry.Config.ByHeartLevel = value, this.UpdateConfig),
-                new MapModSlider(I18n.Immersion_MinHeartLevel(), 8, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
-                new MapModSlider(I18n.Immersion_MaxHeartLevel(), 9, -1, -1, 0, PlayerConfig.MaxPossibleHeartLevel),
-
+                // extra icons
                 new OptionsElement(I18n.Extra_Label()),
-                new ModCheckbox(I18n.Extra_ShowQuestsOrBirthdays(), () => ModEntry.Globals.ShowQuests, value => ModEntry.Globals.ShowQuests = value, this.UpdateConfig),
-                new ModCheckbox(I18n.Extra_ShowHiddenVillagers(), () => ModEntry.Globals.ShowHiddenVillagers, value => ModEntry.Globals.ShowHiddenVillagers = value, this.UpdateConfig),
-                new ModCheckbox(I18n.Extra_ShowTravelingMerchant(), () => ModEntry.Globals.ShowTravelingMerchant, value => ModEntry.Globals.ShowTravelingMerchant = value, this.UpdateConfig),
+                new ModCheckbox(
+                    label: I18n.Extra_ShowQuestsOrBirthdays(),
+                    value: ModEntry.Globals.ShowQuests,
+                    set: value => ModEntry.Globals.ShowQuests = value
+                ),
+                new ModCheckbox(
+                    label: I18n.Extra_ShowHiddenVillagers(),
+                    value: ModEntry.Globals.ShowHiddenVillagers,
+                    set: value => ModEntry.Globals.ShowHiddenVillagers = value
+                ),
+                new ModCheckbox(
+                    label: I18n.Extra_ShowTravelingMerchant(),
+                    value: ModEntry.Globals.ShowTravelingMerchant,
+                    set: value => ModEntry.Globals.ShowTravelingMerchant = value
+                ),
 
                 new OptionsElement(I18n.Villagers_Label())
             });
 
-            int markerOption = 13;
             this.Options.AddRange(
                 from entry in npcMarkers
                 let name = entry.Key
@@ -148,17 +213,16 @@ namespace NPCMapLocations.Framework.Menus
                 orderby marker.DisplayName
 
                 select new ModCheckbox(
-                    marker.DisplayName,
-                    () => !ModEntry.ShouldExcludeNpc(name),
-                    value =>
+                    label: marker.DisplayName,
+                    value: !ModEntry.ShouldExcludeNpc(name),
+                    set: value =>
                     {
                         bool exclude = !value;
                         if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
                             ModEntry.Config.ForceNpcVisibility.Remove(name);
                         else
                             ModEntry.Config.ForceNpcVisibility[name] = exclude;
-                    },
-                    this.UpdateConfig
+                    }
                 )
             );
         }
@@ -199,6 +263,11 @@ namespace NPCMapLocations.Framework.Menus
             }
         }
 
+        protected override void cleanupBeforeExit()
+        {
+            this.UpdateConfig();
+        }
+
         public override void receiveKeyPress(Keys key)
         {
             if ((Game1.options.menuButton.Contains(new InputButton(key)) ||
@@ -211,8 +280,8 @@ namespace NPCMapLocations.Framework.Menus
             if (key.ToString().Equals(ModEntry.Globals.MenuKey) && this.readyToClose() && this.CanClose)
             {
                 Game1.exitActiveMenu();
-                Game1.activeClickableMenu = new GameMenu();
-                (Game1.activeClickableMenu as GameMenu).changeTab(ModConstants.MapTabIndex);
+
+                Game1.activeClickableMenu = new GameMenu(ModConstants.MapTabIndex);
                 return;
             }
 
@@ -285,31 +354,19 @@ namespace NPCMapLocations.Framework.Menus
                 this.leftClickHeld(x, y);
             }
             else if (this.ImmersionAllButton.Rect.Contains(x, y))
-            {
                 this.ImmersionAllButton.receiveLeftClick(x, y);
-                this.ImmersionTalkedToButton.GreyOut();
-                this.ImmersionNotTalkedToButton.GreyOut();
-            }
             else if (this.ImmersionTalkedToButton.Rect.Contains(x, y))
-            {
                 this.ImmersionTalkedToButton.receiveLeftClick(x, y);
-                this.ImmersionAllButton.GreyOut();
-                this.ImmersionNotTalkedToButton.GreyOut();
-            }
             else if (this.ImmersionNotTalkedToButton.Rect.Contains(x, y))
-            {
                 this.ImmersionNotTalkedToButton.receiveLeftClick(x, y);
-                this.ImmersionAllButton.GreyOut();
-                this.ImmersionTalkedToButton.GreyOut();
-            }
 
             if (this.OkButton.containsPoint(x, y))
             {
                 this.OkButton.scale -= 0.25f;
                 this.OkButton.scale = Math.Max(0.75f, this.OkButton.scale);
-                (Game1.activeClickableMenu as ModMenu).exitThisMenu(false);
-                Game1.activeClickableMenu = new GameMenu();
-                (Game1.activeClickableMenu as GameMenu).changeTab(3);
+
+                this.exitThisMenu(false);
+                Game1.activeClickableMenu = new GameMenu(ModConstants.MapTabIndex);
             }
 
             y -= 15;
@@ -324,10 +381,6 @@ namespace NPCMapLocations.Framework.Menus
                     break;
                 }
             }
-        }
-
-        public override void receiveRightClick(int x, int y, bool playSound = true)
-        {
         }
 
         public override void performHoverAction(int x, int y)
