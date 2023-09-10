@@ -75,68 +75,6 @@ namespace NPCMapLocations.Framework.Menus
             this.DrawIsland = Game1.MasterPlayer.hasOrWillReceiveMail("Visited_Island");
             this.MapX = (int)center.X;
             this.MapY = (int)center.Y;
-
-            var regionRects = this.RegionRects().ToList();
-
-            for (int i = 0; i < regionRects.Count; i++)
-            {
-                var rect = regionRects.ElementAtOrDefault(i);
-                string locationName = rect.Key;
-
-                // Special cases where the name is not an in-game location
-                locationName = locationName switch
-                {
-                    "Spa" => "BathHouse_Entry",
-                    "SewerPipe" => "Sewer",
-                    _ => locationName
-                };
-
-                var locVector = ModEntry.LocationToMap(locationName);
-
-                //this.points[i].bounds = new Rectangle(
-                //  // Snaps the cursor to the center instead of bottom right (default)
-                //  (int)(this.MapX + locVector.X - rect.Value.Width / 2),
-                //  (int)(this.MapY + locVector.Y - rect.Value.Height / 2),
-                //  rect.Value.Width,
-                //  rect.Value.Height
-                //);
-            }
-
-            var customTooltips = this.Customizations.Tooltips;
-
-            //foreach (var tooltip in customTooltips)
-            //{
-            //    var vanillaTooltip = this.points.Find(x => x.name == tooltip.Key);
-
-            //    string text = tooltip.Value.SecondaryText != null
-            //    ? tooltip.Value.PrimaryText + Environment.NewLine + tooltip.Value.SecondaryText
-            //    : tooltip.Value.PrimaryText;
-
-            //    var customTooltip = new ClickableComponent(
-            //        new Rectangle(
-            //            this.MapX + tooltip.Value.X,
-            //            this.MapY + tooltip.Value.Y,
-            //            tooltip.Value.Width,
-            //            tooltip.Value.Height
-            //        ),
-            //        text
-            //    );
-
-            //    // Replace vanilla with custom
-            //    if (vanillaTooltip != null)
-            //    {
-            //        vanillaTooltip = customTooltip;
-            //    }
-            //    else
-            //    // If new custom location, add it
-            //    {
-            //        this.points.Add(customTooltip);
-            //    }
-            //}
-
-            // If two tooltip areas overlap, the one earlier in the list takes precedence
-            // Reversing order allows custom tooltips to take precedence
-            this.points.Reverse();
         }
 
         public override void performHoverAction(int x, int y)
@@ -829,54 +767,6 @@ namespace NPCMapLocations.Framework.Menus
                     break;
             }
             return playerLocationName;
-        }
-
-        /// <summary>Get the ModMain.Map points to display on a map.</summary>
-        /// vanilla locations that have to be tweaked to match modified map
-        private Dictionary<string, Rectangle> RegionRects()
-        {
-            var rects = new Dictionary<string, Rectangle>
-            {
-                ["Desert_Region"] = new(-1, -1, 261, 175),
-                ["Farm_Region"] = new(-1, -1, 188, 148),
-                ["Backwoods_Region"] = new(-1, -1, 148, 120),
-                ["BusStop_Region"] = new(-1, -1, 76, 100),
-                ["WizardHouse"] = new(-1, -1, 36, 76),
-                ["AnimalShop"] = new(-1, -1, 76, 40),
-                ["LeahHouse"] = new(-1, -1, 32, 24),
-                ["SamHouse"] = new(-1, -1, 36, 52),
-                ["HaleyHouse"] = new(-1, -1, 40, 36),
-                ["TownSquare"] = new(-1, -1, 48, 45),
-                ["Hospital"] = new(-1, -1, 16, 32),
-                ["SeedShop"] = new(-1, -1, 28, 40),
-                ["Blacksmith"] = new(-1, -1, 80, 36),
-                ["Saloon"] = new(-1, -1, 28, 40),
-                ["ManorHouse"] = new(-1, -1, 44, 56),
-                ["ArchaeologyHouse"] = new(-1, -1, 32, 28),
-                ["ElliottHouse"] = new(-1, -1, 28, 20),
-                ["Sewer"] = new(-1, -1, 24, 20),
-                ["Graveyard"] = new(-1, -1, 40, 32),
-                ["Trailer"] = new(-1, -1, 20, 12),
-                ["JoshHouse"] = new(-1, -1, 36, 36),
-                ["ScienceHouse"] = new(-1, -1, 48, 32),
-                ["Tent"] = new(-1, -1, 12, 16),
-                ["Mine"] = new(-1, -1, 16, 24),
-                ["AdventureGuild"] = new(-1, -1, 32, 36),
-                ["Quarry"] = new(-1, -1, 88, 76),
-                ["JojaMart"] = new(-1, -1, 52, 52),
-                ["FishShop"] = new(-1, -1, 36, 40),
-                ["Spa"] = new(-1, -1, 48, 36),
-                ["Woods"] = new(-1, -1, 196, 176),
-                ["RuinedHouse"] = new(-1, -1, 20, 20),
-                ["CommunityCenter"] = new(-1, -1, 44, 36),
-                ["SewerPipe"] = new(-1, -1, 24, 32),
-                ["Railroad_Region"] = new(-1, -1, 180, 69),
-                ["LonelyStone"] = new(-1, -1, 28, 28)
-            };
-            if (this.DrawIsland)
-                rects.Add("GingerIsland", new(-1, -1, 180, 160));
-
-            return rects;
         }
     }
 }
