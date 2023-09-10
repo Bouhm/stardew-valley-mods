@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Menus;
 
 namespace NPCMapLocations.Framework.Menus
@@ -248,15 +249,6 @@ namespace NPCMapLocations.Framework.Menus
                 }
             }
 
-            // Traveling Merchant
-            if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
-            {
-                Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
-                b.Draw(Game1.mouseCursors, new Vector2(this.mapBounds.X + merchantLoc.X - 16, this.mapBounds.Y + merchantLoc.Y - 15),
-                  new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
-                  1f);
-            }
-
             // NPCs
             // Sort by drawing order
             if (this.NpcMarkers != null)
@@ -283,8 +275,7 @@ namespace NPCMapLocations.Framework.Menus
                     var markerColor = marker.IsHidden ? Color.DarkGray * 0.7f : Color.White;
 
                     // Draw NPC marker
-                    var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
-
+                    Rectangle spriteRect = marker.GetSpriteSourceRect();
                     b.Draw(marker.Sprite, new Rectangle(this.mapBounds.X + marker.MapX, this.mapBounds.Y + marker.MapY, 32, 30), spriteRect, markerColor);
 
                     // Draw icons for quests/birthday
@@ -330,7 +321,7 @@ namespace NPCMapLocations.Framework.Menus
             }
             else
             {
-                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
+                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
                   new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1,

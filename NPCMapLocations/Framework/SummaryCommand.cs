@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -36,10 +35,9 @@ namespace NPCMapLocations.Framework
         /// <param name="monitor">The monitor with which to write output..</param>
         /// <param name="locationUtil">Scans and maps locations in the game world.</param>
         /// <param name="customizations">Manages customized map recolors, NPCs, sprites, names, etc.</param>
-        /// <param name="mapVectors">The in-world tile coordinates and map pixels which represent the same position for each location name.</param>
         /// <param name="npcMarkers">The tracked NPC markers.</param>
-        /// <param name="locationsWithoutMapVectors">The outdoor location contexts which don't have any map vectors.</param>
-        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, IDictionary<string, MapVector[]> mapVectors, Dictionary<string, NpcMarker> npcMarkers, IEnumerable<LocationContext> locationsWithoutMapVectors)
+        /// <param name="locationsWithoutMapPositions">The outdoor location contexts which don't have any map position data.</param>
+        public static void Handle(IMonitor monitor, LocationUtil locationUtil, ModCustomizations customizations, Dictionary<string, NpcMarker> npcMarkers, IEnumerable<LocationContext> locationsWithoutMapPositions)
         {
             if (!Context.IsWorldReady)
             {
@@ -57,7 +55,7 @@ namespace NPCMapLocations.Framework
                 var location = player.currentLocation;
                 string locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
                 LocationContext context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
-                Vector2 mapPixel = ModEntry.LocationToMap(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.MapVectors, customizations.LocationExclusions);
+                Vector2 mapPixel = ModEntry.LocationToMap(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
                 // collect alternate location names
                 List<string> altNames = new();
@@ -76,23 +74,6 @@ namespace NPCMapLocations.Framework
                 output.AppendLine($"Tile: ({player.TilePoint.X}, {player.TilePoint.Y})");
                 output.AppendLine($"Excluded: {customizations.LocationExclusions.Contains(locationName)}");
                 output.AppendLine($"Map pixel: {(mapPixel != ModEntry.Unknown ? $"({mapPixel.X}, {mapPixel.Y})" : "unknown")}");
-                output.AppendLine();
-
-                output.AppendLine("Configured vectors:");
-                if (customizations.MapVectors.TryGetValue(locationName, out MapVector[] vectors) && vectors.Any())
-                {
-                    output.Append(
-                        SummaryCommand.BuildTable(
-                            vectors,
-                            "   ",
-                            new[] { "tile", "map pixel" },
-                            vector => $"{vector.TileX}, {vector.TileY}",
-                            vector => $"{vector.MapX}, {vector.MapY}"
-                        )
-                    );
-                }
-                else
-                    output.AppendLine("   (none)");
                 output.AppendLine();
 
                 if (context != null)
@@ -204,60 +185,22 @@ namespace NPCMapLocations.Framework
                 output.AppendLine();
             }
 
-            // map vectors
-            {
-                output.AppendLine("===================");
-                output.AppendLine("==  Map vectors  ==");
-                output.AppendLine("===================");
-                output.AppendLine("A 'map vector' represents the same position both in-world (measured in tiles) and on the world map (measured in pixels).");
-                output.AppendLine("These are used to calculate where any in-world character should be drawn on the map.");
-                output.AppendLine();
-
-                if (mapVectors.Any())
-                {
-                    var records = mapVectors
-                        .SelectMany(group => group.Value
-                            .Select(vector => new { Location = group.Key, Vector = vector, IsCustom = customizations.MapVectors.ContainsKey(group.Key) })
-                        )
-                        .OrderBy(p => p.Location)
-                        .ThenBy(p => p.Vector.TileX)
-                        .ThenBy(p => p.Vector.TileY);
-
-                    output.Append(
-                        SummaryCommand.BuildTable(
-                            records,
-                            "",
-                            new[] { "location", "tile", "map pixel", "source" },
-                            p => p.Location,
-                            p => $"{p.Vector.TileX}, {p.Vector.TileY}",
-                            p => $"{p.Vector.MapX}, {p.Vector.MapY}",
-                            p => p.IsCustom ? "another mod" : "NPC Map Locations"
-                        )
-                    );
-                }
-                else
-                    output.AppendLine("   (none)");
-
-                output.AppendLine();
-                output.AppendLine();
-            }
-
             // unknown locations
             {
                 output.AppendLine("=========================");
                 output.AppendLine("==  Unknown Locations  ==");
                 output.AppendLine("=========================");
-                output.AppendLine("These locations have no map vectors defined, so NPCs and characters in that location won't appear on the world map.");
+                output.AppendLine("These locations have no position data in Data/WorldMap, so NPCs and characters in that location won't appear on the world map.");
                 output.AppendLine("For location mod authors, see the pinned post at https://www.nexusmods.com/stardewvalley/mods/239?tab=posts.");
                 output.AppendLine();
 
-                locationsWithoutMapVectors = locationsWithoutMapVectors.OrderBy(p => p.Name).ToArray();
+                locationsWithoutMapPositions = locationsWithoutMapPositions.OrderBy(p => p.Name).ToArray();
 
-                if (locationsWithoutMapVectors.Any())
+                if (locationsWithoutMapPositions.Any())
                 {
                     output.Append(
                         SummaryCommand.BuildTable(
-                            locationsWithoutMapVectors,
+                            locationsWithoutMapPositions,
                             "",
                             new[] { "name", "type", "root location" },
                             p => p.Name,

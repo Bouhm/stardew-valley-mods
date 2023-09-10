@@ -18,6 +18,7 @@ using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
+using StardewValley.WorldMaps;
 
 namespace NPCMapLocations
 {
@@ -31,7 +32,6 @@ namespace NPCMapLocations
         private static readonly Dictionary<string, BuildingMarker> FarmBuildings = new();
 
         private readonly PerScreen<Texture2D> BuildingMarkers = new();
-        private readonly PerScreen<Dictionary<string, MapVector[]>> MapVectors = new();
         private readonly PerScreen<ModMinimap> Minimap = new();
         private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new();
         private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new();
@@ -102,9 +102,8 @@ namespace NPCMapLocations
                 monitor: this.Monitor,
                 locationUtil: ModEntry.LocationUtil,
                 customizations: this.Customizations,
-                mapVectors: this.MapVectors.Value,
                 npcMarkers: this.NpcMarkers.Value,
-                locationsWithoutMapVectors: this.GetLocationsWithoutMapVectors()
+                locationsWithoutMapPositions: this.GetLocationsWithoutMapPosition()
             ));
         }
 
@@ -123,111 +122,50 @@ namespace NPCMapLocations
         /// <param name="locationName">The in-world location name.</param>
         /// <param name="tileX">The X tile position within the location, if known.</param>
         /// <param name="tileY">The Y tile position within the location, if known.</param>
-        /// <param name="customMapVectors">The custom vectors which map specific in-game tile coordinates to their map pixels.</param>
         /// <param name="locationExclusions">The locations to ignore when scanning locations for players and NPCs.</param>
-        public static Vector2 LocationToMap(string locationName, int tileX = -1, int tileY = -1, Dictionary<string, MapVector[]> customMapVectors = null, HashSet<string> locationExclusions = null)
+        public static Vector2 LocationToMap(string locationName, int tileX = 0, int tileY = 0, HashSet<string> locationExclusions = null)
         {
-            static Vector2 ScanRecursively(string locationName, int tileX, int tileY, Dictionary<string, MapVector[]> customMapVectors, HashSet<string> locationExclusions, ISet<string> seen, int depth)
+            Point tile = new Point(tileX, tileY);
+
+            ISet<string> seen = new HashSet<string>();
+            int depth = 0;
+
+            while (!string.IsNullOrWhiteSpace(locationName))
             {
                 // special case: map generated level to single name
                 locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
 
-                if (string.IsNullOrWhiteSpace(locationName))
-                    return Unknown;
-
                 // break infinite loops
                 if (!seen.Add(locationName))
                     return Unknown;
-                if (depth > LocationUtil.MaxRecursionDepth)
+                if (++depth > LocationUtil.MaxRecursionDepth)
                     throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
 
-                if (locationExclusions?.Contains(locationName) == true || locationName.Contains("WarpRoom"))
-                    return Unknown;
-
+                // special case: inside farm building
                 if (FarmBuildings.TryGetValue(locationName, out BuildingMarker marker))
                     return marker.MapPosition;
 
-                // Get location of indoor location by its warp position in the outdoor location
-                if (LocationUtil.TryGetContext(locationName, out var loc)
-                  && loc.Type != LocationType.Outdoors
-                  && loc.Root != null
-                  && locationName != "MovieTheater"         // Weird edge cases where the warps are off
-                )
-                {
-                    string building = LocationUtil.GetBuilding(locationName, depth + 1);
-
-                    if (building != null)
-                    {
-                        var buildingContext = LocationUtil.TryGetContext(building);
-                        int doorX = (int)buildingContext.Warp.X;
-                        int doorY = (int)buildingContext.Warp.Y;
-
-                        // Slightly adjust warp location to depict being inside the building 
-                        var warpPos = ScanRecursively(loc.Root, doorX, doorY, customMapVectors, locationExclusions, seen, depth + 1);
-                        return new Vector2(warpPos.X + 1, warpPos.Y - 8);
-                    }
-                }
-
-                // If we fail to grab the indoor location correctly for whatever reason, fallback to old hard-coded constants
-
-                MapVector[] locVectors = ModEntry.GetMapVectors(locationName, customMapVectors);
-                if (locVectors == null)
+                // get location
+                GameLocation location = Game1.getLocationFromName(locationName);
+                if (location is null)
                     return Unknown;
 
-                int x;
-                int y;
+                // get map pixel from game data if found
+                MapAreaPosition mapAreaPos = WorldMapManager.GetPositionData(location, tile);
+                if (mapAreaPos != null)
+                    return mapAreaPos.GetMapPixelPosition(location, tile);
 
-                // Precise (static) regions and indoor locations
-                if (locVectors.Length == 1 || tileX == -1 || tileY == -1)
+                // else try from parent, unless this location is blacklisted
+                if (locationExclusions?.Contains(locationName) != true && !locationName.Contains("WarpRoom") && LocationUtil.TryGetContext(locationName, out var loc))
                 {
-                    x = locVectors.FirstOrDefault().MapX;
-                    y = locVectors.FirstOrDefault().MapY;
+                    locationName = loc.Parent;
+                    tile = Utility.Vector2ToPoint(loc.Warp);
                 }
                 else
-                {
-                    // Sort map vectors by distance to point
-                    MapVector[] vectors = locVectors
-                        .OrderBy(vector => Math.Sqrt(Math.Pow(vector.TileX - tileX, 2) + Math.Pow(vector.TileY - tileY, 2)))
-                        .ToArray();
-
-                    MapVector lower = null;
-                    MapVector upper = null;
-                    bool isSameAxis = false;
-
-                    // Create rectangle bound from two pre-defined points (lower & upper bound) and calculate map scale for that area
-                    foreach (var vector in vectors)
-                    {
-                        if (lower != null && upper != null)
-                        {
-                            if (lower.TileX == upper.TileX || lower.TileY == upper.TileY)
-                                isSameAxis = true;
-                            else
-                                break;
-                        }
-
-                        if ((lower == null || isSameAxis) && tileX >= vector.TileX && tileY >= vector.TileY)
-                        {
-                            lower = vector;
-                            continue;
-                        }
-
-                        if ((upper == null || isSameAxis) && tileX <= vector.TileX && tileY <= vector.TileY)
-                            upper = vector;
-                    }
-
-                    // Handle null cases - not enough vectors to calculate using lower/upper bound strategy
-                    // Uses fallback strategy - get closest points such that lower != upper
-                    lower ??= upper == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-                    upper ??= lower == vectors.First() ? vectors.Skip(1).First() : vectors.First();
-
-                    x = (int)MathHelper.Clamp((int)(lower.MapX + (tileX - lower.TileX) / (double)(upper.TileX - lower.TileX) * (upper.MapX - lower.MapX)), 0, 1200);
-                    y = (int)MathHelper.Clamp((int)(lower.MapY + (tileY - lower.TileY) / (double)(upper.TileY - lower.TileY) * (upper.MapY - lower.MapY)), 0, 720);
-                }
-
-                return new Vector2(x, y);
+                    break; // not found
             }
 
-            return ScanRecursively(locationName, tileX, tileY, customMapVectors, locationExclusions, new HashSet<string>(), 1);
+            return Unknown;
         }
 
         /// <summary>Get whether an NPC is configured to be excluded when rendering markers on the map.</summary>
@@ -318,17 +256,11 @@ namespace NPCMapLocations
             foreach (string npcName in ModConstants.ConditionalNpcs)
                 this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
 
-            this.MapVectors.Value = ModConstants.MapVectors;
-
-            // Add custom map vectors from content.json
-            foreach (var locVectors in this.Customizations.MapVectors)
-                this.MapVectors.Value[locVectors.Key] = locVectors.Value;
-
             // Get context of all locations (indoor, outdoor, relativity)
             LocationUtil.ScanLocationContexts();
 
             // Log any custom locations not handled in content.json
-            string[] unknownLocations = this.GetLocationsWithoutMapVectors().Select(p => p.Name).OrderBy(p => p).ToArray();
+            string[] unknownLocations = this.GetLocationsWithoutMapPosition().Select(p => p.Name).OrderBy(p => p).ToArray();
             if (unknownLocations.Any())
                 this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
 
@@ -437,7 +369,7 @@ namespace NPCMapLocations
         {
             // Check for traveling merchant day
             if (this.ConditionalNpcs.Value != null)
-                this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).travelingMerchantDay;
+                this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).ShouldTravelingMerchantVisitToday();
 
             this.ResetMarkers();
             this.UpdateMarkers(true);
@@ -672,16 +604,15 @@ namespace NPCMapLocations
         }
 
         /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
-        private IEnumerable<LocationContext> GetLocationsWithoutMapVectors()
+        private IEnumerable<LocationContext> GetLocationsWithoutMapPosition()
         {
             foreach (var entry in LocationUtil.LocationContexts)
             {
                 string name = entry.Key;
                 LocationContext context = entry.Value;
 
-                string outdoorName = context.Root ?? name;
-                if (!this.MapVectors.Value.ContainsKey(outdoorName) && context.Type is not (LocationType.Building or LocationType.Room))
-                    yield return entry.Value;
+                if (LocationToMap(name) == Unknown && context.Type is not (LocationType.Building or LocationType.Room))
+                    yield return context;
             }
         }
 
@@ -711,41 +642,6 @@ namespace NPCMapLocations
             return villagers;
         }
 
-        /// <summary>Get the map vectors for a location name, if any.</summary>
-        /// <param name="locationName">The location name.</param>
-        /// <param name="customMapVectors">The custom vectors which map specific in-game tile coordinates to their map pixels.</param>
-        private static MapVector[] GetMapVectors(string locationName, IDictionary<string, MapVector[]> customMapVectors)
-        {
-            // get a key for the specific farm type if known
-            string farmKey = null;
-            if (locationName == "Farm")
-            {
-                farmKey = Game1.whichFarm switch
-                {
-                    Farm.default_layout => "Farm_Default",
-                    Farm.riverlands_layout => "Farm_Riverland",
-                    Farm.forest_layout => "Farm_Forest",
-                    Farm.mountains_layout => "Farm_Hills",
-                    Farm.combat_layout => "Farm_Wilderness",
-                    Farm.fourCorners_layout => "Farm_FourCorners",
-                    Farm.beach_layout => "Farm_Beach",
-                    Farm.mod_layout => "Farm_" + Game1.GetFarmTypeID(),
-                    _ => null
-                };
-            }
-
-            // get most specific vectors available
-            return
-                (
-                    from source in new[] { customMapVectors, ModConstants.MapVectors }
-                    from key in new[] { farmKey, locationName }
-
-                    where source != null && key != null && source.ContainsKey(key)
-                    select source[key]
-                )
-                .FirstOrDefault(p => p?.Any() == true);
-        }
-
         // For drawing farm buildings on the map 
         // and getting positions relative to the farm 
         private void UpdateFarmBuildingLocations()
@@ -766,7 +662,6 @@ namespace NPCMapLocations
                     "Farm", // Get building position in farm
                     building.tileX.Value,
                     building.tileY.Value,
-                    this.Customizations.MapVectors,
                     this.Customizations.LocationExclusions
                 );
                 if (building.buildingType.Value.Contains("Barn"))
@@ -777,7 +672,7 @@ namespace NPCMapLocations
             }
 
             // Add FarmHouse
-            var farmhouseLoc = LocationToMap("FarmHouse", customMapVectors: this.Customizations.MapVectors);
+            var farmhouseLoc = LocationToMap("FarmHouse");
             farmhouseLoc.X -= 6;
             FarmBuildings["FarmHouse"] = new("FarmHouse", farmhouseLoc);
         }
@@ -870,6 +765,26 @@ namespace NPCMapLocations
 
             if (Context.IsMainPlayer)
             {
+                // traveling cart
+                if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs.Value["Merchant"])
+                {
+                    Forest forest = Game1.RequireLocation<Forest>("Forest");
+                    Point cartTile = forest.GetTravelingMerchantCartTile();
+                    Vector2 mapPos = LocationToMap("Forest", cartTile.X + 4, cartTile.Y);
+
+                    this.NpcMarkers.Value.Add("Merchant", new NpcMarker
+                    {
+                        DisplayName = null,
+                        CropOffset = 0,
+                        Sprite = Game1.mouseCursors,
+                        SpriteSourceRect = new Rectangle(191, 1410, 22, 21),
+                        SpriteZoom = 1.3f,
+                        MapX = (int)mapPos.X,
+                        MapY = (int)mapPos.Y
+                    });
+                }
+
+                // villagers
                 foreach (var npc in this.GetVillagers())
                 {
                     if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
@@ -1050,7 +965,7 @@ namespace NPCMapLocations
                 if (locationName != null)
                 {
                     // Get center of NPC marker
-                    var npcLocation = LocationToMap(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
+                    var npcLocation = LocationToMap(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
                     npcMarker.MapX = (int)npcLocation.X - 16;
                     npcMarker.MapY = (int)npcLocation.Y - 15;
                 }
@@ -1160,7 +1075,6 @@ namespace NPCMapLocations
                     locationName,
                     farmer.TilePoint.X,
                     farmer.TilePoint.Y,
-                    this.Customizations.MapVectors,
                     this.Customizations.LocationExclusions
                 );
 

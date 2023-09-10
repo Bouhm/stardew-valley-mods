@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
@@ -14,10 +13,6 @@ namespace NPCMapLocations.Framework
         /*********
         ** Accessors
         *********/
-        /// <summary>The in-world tile coordinates and map pixels which represent the same position, indexed by location name.</summary>
-        /// <remarks>These are used to map any in-game tile coordinate to the map by measuring the distance between the two closest map vectors.</remarks>
-        public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
-
         /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
         public Dictionary<string, string> Names { get; set; } = new();
 
@@ -49,9 +44,6 @@ namespace NPCMapLocations.Framework
             foreach (var locationData in customLocationJson)
             {
                 JObject location = locationData.Value;
-
-                if (location.ContainsKey("MapVectors"))
-                    this.AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
 
                 if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
                     this.LocationExclusions.Add(locationData.Key);
@@ -127,41 +119,6 @@ namespace NPCMapLocations.Framework
 
             ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
-        }
-
-        /// <summary>Override the map vectors for a custom location. See <see cref="MapVectors"/> for details.</summary>
-        /// <param name="locationName">The name of the location for which to add vectors.</param>
-        /// <param name="mapLocations">The array of custom vectors.</param>
-        private void AddCustomMapLocation(string locationName, JArray mapLocations)
-        {
-            var rawVectors = mapLocations.ToObject<JObject[]>();
-            var parsedVectors = new MapVector[rawVectors.Length];
-            for (int i = 0; i < rawVectors.Length; i++)
-            {
-                JObject rawVector = rawVectors[i];
-
-                // Marker doesn't need to specify corresponding Tile position
-                if (rawVector.GetValue("TileX") == null || rawVector.GetValue("TileY") == null)
-                {
-                    parsedVectors[i] = new MapVector(
-                        (int)rawVector.GetValue("MapX"),
-                        (int)rawVector.GetValue("MapY")
-                    );
-                }
-                // Region must specify corresponding Tile positions for
-                // Calculations on movement within location
-                else
-                {
-                    parsedVectors[i] = new MapVector(
-                        (int)rawVector.GetValue("MapX"),
-                        (int)rawVector.GetValue("MapY"),
-                        (int)rawVector.GetValue("TileX"),
-                        (int)rawVector.GetValue("TileY")
-                    );
-                }
-            }
-
-            this.MapVectors[locationName] = parsedVectors;
         }
 
         /// <summary>Merge any number of dictionaries into a new dictionary.</summary>
