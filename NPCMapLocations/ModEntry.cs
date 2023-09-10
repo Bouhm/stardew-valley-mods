@@ -54,9 +54,6 @@ namespace NPCMapLocations
         // Customizations/Custom mods
         private ModCustomizations Customizations;
 
-        // Debugging
-        private bool DebugMode;
-
 
         /*********
         ** Accessors
@@ -64,7 +61,6 @@ namespace NPCMapLocations
         public static PlayerConfig Config;
         public static GlobalConfig Globals;
         public static IModHelper StaticHelper;
-        public static Texture2D Map;
 
 
         /*********
@@ -91,8 +87,6 @@ namespace NPCMapLocations
             helper.Events.Player.Warped += this.OnWarped;
             helper.Events.Display.MenuChanged += this.OnMenuChanged;
             helper.Events.Display.RenderingHud += this.OnRenderingHud;
-            helper.Events.Display.RenderedWorld += this.OnRenderedWorld;
-            helper.Events.Display.Rendered += this.OnRendered;
             helper.Events.Display.WindowResized += this.OnWindowResized;
             helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
@@ -244,12 +238,6 @@ namespace NPCMapLocations
                 this.BuildingMarkers.Value = null;
             }
 
-            // Get season for map
-            Map = Game1.content.Load<Texture2D>("LooseSprites\\Map");
-
-            // Disable for multiplayer for anti-cheat
-            this.DebugMode = Globals.DebugMode && !Context.IsMultiplayer;
-
             // NPCs that player should meet before being shown
             this.ConditionalNpcs.Value = new Dictionary<string, bool>();
             foreach (string npcName in ModConstants.ConditionalNpcs)
@@ -320,10 +308,6 @@ namespace NPCMapLocations
                 }
             }
 
-            // Debug DnD
-            if (this.DebugMode && e.Button == SButton.MouseRight && this.IsModMapOpen.Value)
-                MouseUtil.HandleMouseDown();
-
             // Minimap toggle
             if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
             {
@@ -335,9 +319,6 @@ namespace NPCMapLocations
             // ModMenu
             if (Game1.activeClickableMenu is GameMenu)
                 this.HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
-
-            if (this.DebugMode && !Context.IsMultiplayer && this.Helper.Input.GetState(SButton.LeftControl) == SButtonState.Held && e.Button.Equals(SButton.MouseRight))
-                Game1.player.setTileLocation(Game1.currentCursorTile);
         }
 
         /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
@@ -345,11 +326,10 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
         {
-            if (!Context.IsWorldReady) return;
+            if (!Context.IsWorldReady)
+                return;
 
-            if (this.DebugMode && e.Button == SButton.MouseRight && this.IsModMapOpen.Value)
-                MouseUtil.HandleMouseRelease();
-            else if (this.Minimap.Value != null && !ModEntry.Globals.LockMinimapPosition)
+            if (this.Minimap.Value != null && !ModEntry.Globals.LockMinimapPosition)
             {
                 if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                     this.Minimap.Value.Resize();
@@ -372,8 +352,6 @@ namespace NPCMapLocations
 
             this.ResetMarkers();
             this.UpdateMarkers(true);
-
-            ModEntry.Map = Game1.content.Load<Texture2D>("LooseSprites\\map");
 
             this.Minimap.Value = new ModMinimap(this.CreateMapPage);
         }
@@ -573,34 +551,6 @@ namespace NPCMapLocations
         {
             if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
                 this.Minimap.Value?.Draw();
-        }
-
-        /// <inheritdoc cref="IDisplayEvents.RenderedWorld"/>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event data.</param>
-        private void OnRenderedWorld(object sender, RenderedWorldEventArgs e)
-        {
-            // Highlight tile for debug mode
-            if (this.DebugMode)
-            {
-                Game1.spriteBatch.Draw(Game1.mouseCursors,
-                  new Vector2(
-                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.X) - Game1.viewport.X,
-                    Game1.tileSize * (int)Math.Floor(Game1.currentCursorTile.Y) - Game1.viewport.Y),
-                  new Rectangle(448, 128, 64, 64), Color.White);
-            }
-        }
-
-        /// <inheritdoc cref="IDisplayEvents.Rendered"/>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event data.</param>
-        private void OnRendered(object sender, RenderedEventArgs e)
-        {
-            if (!Context.IsWorldReady || Game1.player == null)
-                return;
-
-            if (this.DebugMode)
-                this.ShowDebugInfo();
         }
 
         /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
@@ -1115,125 +1065,6 @@ namespace NPCMapLocations
                 this.FarmerMarkers.Value[farmerId].WorldMapPosition = farmerLoc;
                 this.FarmerMarkers.Value[farmerId].LocationName = locationName;
             }
-        }
-
-        // Show debug info in top left corner
-        private void ShowDebugInfo()
-        {
-            if (Game1.player.currentLocation == null) return;
-            string locationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-            int textHeight = (int)Game1.dialogueFont
-              .MeasureString("()").Y - 6;
-
-            // If map is open, show map position at cursor
-            if (this.IsModMapOpen.Value)
-            {
-                int borderWidth = 3;
-                float borderOpacity = 0.75f;
-                Vector2 mapPos = MouseUtil.GetMapPositionAtCursor();
-                Rectangle bounds = MouseUtil.GetDragAndDropArea();
-
-                var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
-                tex.SetData(new[] { Color.Red });
-
-                // Draw point at cursor on map
-                Game1.spriteBatch.Draw(tex,
-                  new Rectangle(Game1.getMouseX() - borderWidth / 2, Game1.getMouseY() - borderWidth / 2, borderWidth, borderWidth),
-                  Rectangle.Empty, Color.White);
-
-                // Show map pixel position at cursor
-                this.DrawText($"Map position: ({mapPos.X}, {mapPos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-
-                // Draw drag and drop area
-                if (this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
-                {
-                    // Draw dragging box
-                    this.DrawBorder(tex, MouseUtil.GetCurrentDraggingArea(), borderWidth, Color.White * borderOpacity);
-                }
-                else
-                {
-                    if (MouseUtil.BeginMousePosition.X < 0 && MouseUtil.EndMousePosition.X < 0) return;
-
-                    // Draw drag and drop box
-                    this.DrawBorder(tex, bounds, borderWidth, Color.White * borderOpacity);
-
-                    var mapBounds = MouseUtil.GetRectangleOnMap(bounds);
-
-                    if (mapBounds.Width == 0 && mapBounds.Height == 0)
-                    {
-                        // Show point
-                        this.DrawText($"Point: ({mapBounds.X}, {mapBounds.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
-                    }
-                    else
-                    {
-                        // Show first point of DnD box
-                        this.DrawText($"Top-left: ({mapBounds.X}, {mapBounds.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
-
-                        // Show second point of DnD box
-                        this.DrawText($"Bot-right: ({mapBounds.X + mapBounds.Width}, {mapBounds.Y + mapBounds.Height})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 2), Color.White);
-
-                        // Show width of DnD box
-                        this.DrawText($"Width: {mapBounds.Width}", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 3), Color.White);
-
-                        // Show height of DnD box
-                        this.DrawText($"Height: {mapBounds.Height}", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight * 4), Color.White);
-                    }
-                }
-            }
-            else
-            {
-                // Show tile position of tile at cursor
-                var tilePos = MouseUtil.GetTilePositionAtCursor();
-                this.DrawText($"{locationName} ({Game1.currentLocation.Map.DisplayWidth / Game1.tileSize} x {Game1.currentLocation.Map.DisplayHeight / Game1.tileSize})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4), Color.White);
-                this.DrawText($"Tile position: ({tilePos.X}, {tilePos.Y})", new Vector2(Game1.tileSize / 4, Game1.tileSize / 4 + textHeight), Color.White);
-            }
-        }
-
-        // Draw outlined text
-        private void DrawText(string text, Vector2 pos, Color? color = null)
-        {
-            var tex = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
-            tex.SetData(new[] { Color.Black * 0.75f });
-
-            // Dark background for clearer text
-            Game1.spriteBatch.Draw(
-              tex,
-              new Rectangle(
-                (int)pos.X,
-                (int)pos.Y,
-                (int)Game1.dialogueFont.MeasureString(text).X,
-                (int)Game1.dialogueFont.MeasureString("()").Y - 6),
-              Rectangle.Empty,
-              Color.Black
-             );
-
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, 1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos + new Vector2(-1, -1), Color.Black);
-            Game1.spriteBatch.DrawString(Game1.dialogueFont, text, pos, color ?? Color.White);
-        }
-
-        // Draw rectangle border
-        private void DrawBorder(Texture2D tex, Rectangle rect, int borderWidth, Color color)
-        {
-            // Draw top line
-            Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1, rect.Y - 1, rect.Width + 3, borderWidth), color);
-
-            // Draw left line
-            Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1, rect.Y - 1, borderWidth, rect.Height + 3), color);
-
-            // Draw right line
-            Game1.spriteBatch.Draw(tex, new Rectangle((rect.X + rect.Width - borderWidth + 2),
-              rect.Y - 1,
-              borderWidth,
-              rect.Height + 3), color);
-
-            // Draw bottom line
-            Game1.spriteBatch.Draw(tex, new Rectangle(rect.X - 1,
-              rect.Y + rect.Height - borderWidth + 2,
-              rect.Width + 3,
-              borderWidth), color);
         }
     }
 }

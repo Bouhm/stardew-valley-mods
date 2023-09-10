@@ -7,6 +7,7 @@
 * Increased minimap update rate.
 * Rewrote minimap to dynamically render part of the main map.
 * Removed custom map textures.
+* Removed debug mode (no longer useful now that the mod uses `Data/WorldMap`).
 * Fixed minimap markers popping in/out near the edge.
 * Fixed farmhands not seeing custom world maps added by other mods.
 * Improved translations. Thanks to MakinDay (updated Italian) and Timur13240 (updated Russian)!

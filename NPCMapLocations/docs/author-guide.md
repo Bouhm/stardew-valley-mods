@@ -10,8 +10,6 @@ to support their custom locations or NPCs. **For players, see the [main readme](
   * [Hide a custom location](#hide-a-custom-location)
   * [Customize an NPC icon](#customize-an-npc-icon)
   * [Hide an NPC](#hide-an-npc)
-* [Tools for mod authors](#tools-for-mod-authors)
-  * [Debug mode](#debug-mode)
 * [FAQs](#faqs)
   * [Didn't NPC Map Locations previously redraw the world map?](didnt-npc-map-locations-previously-redraw-the-world-map)
   * [Where can I get more help?](#where-can-i-get-more-help)
@@ -128,17 +126,6 @@ exact name) using [Content Patcher](https://stardewvalleywiki.com/Modding:Conten
     }
 }
 ```
-
-## Tools for mod authors
-### Debug mode
-You can optionally enable `DebugMode` in NPC Map Location's `config\globals.json` file. This will
-show some info in the top-left corner:
-* the current location name and its tile size;
-* the tile position under your cursor.
-
-> <img src="doc-images/debug-mode-location.png" width="500" />
-
-This also lets you `Ctrl` + right-click on the world map to warp to the equivalent tile position.
 
 ## FAQs
 ### Didn't NPC Map Locations previously redraw the world map?
