@@ -93,46 +93,46 @@ namespace NPCMapLocations.Framework.Menus
 
                 var locVector = ModEntry.LocationToMap(locationName);
 
-                this.points[i].bounds = new Rectangle(
-                  // Snaps the cursor to the center instead of bottom right (default)
-                  (int)(this.MapX + locVector.X - rect.Value.Width / 2),
-                  (int)(this.MapY + locVector.Y - rect.Value.Height / 2),
-                  rect.Value.Width,
-                  rect.Value.Height
-                );
+                //this.points[i].bounds = new Rectangle(
+                //  // Snaps the cursor to the center instead of bottom right (default)
+                //  (int)(this.MapX + locVector.X - rect.Value.Width / 2),
+                //  (int)(this.MapY + locVector.Y - rect.Value.Height / 2),
+                //  rect.Value.Width,
+                //  rect.Value.Height
+                //);
             }
 
             var customTooltips = this.Customizations.Tooltips;
 
-            foreach (var tooltip in customTooltips)
-            {
-                var vanillaTooltip = this.points.Find(x => x.name == tooltip.Key);
+            //foreach (var tooltip in customTooltips)
+            //{
+            //    var vanillaTooltip = this.points.Find(x => x.name == tooltip.Key);
 
-                string text = tooltip.Value.SecondaryText != null
-                ? tooltip.Value.PrimaryText + Environment.NewLine + tooltip.Value.SecondaryText
-                : tooltip.Value.PrimaryText;
+            //    string text = tooltip.Value.SecondaryText != null
+            //    ? tooltip.Value.PrimaryText + Environment.NewLine + tooltip.Value.SecondaryText
+            //    : tooltip.Value.PrimaryText;
 
-                var customTooltip = new ClickableComponent(
-                    new Rectangle(
-                        this.MapX + tooltip.Value.X,
-                        this.MapY + tooltip.Value.Y,
-                        tooltip.Value.Width,
-                        tooltip.Value.Height
-                    ),
-                    text
-                );
+            //    var customTooltip = new ClickableComponent(
+            //        new Rectangle(
+            //            this.MapX + tooltip.Value.X,
+            //            this.MapY + tooltip.Value.Y,
+            //            tooltip.Value.Width,
+            //            tooltip.Value.Height
+            //        ),
+            //        text
+            //    );
 
-                // Replace vanilla with custom
-                if (vanillaTooltip != null)
-                {
-                    vanillaTooltip = customTooltip;
-                }
-                else
-                // If new custom location, add it
-                {
-                    this.points.Add(customTooltip);
-                }
-            }
+            //    // Replace vanilla with custom
+            //    if (vanillaTooltip != null)
+            //    {
+            //        vanillaTooltip = customTooltip;
+            //    }
+            //    else
+            //    // If new custom location, add it
+            //    {
+            //        this.points.Add(customTooltip);
+            //    }
+            //}
 
             // If two tooltip areas overlap, the one earlier in the list takes precedence
             // Reversing order allows custom tooltips to take precedence
@@ -145,7 +145,7 @@ namespace NPCMapLocations.Framework.Menus
             this.HoveredLocationText = "";
             this.HoveredNames = "";
             this.HasIndoorCharacter = false;
-            foreach (ClickableComponent current in this.points)
+            foreach (ClickableComponent current in this.points.Values)
             {
                 if (current.containsPoint(x, y))
                 {
@@ -509,7 +509,7 @@ namespace NPCMapLocations.Framework.Menus
             }
             else
             {
-                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions);
+                Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
                   new Vector2(this.MapX + playerLoc.X - 16, this.MapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
@@ -686,7 +686,7 @@ namespace NPCMapLocations.Framework.Menus
                         replacedName = Game1.content.LoadString("Strings\\StringsFromCSFiles:MapPage.cs.11190");
                     break;
             }
-            foreach (ClickableComponent c in this.points)
+            foreach (ClickableComponent c in this.points.Values)
             {
                 string cNameNoSpaces = c.name.Replace(" ", "");
                 int indexOfNewLine = c.name.IndexOf(Environment.NewLine);
@@ -701,8 +701,8 @@ namespace NPCMapLocations.Framework.Menus
                 }
             }
 
-            int x = player.getTileX();
-            int y = player.getTileY();
+            int x = player.TilePoint.X;
+            int y = player.TilePoint.Y;
             switch (player.currentLocation.Name)
             {
                 case "Saloon":

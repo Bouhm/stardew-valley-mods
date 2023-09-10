@@ -154,7 +154,7 @@ namespace NPCMapLocations.Framework.Menus
             // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
             // Positions relative to the map are not.
 
-            this.Center = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.getTileX(), Game1.player.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions);
+            this.Center = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
 
             // Player in unknown location, use previous location as center
             if (this.Center.Equals(ModEntry.Unknown) && this.PrevCenter != null)

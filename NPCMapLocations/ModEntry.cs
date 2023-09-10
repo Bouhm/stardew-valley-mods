@@ -750,24 +750,23 @@ namespace NPCMapLocations
         {
             var villagers = new List<NPC>();
 
-            foreach (GameLocation location in ModEntry.LocationUtil.GetAllStaticLocations())
+            Utility.ForEachCharacter(npc =>
             {
-                foreach (var npc in location.characters)
-                {
-                    bool shouldTrack =
-                        npc != null
-                        && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
-                        && (
-                            npc.isVillager()
-                            || npc.isMarried()
-                            || (Globals.ShowHorse && npc is Horse)
-                            || (Globals.ShowChildren && npc is Child)
-                        );
+                bool shouldTrack =
+                    npc != null
+                    && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
+                    && (
+                        npc.isVillager()
+                        || npc.isMarried()
+                        || (Globals.ShowHorse && npc is Horse)
+                        || (Globals.ShowChildren && npc is Child)
+                    );
 
-                    if (shouldTrack && !villagers.Contains(npc))
-                        villagers.Add(npc);
-                }
-            }
+                if (shouldTrack && !villagers.Contains(npc))
+                    villagers.Add(npc);
+
+                return true;
+            });
 
             return villagers;
         }
@@ -952,7 +951,7 @@ namespace NPCMapLocations
                         {
                             DisplayName = npc.displayName ?? npc.Name,
                             CropOffset = offset,
-                            IsBirthday = npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth),
+                            IsBirthday = npc.isBirthday(),
                             Type = type
                         };
 
@@ -1106,7 +1105,7 @@ namespace NPCMapLocations
                 if (locationName != null)
                 {
                     // Get center of NPC marker
-                    var npcLocation = LocationToMap(locationName, npc.getTileX(), npc.getTileY(), this.Customizations.MapVectors, this.Customizations.LocationExclusions);
+                    var npcLocation = LocationToMap(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
                     npcMarker.MapX = (int)npcLocation.X - 16;
                     npcMarker.MapY = (int)npcLocation.Y - 15;
                 }
@@ -1214,8 +1213,8 @@ namespace NPCMapLocations
                 long farmerId = farmer.UniqueMultiplayerID;
                 var farmerLoc = LocationToMap(
                     locationName,
-                    farmer.getTileX(),
-                    farmer.getTileY(),
+                    farmer.TilePoint.X,
+                    farmer.TilePoint.Y,
                     this.Customizations.MapVectors,
                     this.Customizations.LocationExclusions
                 );

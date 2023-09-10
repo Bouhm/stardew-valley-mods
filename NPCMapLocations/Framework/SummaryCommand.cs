@@ -57,7 +57,7 @@ namespace NPCMapLocations.Framework
                 var location = player.currentLocation;
                 string locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
                 LocationContext context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
-                Vector2 mapPixel = ModEntry.LocationToMap(locationName, player.getTileX(), player.getTileY(), customizations.MapVectors, customizations.LocationExclusions);
+                Vector2 mapPixel = ModEntry.LocationToMap(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.MapVectors, customizations.LocationExclusions);
 
                 // collect alternate location names
                 List<string> altNames = new();
@@ -73,7 +73,7 @@ namespace NPCMapLocations.Framework
                 output.AppendLine("======================");
                 output.AppendLine($"Player: {player.Name} ({player.UniqueMultiplayerID})");
                 output.AppendLine($"Location: {location.Name}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
-                output.AppendLine($"Tile: ({player.getTileX()}, {player.getTileY()})");
+                output.AppendLine($"Tile: ({player.TilePoint.X}, {player.TilePoint.Y})");
                 output.AppendLine($"Excluded: {customizations.LocationExclusions.Contains(locationName)}");
                 output.AppendLine($"Map pixel: {(mapPixel != ModEntry.Unknown ? $"({mapPixel.X}, {mapPixel.Y})" : "unknown")}");
                 output.AppendLine();
