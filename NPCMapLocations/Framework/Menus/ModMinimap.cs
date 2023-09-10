@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Locations;
 
 namespace NPCMapLocations.Framework.Menus
 {
@@ -155,10 +154,12 @@ namespace NPCMapLocations.Framework.Menus
             // Note: Absolute positions relative to viewport are scaled 4x (Game1.pixelZoom).
             // Positions relative to the map are not.
 
-            this.Center = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
+            WorldMapPosition mapPos = ModEntry.GetWorldMapPosition(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
+
+            this.Center = new Vector2(mapPos.X, mapPos.Y);
 
             // Player in unknown location, use previous location as center
-            if (this.Center.Equals(ModEntry.Unknown) && this.PrevCenter != null)
+            if (mapPos.IsEmpty && this.PrevCenter != null)
                 this.Center = this.PrevCenter;
             else
                 this.PrevCenter = this.Center;
@@ -279,6 +280,8 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         private void DrawMarkers()
         {
+            string regionId = ModEntry.GetWorldMapRegion();
+
             int x = this.ScreenBounds.X;
             int y = this.ScreenBounds.Y;
             int width = this.ScreenBounds.Width;
@@ -288,116 +291,119 @@ namespace NPCMapLocations.Framework.Menus
             var color = Color.White;
             var offsetMmLoc = new Vector2(this.MmLoc.X + 2, this.MmLoc.Y + 2);
 
-            //
-            // ===== Farm types =====
-            //
-            // The farms are always overlayed at (0, 43) on the map
-            // The crop position, dimensions, and overlay position must all be adjusted accordingly
-            // When any part of the cropped farm is outside of the minimap as player moves
-            int farmWidth = 131;
-            int farmHeight = 61;
-            int farmX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, x, x + width));
-            int farmY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, y, y + height) + 2);
-            int farmCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
-            int farmCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
-
-            // Check if farm crop extends outside of minimap
-            int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (x + width) / Game1.pixelZoom) ? (x + width - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
-            int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (y + height) / Game1.pixelZoom) ? (y + height - farmY) / Game1.pixelZoom : farmHeight - farmCropY;
-
-            // Check if farm crop extends beyond farm size
-            if (farmCropX + farmCropWidth > farmWidth)
-                farmCropWidth = farmWidth - farmCropX;
-
-            if (farmCropY + farmCropHeight > farmHeight)
-                farmCropHeight = farmHeight - farmCropY;
-
-            switch (Game1.whichFarm)
+            if (regionId == "Valley")
             {
-                case 1:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 2:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 3:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 4:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 5:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-                case 6:
-                    b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-                    break;
-            }
+                //
+                // ===== Farm types =====
+                //
+                // The farms are always overlayed at (0, 43) on the map
+                // The crop position, dimensions, and overlay position must all be adjusted accordingly
+                // When any part of the cropped farm is outside of the minimap as player moves
+                int farmWidth = 131;
+                int farmHeight = 61;
+                int farmX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X, x, x + width));
+                int farmY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + 172, y, y + height) + 2);
+                int farmCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X) / Game1.pixelZoom, 0, farmWidth);
+                int farmCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - 172) / Game1.pixelZoom, 0, farmHeight);
 
-            if (this.DrawPamHouseUpgrade)
-            {
-                var houseLoc = ModEntry.LocationToMap("Trailer_Big");
-                int screenX = this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16);
-                int screenY = this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11);
+                // Check if farm crop extends outside of minimap
+                int farmCropWidth = (farmX / Game1.pixelZoom + farmWidth > (x + width) / Game1.pixelZoom) ? (x + width - farmX) / Game1.pixelZoom : farmWidth - farmCropX;
+                int farmCropHeight = (farmY / Game1.pixelZoom + farmHeight > (y + height) / Game1.pixelZoom) ? (y + height - farmY) / Game1.pixelZoom : farmHeight - farmCropY;
 
-                if (this.ScreenBounds.Contains(screenX, screenY))
-                    b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(263, 181, 8, 8), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-            }
+                // Check if farm crop extends beyond farm size
+                if (farmCropX + farmCropWidth > farmWidth)
+                    farmCropWidth = farmWidth - farmCropX;
 
-            if (this.DrawMovieTheater || this.DrawMovieTheaterJoja)
-            {
-                var theaterLoc = ModEntry.LocationToMap("JojaMart");
-                int screenX = this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20);
-                int screenY = this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11);
+                if (farmCropY + farmCropHeight > farmHeight)
+                    farmCropHeight = farmHeight - farmCropY;
 
-                if (this.ScreenBounds.Contains(screenX, screenY))
+                switch (Game1.whichFarm)
                 {
-                    b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(275, 181, 15, 11), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    case 1:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
+                    case 2:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 180 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
+                    case 3:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
+                    case 4:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 241 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
+                    case 5:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(0 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
+                    case 6:
+                        b.Draw(ModEntry.Map, new Vector2(farmX, farmY), new Rectangle(131 + farmCropX, 302 + farmCropY, farmCropWidth, farmCropHeight), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                        break;
                 }
-            }
 
-            if (this.DrawIsland)
-            {
-                int islandWidth = 40;
-                int islandHeight = 30;
-                int islandImageX = 208;
-                int islandImageY = 363;
-                int mapX = 1040;
-                int mapY = 600;
-
-                int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, x, x + width));
-                int islandY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, y, y + height) + 2);
-                int islandCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
-                int islandCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
-
-                // Check if island crop extends outside of minimap
-                int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (x + width) / Game1.pixelZoom) ? (x + width - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
-                int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (y + height) / Game1.pixelZoom) ? (y + height - islandY) / Game1.pixelZoom : islandHeight - islandCropY;
-
-                // Check if island crop extends beyond island size
-                if (islandCropX + islandCropWidth > islandWidth)
-                    islandCropWidth = islandWidth - islandCropX;
-
-                if (islandCropY + islandCropHeight > islandHeight)
-                    islandCropHeight = islandHeight - islandCropY;
-
-                b.Draw(ModEntry.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
-            }
-
-            //
-            // ===== Farm buildings =====
-            //
-            if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
-            {
-                foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.MapPosition.Y))
+                if (this.DrawPamHouseUpgrade)
                 {
-                    if (ModConstants.FarmBuildingRects.TryGetValue(building.CommonName, out var buildingRect))
-                    {
-                        int screenX = this.NormalizeToMap(offsetMmLoc.X + building.MapPosition.X - (float)Math.Floor(buildingRect.Width / 2.0));
-                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.MapPosition.Y - (float)Math.Floor(buildingRect.Height / 2.0));
+                    var houseLoc = ModEntry.GetWorldMapPosition("Trailer_Big");
+                    int screenX = this.NormalizeToMap(offsetMmLoc.X + houseLoc.X - 16);
+                    int screenY = this.NormalizeToMap(offsetMmLoc.Y + houseLoc.Y - 11);
 
-                        if (this.ScreenBounds.Contains(screenX, screenY))
-                            b.Draw(this.BuildingMarkers, new Vector2(screenX, screenY), buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                    if (this.ScreenBounds.Contains(screenX, screenY))
+                        b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(263, 181, 8, 8), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                }
+
+                if (this.DrawMovieTheater || this.DrawMovieTheaterJoja)
+                {
+                    var theaterLoc = ModEntry.GetWorldMapPosition("JojaMart");
+                    int screenX = this.NormalizeToMap(offsetMmLoc.X + theaterLoc.X - 20);
+                    int screenY = this.NormalizeToMap(offsetMmLoc.Y + theaterLoc.Y - 11);
+
+                    if (this.ScreenBounds.Contains(screenX, screenY))
+                    {
+                        b.Draw(ModEntry.Map, new Vector2(screenX, screenY), new Rectangle(275, 181, 15, 11), color, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                    }
+                }
+
+                if (this.DrawIsland)
+                {
+                    int islandWidth = 40;
+                    int islandHeight = 30;
+                    int islandImageX = 208;
+                    int islandImageY = 363;
+                    int mapX = 1040;
+                    int mapY = 600;
+
+                    int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, x, x + width));
+                    int islandY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, y, y + height) + 2);
+                    int islandCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
+                    int islandCropY = (int)MathHelper.Clamp((y - offsetMmLoc.Y - mapY) / Game1.pixelZoom, 0, islandHeight);
+
+                    // Check if island crop extends outside of minimap
+                    int islandCropWidth = (islandX / Game1.pixelZoom + islandWidth > (x + width) / Game1.pixelZoom) ? (x + width - islandX) / Game1.pixelZoom : islandWidth - islandCropX;
+                    int islandCropHeight = (islandY / Game1.pixelZoom + islandHeight > (y + height) / Game1.pixelZoom) ? (y + height - islandY) / Game1.pixelZoom : islandHeight - islandCropY;
+
+                    // Check if island crop extends beyond island size
+                    if (islandCropX + islandCropWidth > islandWidth)
+                        islandCropWidth = islandWidth - islandCropX;
+
+                    if (islandCropY + islandCropHeight > islandHeight)
+                        islandCropHeight = islandHeight - islandCropY;
+
+                    b.Draw(ModEntry.Map, new Vector2(islandX, islandY), new Rectangle(islandImageX + islandCropX, islandImageY + islandCropY, islandCropWidth, islandCropHeight), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.861f);
+                }
+
+                //
+                // ===== Farm buildings =====
+                //
+                if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+                {
+                    foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.WorldMapPosition.Y))
+                    {
+                        if (ModConstants.FarmBuildingRects.TryGetValue(building.CommonName, out var buildingRect))
+                        {
+                            int screenX = this.NormalizeToMap(offsetMmLoc.X + building.WorldMapPosition.X - (float)Math.Floor(buildingRect.Width / 2.0));
+                            int screenY = this.NormalizeToMap(offsetMmLoc.Y + building.WorldMapPosition.Y - (float)Math.Floor(buildingRect.Height / 2.0));
+
+                            if (this.ScreenBounds.Contains(screenX, screenY))
+                                b.Draw(this.BuildingMarkers, new Vector2(screenX, screenY), buildingRect, color, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f);
+                        }
                     }
                 }
             }
@@ -408,15 +414,16 @@ namespace NPCMapLocations.Framework.Menus
             // Sort by drawing order
             if (this.NpcMarkers != null)
             {
-                var sortedMarkers = this.NpcMarkers.ToList();
-                sortedMarkers.Sort((x, y) => x.Value.Layer.CompareTo(y.Value.Layer));
+                var sortedMarkers = this.NpcMarkers
+                    .Where(p => p.Value.WorldMapPosition.RegionId == regionId)
+                    .OrderBy(p => p.Value.Layer);
 
                 foreach (var npcMarker in sortedMarkers)
                 {
                     string name = npcMarker.Key;
                     var marker = npcMarker.Value;
 
-                    Vector2 rawPos = new(offsetMmLoc.X + marker.MapX, offsetMmLoc.Y + marker.MapY);
+                    Vector2 rawPos = new(offsetMmLoc.X + marker.WorldMapPosition.X, offsetMmLoc.Y + marker.WorldMapPosition.Y);
                     Point screenPos = new(this.NormalizeToMap(rawPos.X), this.NormalizeToMap(rawPos.Y));
 
                     // Skip if no specified location
@@ -452,10 +459,10 @@ namespace NPCMapLocations.Framework.Menus
                 foreach (var farmer in Game1.getOnlineFarmers())
                 {
                     // Temporary solution to handle desync of farmhand location/tile position when changing location
-                    if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
+                    if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker) && farMarker.WorldMapPosition.RegionId == regionId)
                     {
-                        int screenX = this.NormalizeToMap(offsetMmLoc.X + farMarker.MapX - 16);
-                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + farMarker.MapY - 15);
+                        int screenX = this.NormalizeToMap(offsetMmLoc.X + farMarker.WorldMapPosition.X - 16);
+                        int screenY = this.NormalizeToMap(offsetMmLoc.Y + farMarker.WorldMapPosition.Y - 15);
 
                         if (this.ScreenBounds.Contains(screenX, screenY) && farMarker.DrawDelay == 0)
                             farmer.FarmerRenderer.drawMiniPortrat(b, new Vector2(screenX, screenY), 0.00011f, 2f, 1, farmer);

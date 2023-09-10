@@ -65,7 +65,6 @@ namespace NPCMapLocations
         public static GlobalConfig Globals;
         public static IModHelper StaticHelper;
         public static Texture2D Map;
-        public static Vector2 Unknown = new(-9999, -9999);
 
 
         /*********
@@ -118,12 +117,28 @@ namespace NPCMapLocations
             }
         }
 
-        /// <summary>Get the pixel coordinates relative to the top-left corner of the map for an in-world tile position.</summary>
+        /// <summary>Get the ID of the world map region which contains the current player.</summary>
+        public static string GetWorldMapRegion()
+        {
+            return ModEntry.GetWorldMapRegion(Game1.currentLocation, Game1.player.TilePoint);
+        }
+
+        /// <summary>Get the ID of the world map region which contains a given position.</summary>
+        /// <param name="location">The in-world location to match.</param>
+        /// <param name="tile">The tile position within the <paramref name="location"/> to match.</param>
+        public static string GetWorldMapRegion(GameLocation location, Point tile)
+        {
+            return
+                WorldMapManager.GetPositionData(location, tile)?.Region?.Id
+                ?? "Valley";
+        }
+
+        /// <summary>Get the world map position which matches an in-world tile coordinate.</summary>
         /// <param name="locationName">The in-world location name.</param>
-        /// <param name="tileX">The X tile position within the location, if known.</param>
-        /// <param name="tileY">The Y tile position within the location, if known.</param>
+        /// <param name="tileX">The X tile position within the location to match.</param>
+        /// <param name="tileY">The Y tile position within the location to match.</param>
         /// <param name="locationExclusions">The locations to ignore when scanning locations for players and NPCs.</param>
-        public static Vector2 LocationToMap(string locationName, int tileX = 0, int tileY = 0, HashSet<string> locationExclusions = null)
+        public static WorldMapPosition GetWorldMapPosition(string locationName, int tileX = 0, int tileY = 0, HashSet<string> locationExclusions = null)
         {
             Point tile = new Point(tileX, tileY);
 
@@ -137,23 +152,23 @@ namespace NPCMapLocations
 
                 // break infinite loops
                 if (!seen.Add(locationName))
-                    return Unknown;
+                    return WorldMapPosition.Empty;
                 if (++depth > LocationUtil.MaxRecursionDepth)
                     throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
 
                 // special case: inside farm building
                 if (FarmBuildings.TryGetValue(locationName, out BuildingMarker marker))
-                    return marker.MapPosition;
+                    return marker.WorldMapPosition;
 
                 // get location
                 GameLocation location = Game1.getLocationFromName(locationName);
                 if (location is null)
-                    return Unknown;
+                    return WorldMapPosition.Empty;
 
                 // get map pixel from game data if found
                 MapAreaPosition mapAreaPos = WorldMapManager.GetPositionData(location, tile);
                 if (mapAreaPos != null)
-                    return mapAreaPos.GetMapPixelPosition(location, tile);
+                    return new WorldMapPosition(mapAreaPos, location, tile);
 
                 // else try from parent, unless this location is blacklisted
                 if (locationExclusions?.Contains(locationName) != true && !locationName.Contains("WarpRoom") && LocationUtil.TryGetContext(locationName, out var loc))
@@ -165,7 +180,7 @@ namespace NPCMapLocations
                     break; // not found
             }
 
-            return Unknown;
+            return WorldMapPosition.Empty;
         }
 
         /// <summary>Get whether an NPC is configured to be excluded when rendering markers on the map.</summary>
@@ -412,8 +427,7 @@ namespace NPCMapLocations
                         {
                             DisplayName = npcMarker.Value.DisplayName,
                             LocationName = npcMarker.Value.LocationName,
-                            MapX = npcMarker.Value.MapX,
-                            MapY = npcMarker.Value.MapY,
+                            WorldMapPosition = npcMarker.Value.WorldMapPosition,
                             IsBirthday = npcMarker.Value.IsBirthday,
                             Type = npcMarker.Value.Type
                         });
@@ -492,8 +506,7 @@ namespace NPCMapLocations
                             }
 
                             npcMarker.LocationName = syncedMarker.Value.LocationName;
-                            npcMarker.MapX = syncedMarker.Value.MapX;
-                            npcMarker.MapY = syncedMarker.Value.MapY;
+                            npcMarker.WorldMapPosition = syncedMarker.Value.WorldMapPosition;
                             npcMarker.DisplayName = syncedMarker.Value.DisplayName;
                             npcMarker.CropOffset = offset;
                             npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
@@ -611,7 +624,7 @@ namespace NPCMapLocations
                 string name = entry.Key;
                 LocationContext context = entry.Value;
 
-                if (LocationToMap(name) == Unknown && context.Type is not (LocationType.Building or LocationType.Room))
+                if (GetWorldMapPosition(name).IsEmpty && context.Type is not (LocationType.Building or LocationType.Room))
                     yield return context;
             }
         }
@@ -658,23 +671,20 @@ namespace NPCMapLocations
                     continue;
 
                 // get map marker position
-                Vector2 locVector = LocationToMap(
-                    "Farm", // Get building position in farm
-                    building.tileX.Value,
-                    building.tileY.Value,
-                    this.Customizations.LocationExclusions
-                );
+                WorldMapPosition position = GetWorldMapPosition("Farm", building.tileX.Value, building.tileY.Value, this.Customizations.LocationExclusions); // Get building position in farm
                 if (building.buildingType.Value.Contains("Barn"))
-                    locVector.Y += 3;
+                    position = position with { Y = position.Y + 3 };
 
                 // track marker
-                FarmBuildings[indoors.NameOrUniqueName] = new BuildingMarker(building.buildingType.Value, locVector);
+                FarmBuildings[indoors.NameOrUniqueName] = new BuildingMarker(building.buildingType.Value, position);
             }
 
             // Add FarmHouse
-            var farmhouseLoc = LocationToMap("FarmHouse");
-            farmhouseLoc.X -= 6;
-            FarmBuildings["FarmHouse"] = new("FarmHouse", farmhouseLoc);
+            {
+                WorldMapPosition position = GetWorldMapPosition("FarmHouse");
+                position = position with { X = position.X - 6 };
+                FarmBuildings["FarmHouse"] = new("FarmHouse", position);
+            }
         }
 
         // Handle keyboard/controller inputs
@@ -770,7 +780,7 @@ namespace NPCMapLocations
                 {
                     Forest forest = Game1.RequireLocation<Forest>("Forest");
                     Point cartTile = forest.GetTravelingMerchantCartTile();
-                    Vector2 mapPos = LocationToMap("Forest", cartTile.X + 4, cartTile.Y);
+                    WorldMapPosition mapPos = GetWorldMapPosition("Forest", cartTile.X + 4, cartTile.Y);
 
                     this.NpcMarkers.Value.Add("Merchant", new NpcMarker
                     {
@@ -779,8 +789,7 @@ namespace NPCMapLocations
                         Sprite = Game1.mouseCursors,
                         SpriteSourceRect = new Rectangle(191, 1410, 22, 21),
                         SpriteZoom = 1.3f,
-                        MapX = (int)mapPos.X,
-                        MapY = (int)mapPos.Y
+                        WorldMapPosition = mapPos
                     });
                 }
 
@@ -965,9 +974,9 @@ namespace NPCMapLocations
                 if (locationName != null)
                 {
                     // Get center of NPC marker
-                    var npcLocation = LocationToMap(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
-                    npcMarker.MapX = (int)npcLocation.X - 16;
-                    npcMarker.MapY = (int)npcLocation.Y - 15;
+                    var mapPos = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
+                    mapPos = mapPos with { X = mapPos.X - 16, Y = mapPos.Y - 15 };
+                    npcMarker.WorldMapPosition = mapPos;
                 }
             }
         }
@@ -1065,13 +1074,14 @@ namespace NPCMapLocations
         {
             foreach (var farmer in Game1.getOnlineFarmers())
             {
-                if (farmer?.currentLocation == null) continue;
-                string locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
+                if (farmer?.currentLocation == null)
+                    continue;
 
+                string locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
                 locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
 
                 long farmerId = farmer.UniqueMultiplayerID;
-                var farmerLoc = LocationToMap(
+                var farmerLoc = GetWorldMapPosition(
                     locationName,
                     farmer.TilePoint.X,
                     farmer.TilePoint.Y,
@@ -1080,12 +1090,12 @@ namespace NPCMapLocations
 
                 if (this.FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
                 {
-                    float deltaX = farmerLoc.X - farMarker.PrevMapX;
-                    float deltaY = farmerLoc.Y - farMarker.PrevMapY;
+                    float deltaX = farmerLoc.X - farMarker.WorldMapPosition.X;
+                    float deltaY = farmerLoc.Y - farMarker.WorldMapPosition.Y;
 
                     // Location changes before tile position, causing farmhands to blink
                     // to the wrong position upon entering new location. Handle this in draw.
-                    if (locationName == farMarker.LocationName && MathHelper.Distance(deltaX, deltaY) > 15)
+                    if (locationName == farMarker.LocationName && farmerLoc.RegionId == farMarker.WorldMapPosition.RegionId && MathHelper.Distance(deltaX, deltaY) > 15)
                         this.FarmerMarkers.Value[farmerId].DrawDelay = 1;
                     else if (farMarker.DrawDelay > 0)
                         this.FarmerMarkers.Value[farmerId].DrawDelay--;
@@ -1101,14 +1111,8 @@ namespace NPCMapLocations
                     this.FarmerMarkers.Value.Add(farmerId, newMarker);
                 }
 
-
-                this.FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
-                this.FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
-                this.FarmerMarkers.Value[farmerId].PrevMapX = (int)farmerLoc.X;
-                this.FarmerMarkers.Value[farmerId].PrevMapY = (int)farmerLoc.Y;
+                this.FarmerMarkers.Value[farmerId].WorldMapPosition = farmerLoc;
                 this.FarmerMarkers.Value[farmerId].LocationName = locationName;
-                this.FarmerMarkers.Value[farmerId].MapX = (int)farmerLoc.X;
-                this.FarmerMarkers.Value[farmerId].MapY = (int)farmerLoc.Y;
             }
         }
 

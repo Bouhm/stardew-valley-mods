@@ -9,17 +9,8 @@
         /// <summary>The player name.</summary>
         public string Name { get; set; }
 
-        /// <summary>The marker's pixel X coordinate relative to the top-left corner of the map.</summary>
-        public int MapX { get; set; }
-
-        /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
-        public int MapY { get; set; }
-
-        /// <summary>The <see cref="MapX"/> value during the previous update tick.</summary>
-        public int PrevMapX { get; set; }
-
-        /// <summary>The <see cref="MapY"/> value during the previous update tick.</summary>
-        public int PrevMapY { get; set; }
+        /// <summary>The NPC's marker position on the world map.</summary>
+        public WorldMapPosition WorldMapPosition { get; set; }
 
         /// <summary>The name of the location containing the player.</summary>
         public string LocationName { get; set; }

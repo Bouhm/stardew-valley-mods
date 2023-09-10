@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Bouhm.Shared.Locations;
-using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -55,7 +54,7 @@ namespace NPCMapLocations.Framework
                 var location = player.currentLocation;
                 string locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
                 LocationContext context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
-                Vector2 mapPixel = ModEntry.LocationToMap(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
+                WorldMapPosition worldPos = ModEntry.GetWorldMapPosition(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
                 // collect alternate location names
                 List<string> altNames = new();
@@ -71,9 +70,10 @@ namespace NPCMapLocations.Framework
                 output.AppendLine("======================");
                 output.AppendLine($"Player: {player.Name} ({player.UniqueMultiplayerID})");
                 output.AppendLine($"Location: {location.Name}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
+                output.AppendLine($"Map region: {worldPos.RegionId}");
                 output.AppendLine($"Tile: ({player.TilePoint.X}, {player.TilePoint.Y})");
                 output.AppendLine($"Excluded: {customizations.LocationExclusions.Contains(locationName)}");
-                output.AppendLine($"Map pixel: {(mapPixel != ModEntry.Unknown ? $"({mapPixel.X}, {mapPixel.Y})" : "unknown")}");
+                output.AppendLine($"Map pixel: {(!worldPos.IsEmpty ? $"({worldPos.X}, {worldPos.Y})" : "unknown")}");
                 output.AppendLine();
 
                 if (context != null)
@@ -158,11 +158,12 @@ namespace NPCMapLocations.Framework
                             SummaryCommand.BuildTable(
                                 typeGroup.OrderBy(p => p.Key),
                                 "      ",
-                                new[] { "name", "location", "map pixel", "crop offset", "notes" },
+                                new[] { "name", "location", "map region", "map pixel", "crop offset", "notes" },
 
                                 marker => marker.Value.DisplayName != marker.Key ? $"{marker.Key} ({marker.Value.DisplayName})" : marker.Key,
                                 marker => marker.Value.LocationName,
-                                marker => $"{marker.Value.MapX}, {marker.Value.MapY}",
+                                marker => marker.Value.WorldMapPosition.RegionId,
+                                marker => $"{marker.Value.WorldMapPosition.X}, {marker.Value.WorldMapPosition.Y}",
                                 marker => marker.Value.CropOffset != 0 ? marker.Value.CropOffset.ToString() : "",
                                 marker =>
                                 {
