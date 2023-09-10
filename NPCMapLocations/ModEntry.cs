@@ -926,6 +926,11 @@ namespace NPCMapLocations
             // Changing the page in GameMenu instead of changing Game1.activeClickableMenu
             // allows for better compatibility with other mods that use MapPage
             pages[ModConstants.MapTabIndex] = new ModMapPage(
+                gameMenu.xPositionOnScreen,
+                gameMenu.yPositionOnScreen,
+                gameMenu.width,
+                gameMenu.height,
+
                 this.NpcMarkers.Value,
                 this.ConditionalNpcs.Value,
                 this.FarmerMarkers.Value,

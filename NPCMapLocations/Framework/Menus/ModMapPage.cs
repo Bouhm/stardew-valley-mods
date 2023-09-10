@@ -29,8 +29,6 @@ namespace NPCMapLocations.Framework.Menus
         private readonly Texture2D BuildingMarkers;
         private readonly ModCustomizations Customizations;
         private string HoveredNames = "";
-        private readonly int MapX;
-        private readonly int MapY;
         private bool HasIndoorCharacter;
         private Vector2 IndoorIconVector;
 
@@ -43,16 +41,19 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         // Map menu that uses modified map page and modified component locations for hover
         public ModMapPage(
-          Dictionary<string, NpcMarker> npcMarkers,
-          Dictionary<string, bool> conditionalNpcs,
-          Dictionary<long, FarmerMarker> farmerMarkers,
-          Dictionary<string, BuildingMarker> farmBuildings,
-          Texture2D buildingMarkers,
-          ModCustomizations customizations,
-          LocationUtil locationUtil
-        ) : base(Game1.uiViewport.Width / 2 - (800 + IClickableMenu.borderWidth * 2) / 2,
-          Game1.uiViewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 800 + IClickableMenu.borderWidth * 2,
-          600 + IClickableMenu.borderWidth * 2)
+            int x,
+            int y,
+            int width,
+            int height,
+            Dictionary<string, NpcMarker> npcMarkers,
+            Dictionary<string, bool> conditionalNpcs,
+            Dictionary<long, FarmerMarker> farmerMarkers,
+            Dictionary<string, BuildingMarker> farmBuildings,
+            Texture2D buildingMarkers,
+            ModCustomizations customizations,
+            LocationUtil locationUtil
+        )
+            : base(x, y, width, height)
         {
             this.NpcMarkers = npcMarkers;
             this.ConditionalNpcs = conditionalNpcs;
@@ -61,10 +62,6 @@ namespace NPCMapLocations.Framework.Menus
             this.BuildingMarkers = buildingMarkers;
             this.Customizations = customizations;
             this.LocationUtil = locationUtil;
-
-            Vector2 center = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * 4, 720);
-            this.MapX = (int)center.X;
-            this.MapY = (int)center.Y;
         }
 
         public override void performHoverAction(int x, int y)
@@ -90,7 +87,7 @@ namespace NPCMapLocations.Framework.Menus
             {
                 foreach (var npcMarker in this.NpcMarkers)
                 {
-                    Vector2 npcLocation = new Vector2(this.MapX + npcMarker.Value.MapX, this.MapY + npcMarker.Value.MapY);
+                    Vector2 npcLocation = new Vector2(this.mapBounds.X + npcMarker.Value.MapX, this.mapBounds.Y + npcMarker.Value.MapY);
                     if (Game1.getMouseX() >= npcLocation.X && Game1.getMouseX() <= npcLocation.X + markerWidth &&
                         Game1.getMouseY() >= npcLocation.Y && Game1.getMouseY() <= npcLocation.Y + markerHeight)
                     {
@@ -112,11 +109,15 @@ namespace NPCMapLocations.Framework.Menus
             {
                 foreach (var farMarker in this.FarmerMarkers.Values)
                 {
-                    Vector2 farmerLocation = new Vector2(this.MapX + farMarker.MapX, this.MapY + farMarker.MapY);
-                    if (Game1.getMouseX() >= farmerLocation.X - markerWidth / 2
-                     && Game1.getMouseX() <= farmerLocation.X + markerWidth / 2
-                     && Game1.getMouseY() >= farmerLocation.Y - markerHeight / 2
-                     && Game1.getMouseY() <= farmerLocation.Y + markerHeight / 2)
+                    Vector2 farmerLocation = new Vector2(this.mapBounds.X + farMarker.MapX, this.mapBounds.Y + farMarker.MapY);
+                    Point mousePos = Game1.getMousePosition();
+
+                    if (
+                        mousePos.X >= farmerLocation.X - markerWidth / 2
+                         && mousePos.X <= farmerLocation.X + markerWidth / 2
+                         && mousePos.Y >= farmerLocation.Y - markerHeight / 2
+                         && mousePos.Y <= farmerLocation.Y + markerHeight / 2
+                    )
                     {
                         hoveredList.Add(farMarker.Name);
 
@@ -238,8 +239,8 @@ namespace NPCMapLocations.Framework.Menus
                         b.Draw(
                             this.BuildingMarkers,
                             new Vector2(
-                                this.MapX + building.MapPosition.X - buildingRect.Width / 2,
-                                this.MapY + building.MapPosition.Y - buildingRect.Height / 2
+                                this.mapBounds.X + building.MapPosition.X - buildingRect.Width / 2,
+                                this.mapBounds.Y + building.MapPosition.Y - buildingRect.Height / 2
                             ),
                             buildingRect, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
                         );
@@ -251,7 +252,7 @@ namespace NPCMapLocations.Framework.Menus
             if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs["Merchant"])
             {
                 Vector2 merchantLoc = new Vector2(ModConstants.MapVectors["Merchant"][0].MapX, ModConstants.MapVectors["Merchant"][0].MapY);
-                b.Draw(Game1.mouseCursors, new Vector2(this.MapX + merchantLoc.X - 16, this.MapY + merchantLoc.Y - 15),
+                b.Draw(Game1.mouseCursors, new Vector2(this.mapBounds.X + merchantLoc.X - 16, this.mapBounds.Y + merchantLoc.Y - 15),
                   new Rectangle(191, 1410, 22, 21), Color.White, 0f, Vector2.Zero, 1.3f, SpriteEffects.None,
                   1f);
             }
@@ -284,10 +285,7 @@ namespace NPCMapLocations.Framework.Menus
                     // Draw NPC marker
                     var spriteRect = marker.Type == CharacterType.Horse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, marker.CropOffset, 16, 15);
 
-                    b.Draw(marker.Sprite,
-                      new Rectangle(this.MapX + marker.MapX, this.MapY + marker.MapY,
-                        32, 30),
-                      spriteRect, markerColor);
+                    b.Draw(marker.Sprite, new Rectangle(this.mapBounds.X + marker.MapX, this.mapBounds.Y + marker.MapY, 32, 30), spriteRect, markerColor);
 
                     // Draw icons for quests/birthday
                     if (ModEntry.Globals.ShowQuests)
@@ -296,7 +294,7 @@ namespace NPCMapLocations.Framework.Menus
                         {
                             // Gift icon
                             b.Draw(Game1.mouseCursors,
-                              new Vector2(this.MapX + marker.MapX + 20, this.MapY + marker.MapY),
+                              new Vector2(this.mapBounds.X + marker.MapX + 20, this.mapBounds.Y + marker.MapY),
                               new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
@@ -305,7 +303,7 @@ namespace NPCMapLocations.Framework.Menus
                         {
                             // Quest icon
                             b.Draw(Game1.mouseCursors,
-                              new Vector2(this.MapX + marker.MapX + 22, this.MapY + marker.MapY - 3),
+                              new Vector2(this.mapBounds.X + marker.MapX + 22, this.mapBounds.Y + marker.MapY - 3),
                               new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f,
                               SpriteEffects.None, 0f);
                         }
@@ -325,7 +323,7 @@ namespace NPCMapLocations.Framework.Menus
                     if (farMarker is { DrawDelay: 0 })
                     {
                         farmer.FarmerRenderer.drawMiniPortrat(b,
-                          new Vector2(this.MapX + farMarker.MapX - 16, this.MapY + farMarker.MapY - 15),
+                          new Vector2(this.mapBounds.X + farMarker.MapX - 16, this.mapBounds.Y + farMarker.MapY - 15),
                           0.00011f, 2f, 1, farmer);
                     }
                 }
@@ -335,7 +333,7 @@ namespace NPCMapLocations.Framework.Menus
                 Vector2 playerLoc = ModEntry.LocationToMap(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.MapVectors, this.Customizations.LocationExclusions);
 
                 Game1.player.FarmerRenderer.drawMiniPortrat(b,
-                  new Vector2(this.MapX + playerLoc.X - 16, this.MapY + playerLoc.Y - 15), 0.00011f, 2f, 1,
+                  new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1,
                   Game1.player);
             }
         }
