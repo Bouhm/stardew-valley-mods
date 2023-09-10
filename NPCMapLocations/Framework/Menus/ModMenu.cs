@@ -26,8 +26,6 @@ namespace NPCMapLocations.Framework.Menus
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
         private readonly MapModButton ImmersionButton3;
-        private readonly int MapX;
-        private readonly int MapY;
         private readonly ClickableTextureComponent OkButton;
         private readonly List<OptionsElement> Options = new();
         private readonly List<ClickableComponent> OptionSlots = new();
@@ -46,10 +44,6 @@ namespace NPCMapLocations.Framework.Menus
         public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs, Action onMinimapToggled)
             : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
-            var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom);
-            this.MapX = (int)topLeftPositionForCenteringOnScreen.X;
-            this.MapY = (int)topLeftPositionForCenteringOnScreen.Y;
-
             // Most of this mess is straight from the game code just... just give it space
             this.OkButton = new ClickableTextureComponent(
                 "OK",
@@ -357,10 +351,6 @@ namespace NPCMapLocations.Framework.Menus
         {
             if (Game1.options.showMenuBackground) this.drawBackground(b);
 
-            Game1.drawDialogueBox(this.MapX - Game1.pixelZoom * 8, this.MapY - Game1.pixelZoom * 24,
-              (ModEntry.Map.Bounds.Width + 16) * Game1.pixelZoom, 212 * Game1.pixelZoom, false, true);
-            b.Draw(ModEntry.Map, new Vector2(this.MapX, this.MapY), new Rectangle(0, 0, 300, 180),
-              Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.86f);
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
             Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
             this.OkButton.draw(b);
