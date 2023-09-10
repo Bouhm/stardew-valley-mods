@@ -387,31 +387,40 @@ namespace NPCMapLocations
                 return;
 
             // update and sync markers
-            if (e.IsMultipleOf(30) && Game1.currentLocation != null && Game1.player?.currentLocation != null)
+            if (Game1.currentLocation != null && Game1.player?.currentLocation != null)
             {
-                bool updateForMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
-                if (updateForMinimap)
-                    this.Minimap.Value.Update();
-                this.UpdateMarkers(updateForMinimap | Context.IsMainPlayer);
-
-                // Sync multiplayer data
-                if (Context.IsMainPlayer && Context.IsMultiplayer)
+                if (e.IsMultipleOf(15))
                 {
-                    var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
+                    // update local minimap display
+                    bool hasMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
+                    if (hasMinimap)
+                        this.Minimap.Value.Update();
 
-                    foreach (var npcMarker in this.NpcMarkers.Value)
+                    // update & sync NPC markers
+                    if (e.IsMultipleOf(30))
                     {
-                        syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker
-                        {
-                            DisplayName = npcMarker.Value.DisplayName,
-                            LocationName = npcMarker.Value.LocationName,
-                            WorldMapPosition = npcMarker.Value.WorldMapPosition,
-                            IsBirthday = npcMarker.Value.IsBirthday,
-                            Type = npcMarker.Value.Type
-                        });
-                    }
+                        this.UpdateMarkers(hasMinimap || Context.IsMainPlayer);
 
-                    this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
+                        // Sync multiplayer data
+                        if (Context.IsMainPlayer && Context.IsMultiplayer)
+                        {
+                            var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
+
+                            foreach (var npcMarker in this.NpcMarkers.Value)
+                            {
+                                syncedMarkers.Add(npcMarker.Key, new SyncedNpcMarker
+                                {
+                                    DisplayName = npcMarker.Value.DisplayName,
+                                    LocationName = npcMarker.Value.LocationName,
+                                    WorldMapPosition = npcMarker.Value.WorldMapPosition,
+                                    IsBirthday = npcMarker.Value.IsBirthday,
+                                    Type = npcMarker.Value.Type
+                                });
+                            }
+
+                            this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
+                        }
+                    }
                 }
             }
 
