@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using NPCMapLocations.Framework.Models;
@@ -25,12 +24,6 @@ namespace NPCMapLocations.Framework
         /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
         /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
         public HashSet<string> LocationExclusions { get; set; } = new();
-
-        /// <summary>The name of the folder containing map assets.</summary>
-        public string MapsRootPath { get; } = "maps";
-
-        /// <summary>The folder path containing map assets relative to the mod folder.</summary>
-        public string MapsPath { get; } = Path.Combine("maps", "_default");
 
 
         /*********

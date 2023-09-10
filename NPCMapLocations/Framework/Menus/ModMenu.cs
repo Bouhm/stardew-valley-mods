@@ -22,7 +22,6 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Fields
         *********/
-        private readonly Action OnMinimapToggled;
         private readonly ClickableTextureComponent DownArrow;
         private readonly MapModButton ImmersionButton1;
         private readonly MapModButton ImmersionButton2;
@@ -47,8 +46,6 @@ namespace NPCMapLocations.Framework.Menus
         public ModMenu(Dictionary<string, NpcMarker> npcMarkers, Dictionary<string, bool> conditionalNpcs, Action onMinimapToggled)
             : base(Game1.viewport.Width / 2 - (1000 + IClickableMenu.borderWidth * 2) / 2, Game1.viewport.Height / 2 - (600 + IClickableMenu.borderWidth * 2) / 2, 1000 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, true)
         {
-            this.OnMinimapToggled = onMinimapToggled;
-
             var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(ModEntry.Map.Bounds.Width * Game1.pixelZoom, 180 * Game1.pixelZoom);
             this.MapX = (int)topLeftPositionForCenteringOnScreen.X;
             this.MapY = (int)topLeftPositionForCenteringOnScreen.Y;
@@ -117,7 +114,7 @@ namespace NPCMapLocations.Framework.Menus
                     value =>
                     {
                         ModEntry.Globals.ShowMinimap = value;
-                        this.OnMinimapToggled();
+                        onMinimapToggled();
                     },
                     this.UpdateConfig
                 ),

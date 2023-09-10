@@ -16,9 +16,5 @@
     <Reference Include="Newtonsoft.Json" HintPath="$(GamePath)/smapi-internal/Newtonsoft.Json.dll" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="maps\_default\*.*" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
   <Import Project="..\Bouhm.Shared\Bouhm.Shared.projitems" Label="Shared" />
 </Project>

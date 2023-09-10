@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Bouhm.Shared;
 using Bouhm.Shared.Locations;
@@ -46,7 +45,6 @@ namespace NPCMapLocations
         private static LocationUtil LocationUtil;
 
         // External mod settings
-        private readonly string MapFilePath = @"LooseSprites\Map";
         private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
         private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
 
@@ -54,7 +52,6 @@ namespace NPCMapLocations
         private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new();
 
         // Customizations/Custom mods
-        private string MapSeason;
         private ModCustomizations Customizations;
 
         // Debugging
@@ -116,42 +113,7 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
         {
-            // Replace game map with modified map
-            if (e.NameWithoutLocale.IsEquivalentTo(this.MapFilePath))
-            {
-                e.LoadFrom(
-                    () =>
-                    {
-                        if (this.MapSeason == null)
-                        {
-                            this.Monitor.Log("Unable to get current season. Defaulted to spring.", LogLevel.Debug);
-                            this.MapSeason = "spring";
-                        }
-
-                        if (!File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, $"{this.MapSeason}_map.png")))
-                        {
-                            this.Monitor.Log("Seasonal maps not provided. Defaulted to spring.");
-                            this.MapSeason = null; // Set to null so that cache is not invalidated when game season changes
-                        }
-
-                        // Replace map page
-                        string defaultMapFile = File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, "spring_map.png")) ? "spring_map.png" : "map.png";
-                        string filename = this.MapSeason == null ? defaultMapFile : $"{this.MapSeason}_map.png";
-
-                        bool useRecolor = this.Customizations.MapsPath != null && File.Exists(Path.Combine(this.Helper.DirectoryPath, this.Customizations.MapsPath, filename));
-                        Texture2D map = useRecolor
-                            ? this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/{filename}")
-                            : this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsRootPath}/_default/{filename}");
-
-                        if (useRecolor)
-                            this.Monitor.Log($"Using {Path.Combine(this.Customizations.MapsPath, filename)}.");
-
-                        return map;
-                    },
-                    AssetLoadPriority.Exclusive
-                );
-            }
-            else if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
+            if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
             {
                 e.LoadFrom(() => new Dictionary<string, JObject>(), AssetLoadPriority.Exclusive);
             }
@@ -338,19 +300,15 @@ namespace NPCMapLocations
             // Load farm buildings
             try
             {
-                this.BuildingMarkers.Value = this.Helper.ModContent.Load<Texture2D>($"{this.Customizations.MapsPath}/buildings.png");
+                this.BuildingMarkers.Value = this.Helper.ModContent.Load<Texture2D>("assets/buildings.png");
             }
             catch
             {
-                this.BuildingMarkers.Value = File.Exists(Path.Combine("maps/_default", "buildings.png"))
-                    ? this.Helper.ModContent.Load<Texture2D>("maps/_default/buildings.png")
-                    : null;
+                this.BuildingMarkers.Value = null;
             }
 
             // Get season for map
-            this.MapSeason = Globals.UseSeasonalMaps ? Game1.currentSeason : "spring";
-            this.Helper.GameContent.InvalidateCache(this.MapFilePath);
-            Map = Game1.content.Load<Texture2D>(this.MapFilePath);
+            Map = Game1.content.Load<Texture2D>("LooseSprites\\Map");
 
             // Disable for multiplayer for anti-cheat
             this.DebugMode = Globals.DebugMode && !Context.IsMultiplayer;
@@ -483,6 +441,7 @@ namespace NPCMapLocations
 
             this.ResetMarkers();
             this.UpdateMarkers(true);
+            this.Minimap.Value?.UpdateMapForSeason();
 
             this.Minimap.Value = new ModMinimap(
                 this.NpcMarkers.Value,
@@ -530,25 +489,6 @@ namespace NPCMapLocations
 
                     this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
                 }
-            }
-
-            // update for season change (for when it's changed via console)
-            if (e.IsOneSecond && Globals.UseSeasonalMaps && this.MapSeason != null && this.MapSeason != Game1.currentSeason && Game1.currentSeason != null)
-            {
-                this.MapSeason = Game1.currentSeason;
-
-                // Force reload of map for season changes
-                try
-                {
-                    this.Helper.GameContent.InvalidateCache(this.MapFilePath);
-                }
-                catch (Exception ex)
-                {
-                    this.Monitor.Log("Failed to update map for current season.", LogLevel.Error);
-                    this.Monitor.Log(ex.ToString());
-                }
-
-                this.Minimap.Value?.UpdateMapForSeason();
             }
 
             // enable conditional NPCs who've been talked to

@@ -364,16 +364,6 @@ namespace NPCMapLocations.Framework.Menus
                 int mapX = 1040;
                 int mapY = 600;
 
-                if (ModEntry.Globals.UseDetailedIsland)
-                {
-                    islandWidth = 45;
-                    islandHeight = 40;
-                    islandImageX = 248;
-                    islandImageY = 363;
-                    mapX = 1020;
-                    mapY = 560;
-                }
-
                 int islandX = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.X + mapX, x, x + width));
                 int islandY = this.NormalizeToMap(MathHelper.Clamp(offsetMmLoc.Y + mapY, y, y + height) + 2);
                 int islandCropX = (int)MathHelper.Clamp((x - offsetMmLoc.X - mapX) / Game1.pixelZoom, 0, islandWidth);
