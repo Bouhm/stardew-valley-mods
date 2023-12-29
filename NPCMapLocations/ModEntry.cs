@@ -146,7 +146,7 @@ namespace NPCMapLocations
                 // get map pixel from game data if found
                 MapAreaPosition mapAreaPos = WorldMapManager.GetPositionData(location, tile);
                 if (mapAreaPos != null)
-                    return new WorldMapPosition(mapAreaPos, location, tile);
+                    return WorldMapPosition.Create(mapAreaPos, location, tile);
 
                 // else try from parent, unless this location is blacklisted
                 if (locationExclusions?.Contains(locationName) != true && !locationName.Contains("WarpRoom") && LocationUtil.TryGetContext(locationName, out var loc))
