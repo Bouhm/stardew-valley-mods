@@ -79,53 +79,81 @@ namespace NPCMapLocations.Framework.Menus
             bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers?.Count > 0;
             if (hasNpcMarkers || hasFarmerMarkers)
             {
-                const int markerWidth = 32;
-                const int markerHeight = 30;
-
-                string regionId = this.RegionId;
-                Point mousePos = Game1.getMousePosition();
-
-                List<string> hoveredList = new List<string>();
-
-                if (hasNpcMarkers)
+                // get hovered names
+                string[] hoveredNames;
+                bool hasIndoorCharacters;
                 {
-                    foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
+                    const int markerWidth = 32;
+                    const int markerHeight = 30;
+
+                    string regionId = this.RegionId;
+                    Point mousePos = Game1.getMousePosition();
+
+                    HashSet<string> newHoveredNames = new();
+                    HashSet<string> indoorLocationNames = new();
+
+                    // add markers directly under cursor
+                    if (hasNpcMarkers)
                     {
-                        // skip if not applicable
-                        if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
-                            continue;
+                        foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
+                        {
+                            if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
+                                continue;
 
-                        // add to hover
-                        if (this.Customizations.Names.TryGetValue(npcName, out string name))
-                            hoveredList.Add(name);
-                        else if (npcMarker.Type == CharacterType.Horse)
-                            hoveredList.Add(npcName);
+                            newHoveredNames.Add(this.GetNpcDisplayName(npcName));
 
-                        // track indoor NPCs
-                        if (!this.HasIndoorCharacter)
-                            this.HasIndoorCharacter = !this.LocationUtil.IsOutdoors(npcMarker.LocationName);
+                            if (!this.LocationUtil.IsOutdoors(npcMarker.LocationName))
+                                indoorLocationNames.Add(npcMarker.LocationName);
+                        }
                     }
+                    if (hasFarmerMarkers)
+                    {
+                        foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
+                        {
+                            if (farmerMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
+                                continue;
+
+                            newHoveredNames.Add(farmerMarker.Name);
+
+                            if (!this.LocationUtil.IsOutdoors(farmerMarker.LocationName))
+                                indoorLocationNames.Add(farmerMarker.LocationName);
+                        }
+                    }
+
+                    // add any other markers in the same indoor locations
+                    if (indoorLocationNames.Count > 0)
+                    {
+                        if (hasNpcMarkers)
+                        {
+                            foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
+                            {
+                                if (!npcMarker.IsHidden && indoorLocationNames.Contains(npcMarker.LocationName))
+                                    newHoveredNames.Add(this.GetNpcDisplayName(npcName));
+                            }
+                        }
+                        if (hasFarmerMarkers)
+                        {
+                            foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
+                            {
+                                if (indoorLocationNames.Contains(farmerMarker.LocationName))
+                                    newHoveredNames.Add(farmerMarker.Name);
+                            }
+                        }
+                    }
+
+                    // sort names
+                    hasIndoorCharacters = indoorLocationNames.Count > 0;
+                    hoveredNames = newHoveredNames.Count > 0
+                        ? newHoveredNames.Distinct().OrderBy(p => p).ToArray()
+                        : Array.Empty<string>();
                 }
 
-                if (hasFarmerMarkers)
-                {
-                    foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
-                    {
-                        // skip if not applicable
-                        if (farmerMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
-                            continue;
-
-                        hoveredList.Add(farmerMarker.Name);
-
-                        if (!this.HasIndoorCharacter)
-                            this.HasIndoorCharacter = !this.LocationUtil.IsOutdoors(farmerMarker.LocationName);
-                    }
-                }
-
-                switch (hoveredList.Count)
+                // render tooltip
+                this.HasIndoorCharacter = hasIndoorCharacters;
+                switch (hoveredNames.Length)
                 {
                     case 1:
-                        this.HoveredNames = hoveredList[0];
+                        this.HoveredNames = hoveredNames[0];
                         break;
 
                     case > 1:
@@ -136,10 +164,10 @@ namespace NPCMapLocations.Framework.Menus
 
                             int maxLineLength = (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X;
 
-                            List<string> lines = new() { hoveredList[0] };
-                            for (int i = 1; i < hoveredList.Count; i++)
+                            List<string> lines = new() { hoveredNames[0] };
+                            for (int i = 1; i < hoveredNames.Length; i++)
                             {
-                                string name = hoveredList[i];
+                                string name = hoveredNames[i];
 
                                 int lastLineLength = (int)Game1.smallFont.MeasureString(lines[^1] + separator + name).X;
                                 if (lastLineLength > maxLineLength)
@@ -423,6 +451,13 @@ namespace NPCMapLocations.Framework.Menus
               SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None,
               0f);
+        }
+
+        /// <summary>Get the display name to show for an NPC.</summary>
+        /// <param name="npcName">The NPC's internal name.</param>
+        private string GetNpcDisplayName(string npcName)
+        {
+            return this.Customizations.Names.GetValueOrDefault(npcName, npcName);
         }
 
         /// <summary>Get whether a pixel area on the world map is under the cursor, adjusted for the map offset.</summary>

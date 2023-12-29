@@ -2,11 +2,11 @@
 
 # Release notes
 ## Upcoming release
-* Updated for Stardew Valley 1.6.
-* Added support for the new `Data/WorldMap` asset in 1.6 (including custom world regions).
+* Updated for Stardew Valley 1.6, including the Ginger Island world map and custom world map regions in `Data/WorldMap`.
+* Tooltips over an indoor location now show all NPCs/farmers inside it.
 * Added enum for villager visibility config.
 * Increased minimap update rate.
-* Rewrote minimap to dynamically render part of the main map.
+* Rewrote minimap to dynamically render from the main map.
 * Removed custom map textures.
 * Removed debug mode (no longer useful now that the mod uses `Data/WorldMap`).
 * Fixed minimap markers popping in/out near the edge.
