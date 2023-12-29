@@ -69,100 +69,91 @@ namespace NPCMapLocations.Framework.Menus
 
         public override void performHoverAction(int x, int y)
         {
-            string regionId = this.RegionId;
-
-            // set location tooltips
+            // reset baseline tooltips
             base.performHoverAction(x, y);
-
-            // set marker tooltips
             this.HoveredNames = "";
             this.HasIndoorCharacter = false;
 
-            List<string> hoveredList = new List<string>();
-
-            const int markerWidth = 32;
-            const int markerHeight = 30;
-
-            // Have to use special character to separate strings for Chinese
-            string separator = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.zh)
-              ? "，"
-              : ", ";
-
-            if (this.NpcMarkers != null)
+            // apply custom tooltips
+            bool hasNpcMarkers = this.NpcMarkers?.Count > 0;
+            bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers?.Count > 0;
+            if (hasNpcMarkers || hasFarmerMarkers)
             {
+                const int markerWidth = 32;
+                const int markerHeight = 30;
+
+                string regionId = this.RegionId;
                 Point mousePos = Game1.getMousePosition();
 
-                foreach (var npcMarker in this.NpcMarkers)
+                List<string> hoveredList = new List<string>();
+
+                if (hasNpcMarkers)
                 {
-                    if (npcMarker.Value.WorldMapPosition.RegionId != regionId)
-                        continue;
-
-                    WorldMapPosition mapPos = npcMarker.Value.WorldMapPosition;
-                    int markerX = this.mapBounds.X + mapPos.X;
-                    int markerY = this.mapBounds.Y + mapPos.Y;
-
-                    if (
-                        mousePos.X >= markerX
-                        && mousePos.X <= markerX + markerWidth
-                        && mousePos.Y >= markerY
-                        && mousePos.Y <= markerY + markerHeight
-                    )
+                    foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                     {
-                        if (!npcMarker.Value.IsHidden) //&& !(npcMarker.Value.Type == Character.Horse))
+                        // skip if not applicable
+                        if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
+                            continue;
+
+                        // add to hover
+                        if (this.Customizations.Names.TryGetValue(npcName, out string name))
+                            hoveredList.Add(name);
+                        else if (npcMarker.Type == CharacterType.Horse)
+                            hoveredList.Add(npcName);
+
+                        // track indoor NPCs
+                        if (!this.HasIndoorCharacter)
+                            this.HasIndoorCharacter = !this.LocationUtil.IsOutdoors(npcMarker.LocationName);
+                    }
+                }
+
+                if (hasFarmerMarkers)
+                {
+                    foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
+                    {
+                        // skip if not applicable
+                        if (farmerMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
+                            continue;
+
+                        hoveredList.Add(farmerMarker.Name);
+
+                        if (!this.HasIndoorCharacter)
+                            this.HasIndoorCharacter = !this.LocationUtil.IsOutdoors(farmerMarker.LocationName);
+                    }
+                }
+
+                switch (hoveredList.Count)
+                {
+                    case 1:
+                        this.HoveredNames = hoveredList[0];
+                        break;
+
+                    case > 1:
                         {
-                            if (this.Customizations.Names.TryGetValue(npcMarker.Key, out string name))
-                                hoveredList.Add(name);
-                            else if (npcMarker.Value.Type == CharacterType.Horse)
-                                hoveredList.Add(npcMarker.Key);
+                            string separator = LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.zh
+                                ? "，" // need special character to separate strings for Chinese
+                                : ", ";
+
+                            int maxLineLength = (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X;
+
+                            List<string> lines = new() { hoveredList[0] };
+                            for (int i = 1; i < hoveredList.Count; i++)
+                            {
+                                string name = hoveredList[i];
+
+                                int lastLineLength = (int)Game1.smallFont.MeasureString(lines[^1] + separator + name).X;
+                                if (lastLineLength > maxLineLength)
+                                {
+                                    lines[^1] += separator;
+                                    lines.Add(name);
+                                }
+                                else
+                                    lines[^1] += separator + name;
+                            }
+
+                            this.HoveredNames = string.Join(Environment.NewLine, lines);
                         }
-
-                        if (!this.LocationUtil.IsOutdoors(npcMarker.Value.LocationName) && !this.HasIndoorCharacter)
-                            this.HasIndoorCharacter = true;
-                    }
-                }
-            }
-
-            if (Context.IsMultiplayer && this.FarmerMarkers != null)
-            {
-                foreach (var farMarker in this.FarmerMarkers.Values)
-                {
-                    if (farMarker.WorldMapPosition.RegionId != regionId)
-                        continue;
-
-                    Vector2 farmerLocation = new Vector2(this.mapBounds.X + farMarker.WorldMapPosition.X, this.mapBounds.Y + farMarker.WorldMapPosition.Y);
-                    Point mousePos = Game1.getMousePosition();
-
-                    if (
-                        mousePos.X >= farmerLocation.X - markerWidth / 2
-                         && mousePos.X <= farmerLocation.X + markerWidth / 2
-                         && mousePos.Y >= farmerLocation.Y - markerHeight / 2
-                         && mousePos.Y <= farmerLocation.Y + markerHeight / 2
-                    )
-                    {
-                        hoveredList.Add(farMarker.Name);
-
-                        if (!this.LocationUtil.IsOutdoors(farMarker.LocationName) && !this.HasIndoorCharacter)
-                            this.HasIndoorCharacter = true;
-                    }
-                }
-            }
-
-            if (hoveredList.Count > 0)
-            {
-                this.HoveredNames = hoveredList[0];
-                for (int i = 1; i < hoveredList.Count; i++)
-                {
-                    string[] lines = this.HoveredNames.Split('\n');
-                    if ((int)Game1.smallFont.MeasureString(lines[lines.Length - 1] + separator + hoveredList[i]).X >
-                        (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X) // Longest string
-                    {
-                        this.HoveredNames += separator + Environment.NewLine;
-                        this.HoveredNames += hoveredList[i];
-                    }
-                    else
-                    {
-                        this.HoveredNames += separator + hoveredList[i];
-                    }
+                        break;
                 }
             }
         }
@@ -432,6 +423,23 @@ namespace NPCMapLocations.Framework.Menus
               SpriteEffects.None, 0f);
             b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None,
               0f);
+        }
+
+        /// <summary>Get whether a pixel area on the world map is under the cursor, adjusted for the map offset.</summary>
+        /// <param name="mousePos">The pixel position of the mouse, relative to the game window.</param>
+        /// <param name="mapPos">The pixel position on the world map, relative to the top-left corner of the map.</param>
+        /// <param name="markerWidth">The pixel width of the position on the world map.</param>
+        /// <param name="markerHeight">The pixel height of the position on the world map.</param>
+        private bool IsMapPixelUnderCursor(Point mousePos, WorldMapPosition mapPos, int markerWidth, int markerHeight)
+        {
+            int x = this.mapBounds.X + mapPos.X;
+            int y = this.mapBounds.Y + mapPos.Y;
+
+            return
+                mousePos.X >= x
+                && mousePos.X <= x + markerWidth
+                && mousePos.Y >= y
+                && mousePos.Y <= y + markerHeight;
         }
     }
 }
