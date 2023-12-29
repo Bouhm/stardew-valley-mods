@@ -131,6 +131,9 @@ namespace NPCMapLocations.Framework.Menus
         /// <summary>Draw the minimap to the screen.</summary>
         public void Draw()
         {
+            if (this.MapPage is null)
+                return; // not ready yet
+
             // update map if needed
             if (this.MapPage.mapRegion.Id != this.MapRegionId)
             {
