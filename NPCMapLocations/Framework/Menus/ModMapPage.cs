@@ -90,20 +90,22 @@ namespace NPCMapLocations.Framework.Menus
 
             if (this.NpcMarkers != null)
             {
+                Point mousePos = Game1.getMousePosition();
+
                 foreach (var npcMarker in this.NpcMarkers)
                 {
                     if (npcMarker.Value.WorldMapPosition.RegionId != regionId)
                         continue;
 
                     WorldMapPosition mapPos = npcMarker.Value.WorldMapPosition;
-                    Point mousePos = Game1.getMousePosition();
-                    Vector2 mapPixel = new Vector2(this.mapBounds.X + mapPos.X, this.mapBounds.Y + mapPos.Y);
+                    int markerX = this.mapBounds.X + mapPos.X;
+                    int markerY = this.mapBounds.Y + mapPos.Y;
 
                     if (
-                        mousePos.X >= mapPixel.X
-                        && mousePos.Y <= mapPixel.X + markerWidth
-                        && mousePos.Y >= mapPixel.Y
-                        && mousePos.Y <= mapPixel.Y + markerHeight
+                        mousePos.X >= markerX
+                        && mousePos.X <= markerX + markerWidth
+                        && mousePos.Y >= markerY
+                        && mousePos.Y <= markerY + markerHeight
                     )
                     {
                         if (!npcMarker.Value.IsHidden) //&& !(npcMarker.Value.Type == Character.Horse))
