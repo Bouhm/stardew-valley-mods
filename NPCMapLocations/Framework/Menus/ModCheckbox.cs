@@ -61,10 +61,13 @@ namespace NPCMapLocations.Framework.Menus
                 var marker = this.NpcMarker;
 
                 // draw icon
-                Color color = this.IsChecked
-                    ? Color.White
-                    : Color.White * 0.33f;
-                Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle(0, marker.CropOffset, 16, 15), color, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                if (marker.Sprite != null)
+                {
+                    Color color = this.IsChecked
+                        ? Color.White
+                        : Color.White * 0.33f;
+                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle(0, marker.CropOffset, 16, 15), color, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                }
 
                 // Draw name
                 slotX += 75;

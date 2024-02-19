@@ -762,10 +762,8 @@ namespace NPCMapLocations
                         }
                         catch (Exception ex)
                         {
-                            this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'; using the default sprite instead.", LogLevel.Warn);
+                            this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'.", LogLevel.Warn);
                             this.Monitor.Log(ex.ToString());
-
-                            newMarker.Sprite = new AnimatedSprite($@"Characters\{(npc.Gender == NPC.male ? "maleRival" : "femaleRival")}", 0, 16, 32).Texture;
                         }
 
                         this.NpcMarkers.Value.Add(npc.Name, newMarker);

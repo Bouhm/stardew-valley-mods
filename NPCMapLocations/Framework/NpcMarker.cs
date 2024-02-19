@@ -9,8 +9,8 @@ namespace NPCMapLocations.Framework
         /*********
         ** Accessors
         *********/
-        /// <summary>The NPC's overworld character sprite.</summary>
-        public Texture2D Sprite { get; set; }
+        /// <summary>The NPC's overworld character sprite, if it could be loaded.</summary>
+        public Texture2D? Sprite { get; set; }
 
         /// <summary>The pixel area within the <see cref="Sprite"/> to draw, or <c>null</c> to use the first sprite in the NPC spritesheet.</summary>
         public Rectangle? SpriteSourceRect { get; set; }
