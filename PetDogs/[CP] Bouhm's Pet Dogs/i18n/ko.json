@@ -1,0 +1,35 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Field names & tooltips
+    ****/
+    "config.breed1.name": "개 품종 1",
+    "config.breed1.description": "게임 내에서 첫 번째 개 품종이 선택한 품종으로 나타납니다.",
+
+    "config.breed2.name": "개 품종 2",
+    "config.breed2.description": "게임 내에서 두 번째 개 품종이 선택한 품종으로 나타납니다.",
+
+    "config.breed3.name": "개 품종 3",
+    "config.breed3.description": "게임 내에서 세 번째 개 품종이 선택한 품종으로 나타납니다.",
+
+    /****
+    ** Dropdown values
+    ****/
+    "config.breed1.values.shibainu": "시바 이누",
+    "config.breed2.values.shibainu": "시바 이누",
+    "config.breed3.values.shibainu": "시바 이누",
+
+    "config.breed1.values.shepherd": "저먼 셰퍼드",
+    "config.breed2.values.shepherd": "저먼 셰퍼드",
+    "config.breed3.values.shepherd": "저먼 셰퍼드",
+
+    "config.breed1.values.husky": "허스키",
+    "config.breed2.values.husky": "허스키",
+    "config.breed3.values.husky": "허스키",
+
+    "config.breed1.values.none": "없음",
+    "config.breed2.values.none": "없음",
+    "config.breed3.values.none": "없음"
+}
