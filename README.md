@@ -24,22 +24,22 @@ on the wiki for help contributing translations.
 
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-&nbsp;      | Bouhm's Pet Dogs                                          | NPC Map Locations
-:---------- | :-------------------------------------------------------- | :--------------------------------
-Chinese     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/zh.json)
-French      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/fr.json) | [✓](NPCMapLocations/i18n/fr.json)
-German      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/de.json) | [✓](NPCMapLocations/i18n/de.json)
-Hungarian   | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/hu.json)
-Italian     | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/it.json) | [✓](NPCMapLocations/i18n/it.json)
-Japanese    | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ja.json)
-Korean      | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [↻](NPCMapLocations/i18n/ko.json)
-[Polish]    | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/pl.json) | [✓](NPCMapLocations/i18n/pl.json)
-Portuguese  | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/pt.json) | [✓](NPCMapLocations/i18n/pt.json)
-Russian     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/ru.json)
-Spanish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/es.json)
-[Thai]      | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/th.json) | [✓](NPCMapLocations/i18n/th.json)
-Turkish     | [❑](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n)         | [✓](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [✓](PetDogs/%5BCP%5D%20Bouhm's%20Pet%20Dogs/i18n/uk.json) | [✓](NPCMapLocations/i18n/uk.json)
+&nbsp;      | NPC Map Locations
+:---------- | :--------------------------------
+Chinese     | [✓](NPCMapLocations/i18n/zh.json)
+French      | [✓](NPCMapLocations/i18n/fr.json)
+German      | [✓](NPCMapLocations/i18n/de.json)
+Hungarian   | [✓](NPCMapLocations/i18n/hu.json)
+Italian     | [✓](NPCMapLocations/i18n/it.json)
+Japanese    | [↻](NPCMapLocations/i18n/ja.json)
+Korean      | [✓](NPCMapLocations/i18n/ko.json)
+[Polish]    | [✓](NPCMapLocations/i18n/pl.json)
+Portuguese  | [✓](NPCMapLocations/i18n/pt.json)
+Russian     | [✓](NPCMapLocations/i18n/ru.json)
+Spanish     | [✓](NPCMapLocations/i18n/es.json)
+[Thai]      | [✓](NPCMapLocations/i18n/th.json)
+Turkish     | [✓](NPCMapLocations/i18n/tr.json)
+[Ukrainian] | [✓](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052

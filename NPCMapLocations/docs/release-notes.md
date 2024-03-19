@@ -11,7 +11,7 @@
 * Removed debug mode (no longer useful now that the mod uses `Data/WorldMap`).
 * Fixed minimap markers popping in/out near the edge.
 * Fixed farmhands not seeing custom world maps added by other mods.
-* Improved translations. Thanks to MakinDay (updated Italian) and Timur13240 (updated Russian)!
+* Improved translations. Thanks to MakinDay (updated Italian), Timur13240 (updated Russian), and twosoup (updated Korean)!
 
 **Breaking changes:**
 * The mod is now automatically compatible with custom world maps, overlays, and recolors from other mods. Compatibility patches are no longer needed.
