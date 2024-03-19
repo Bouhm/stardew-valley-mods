@@ -5,7 +5,7 @@
     // minimap section
     "minimap.label": "미니맵",
     "minimap.enabled": "사용하기",
-    "minimap.locked": "Lock minimap position", // TODO
+    "minimap.locked": "미니맵 위치 잠금",
     "minimap.width": "미니맵 가로",
     "minimap.height": "미니맵 세로",
 
