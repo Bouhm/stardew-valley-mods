@@ -1,6 +1,24 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.0.0
+Released 19 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
+
+* Updated for Stardew Valley 1.6, including the Ginger Island world map and custom world map regions in `Data/WorldMap`.
+* Tooltips over an indoor location now show all NPCs/farmers inside it.
+* Added enum for villager visibility config.
+* Increased minimap update rate.
+* Rewrote minimap to dynamically render from the main map, so it now fully supports custom world maps and recolors.
+* Removed custom map textures.
+* Removed debug mode (no longer useful now that the mod uses `Data/WorldMap`).
+* Fixed minimap markers popping in/out near the edge.
+* Fixed farmhands not seeing custom world maps added by other mods.
+* Improved translations. Thanks to MakinDay (updated Italian), Timur13240 (updated Russian), and twosoup (updated Korean)!
+
+**Breaking changes:**
+* The mod is now automatically compatible with custom world maps, overlays, and recolors from other mods. Compatibility patches are no longer needed.
+* Mod authors can no longer add custom tooltips/vectors via NPC Map Locations. You should add them to the new [world map data in 1.6](https://stardewvalleywiki.com/Modding:World_map) instead (see the updated [author guide](author-guide.md)).
+
 ## 2.11.5
 Released 29 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 

@@ -12,11 +12,8 @@
         /// <summary>The name of the location containing the NPC.</summary>
         public string LocationName { get; set; }
 
-        /// <summary>The marker's pixel X coordinate relative to the top-left corner of the map.</summary>
-        public int MapX { get; set; } = -9999;
-
-        /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
-        public int MapY { get; set; } = -9999;
+        /// <summary>The NPC's marker position on the world map.</summary>
+        public WorldMapPosition WorldMapPosition { get; set; }
 
         /// <summary>Whether the NPC's birthday is today.</summary>
         public bool IsBirthday { get; set; }

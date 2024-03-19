@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>2.11.5</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <Version>3.0.0</Version>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
     <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
@@ -14,10 +14,6 @@
 
   <ItemGroup>
     <Reference Include="Newtonsoft.Json" HintPath="$(GamePath)/smapi-internal/Newtonsoft.Json.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="maps\_default\*.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <Import Project="..\Bouhm.Shared\Bouhm.Shared.projitems" Label="Shared" />

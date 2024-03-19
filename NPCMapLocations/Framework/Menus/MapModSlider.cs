@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -13,28 +13,43 @@ namespace NPCMapLocations.Framework.Menus
         ** Fields
         *********/
         private readonly string ValueLabel;
+
+        /// <summary>The minimum value that can be selected.</summary>
         private readonly int Max;
+
+        /// <summary>The maximum value that can be selected.</summary>
         private readonly int Min;
+
+        /// <summary>Set the new option value.</summary>
+        private readonly Action<int> SetValue;
+
+        /// <summary>Get whether the option should be grayed out and disabled.</summary>
+        private readonly Func<bool> ShouldGrayOut;
+
+        /// <summary>The currently selected value.</summary>
         private float Value;
 
 
         /*********
         ** Public methods
         *********/
-        public MapModSlider(string label, int whichOption, int x, int y, int min, int max)
-            : base(label, x, y, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, whichOption)
+        /// <summary>Construct an instance.</summary>
+        /// <param name="label">The display text.</param>
+        /// <param name="value">The initial option value.</param>
+        /// <param name="min">The minimum value that can be selected.</param>
+        /// <param name="max">The maximum value that can be selected.</param>
+        /// <param name="set">Set the new option value.</param>
+        /// <param name="shouldGrayOut">Get whether the option should be grayed out and disabled.</param>
+        public MapModSlider(string label, int value, int min, int max, Action<int> set, Func<bool> shouldGrayOut)
+            : base(label, -1, -1, 48 * Game1.pixelZoom, 6 * Game1.pixelZoom, 1)
         {
+            this.ValueLabel = label;
             this.Min = min;
             this.Max = max;
-            if (whichOption != 8 && whichOption != 9) this.bounds.Width = this.bounds.Width * 2;
-            this.ValueLabel = label;
+            this.SetValue = set;
+            this.ShouldGrayOut = shouldGrayOut;
 
-            this.Value = whichOption switch
-            {
-                8 => ModEntry.Config.HeartLevelMin,
-                9 => ModEntry.Config.HeartLevelMax,
-                _ => this.Value
-            };
+            this.Value = value;
         }
 
         public override void leftClickHeld(int x, int y)
@@ -46,20 +61,11 @@ namespace NPCMapLocations.Framework.Menus
             this.Value = x >= this.bounds.X
                 ? (x <= this.bounds.Right - 10 * Game1.pixelZoom
                     ? (int)((x - this.bounds.X) / (float)(this.bounds.Width - 10 * Game1.pixelZoom) * this.Max)
-                    : this.Max)
+                    : this.Max
+                )
                 : 0;
 
-            switch (this.whichOption)
-            {
-                case 8:
-                    ModEntry.Config.HeartLevelMin = (int)this.Value;
-                    break;
-                case 9:
-                    ModEntry.Config.HeartLevelMax = (int)this.Value;
-                    break;
-            }
-
-            ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
+            this.SetValue((int)this.Value);
         }
 
         public override void receiveLeftClick(int x, int y)
@@ -73,18 +79,18 @@ namespace NPCMapLocations.Framework.Menus
         public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
             this.label = this.ValueLabel + ": " + this.Value;
-            this.greyedOut = false;
-            if (this.whichOption == 8 || this.whichOption == 9) this.greyedOut = !ModEntry.Config.ByHeartLevel;
+            this.greyedOut = this.ShouldGrayOut();
 
             base.draw(b, slotX, slotY, context);
-            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X,
-                slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, Game1.pixelZoom, false);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, OptionsSlider.sliderBGSource, slotX + this.bounds.X, slotY + this.bounds.Y, this.bounds.Width, this.bounds.Height, Color.White, Game1.pixelZoom, false);
             b.Draw(Game1.mouseCursors,
                 new Vector2(
-                    slotX + this.bounds.X + (this.bounds.Width - 10 * Game1.pixelZoom) *
-                    (this.Value / this.Max), slotY + this.bounds.Y),
+                    slotX + this.bounds.X + (this.bounds.Width - 10 * Game1.pixelZoom) * (this.Value / this.Max),
+                    slotY + this.bounds.Y
+                ),
                 OptionsSlider.sliderButtonRect, Color.White, 0f, Vector2.Zero, Game1.pixelZoom,
-                SpriteEffects.None, 0.9f);
+                SpriteEffects.None, 0.9f
+            );
         }
     }
 }

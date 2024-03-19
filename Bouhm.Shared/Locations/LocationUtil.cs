@@ -38,19 +38,6 @@ namespace Bouhm.Shared.Locations
             this.Monitor = monitor;
         }
 
-        /// <summary>Get all in-game locations (except dynamic locations like mine levels).</summary>
-        /// <remarks>Derived from <c>CommonHelper.GetLocations</c> in <a href="https://github.com/Pathoschild/StardewMods" />.</remarks>
-        public IEnumerable<GameLocation> GetAllStaticLocations()
-        {
-            return Game1.locations
-                .Concat(
-                    from location in Game1.locations.OfType<BuildableGameLocation>()
-                    from building in location.buildings
-                    where building.indoors.Value != null
-                    select building.indoors.Value
-                );
-        }
-
         public Dictionary<string, LocationContext> ScanLocationContexts()
         {
             foreach (var location in Game1.locations)

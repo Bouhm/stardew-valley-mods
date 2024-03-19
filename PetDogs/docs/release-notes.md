@@ -1,6 +1,17 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.0.0
+Released 19 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
+
+* Updated for Stardew Valley 1.6 and Content Patcher 2.0.0.
+* The mod now adds separate dog breeds to the options you can choose, instead of replacing the default dogs.
+* Improved translations. Thanks to MakinDay (added Italian)!
+
+**Breaking changes:**  
+If you previously used the mod, see [_use pet breeds_ in the readme](README.md#use-dog-breeds) to switch your dog to
+one of the new breeds.
+
 ## 2.0.5
 Released 25 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
 

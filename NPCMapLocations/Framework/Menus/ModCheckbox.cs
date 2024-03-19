@@ -12,14 +12,8 @@ namespace NPCMapLocations.Framework.Menus
         /*********
         ** Fields
         *********/
-        /// <summary>Get the current option value.</summary>
-        private readonly Func<bool> GetValue;
-
         /// <summary>Set the new option value.</summary>
         private readonly Action<bool> SetValue;
-
-        /// <summary>Update the configuration after the checkbox value changes.</summary>
-        private readonly Action UpdateConfig;
 
         /// <summary>The NPC marker and name to draw, if applicable.</summary>
         private readonly NpcMarker NpcMarker;
@@ -33,19 +27,16 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         /// <summary>Construct an instance.</summary>
         /// <param name="label">The display text.</param>
-        /// <param name="getValue">Get the current option value.</param>
-        /// <param name="setValue">Set the new option value.</param>
-        /// <param name="updateConfig">Update the configuration after the checkbox value changes.</param>
+        /// <param name="value">The initial option value.</param>
+        /// <param name="set">Set the new option value.</param>
         /// <param name="npcMarker">The NPC marker and name to draw, if applicable.</param>
-        public ModCheckbox(string label, Func<bool> getValue, Action<bool> setValue, Action updateConfig, NpcMarker npcMarker = null)
+        public ModCheckbox(string label, bool value, Action<bool> set, NpcMarker npcMarker = null)
             : base(label, -1, -1, 9 * Game1.pixelZoom, 9 * Game1.pixelZoom, 0)
         {
-            this.GetValue = getValue;
-            this.SetValue = setValue;
-            this.UpdateConfig = updateConfig;
+            this.SetValue = set;
             this.NpcMarker = npcMarker;
 
-            this.IsChecked = getValue();
+            this.IsChecked = value;
         }
 
         /// <inheritdoc />
@@ -56,10 +47,8 @@ namespace NPCMapLocations.Framework.Menus
 
             base.receiveLeftClick(x, y);
 
-            this.SetValue(!this.IsChecked);
-            this.IsChecked = this.GetValue();
-
-            this.UpdateConfig();
+            this.IsChecked = !this.IsChecked;
+            this.SetValue(this.IsChecked);
         }
 
         /// <inheritdoc />
@@ -72,10 +61,13 @@ namespace NPCMapLocations.Framework.Menus
                 var marker = this.NpcMarker;
 
                 // draw icon
-                Color color = this.IsChecked
-                    ? Color.White
-                    : Color.White * 0.33f;
-                Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle(0, marker.CropOffset, 16, 15), color, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                if (marker.Sprite != null)
+                {
+                    Color color = this.IsChecked
+                        ? Color.White
+                        : Color.White * 0.33f;
+                    Game1.spriteBatch.Draw(marker.Sprite, new Vector2((float)slotX + this.bounds.X + 50, slotY), new Rectangle(0, marker.CropOffset, 16, 15), color, 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+                }
 
                 // Draw name
                 slotX += 75;

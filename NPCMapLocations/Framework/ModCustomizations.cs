@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
@@ -15,25 +13,12 @@ namespace NPCMapLocations.Framework
         /*********
         ** Accessors
         *********/
-        /// <summary>The in-world tile coordinates and map pixels which represent the same position, indexed by location name.</summary>
-        /// <remarks>These are used to map any in-game tile coordinate to the map by measuring the distance between the two closest map vectors.</remarks>
-        public Dictionary<string, MapVector[]> MapVectors { get; set; } = new();
-
         /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
         public Dictionary<string, string> Names { get; set; } = new();
 
         /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
         /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
         public HashSet<string> LocationExclusions { get; set; } = new();
-
-        /// <summary>The tooltips to show on the map, indexed by location name. If the location name matches a <strong>translated</strong> vanilla tooltip text (e.g. <c>Calico Desert</c>), that tooltip is removed.</summary>
-        public Dictionary<string, MapTooltip> Tooltips { get; set; } = new();
-
-        /// <summary>The name of the folder containing map assets.</summary>
-        public string MapsRootPath { get; } = "maps";
-
-        /// <summary>The folder path containing map assets relative to the mod folder.</summary>
-        public string MapsPath { get; } = Path.Combine("maps", "_default");
 
 
         /*********
@@ -59,12 +44,6 @@ namespace NPCMapLocations.Framework
             foreach (var locationData in customLocationJson)
             {
                 JObject location = locationData.Value;
-
-                if (location.ContainsKey("MapVectors"))
-                    this.AddCustomMapLocation(locationData.Key, (JArray)location.GetValue("MapVectors"));
-
-                if (location.ContainsKey("MapTooltip"))
-                    this.AddTooltip(locationData.Key, (JObject)location.GetValue("MapTooltip"));
 
                 if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
                     this.LocationExclusions.Add(locationData.Key);
@@ -142,59 +121,6 @@ namespace NPCMapLocations.Framework
             ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
         }
 
-        /// <summary>Load a custom tooltip received from another mod through the content pipeline.</summary>
-        /// <param name="locationName">The location name on the map.</param>
-        /// <param name="tooltip">The map tooltip to add. See <see cref="Tooltips"/> for details.</param>
-        private void AddTooltip(string locationName, JObject tooltip)
-        {
-            this.Tooltips[locationName] = new MapTooltip(
-                (int)tooltip.GetValue("X"),
-                (int)tooltip.GetValue("Y"),
-                (int)tooltip.GetValue("Width"),
-                (int)tooltip.GetValue("Height"),
-                (string)tooltip.GetValue("PrimaryText"),
-                (string)tooltip.GetValue("SecondaryText")
-            );
-
-            if (tooltip.ContainsKey("SecondaryText"))
-                this.Tooltips[locationName].SecondaryText = (string)tooltip.GetValue("SecondaryText");
-        }
-
-        /// <summary>Override the map vectors for a custom location. See <see cref="MapVectors"/> for details.</summary>
-        /// <param name="locationName">The name of the location for which to add vectors.</param>
-        /// <param name="mapLocations">The array of custom vectors.</param>
-        private void AddCustomMapLocation(string locationName, JArray mapLocations)
-        {
-            var rawVectors = mapLocations.ToObject<JObject[]>();
-            var parsedVectors = new MapVector[rawVectors.Length];
-            for (int i = 0; i < rawVectors.Length; i++)
-            {
-                JObject rawVector = rawVectors[i];
-
-                // Marker doesn't need to specify corresponding Tile position
-                if (rawVector.GetValue("TileX") == null || rawVector.GetValue("TileY") == null)
-                {
-                    parsedVectors[i] = new MapVector(
-                        (int)rawVector.GetValue("MapX"),
-                        (int)rawVector.GetValue("MapY")
-                    );
-                }
-                // Region must specify corresponding Tile positions for
-                // Calculations on movement within location
-                else
-                {
-                    parsedVectors[i] = new MapVector(
-                        (int)rawVector.GetValue("MapX"),
-                        (int)rawVector.GetValue("MapY"),
-                        (int)rawVector.GetValue("TileX"),
-                        (int)rawVector.GetValue("TileY")
-                    );
-                }
-            }
-
-            this.MapVectors[locationName] = parsedVectors;
-        }
-
         /// <summary>Merge any number of dictionaries into a new dictionary.</summary>
         /// <typeparam name="TValue">The dictionary value type.</typeparam>
         /// <param name="dictionaries">The dictionaries to merge. Later dictionaries have precedence for conflicting keys.</param>
@@ -207,26 +133,6 @@ namespace NPCMapLocations.Framework
             {
                 foreach (var pair in dictionary)
                     merged[pair.Key] = pair.Value;
-            }
-
-            return merged;
-        }
-
-        /// <summary>Merge any number of sets into a new set.</summary>
-        /// <typeparam name="TValue">The set value type.</typeparam>
-        /// <param name="sets">The sets to merge. Later sets have precedence for conflicting keys.</param>
-        /// <returns>Returns a new set instance.</returns>
-        private HashSet<TValue> Merge<TValue>(params HashSet<TValue>[] sets)
-        {
-            HashSet<TValue> merged = new();
-
-            foreach (var set in sets)
-            {
-                foreach (TValue value in set)
-                {
-                    merged.Remove(value);
-                    merged.Add(value);
-                }
             }
 
             return merged;

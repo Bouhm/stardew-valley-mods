@@ -12,9 +12,6 @@ namespace NPCMapLocations.Framework.Models
         /*********
         ** Accessors
         *********/
-        /// <summary>Whether to enable debug features.</summary>
-        public bool DebugMode { get; set; } = false;
-
         /// <summary>The key binding to open the options menu when on the map view.</summary>
         public string MenuKey { get; set; } = "Tab";
 
@@ -62,12 +59,6 @@ namespace NPCMapLocations.Framework.Models
 
         /// <summary>Location names in which the minimap should be disabled.</summary>
         public HashSet<string> MinimapExclusions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-
-        /// <summary>Whether to show seasonal variations of the map.</summary>
-        public bool UseSeasonalMaps { get; set; } = true;
-
-        /// <summary>Whether to replace the stylized Ginger Island in the bottom-right corner of the map with a more detailed and accurate map.</summary>
-        public bool UseDetailedIsland { get; set; } = false;
 
         /// <summary>Whether to show player children on the map.</summary>
         public bool ShowChildren { get; set; } = false;

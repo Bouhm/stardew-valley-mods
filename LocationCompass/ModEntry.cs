@@ -262,17 +262,14 @@ namespace LocationCompass
                 "Krobus"
             };
 
-            foreach (GameLocation location in this.LocationUtil.GetAllStaticLocations())
+            Utility.ForEachCharacter(npc =>
             {
-                foreach (NPC npc in location.characters)
-                {
-                    if (npc == null)
-                        continue;
+                if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
+                    villagers.Add(npc);
 
-                    if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
-                        villagers.Add(npc);
-                }
-            }
+                return true;
+            });
+
             return villagers;
         }
 
@@ -311,7 +308,7 @@ namespace LocationCompass
                     bool isBirthday = false;
                     bool hasQuest = false;
                     // Check if gifted for birthday
-                    if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
+                    if (npc.isBirthday())
                     {
                         isBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) && Game1.player.friendshipData[npc.Name].GiftsToday == 0;
                     }
