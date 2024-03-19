@@ -16,8 +16,7 @@ For an existing save, you can change pet breed by running `debug customize` in t
 customization screen again. Make sure you _only_ change the pet type; changing other values may have unexpected effects.
 
 ## Compatibility
-Compatible with Stardew Valley 1.4 and 1.5+ on Linux/macOS/Windows, both single-player and
-multiplayer.
+Compatible with Stardew Valley 1.6+ on Linux/macOS/Windows, both single-player and multiplayer.
 
 ## See also
 * [Release notes](release-notes.md)
