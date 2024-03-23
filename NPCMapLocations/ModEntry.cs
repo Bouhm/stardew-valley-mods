@@ -37,6 +37,7 @@ namespace NPCMapLocations
         private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new();
         private readonly PerScreen<bool> HasOpenedMap = new();
         private readonly PerScreen<bool> IsModMapOpen = new();
+        private readonly PerScreen<bool> IsFirstDay = new();
 
         /// <summary>Whether to show the minimap.</summary>
         private readonly PerScreen<bool> ShowMinimap = new();
@@ -215,6 +216,7 @@ namespace NPCMapLocations
             //
 
             Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
+            this.IsFirstDay.Value = true;
 
             // Initialize these early for multiplayer sync
             this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
@@ -245,11 +247,6 @@ namespace NPCMapLocations
 
             // Get context of all locations (indoor, outdoor, relativity)
             LocationUtil.ScanLocationContexts();
-
-            // Log any custom locations not handled in content.json
-            string[] unknownLocations = this.GetLocationsWithoutMapPosition().Select(p => p.Name).OrderBy(p => p).ToArray();
-            if (unknownLocations.Any())
-                this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
 
             this.UpdateFarmBuildingLocations();
 
@@ -346,6 +343,16 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
         {
+            // Log any custom locations not handled in content.json
+            if (this.IsFirstDay.Value)
+            {
+                this.IsFirstDay.Value = false;
+
+                string[] unknownLocations = this.GetLocationsWithoutMapPosition().Select(p => p.Name).OrderBy(p => p).ToArray();
+                if (unknownLocations.Any())
+                    this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
+            }
+
             // Check for traveling merchant day
             if (this.ConditionalNpcs.Value != null)
                 this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).ShouldTravelingMerchantVisitToday();

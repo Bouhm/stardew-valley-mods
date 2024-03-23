@@ -1,6 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.0.1
+Released 22 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
+
+* Fixed Meadowlands farm's coop being empty on day one.
+
 ## 3.0.0
 Released 19 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
 
