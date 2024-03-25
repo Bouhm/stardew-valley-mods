@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed error in some cases due to accessing Volcano Dungeon entrance location.
+
 ## 3.0.1
 Released 22 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
 

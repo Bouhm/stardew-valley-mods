@@ -292,8 +292,8 @@ namespace Bouhm.Shared.Locations
             // Dungeon levels, which will be ignored.
             if (location is Caldera)
             {
-                var entrance = Game1.getLocationFromName("VolcanoDungeon0");
-                var exitWarp = entrance?.warps.FirstOrDefault(p => p.TargetName == "IslandNorth");
+                var entrance = Game1.getLocationFromName("IslandNorth");
+                var exitWarp = entrance?.warps.FirstOrDefault(p => p.TargetName == "VolcanoEntrance");
                 if (exitWarp != null)
                     return new[] { exitWarp };
             }
