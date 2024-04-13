@@ -79,6 +79,7 @@ namespace NPCMapLocations
             this.Customizations = new ModCustomizations();
 
             helper.Events.Content.AssetRequested += this.OnAssetRequested;
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
@@ -206,6 +207,15 @@ namespace NPCMapLocations
         /*********
         ** Private methods
         *********/
+        /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
+                .Register();
+        }
+
         /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>

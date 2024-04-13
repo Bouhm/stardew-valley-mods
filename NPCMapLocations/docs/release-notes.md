@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Added integration with Generic Mod Config Menu for the keybind settings.
 * Fixed error in some cases due to accessing Volcano Dungeon entrance location.
 
 ## 3.0.1

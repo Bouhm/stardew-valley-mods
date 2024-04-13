@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CommonHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)integrations\IGenericModConfigMenuApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\LocationContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\LocationData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\LocationType.cs" />
