@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Added integration with Generic Mod Config Menu for the keybind settings.
+* Raised heart level slider's max value from 12 to 14 to account for newer marriage events.
 * Fixed error in some cases due to accessing Volcano Dungeon entrance location.
 
 ## 3.0.1
