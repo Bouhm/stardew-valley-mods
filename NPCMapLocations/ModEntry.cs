@@ -750,9 +750,6 @@ namespace NPCMapLocations
                 // villagers
                 foreach (var npc in this.GetVillagers())
                 {
-                    if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
-                        continue;
-
                     var type = npc switch
                     {
                         Horse => CharacterType.Horse,
@@ -760,8 +757,7 @@ namespace NPCMapLocations
                         _ => CharacterType.Villager
                     };
 
-                    if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
-                        offset = 0;
+                    int offset = ModEntry.Globals.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
 
                     if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                     {
