@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Mostrar misiones o cumpleaños",
     "extra.show-hidden-villagers": "Mostrar aldeanos ocultos",
     "extra.show-traveling-merchant": "Mostrar al comerciante ambulante",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "Incluir/Excluir aldeanos:",

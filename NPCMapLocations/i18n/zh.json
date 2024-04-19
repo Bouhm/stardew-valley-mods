@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "显示任务或生日",
     "extra.show-hidden-villagers": "显示隐藏的村民",
     "extra.show-traveling-merchant": "显示旅行商人",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section (包含/排除 村民选项)
     "villagers.label": "包含村民清单:",

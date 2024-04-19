@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Görevleri ya da doğum günlerini göster",
     "extra.show-hidden-villagers": "Gizli köylüleri göster",
     "extra.show-traveling-merchant": "Gezgin tüccarı göster",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "Köylüleri ekle/çıkar:",

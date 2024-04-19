@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
     "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
     "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
     "villagers.label": "Falusiak Engedélyezése/Kizárása:",

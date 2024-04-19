@@ -4,6 +4,7 @@
 ## Upcoming release
 * Added integration with Generic Mod Config Menu for the keybind settings.
 * Raised heart level slider's max value from 12 to 14 to account for newer marriage events.
+* Fixed 'show horses' option not shown in config UI.
 * Fixed error in some cases due to accessing Volcano Dungeon entrance location.
 * Fixed custom NPCs sometimes not shown on the world map.
 * Fixed minimap shown in whole-map screenshots.

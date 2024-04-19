@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Show quests or birthdays",
     "extra.show-hidden-villagers": "Show hidden villagers",
     "extra.show-traveling-merchant": "Show traveling merchant",
+    "extra.show-horses": "Show horses",
 
     // include/exclude villagers section
     "villagers.label": "Include/Exclude villagers:",

@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "แสดงเควสหรือวันเกิด",
     "extra.show-hidden-villagers": "แสดงชาวบ้านที่ซ่อนอยู่",
     "extra.show-traveling-merchant": "แสดงพ่อค้าเร่",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "แสดง/ซ่อน ชาวบ้าน:",

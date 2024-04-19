@@ -196,6 +196,11 @@ namespace NPCMapLocations.Framework.Menus
                     value: ModEntry.Globals.ShowTravelingMerchant,
                     set: value => ModEntry.Globals.ShowTravelingMerchant = value
                 ),
+                new ModCheckbox(
+                    label: I18n.Extra_ShowHorses(),
+                    value: ModEntry.Globals.ShowHorse,
+                    set: value => ModEntry.Globals.ShowHorse = value
+                ),
 
                 new OptionsElement(I18n.Villagers_Label())
             });

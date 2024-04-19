@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Mostra le missioni ed i compleanni",
     "extra.show-hidden-villagers": "Mostra gli abitanti nascosti",
     "extra.show-traveling-merchant": "Mostra i mercanti viaggiatori",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "Includi/Escludi abitanti:",

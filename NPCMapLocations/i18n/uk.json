@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Показувати завдання або дні народження",
     "extra.show-hidden-villagers": "Показувати прихованих містян",
     "extra.show-traveling-merchant": "Показувати мандрівного купця",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "Додати/Виключити містян:",

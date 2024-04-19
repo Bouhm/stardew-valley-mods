@@ -24,6 +24,7 @@
     "extra.show-quests-or-birthdays": "Afficher les quêtes ou les anniversaires",
     "extra.show-hidden-villagers": "Afficher les villageois cachés",
     "extra.show-traveling-merchant": "Afficher les marchands ambulants",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
     "villagers.label": "Inclure/Exclure les villageois:",
