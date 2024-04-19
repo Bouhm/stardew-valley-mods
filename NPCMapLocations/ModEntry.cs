@@ -566,7 +566,7 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
-            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
+            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD && !Game1.game1.takingMapScreenshot)
                 this.Minimap.Value?.Draw();
         }
 
