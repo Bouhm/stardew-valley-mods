@@ -1,0 +1,43 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Options",
+
+    "config.hide-hud.name": "Hide HUD",
+    "config.hide-hud.desc": "Whether to hide the game's HUD when the locator icons are shown.",
+
+    "config.same-location-only.name": "Same location only",
+    "config.same-location-only.desc": "Whether to only show locators in the current location. If false, characters in neighboring locations will be shown in gray.",
+
+    "config.quests-and-birthdays-only.name": "Quests & birthdays only",
+    "config.quests-and-birthdays-only.desc": "Whether to only show locators for NPCs with a quest or birthday today.",
+
+    "config.players-only.name": "Players only",
+    "config.players-only.desc": "Whether to only show locators for players.",
+
+    "config.show-horses.name": "Show horses",
+    "config.show-horses.desc": "Whether to show locators for horses.",
+
+    // controls
+    "config.title.controls": "Controls",
+
+    "config.hold-to-toggle.name": "Hold to toggle",
+    "config.hold-to-toggle.desc": "Whether you need to hold the button to show the locator icons (else the button toggles them).",
+
+    "config.toggle-key.name": "Toggle key",
+    "config.toggle-key.desc": "The button which shows or hides the locator icons.",
+
+    "config.same-location-key.name": "'Same location' key",
+    "config.same-location-key.desc": "The button which enables or disables the 'same location only' option above.",
+
+    "config.quests-and-birthdays-key.name": "'Quests & birthdays only' key",
+    "config.quests-and-birthdays-key.desc": "The button which enables or disables the 'quests and birthdays only' option above.",
+
+    "config.players-key.name": "'Players only' key",
+    "config.players-key.desc": "The button which enables or disables the 'players only' option above.",
+
+    "config.horses-key.name": "'Show horses' key",
+    "config.horses-key.desc": "The button which enables or disables the 'show horses' option above."
+}

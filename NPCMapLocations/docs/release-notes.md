@@ -1,6 +1,17 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.1.0
+Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
+
+* Added integration with Generic Mod Config Menu for the keybind settings.
+* Raised heart level slider's max value from 12 to 14 to account for newer marriage events.
+* Updated for Stardew Valley 1.6.5.
+* Fixed 'show horses' option not shown in config UI.
+* Fixed error in some cases due to accessing Volcano Dungeon entrance location.
+* Fixed custom NPCs sometimes not shown on the world map.
+* Fixed minimap shown in whole-map screenshots.
+
 ## 3.0.1
 Released 22 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
 

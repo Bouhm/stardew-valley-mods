@@ -24,7 +24,24 @@
     "extra.show-quests-or-birthdays": "주민 퀘스트나 생일 표시",
     "extra.show-hidden-villagers": "숨어있는 주민 표시",
     "extra.show-traveling-merchant": "행상인마차 표시",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section
-    "villagers.label": "포함/제외할 주민:"
+    "villagers.label": "포함/제외할 주민:",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // TODO
+    "config.menu-key.name": "Menu key",
+    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+
+    "config.minimap-key.name": "Minimap toggle key",
+    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+
+    "config.tooltip-key.name": "Tooltip key",
+    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+
+    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
 }

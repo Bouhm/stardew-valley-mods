@@ -24,7 +24,24 @@
     "extra.show-quests-or-birthdays": "显示任务或生日",
     "extra.show-hidden-villagers": "显示隐藏的村民",
     "extra.show-traveling-merchant": "显示旅行商人",
+    "extra.show-horses": "Show horses", // TODO
 
     // include/exclude villagers section (包含/排除 村民选项)
-    "villagers.label": "包含村民清单:"
+    "villagers.label": "包含村民清单:",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // TODO
+    "config.menu-key.name": "Menu key",
+    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+
+    "config.minimap-key.name": "Minimap toggle key",
+    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+
+    "config.tooltip-key.name": "Tooltip key",
+    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+
+    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
 }

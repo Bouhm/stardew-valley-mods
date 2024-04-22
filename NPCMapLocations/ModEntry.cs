@@ -79,6 +79,7 @@ namespace NPCMapLocations
             this.Customizations = new ModCustomizations();
 
             helper.Events.Content.AssetRequested += this.OnAssetRequested;
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
@@ -206,6 +207,15 @@ namespace NPCMapLocations
         /*********
         ** Private methods
         *********/
+        /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
+                .Register();
+        }
+
         /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
@@ -556,7 +566,7 @@ namespace NPCMapLocations
         /// <param name="e">The event data.</param>
         private void OnRenderingHud(object sender, RenderingHudEventArgs e)
         {
-            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD)
+            if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD && !Game1.game1.takingMapScreenshot)
                 this.Minimap.Value?.Draw();
         }
 
@@ -740,9 +750,6 @@ namespace NPCMapLocations
                 // villagers
                 foreach (var npc in this.GetVillagers())
                 {
-                    if (!this.Customizations.Names.ContainsKey(npc.Name) && npc is not (Horse or Child))
-                        continue;
-
                     var type = npc switch
                     {
                         Horse => CharacterType.Horse,
@@ -750,8 +757,7 @@ namespace NPCMapLocations
                         _ => CharacterType.Villager
                     };
 
-                    if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(npc.Name, out int offset))
-                        offset = 0;
+                    int offset = ModEntry.Globals.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
 
                     if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                     {

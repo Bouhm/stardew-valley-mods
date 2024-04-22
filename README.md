@@ -24,22 +24,22 @@ on the wiki for help contributing translations.
 
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-&nbsp;      | NPC Map Locations
-:---------- | :--------------------------------
-Chinese     | [✓](NPCMapLocations/i18n/zh.json)
-French      | [✓](NPCMapLocations/i18n/fr.json)
-German      | [✓](NPCMapLocations/i18n/de.json)
-Hungarian   | [✓](NPCMapLocations/i18n/hu.json)
-Italian     | [✓](NPCMapLocations/i18n/it.json)
-Japanese    | [↻](NPCMapLocations/i18n/ja.json)
-Korean      | [✓](NPCMapLocations/i18n/ko.json)
-[Polish]    | [✓](NPCMapLocations/i18n/pl.json)
-Portuguese  | [✓](NPCMapLocations/i18n/pt.json)
-Russian     | [✓](NPCMapLocations/i18n/ru.json)
-Spanish     | [✓](NPCMapLocations/i18n/es.json)
-[Thai]      | [✓](NPCMapLocations/i18n/th.json)
-Turkish     | [✓](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [✓](NPCMapLocations/i18n/uk.json)
+&nbsp;      | NPC Location Compass      | NPC Map Locations
+:---------- | :------------------------ | :--------------------------------
+Chinese     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/zh.json)
+French      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/fr.json)
+German      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/de.json)
+Hungarian   | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/hu.json)
+Italian     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/it.json)
+Japanese    | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ja.json)
+Korean      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ko.json)
+[Polish]    | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/pl.json)
+Portuguese  | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/pt.json)
+Russian     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ru.json)
+Spanish     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/es.json)
+[Thai]      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/th.json)
+Turkish     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/tr.json)
+[Ukrainian] | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/uk.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052

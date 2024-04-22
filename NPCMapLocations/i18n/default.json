@@ -24,7 +24,23 @@
     "extra.show-quests-or-birthdays": "Show quests or birthdays",
     "extra.show-hidden-villagers": "Show hidden villagers",
     "extra.show-traveling-merchant": "Show traveling merchant",
+    "extra.show-horses": "Show horses",
 
     // include/exclude villagers section
-    "villagers.label": "Include/Exclude villagers:"
+    "villagers.label": "Include/Exclude villagers:",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    "config.menu-key.name": "Menu key",
+    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+
+    "config.minimap-key.name": "Minimap toggle key",
+    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+
+    "config.tooltip-key.name": "Tooltip key",
+    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+
+    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
 }

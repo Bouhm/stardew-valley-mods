@@ -9,7 +9,7 @@ namespace NPCMapLocations.Framework.Models
         ** Accessors
         *********/
         /// <summary>The maximum heart level that can be configured for <see cref="HeartLevelMin"/> or <see cref="HeartLevelMax"/>.</summary>
-        internal const int MaxPossibleHeartLevel = 12;
+        internal const int MaxPossibleHeartLevel = 14;
 
         /// <summary>Which NPCs to display.</summary>
         public VillagerVisibility ImmersionOption { get; set; } = VillagerVisibility.All;

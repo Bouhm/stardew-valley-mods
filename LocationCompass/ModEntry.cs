@@ -43,6 +43,7 @@ namespace LocationCompass
         *********/
         public override void Entry(IModHelper helper)
         {
+            I18n.Init(helper.Translation);
             CommonHelper.RemoveObsoleteFiles(this, "LocationCompass.pdb");
 
             this.Config = helper.ReadConfig<ModConfig>();
@@ -50,6 +51,7 @@ namespace LocationCompass
             this.Constants = helper.Data.ReadJsonFile<ModData>("assets/constants.json") ?? new ModData();
             this.LocationUtil = new(this.Monitor);
 
+            helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
             helper.Events.World.LocationListChanged += this.OnLocationListChanged;
@@ -64,6 +66,15 @@ namespace LocationCompass
         /*********
         ** Private methods
         *********/
+        /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event data.</param>
+        private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+        {
+            new GenericModConfigMenuIntegration(this.Config, this.ModManifest, this.Helper.ModRegistry, () => this.Helper.WriteConfig(this.Config))
+                .Register();
+        }
+
         /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>

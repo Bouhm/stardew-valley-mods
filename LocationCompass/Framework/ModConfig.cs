@@ -36,7 +36,7 @@
         /// <summary>Whether to show horses.</summary>
         public bool ShowHorses { get; set; } = false;
 
-        /// <summary>The key binding to toggle <see cref="ShowFarmersOnly"/>.</summary>
+        /// <summary>The key binding to toggle <see cref="ShowHorses"/>.</summary>
         public string HorsesToggleKey { get; set; } = "L";
     }
 }

@@ -1,6 +1,12 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 1.4.0
+Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
+
+* Added integration with Generic Mod Config Menu.
+* Updated for Stardew Valley 1.6.5.
+
 ## 1.3.13
 Released 19 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
 
