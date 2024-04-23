@@ -11,11 +11,11 @@
 
     // immersion section (拟真体验选项)
     "immersion.label": "设置:",
-    "immersion.always-show-villagers": "展示所有村民",
-    "immersion.only-villagers-talked-to": "显示所有说话的村民",
-    "immersion.hide-villagers-talked-to": "隐藏所有说话的村民",
-    "immersion.only-villagers-in-player-location": "显示村民在玩家的位置",
-    "immersion.only-villagers-within-heart-level": "显示指定关系级别内的村民",
+    "immersion.always-show-villagers": "显示所有村民",
+    "immersion.only-villagers-talked-to": "只显示已对话的村民",
+    "immersion.hide-villagers-talked-to": "隐藏所有已对话的村民",
+    "immersion.only-villagers-in-player-location": "只显示玩家所在位置的村民",
+    "immersion.only-villagers-within-heart-level": "显示指定好感度范围内的村民",
     "immersion.min-heart-level": "最小好感度",
     "immersion.max-heart-level": "最大好感度",
 
@@ -27,7 +27,7 @@
     "extra.show-horses": "显示马",
 
     // include/exclude villagers section (包含/排除 村民选项)
-    "villagers.label": "包含村民清单:",
+    "villagers.label": "显示村民列表:",
 
 
     /*********
@@ -41,7 +41,7 @@
     "config.minimap-key.desc": "按此快捷键以显示/隐藏小地图",
 
     "config.tooltip-key.name": "切换提示条位置",
-    "config.tooltip-key.desc": "在地图界面按此快捷键以切换在指定地点的角色提示条位置",
+    "config.tooltip-key.desc": "在地图界面按此快捷键以切换角色提示条位置",
 
     "config.other-settings": "若需更改本Mod其他设置，请在游戏内地图界面按打开菜单键进行更改"
 }
