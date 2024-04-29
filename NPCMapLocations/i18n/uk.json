@@ -3,11 +3,11 @@
     ** Map options
     *********/
     // minimap section
-    "minimap.label": "Мінімапа",
+    "minimap.label": "Міні-мапа",
     "minimap.enabled": "Ввімкнено",
-    "minimap.locked": "Заблокувати розташування мінімапи",
-    "minimap.width": "Ширина мінімапи",
-    "minimap.height": "Висота мінімапи",
+    "minimap.locked": "Заблокувати розташування міні-мапи",
+    "minimap.width": "Ширина міні-мапи",
+    "minimap.height": "Висота міні-мапи",
 
     // immersion section
     "immersion.label": "Налаштування:",
@@ -24,7 +24,7 @@
     "extra.show-quests-or-birthdays": "Показувати завдання або дні народження",
     "extra.show-hidden-villagers": "Показувати прихованих містян",
     "extra.show-traveling-merchant": "Показувати мандрівного купця",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-horses": "Показувати коней",
 
     // include/exclude villagers section
     "villagers.label": "Додати/Виключити містян:",
@@ -33,15 +33,14 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "Кнопка меню",
+    "config.menu-key.desc": "Натиснувши цю кнопку на ігровій мапі відкриється меню налаштування модифікації.",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "Кнопка перемикання міні-мапи",
+    "config.minimap-key.desc": "Натисніть цю кнопку, аби приховати чи показати міні-мапу.",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "Кнопка підказки",
+    "config.tooltip-key.desc": "Натисніть цю кнопку для циклічного переміщення підказки на мапі.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "Для зміни інших параметрів модифікації, відкрийте ігрову мапу і натисніть кнопку виклику меню."
 }
