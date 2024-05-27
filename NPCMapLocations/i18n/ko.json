@@ -23,8 +23,8 @@
     "extra.label": "기타 설정:",
     "extra.show-quests-or-birthdays": "주민 퀘스트나 생일 표시",
     "extra.show-hidden-villagers": "숨어있는 주민 표시",
-    "extra.show-traveling-merchant": "행상인마차 표시",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-traveling-merchant": "행상인 마차 표시",
+    "extra.show-horses": "말 표시",
 
     // include/exclude villagers section
     "villagers.label": "포함/제외할 주민:",
@@ -33,15 +33,14 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "메뉴 키",
+    "config.menu-key.desc": "게임 내 지도가 열려 있는 동안 이 버튼을 누르면 모드 설정이 표시됩니다.",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "미니맵 전환 키",
+    "config.minimap-key.desc": "미니맵을 표시하거나 숨기려면 이 버튼을 누릅니다.",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "도움말 키",
+    "config.tooltip-key.desc": "지도 보기에서 도움말을 순환하려면 이 버튼을 누릅니다.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "다른 모드 설정을 변경하려면 게임 내 세계 지도를 열고 위에 표시된 메뉴 키를 누릅니다."
 }
