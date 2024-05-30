@@ -15,7 +15,6 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Characters;
-using StardewValley.GameData.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
