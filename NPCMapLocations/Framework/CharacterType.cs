@@ -6,6 +6,9 @@
         /// <summary>A villager NPC.</summary>
         Villager,
 
+        /// <summary>A raccoon villager NPC.</summary>
+        Raccoon,
+
         /// <summary>A player's child NPC.</summary>
         Child,
 

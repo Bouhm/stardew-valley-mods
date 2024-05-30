@@ -15,6 +15,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Characters;
+using StardewValley.GameData.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Quests;
@@ -496,7 +497,7 @@ namespace NPCMapLocations
 
                             try
                             {
-                                if (syncedMarker.Value.Type == CharacterType.Villager)
+                                if (syncedMarker.Value.Type is CharacterType.Villager or CharacterType.Raccoon)
                                 {
                                     npcMarker.Sprite = internalName == "Leo"
                                         ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
@@ -594,7 +595,7 @@ namespace NPCMapLocations
                     npc != null
                     && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
                     && (
-                        npc.isVillager()
+                        npc.IsVillager
                         || npc.isMarried()
                         || (Globals.ShowHorse && npc is Horse)
                         || (Globals.ShowChildren && npc is Child)
@@ -754,6 +755,7 @@ namespace NPCMapLocations
                     {
                         Horse => CharacterType.Horse,
                         Child => CharacterType.Child,
+                        Raccoon => CharacterType.Raccoon,
                         _ => CharacterType.Villager
                     };
 
