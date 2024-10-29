@@ -592,7 +592,7 @@ namespace NPCMapLocations
             {
                 bool shouldTrack =
                     npc != null
-                    && npc.IsInvisible != true
+                    && !npc.IsInvisible
                     && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
                     && (
                         npc.isVillager()
