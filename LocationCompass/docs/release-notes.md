@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Improved translations. Thanks to juliowh (added Portuguese), mitekano23 (added Japanese), and ranke96 (added Chinese)!
+
 ## 1.4.0
 Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
 

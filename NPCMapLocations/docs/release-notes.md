@@ -1,6 +1,11 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed raccoon icon on the map (thanks to Exblosis!).
+* Fixed invisible NPCs shown on the map (thanks to Abagaianye!).
+* Improved translations. Thanks to burunduk (updated Ukrainian), CaranudLapin (updated French), DARKS0UND (updated Korean), Exblosis (updated German), juliowh (updated Portuguese), MagiaBaiser (updated Spanish), mitekano23 (updated Japanese), and ykinsoul (updated Chinese!).
+
 ## 3.1.0
 Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
 

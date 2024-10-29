@@ -33,7 +33,6 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    
     "config.menu-key.name": "打开菜单",
     "config.menu-key.desc": "在游戏内地图中按此快捷键以打开Mod设置界面",
 

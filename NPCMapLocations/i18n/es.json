@@ -1,4 +1,4 @@
-{
+﻿{
     /*********
     ** Map options
     *********/
@@ -33,7 +33,6 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
     "config.menu-key.name": "Botón de Menú",
     "config.menu-key.desc": "Pulsa este botón mientras el mapa del juego está abierto para mostrar la configuración del mod.",
 
@@ -45,4 +44,3 @@
 
     "config.other-settings": "Para cambiar la configuración de los otros mods, abra el mapa del mundo del juego y pulsa el botón de menú que se muestra arriba."
 }
-
