@@ -43,9 +43,12 @@ namespace NPCMapLocations.Framework
             if (this.SpriteSourceRect.HasValue)
                 return this.SpriteSourceRect.Value;
 
-            return this.Type == CharacterType.Horse
-                ? new Rectangle(17, 104, 16, 14)
-                : new Rectangle(0, this.CropOffset, 16, 15);
+            return this.Type switch
+            {
+                CharacterType.Horse => new(17, 104, 16, 14),
+                CharacterType.Raccoon => new(11, 17, 11, 10),
+                _ => new(0, this.CropOffset, 16, 15)
+            };
         }
     }
 }

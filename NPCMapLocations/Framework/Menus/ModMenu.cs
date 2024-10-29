@@ -212,7 +212,7 @@ namespace NPCMapLocations.Framework.Menus
 
                 where
                     marker.Sprite != null
-                    && marker.Type == CharacterType.Villager
+                    && marker.Type is CharacterType.Villager or CharacterType.Raccoon
                     && (!conditionalNpcs.TryGetValue(name, out bool enabled) || enabled)
 
                 orderby marker.DisplayName
