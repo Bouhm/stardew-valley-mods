@@ -1,0 +1,43 @@
+{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "オプション",
+
+    "config.hide-hud.name": "HUDの非表示",
+    "config.hide-hud.desc": "コンパスが表示されているときに、ゲームのHUDを非表示にする。",
+
+    "config.same-location-only.name": "現在地のみ表示",
+    "config.same-location-only.desc": "現在地のコンパスだけを表示する。オフの場合は隣接する場所のキャラクターは灰色で表示される。",
+
+    "config.quests-and-birthdays-only.name": "クエストや誕生日持ち限定",
+    "config.quests-and-birthdays-only.desc": "クエストや誕生日を持つNPCのコンパスだけを表示する。",
+
+    "config.players-only.name": "プレイヤー限定",
+    "config.players-only.desc": "プレイヤーのコンパスだけ表示する（マルチ向け）",
+
+    "config.show-horses.name": "馬を表示",
+    "config.show-horses.desc": "馬をコンパスに表示する",
+
+    // controls
+    "config.title.controls": "操作設定",
+
+    "config.hold-to-toggle.name": "長押しで切り替え",
+    "config.hold-to-toggle.desc": "オンにすると、コンパスを表示するためにキーを押し続ける必要がある。（オフの場合は切り替式）",
+
+    "config.toggle-key.name": "表示・非表示の切り替え",
+    "config.toggle-key.desc": "コンパスの表示・非表示を切り替えるキー。",
+
+    "config.same-location-key.name": "現在地のみ表示",
+    "config.same-location-key.desc": "上記の「現在地のみ表示」オプションを有効または無効にするキー。",
+
+    "config.quests-and-birthdays-key.name": "クエストや誕生日持ち限定",
+    "config.quests-and-birthdays-key.desc": "上記の「クエストや誕生日持ち限定」オプションを有効または無効にするキー。",
+
+    "config.players-key.name": "プレイヤー限定",
+    "config.players-key.desc": "上記の「プレイヤー限定」オプションを有効または無効にするキー。",
+
+    "config.horses-key.name": "馬を表示",
+    "config.horses-key.desc": "上記の「馬を表示する」オプションを有効または無効にするキー。"
+}
