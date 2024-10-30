@@ -1020,11 +1020,13 @@ namespace NPCMapLocations
                 marker.ReasonHidden = reason;
             }
 
+            bool shownForQuest = ModEntry.Globals.ShowQuests && (marker.HasQuest || marker.IsBirthday);
+
             if (ModEntry.ShouldExcludeNpc(name, out string reason))
                 Hide($"hidden per config ({reason})");
-            else if (Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
+            else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
                 Hide("hidden per config (didn't talk to them today)");
-            else if (Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
+            else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
                 Hide("hidden per config (talked to them today)");
             else if (Globals.OnlySameLocation && !isSameLocation)
                 Hide("hidden per config (not in same location)");
