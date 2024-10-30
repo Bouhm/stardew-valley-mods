@@ -245,7 +245,7 @@ namespace NPCMapLocations.Framework.Menus
             int viewHeight = screenBounds.Height;
             var viewCenter = new Point(
                 viewX + (viewWidth / 2),
-                viewX + (viewHeight / 2)
+                viewY + (viewHeight / 2)
             );
 
             // calculate top-left position of full map which would center player within the minimap

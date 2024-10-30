@@ -4,6 +4,7 @@
 ## Upcoming release
 * You can now change the update rate in `config/globals.json`.
 * When 'Show quests or birthdays' is enabled, matching NPCs are now shown regardless of the 'Show/Hide villagers player has talked to' options.
+* Fixed minimap rendering when it's moved away from top-left corner.
 * Fixed raccoon icon on the map (thanks to Exblosis!).
 * Fixed invisible NPCs shown on the map (thanks to Abagaianye!).
 * Improved translations. Thanks to burunduk (updated Ukrainian), CaranudLapin (updated French), CuongNguyen0903 (added Vietnamese), DARKS0UND (updated Korean), Exblosis (updated German), juliowh (updated Portuguese), MagiaBaiser (updated Spanish), mitekano23 (updated Japanese), and ykinsoul (updated Chinese!).
