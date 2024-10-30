@@ -1,0 +1,46 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // minimap section
+    "minimap.label": "Minimap",
+    "minimap.enabled": "Đã bật",
+    "minimap.locked": "Khóa vị trí Minimap",
+    "minimap.width": "Chiều rộng Minimap",
+    "minimap.height": "Chiều dài Minimap",
+
+    // immersion section
+    "immersion.label": "Cài đặt:",
+    "immersion.always-show-villagers": "Luôn hiện dân làng",
+    "immersion.only-villagers-talked-to": "Hiện dân làng mà người chơi đã nói chuyện",
+    "immersion.hide-villagers-talked-to": "Ẩn dân làng mà người chơi đã nói chuyện",
+    "immersion.only-villagers-in-player-location": "Chỉ hiện dân làng ở vị trí người chơi",
+    "immersion.only-villagers-within-heart-level": "Chỉ hiện dân làng dựa theo cấp độ thân mật",
+    "immersion.min-heart-level": "Mức thân mật tối thiểu",
+    "immersion.max-heart-level": "Mức thân mật tối đa",
+
+    // extra settings section
+    "extra.label": "Cài đặt bổ sung:",
+    "extra.show-quests-or-birthdays": "Hiện nhiệm vụ và sinh nhật",
+    "extra.show-hidden-villagers": "Hiện dân làng đang bị ẩn",
+    "extra.show-traveling-merchant": "hiện thương gia",
+    "extra.show-horses": "Hiện ngựa",
+
+    // include/exclude villagers section
+    "villagers.label": "Bao gồm/Loại trừ dân làng:",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    "config.menu-key.name": "Phím menu",
+    "config.menu-key.desc": "Nhấn nút này khi bản đồ trong trò chơi đang mở để hiển thị các cài đặt của mod.",
+
+    "config.minimap-key.name": "Phím chuyển đổi bản đồ nhỏ",
+    "config.minimap-key.desc": "Nhấn nút này để hiển thị hoặc ẩn bản đồ nhỏ.",
+
+    "config.tooltip-key.name": "Phím chú thích",
+    "config.tooltip-key.desc": "Nhấn nút này để chuyển vị trí chú thích khi ở chế độ xem bản đồ.",
+
+    "config.other-settings": "Để thay đổi các cài đặt mod khác, hãy mở bản đồ thế giới trong trò chơi và nhấn phím menu được hiển thị ở trên."   
+}
