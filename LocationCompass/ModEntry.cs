@@ -150,21 +150,21 @@ namespace LocationCompass
             this.LocationUtil.ScanLocationContexts();
 
             // Log warning if host does not have mod installed
-            if (Context.IsMultiplayer)
+            if (!Context.IsMainPlayer)
             {
                 bool hostHasMod = false;
 
                 foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
                 {
-                    if (peer.GetMod("Bouhm.LocationCompass") != null && peer.IsHost)
+                    if (peer.IsHost)
                     {
-                        hostHasMod = true;
+                        hostHasMod = peer.GetMod(this.ModManifest.UniqueID) != null;
                         break;
                     }
                 }
 
                 if (!hostHasMod)
-                    this.Monitor.Log("Since the server host does not have LocationCompass installed, NPC locations cannot be synced and updated.", LogLevel.Warn);
+                    this.Monitor.Log("Since the server host doesn't have Location Compass installed, NPC locations can't be synced.", LogLevel.Warn);
             }
         }
 

@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed 'host does not have Location Compass installed' check on the host.
 * Improved translations. Thanks to juliowh (added Portuguese), mitekano23 (added Japanese), and ranke96 (added Chinese)!
 
 ## 1.4.0

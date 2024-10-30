@@ -261,15 +261,15 @@ namespace NPCMapLocations
             this.UpdateFarmBuildingLocations();
 
             // Log warning if host does not have mod installed
-            if (Context.IsMultiplayer)
+            if (!Context.IsMainPlayer)
             {
                 bool hostHasMod = false;
 
                 foreach (IMultiplayerPeer peer in this.Helper.Multiplayer.GetConnectedPlayers())
                 {
-                    if (peer.GetMod("Bouhm.NPCMapLocations") != null && peer.IsHost)
+                    if (peer.IsHost)
                     {
-                        hostHasMod = true;
+                        hostHasMod = peer.GetMod(this.ModManifest.UniqueID) != null;
                         break;
                     }
                 }
