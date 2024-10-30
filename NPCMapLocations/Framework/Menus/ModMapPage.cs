@@ -186,11 +186,11 @@ namespace NPCMapLocations.Framework.Menus
             }
         }
 
-        public override void drawMiniPortraits(SpriteBatch b)
+        public override void drawMiniPortraits(SpriteBatch b, float alpha = 1f)
         {
             // base.drawMiniPortraits(b); // draw our own smaller farmer markers instead
 
-            this.DrawMarkers(b);
+            this.DrawMarkers(b, alpha);
         }
 
         public override void drawTooltip(SpriteBatch b)
@@ -267,7 +267,7 @@ namespace NPCMapLocations.Framework.Menus
         *********/
         // Draw event
         // Subtractions within location vectors are to set the origin to the center of the sprite
-        private void DrawMarkers(SpriteBatch b)
+        private void DrawMarkers(SpriteBatch b, float alpha)
         {
             string regionId = this.RegionId;
 
@@ -285,7 +285,7 @@ namespace NPCMapLocations.Framework.Menus
                                     this.mapBounds.X + building.WorldMapPosition.X - buildingRect.Width / 2,
                                     this.mapBounds.Y + building.WorldMapPosition.Y - buildingRect.Height / 2
                                 ),
-                                buildingRect, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
+                                buildingRect, Color.White * alpha, 0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
                             );
                         }
                     }
@@ -316,7 +316,7 @@ namespace NPCMapLocations.Framework.Menus
                     }
 
                     // Dim marker for hidden markers
-                    var markerColor = marker.IsHidden ? Color.DarkGray * 0.7f : Color.White;
+                    var markerColor = (marker.IsHidden ? Color.DarkGray * 0.7f : Color.White) * alpha;
 
                     // Draw NPC marker
                     Rectangle spriteRect = marker.GetSpriteSourceRect();
@@ -357,7 +357,7 @@ namespace NPCMapLocations.Framework.Menus
                         {
                             farmer.FarmerRenderer.drawMiniPortrat(b,
                               new Vector2(this.mapBounds.X + farMarker.WorldMapPosition.X - 16, this.mapBounds.Y + farMarker.WorldMapPosition.Y - 15),
-                              0.00011f, 2f, 1, farmer);
+                              0.00011f, 2f, 1, farmer, alpha);
                         }
                     }
                 }
@@ -366,7 +366,7 @@ namespace NPCMapLocations.Framework.Menus
             {
                 WorldMapPosition playerLoc = ModEntry.GetWorldMapPosition(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
 
-                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player);
+                Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player, alpha);
             }
         }
 

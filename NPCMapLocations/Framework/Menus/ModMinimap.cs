@@ -147,13 +147,20 @@ namespace NPCMapLocations.Framework.Menus
 
             bool isHoveringMinimap = this.IsHoveringDragZone();
 
-            // Make transparent on hover
-            var color = isHoveringMinimap
-              ? Color.White * 0.25f
-              : Color.White;
-
+            // handle hover
+            float alpha;
+            Color color;
             if (isHoveringMinimap)
-                Game1.mouseCursor = 2;
+            {
+                alpha = 0.25f;
+                color = Color.White * alpha;
+                Game1.mouseCursor = Game1.cursor_grab;
+            }
+            else
+            {
+                alpha = 1f;
+                color = Color.White;
+            }
 
             // draw map
             var spriteBatch = Game1.spriteBatch;
@@ -168,12 +175,12 @@ namespace NPCMapLocations.Framework.Menus
 
                     clippedBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, new RasterizerState { ScissorTestEnable = true });
 
-                    clippedBatch.Draw(Game1.staminaRect, mapArea, new Rectangle(0, 0, 1, 1), Color.Black); // black background in case map doesn't fill minimap view
+                    clippedBatch.Draw(Game1.staminaRect, mapArea, new Rectangle(0, 0, 1, 1), Color.Black * alpha); // black background in case map doesn't fill minimap view
 
                     if (!(this.IsHoveringDragZone() && ModEntry.StaticHelper.Input.GetState(SButton.MouseRight) == SButtonState.Held)) // don't draw map while it's being dragged
                     {
-                        this.MapPage.drawMap(clippedBatch, false);
-                        this.MapPage.drawMiniPortraits(clippedBatch);
+                        this.MapPage.drawMap(clippedBatch, false, alpha);
+                        this.MapPage.drawMiniPortraits(clippedBatch, alpha);
                     }
 
                     clippedBatch.End();
