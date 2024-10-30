@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* You can now change the update rate in `config/globals.json`.
 * Fixed raccoon icon on the map (thanks to Exblosis!).
 * Fixed invisible NPCs shown on the map (thanks to Abagaianye!).
 * Improved translations. Thanks to burunduk (updated Ukrainian), CaranudLapin (updated French), DARKS0UND (updated Korean), Exblosis (updated German), juliowh (updated Portuguese), MagiaBaiser (updated Spanish), mitekano23 (updated Japanese), and ykinsoul (updated Chinese!).

@@ -28,7 +28,8 @@ See the [author guide](author-guide.md) for more info.
 The mod creates a `config/global.json` file in its mod folder the first time you run it, and a
 separate file for each save. You can open those files in a text editor to configure the mod.
 
-These are the available settings (most configurable through the in-game menu _except_ the key bindings):
+These are the available settings (most configurable through the in-game menu _except_ the key
+bindings and update rate):
 
 setting            | what it affects
 ------------------ | ---------------
@@ -51,6 +52,8 @@ setting            | what it affects
 `MenuKey`          | The [key binding](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) to open the options menu when on the map view. Default `"Tab"`.
 `TooltipKey`       | The [key binding](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) to cycle the tooltip position when on the map view. Default `"Space"`.
 `MinimapToggleKey` | The [key binding](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) to toggle the floating minimap. Default `"OemPipe"` (i.e. the `|` button).
+`MinimapCacheWTicks` | The number of ticks between each minimap update. Default 15.
+`NpcCacheTicks`      | The number of ticks between each update to NPC markers. Default 30.
 
 ## FAQs
 * **Why do I see duplicate villagers on the map with UI Info Suite?**  

@@ -18,6 +18,12 @@ namespace NPCMapLocations.Framework.Models
         /// <summary>The key binding to cycle the tooltip position when on the map view.</summary>
         public string TooltipKey { get; set; } = "Space";
 
+        /// <summary>The number of ticks between each minimap update.</summary>
+        public uint MiniMapCacheTicks { get; set; } = 15;
+
+        /// <summary>The number of ticks between each update to NPC markers.</summary>
+        public uint NpcCacheTicks { get; set; } = 30;
+
         /// <summary>The tooltip position when pointing at something on the map.</summary>
         public int NameTooltipMode { get; set; } = 1;
 
