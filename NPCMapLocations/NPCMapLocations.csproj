@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-    <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" />
+    <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" />
   </ItemGroup>
 
   <ItemGroup>

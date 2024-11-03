@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace LocationCompass.Framework
+namespace LocationCompass.Framework;
+
+internal class ModData
 {
-    internal class ModData
-    {
-        /*********
-        ** Accessors
-        *********/
-        public Dictionary<string, int> MarkerCrop { get; set; }
-    }
+    /*********
+    ** Accessors
+    *********/
+    public Dictionary<string, int> MarkerCrop { get; set; }
 }

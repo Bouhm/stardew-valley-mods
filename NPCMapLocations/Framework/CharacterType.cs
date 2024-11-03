@@ -1,15 +1,17 @@
-﻿namespace NPCMapLocations.Framework
+﻿namespace NPCMapLocations.Framework;
+
+/// <summary>The character type for a map marker.</summary>
+public enum CharacterType
 {
-    /// <summary>The character type for a map marker.</summary>
-    public enum CharacterType
-    {
-        /// <summary>A villager NPC.</summary>
-        Villager,
+    /// <summary>A villager NPC.</summary>
+    Villager,
 
-        /// <summary>A player's child NPC.</summary>
-        Child,
+    /// <summary>A raccoon NPC.</summary>
+    Raccoon,
 
-        /// <summary>A player's horse mount.</summary>
-        Horse
-    }
+    /// <summary>A player's child NPC.</summary>
+    Child,
+
+    /// <summary>A player's horse mount.</summary>
+    Horse
 }

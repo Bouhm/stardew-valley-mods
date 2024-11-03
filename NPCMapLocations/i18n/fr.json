@@ -16,15 +16,15 @@
     "immersion.hide-villagers-talked-to": "Cacher les villageois avec qui le joueur a parlé",
     "immersion.only-villagers-in-player-location": "Afficher uniquement les villageois à l'emplacement du joueur",
     "immersion.only-villagers-within-heart-level": "Afficher uniquement les villageois selon le niveau de coeur",
-    "immersion.min-heart-level": "Niveau de coeur minimum",
-    "immersion.max-heart-level": "Niveau de coeur maximum",
+    "immersion.min-heart-level": "< Niveau de cœur minimum <",
+    "immersion.max-heart-level": "< Niveau de cœur maximum <",
 
     // extra settings section
-    "extra.label": "Paramètres supplémentaires:",
+    "extra.label": "Paramètres supplémentaires :",
     "extra.show-quests-or-birthdays": "Afficher les quêtes ou les anniversaires",
     "extra.show-hidden-villagers": "Afficher les villageois cachés",
     "extra.show-traveling-merchant": "Afficher les marchands ambulants",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-horses": "Montrer les chevaux",
 
     // include/exclude villagers section
     "villagers.label": "Inclure/Exclure les villageois:",
@@ -33,15 +33,14 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "Raccourci de menu",
+    "config.menu-key.desc": "Appuyer sur bouton lorsque la carte du jeu est ouverte pour voir les paramètres du mod.",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "Raccourci minimap",
+    "config.minimap-key.desc": "Appuyez sur ce bouton pour montrer/cacher la minimap.",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "Raccourci infobulle",
+    "config.tooltip-key.desc": "Appuyez sur ce bouton pour changer la position de l’infobulle sur la carte du jeu.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "Pour changer les autres paramètres du mod, ouvrez la carte du jeu et appuyez sur le raccourci de menu défini ci-dessus."
 }

@@ -11,11 +11,11 @@
 
     // immersion section (拟真体验选项)
     "immersion.label": "设置:",
-    "immersion.always-show-villagers": "展示所有村民",
-    "immersion.only-villagers-talked-to": "显示所有说话的村民",
-    "immersion.hide-villagers-talked-to": "隐藏所有说话的村民",
-    "immersion.only-villagers-in-player-location": "显示村民在玩家的位置",
-    "immersion.only-villagers-within-heart-level": "显示指定关系级别内的村民",
+    "immersion.always-show-villagers": "显示所有村民",
+    "immersion.only-villagers-talked-to": "只显示已对话的村民",
+    "immersion.hide-villagers-talked-to": "隐藏所有已对话的村民",
+    "immersion.only-villagers-in-player-location": "只显示玩家所在位置的村民",
+    "immersion.only-villagers-within-heart-level": "显示指定好感度范围内的村民",
     "immersion.min-heart-level": "最小好感度",
     "immersion.max-heart-level": "最大好感度",
 
@@ -24,24 +24,23 @@
     "extra.show-quests-or-birthdays": "显示任务或生日",
     "extra.show-hidden-villagers": "显示隐藏的村民",
     "extra.show-traveling-merchant": "显示旅行商人",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-horses": "显示马",
 
     // include/exclude villagers section (包含/排除 村民选项)
-    "villagers.label": "包含村民清单:",
+    "villagers.label": "显示村民列表:",
 
 
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "打开菜单",
+    "config.menu-key.desc": "在游戏内地图中按此快捷键以打开Mod设置界面",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "切换小地图显示",
+    "config.minimap-key.desc": "按此快捷键以显示/隐藏小地图",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "切换提示条位置",
+    "config.tooltip-key.desc": "在地图界面按此快捷键以切换角色提示条位置",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "若需更改本Mod其他设置，请在游戏内地图界面按打开菜单键进行更改"
 }

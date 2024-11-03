@@ -1,6 +1,19 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.2.0
+Released 04 November 2024 for SMAPI 4.1.0 or later. Updated by Pathoschild.
+
+* Updated for Stardew Valley 1.6.
+* You can now change the update rate in `config/globals.json`.
+* When 'Show quests or birthdays' is enabled, matching NPCs are now shown regardless of the 'Show/Hide villagers player has talked to' options.
+* Fixed minimap rendering when it's moved away from top-left corner.
+* Fixed minimap no longer becoming transparent when you hover the cursor over it.
+* Fixed raccoon icon on the map (thanks to Exblosis!).
+* Fixed invisible NPCs shown on the map (thanks to Abagaianye!).
+* Fixed 'host does not have NPC Map Locations installed' check on the host.
+* Improved translations. Thanks to burunduk (updated Ukrainian), CaranudLapin (updated French), CuongNguyen0903 (added Vietnamese), DARKS0UND (updated Korean), Exblosis (updated German), juliowh (updated Portuguese), MagiaBaiser (updated Spanish), mitekano23 (updated Japanese), and ykinsoul (updated Chinese!).
+
 ## 3.1.0
 Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
 

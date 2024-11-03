@@ -1,6 +1,12 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 1.4.1
+Released 04 November 2024 for SMAPI 4.1.0 or later. Updated by Pathoschild.
+
+* Fixed 'host does not have Location Compass installed' check on the host.
+* Improved translations. Thanks to juliowh (added Portuguese), mitekano23 (added Japanese), and ranke96 (added Chinese)!
+
 ## 1.4.0
 Released 21 April 2024 for SMAPI 4.0.7 or later. Updated by Pathoschild.
 

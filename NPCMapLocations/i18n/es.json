@@ -24,7 +24,7 @@
     "extra.show-quests-or-birthdays": "Mostrar misiones o cumpleaños",
     "extra.show-hidden-villagers": "Mostrar aldeanos ocultos",
     "extra.show-traveling-merchant": "Mostrar al comerciante ambulante",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-horses": "Mostrar Caballos",
 
     // include/exclude villagers section
     "villagers.label": "Incluir/Excluir aldeanos:",
@@ -33,15 +33,14 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "Botón de Menú",
+    "config.menu-key.desc": "Pulsa este botón mientras el mapa del juego está abierto para mostrar la configuración del mod.",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "Botón alternar minimapa",
+    "config.minimap-key.desc": "Pulsa este botón para mostrar u ocultar el minimapa.",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "Botón de Información",
+    "config.tooltip-key.desc": "Pulsa este botón para alternar la posición de la información sobre herramientas en la vista de mapa.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "Para cambiar la configuración de los otros mods, abra el mapa del mundo del juego y pulsa el botón de menú que se muestra arriba."
 }

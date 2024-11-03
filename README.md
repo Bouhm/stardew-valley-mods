@@ -24,26 +24,28 @@ on the wiki for help contributing translations.
 
 (❑ = untranslated, ↻ = partly translated, ✓ = fully translated)
 
-&nbsp;      | NPC Location Compass      | NPC Map Locations
-:---------- | :------------------------ | :--------------------------------
-Chinese     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/zh.json)
-French      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/fr.json)
-German      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/de.json)
-Hungarian   | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/hu.json)
-Italian     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/it.json)
-Japanese    | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ja.json)
-Korean      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ko.json)
-[Polish]    | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/pl.json)
-Portuguese  | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/pt.json)
-Russian     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/ru.json)
-Spanish     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/es.json)
-[Thai]      | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/th.json)
-Turkish     | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/tr.json)
-[Ukrainian] | [❑](LocationCompass/i18n) | [↻](NPCMapLocations/i18n/uk.json)
+&nbsp;       | NPC Location Compass              | NPC Map Locations
+:----------- | :-------------------------------- | :--------------------------------
+Chinese      | [✓](LocationCompass/i18n/zh.json) | [✓](NPCMapLocations/i18n/zh.json)
+French       | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/fr.json)
+German       | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/de.json)
+Hungarian    | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
+Italian      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/it.json)
+Japanese     | [✓](LocationCompass/i18n/ja.json) | [✓](NPCMapLocations/i18n/ja.json)
+Korean       | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/ko.json)
+[Polish]     | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/pl.json)
+Portuguese   | [✓](LocationCompass/i18n/pt.json) | [✓](NPCMapLocations/i18n/pt.json)
+Russian      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/ru.json)
+Spanish      | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/es.json)
+[Thai]       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/th.json)
+Turkish      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/tr.json)
+[Ukrainian]  | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/uk.json)
+[Vietnamese] | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/vi.json)
 
 [Polish]: https://www.nexusmods.com/stardewvalley/mods/3616
 [Thai]: https://www.nexusmods.com/stardewvalley/mods/7052
 [Ukrainian]: https://www.nexusmods.com/stardewvalley/mods/8427
+[Vietnamese]: https://www.nexusmods.com/stardewvalley/mods/24371
 
 ## Compiling the mods
 Installing stable releases from Nexus Mods is recommended for most users. If you really want to

@@ -3,46 +3,44 @@
     ** Map options
     *********/
     // minimap section
-    // TODO
-    "minimap.label": "Minimap",
-    "minimap.enabled": "Enabled",
-    "minimap.locked": "Lock minimap position",
-    "minimap.width": "Minimap width",
-    "minimap.height": "Minimap height",
+    "minimap.label": "ミニマップ",
+    "minimap.enabled": "有効化",
+    "minimap.locked": "ミニマップの位置を固定",
+    "minimap.width": "ミニマップの幅",
+    "minimap.height": "ミニマップの高さ",
 
     // immersion section
-    "immersion.label": "設定:",
-    "immersion.always-show-villagers": "住人を常に表示する",
-    "immersion.only-villagers-talked-to": "プレイヤーと話した住人を表示する",
-    "immersion.hide-villagers-talked-to": "プレイヤーと話した住人を非表示にする",
-    "immersion.only-villagers-in-player-location": "プレイヤーがいる地区の住人だけを表示する",
-    "immersion.only-villagers-within-heart-level": "特定の好感度の住人だけを表示する",
-    "immersion.min-heart-level": "最小好感度",
-    "immersion.max-heart-level": "最大好感度",
+    "immersion.label": "設定：",
+    "immersion.always-show-villagers": "住人を常に表示",
+    "immersion.only-villagers-talked-to": "プレイヤーと話した住人を表示",
+    "immersion.hide-villagers-talked-to": "プレイヤーと話した住人を非表示",
+    "immersion.only-villagers-in-player-location": "プレイヤーがいる場所の住人のみ表示",
+    "immersion.only-villagers-within-heart-level": "特定の友好度の住人のみ表示",
+    "immersion.min-heart-level": "最小友好度",
+    "immersion.max-heart-level": "最大友好度",
 
     // extra settings section
     "extra.label": "その他の設定:",
-    "extra.show-quests-or-birthdays": "クエストや誕生日を表示する",
-    "extra.show-hidden-villagers": "隠された住人を表示する",
-    "extra.show-traveling-merchant": "行商人を表示する",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-quests-or-birthdays": "クエストや誕生日を表示",
+    "extra.show-hidden-villagers": "隠された住人を表示",
+    "extra.show-traveling-merchant": "行商人を表示",
+    "extra.show-horses": "馬を表示",
 
     // include/exclude villagers section
-    "villagers.label": "住人の表示/非表示:",
+    "villagers.label": "住人の表示・非表示：",
 
 
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "メニュー",
+    "config.menu-key.desc": "ゲーム内のマップが開いているときにこのキーを押すと、MODの設定を表示する。",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "ミニマップ切り替え",
+    "config.minimap-key.desc": "このキーを押すと、ミニマップの表示・非表示が切り替わる。",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "ツールチップ",
+    "config.tooltip-key.desc": "このキーを押すと、マップビューのツールチップの位置が切り替わる。",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "その他のMOD設定を変更するには、ゲーム内のワールドマップを開き、上記のメニューキーを押してください。"
 }
