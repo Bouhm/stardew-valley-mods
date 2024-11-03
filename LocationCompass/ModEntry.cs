@@ -275,7 +275,7 @@ public class ModEntry : Mod
 
         Utility.ForEachCharacter(npc =>
         {
-            if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.isVillager()))
+            if (!villagers.Contains(npc) && !excludedNpcs.Contains(npc.Name) && (npc is Horse || npc.IsVillager))
                 villagers.Add(npc);
 
             return true;
