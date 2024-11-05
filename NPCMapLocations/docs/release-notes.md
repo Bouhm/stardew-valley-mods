@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed the previous update being broken on Linux/macOS.
+
 ## 3.2.0
 Released 04 November 2024 for SMAPI 4.1.0 or later. Updated by Pathoschild.
 
