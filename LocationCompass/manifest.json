@@ -1,8 +1,8 @@
 ﻿{
     "Name": "NPC Location Compass",
     "Author": "Bouhm",
-    "Version": "1.4.1",
-    "MinimumApiVersion": "4.1.0",
+    "Version": "1.4.2",
+    "MinimumApiVersion": "4.1.2",
     "Description": "Locates villagers and farmers on the screen",
     "UniqueID": "Bouhm.LocationCompass",
     "EntryDll": "LocationCompass.dll",
