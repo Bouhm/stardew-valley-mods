@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using StardewValley;
-using StardewValley.WorldMaps;
+﻿using StardewValley.WorldMaps;
 
 namespace NPCMapLocations.Framework;
 
@@ -17,18 +15,16 @@ public record WorldMapPosition(string RegionId, int X, int Y)
     public bool IsEmpty => this.RegionId == null;
 
     /// <summary>Construct an instance.</summary>
-    /// <param name="data">The map area position from the game data.</param>
-    /// <param name="location">The in-world location to match.</param>
-    /// <param name="tile">The in-world tile coordinate within the <paramref name="location"/> to match.</param>
-    public static WorldMapPosition Create(MapAreaPosition data, GameLocation location, Point tile)
+    /// <param name="position">The map area position from the game data.</param>
+    public static WorldMapPosition Create(MapAreaPositionWithContext position)
     {
         // note: this can't be a constructor for compatibility with Json.NET, since we can't
         // put [JsonConstructor] on the primary constructor for a record class.
 
-        var pixel = data.GetMapPixelPosition(location, tile);
+        var pixel = position.GetMapPixelPosition();
         int x = (int)pixel.X;
         int y = (int)pixel.Y;
 
-        return new WorldMapPosition(data.Region.Id, x, y);
+        return new WorldMapPosition(position.Data.Region.Id, x, y);
     }
 }

@@ -1,6 +1,12 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.2.2
+Released 12 November 2024 for SMAPI 4.1.7 or later. Updated by Pathoschild.
+
+* Updated for Stardew Valley 1.6.14.
+* Fixed player markers mis-positioned when they're inside farm buildings.
+
 ## 3.2.1
 Released 04 November 2024 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 
