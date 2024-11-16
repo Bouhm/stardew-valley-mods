@@ -363,10 +363,6 @@ public class ModEntry : Mod
                 this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
         }
 
-        // Check for traveling merchant day
-        if (this.ConditionalNpcs.Value != null)
-            this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).ShouldTravelingMerchantVisitToday();
-
         this.ResetMarkers();
         this.UpdateMarkers(true);
 
@@ -735,7 +731,7 @@ public class ModEntry : Mod
         if (Context.IsMainPlayer)
         {
             // traveling cart
-            if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs.Value["Merchant"])
+            if (ModEntry.Globals.ShowTravelingMerchant && Game1.RequireLocation<Forest>("Forest").ShouldTravelingMerchantVisitToday())
             {
                 Forest forest = Game1.RequireLocation<Forest>("Forest");
                 Point cartTile = forest.GetTravelingMerchantCartTile();
