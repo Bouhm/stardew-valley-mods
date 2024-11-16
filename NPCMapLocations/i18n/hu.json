@@ -29,6 +29,9 @@
     // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
     "villagers.label": "Falusiak Engedélyezése/Kizárása:",
 
+    // special NPC markers
+    "marker-names.merchant": "Traveling merchant", // TODO
+
 
     /*********
     ** Generic Mod Config Menu UI

@@ -29,6 +29,9 @@
     // include/exclude villagers section
     "villagers.label": "Inclure/Exclure les villageois:",
 
+    // special NPC markers
+    "marker-names.merchant": "Traveling merchant", // TODO
+
 
     /*********
     ** Generic Mod Config Menu UI

@@ -29,6 +29,9 @@
     // include/exclude villagers section
     "villagers.label": "Incluir/Excluir aldeanos:",
 
+    // special NPC markers
+    "marker-names.merchant": "Traveling merchant", // TODO
+
 
     /*********
     ** Generic Mod Config Menu UI

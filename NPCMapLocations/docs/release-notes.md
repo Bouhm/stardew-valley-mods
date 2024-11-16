@@ -1,6 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed traveling merchant tooltip not translated for non-English players.  
+  _Note: it'll still be shown in English for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
+
 ## 3.2.2
 Released 12 November 2024 for SMAPI 4.1.7 or later. Updated by Pathoschild.
 

@@ -100,7 +100,7 @@ internal class ModMapPage : MapPage
                         if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
                             continue;
 
-                        newHoveredNames.Add(this.GetNpcDisplayName(npcName));
+                        newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
 
                         if (!this.LocationUtil.IsOutdoors(npcMarker.LocationName))
                             indoorLocationNames.Add(npcMarker.LocationName);

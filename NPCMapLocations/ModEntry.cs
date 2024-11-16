@@ -743,7 +743,8 @@ public class ModEntry : Mod
 
                 this.NpcMarkers.Value.Add("Merchant", new NpcMarker
                 {
-                    DisplayName = null,
+                    DisplayName = I18n.MarkerNames_Merchant(),
+                    LocationName = "Forest",
                     CropOffset = 0,
                     Sprite = Game1.mouseCursors,
                     SpriteSourceRect = new Rectangle(191, 1410, 22, 21),
