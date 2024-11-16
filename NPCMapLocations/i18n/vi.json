@@ -30,7 +30,9 @@
     "villagers.label": "Bao gồm/Loại trừ dân làng:",
 
     // special NPC markers
-    "marker-names.merchant": "Traveling merchant", // TODO
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
 
 
     /*********

@@ -730,6 +730,23 @@ public class ModEntry : Mod
 
         if (Context.IsMainPlayer)
         {
+            // book seller
+            if (ModEntry.Globals.ShowBookseller && Utility.getDaysOfBooksellerThisSeason().Contains(Game1.dayOfMonth))
+            {
+                WorldMapPosition mapPos = GetWorldMapPosition("Town", 108, 25); // hardcoded in Town.draw
+
+                this.NpcMarkers.Value.Add("Bookseller", new NpcMarker
+                {
+                    DisplayName = I18n.MarkerNames_Bookseller(),
+                    LocationName = "Town",
+                    CropOffset = 0,
+                    Sprite = Game1.mouseCursors_1_6,
+                    SpriteSourceRect = new Rectangle(181, 490, 12, 18),
+                    SpriteZoom = 1.5f,
+                    WorldMapPosition = mapPos
+                });
+            }
+
             // traveling cart
             if (ModEntry.Globals.ShowTravelingMerchant && Game1.RequireLocation<Forest>("Forest").ShouldTravelingMerchantVisitToday())
             {

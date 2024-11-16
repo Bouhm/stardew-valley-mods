@@ -30,7 +30,9 @@
     "villagers.label": "住人の表示・非表示：",
 
     // special NPC markers
-    "marker-names.merchant": "Traveling merchant", // TODO
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
 
 
     /*********

@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Added bookseller to world map when he visits.
 * Fixed traveling merchant tooltip not translated for non-English players.  
   _Note: it'll still be shown in English for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
 

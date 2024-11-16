@@ -36,6 +36,9 @@ public class GlobalConfig
     /// <summary>Whether to mark NPCs with quests or birthdays today.</summary>
     public bool ShowQuests { get; set; } = true;
 
+    /// <summary>Whether to show the bookseller when he's in town.</summary>
+    public bool ShowBookseller { get; set; } = true;
+
     /// <summary>Whether to show the Traveling Merchant when she's in the forest.</summary>
     public bool ShowTravelingMerchant { get; set; } = true;
 

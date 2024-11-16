@@ -30,7 +30,9 @@
     "villagers.label": "Ein-/Ausschließen von Einwohnern:",
 
     // special NPC markers
-    "marker-names.merchant": "Traveling merchant", // TODO
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
 
 
     /*********
