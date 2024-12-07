@@ -3,8 +3,10 @@
 # Release notes
 ## Upcoming release
 * Added bookseller to world map when he visits.
+* Fixed map markers not reflecting custom NPCs' override names/textures in some cases (e.g. the tractor from Tractor Mod).
 * Fixed traveling merchant tooltip not translated for non-English players.  
-  _Note: it'll still be shown in English for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
+  _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
+* Fixed support for mods setting override NPC/horse textures.
 
 ## 3.2.2
 Released 12 November 2024 for SMAPI 4.1.7 or later. Updated by Pathoschild.

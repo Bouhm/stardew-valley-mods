@@ -351,6 +351,7 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event data.</param>
+    [EventPriority(EventPriority.Low)] // let other mods initialize their locations/NPCs first
     private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
     {
         // Log any custom locations not handled in content.json
@@ -783,7 +784,7 @@ public class ModEntry : Mod
                 {
                     var newMarker = new NpcMarker
                     {
-                        DisplayName = npc.displayName ?? npc.Name,
+                        DisplayName = string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName,
                         CropOffset = offset,
                         IsBirthday = npc.isBirthday(),
                         Type = type
@@ -791,7 +792,7 @@ public class ModEntry : Mod
 
                     try
                     {
-                        newMarker.Sprite = new AnimatedSprite(npc.Sprite.textureName.Value, 0, 16, 32).Texture;
+                        newMarker.Sprite = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
                     }
                     catch (Exception ex)
                     {
