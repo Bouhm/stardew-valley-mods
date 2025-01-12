@@ -29,6 +29,11 @@
     // include/exclude villagers section
     "villagers.label": "Bao gồm/Loại trừ dân làng:",
 
+    // special NPC markers
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
+
 
     /*********
     ** Generic Mod Config Menu UI
@@ -42,5 +47,5 @@
     "config.tooltip-key.name": "Phím chú thích",
     "config.tooltip-key.desc": "Nhấn nút này để chuyển vị trí chú thích khi ở chế độ xem bản đồ.",
 
-    "config.other-settings": "Để thay đổi các cài đặt mod khác, hãy mở bản đồ thế giới trong trò chơi và nhấn phím menu được hiển thị ở trên."   
+    "config.other-settings": "Để thay đổi các cài đặt mod khác, hãy mở bản đồ thế giới trong trò chơi và nhấn phím menu được hiển thị ở trên."
 }

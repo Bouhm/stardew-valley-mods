@@ -29,6 +29,11 @@
     // include/exclude villagers section (包含/排除 村民选项)
     "villagers.label": "显示村民列表:",
 
+    // special NPC markers
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
+
 
     /*********
     ** Generic Mod Config Menu UI

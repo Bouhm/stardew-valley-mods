@@ -29,6 +29,11 @@
     // include/exclude villagers section
     "villagers.label": "포함/제외할 주민:",
 
+    // special NPC markers
+    // TODO
+    "marker-names.bookseller": "Bookseller",
+    "marker-names.merchant": "Traveling merchant",
+
 
     /*********
     ** Generic Mod Config Menu UI

@@ -351,6 +351,7 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
     /// <param name="sender">The event sender.</param>
     /// <param name="e">The event data.</param>
+    [EventPriority(EventPriority.Low)] // let other mods initialize their locations/NPCs first
     private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
     {
         // Log any custom locations not handled in content.json
@@ -362,10 +363,6 @@ public class ModEntry : Mod
             if (unknownLocations.Any())
                 this.Monitor.Log($"Unknown locations: {string.Join(", ", unknownLocations)}");
         }
-
-        // Check for traveling merchant day
-        if (this.ConditionalNpcs.Value != null)
-            this.ConditionalNpcs.Value["Merchant"] = ((Forest)Game1.getLocationFromName("Forest")).ShouldTravelingMerchantVisitToday();
 
         this.ResetMarkers();
         this.UpdateMarkers(true);
@@ -734,8 +731,25 @@ public class ModEntry : Mod
 
         if (Context.IsMainPlayer)
         {
+            // book seller
+            if (ModEntry.Globals.ShowBookseller && Utility.getDaysOfBooksellerThisSeason().Contains(Game1.dayOfMonth))
+            {
+                WorldMapPosition mapPos = GetWorldMapPosition("Town", 108, 25); // hardcoded in Town.draw
+
+                this.NpcMarkers.Value.Add("Bookseller", new NpcMarker
+                {
+                    DisplayName = I18n.MarkerNames_Bookseller(),
+                    LocationName = "Town",
+                    CropOffset = 0,
+                    Sprite = Game1.mouseCursors_1_6,
+                    SpriteSourceRect = new Rectangle(181, 490, 12, 18),
+                    SpriteZoom = 1.5f,
+                    WorldMapPosition = mapPos
+                });
+            }
+
             // traveling cart
-            if (ModEntry.Globals.ShowTravelingMerchant && this.ConditionalNpcs.Value["Merchant"])
+            if (ModEntry.Globals.ShowTravelingMerchant && Game1.RequireLocation<Forest>("Forest").ShouldTravelingMerchantVisitToday())
             {
                 Forest forest = Game1.RequireLocation<Forest>("Forest");
                 Point cartTile = forest.GetTravelingMerchantCartTile();
@@ -743,7 +757,8 @@ public class ModEntry : Mod
 
                 this.NpcMarkers.Value.Add("Merchant", new NpcMarker
                 {
-                    DisplayName = null,
+                    DisplayName = I18n.MarkerNames_Merchant(),
+                    LocationName = "Forest",
                     CropOffset = 0,
                     Sprite = Game1.mouseCursors,
                     SpriteSourceRect = new Rectangle(191, 1410, 22, 21),
@@ -769,7 +784,7 @@ public class ModEntry : Mod
                 {
                     var newMarker = new NpcMarker
                     {
-                        DisplayName = npc.displayName ?? npc.Name,
+                        DisplayName = string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName,
                         CropOffset = offset,
                         IsBirthday = npc.isBirthday(),
                         Type = type
@@ -777,7 +792,7 @@ public class ModEntry : Mod
 
                     try
                     {
-                        newMarker.Sprite = new AnimatedSprite(npc.Sprite.textureName.Value, 0, 16, 32).Texture;
+                        newMarker.Sprite = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
                     }
                     catch (Exception ex)
                     {

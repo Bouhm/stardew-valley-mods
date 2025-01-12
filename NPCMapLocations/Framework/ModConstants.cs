@@ -86,7 +86,6 @@ public static class ModConstants
         "Kent",
         "Krobus",
         "Marlon",
-        "Merchant",
         "Sandy",
         "Wizard",
         "Leo"
