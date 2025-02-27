@@ -31,8 +31,8 @@
 
     // special NPC markers
     // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
+    "marker-names.bookseller": "书摊老板",
+    "marker-names.merchant": "旅行商人",
 
 
     /*********
