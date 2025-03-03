@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Bouhm.Shared;
 using Bouhm.Shared.Locations;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using Newtonsoft.Json.Linq;
+
 using NPCMapLocations.Framework;
 using NPCMapLocations.Framework.Menus;
 using NPCMapLocations.Framework.Models;
+
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
+
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Characters;
@@ -41,6 +47,9 @@ public class ModEntry : Mod
 
     /// <summary>Whether to show the minimap.</summary>
     private readonly PerScreen<bool> ShowMinimap = new();
+
+    /// <summary>An integration with Better Game Menu to use NPC Map Locations.</summary>
+    private BetterGameMenuIntegration BetterGameMenuIntegration;
 
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil;
@@ -214,6 +223,7 @@ public class ModEntry : Mod
     {
         new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
             .Register();
+        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage, this.Monitor, this.Helper.ModRegistry);
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
@@ -438,7 +448,7 @@ public class ModEntry : Mod
 
         // toggle mod map
         if (Game1.activeClickableMenu is not GameMenu gameMenu)
-            this.IsModMapOpen.Value = false;
+            this.IsModMapOpen.Value = this.BetterGameMenuIntegration?.IsMenuOpen ?? false;
         else
         {
             this.HasOpenedMap.Value = gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
@@ -823,7 +833,7 @@ public class ModEntry : Mod
 
     /// <summary>Create the map page for a menu instance.</summary>
     /// <param name="menu">The game menu for which to create a map view.</param>
-    private ModMapPage CreateMapPage(GameMenu menu)
+    private ModMapPage CreateMapPage(IClickableMenu menu)
     {
         return new ModMapPage(
             menu.xPositionOnScreen,
