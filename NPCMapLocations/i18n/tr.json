@@ -30,9 +30,8 @@
     "villagers.label": "Köylüleri ekle/çıkar:",
 
     // special NPC markers
-    // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
+    "marker-names.bookseller": "Kitapçı",
+    "marker-names.merchant": "Gezgin Tüccar",
 
 
     /*********
