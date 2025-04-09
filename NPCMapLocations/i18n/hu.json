@@ -30,9 +30,8 @@
     "villagers.label": "Falusiak Engedélyezése/Kizárása:",
 
     // special NPC markers
-    // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
+    "marker-names.bookseller": "Könyvkereskedő",
+    "marker-names.merchant": "Utazó kereskedő",
 
 
     /*********
