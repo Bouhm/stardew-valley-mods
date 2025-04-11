@@ -320,7 +320,9 @@ internal class ModMapPage : MapPage
 
                 // Draw NPC marker
                 Rectangle spriteRect = marker.GetSpriteSourceRect();
-                b.Draw(marker.Sprite, new Rectangle(this.mapBounds.X + marker.WorldMapPosition.X, this.mapBounds.Y + marker.WorldMapPosition.Y, 32, 30), spriteRect, markerColor);
+                float multiplier = spriteRect.Width > spriteRect.Height ? 32f / spriteRect.Width : 30f / spriteRect.Height;
+                b.Draw(marker.Sprite, new Rectangle(this.mapBounds.X + marker.WorldMapPosition.X, this.mapBounds.Y + marker.WorldMapPosition.Y,
+                    (int)(spriteRect.Width * multiplier), (int)(spriteRect.Height * multiplier)), spriteRect, markerColor);
 
                 // Draw icons for quests/birthday
                 if (ModEntry.Globals.ShowQuests)
