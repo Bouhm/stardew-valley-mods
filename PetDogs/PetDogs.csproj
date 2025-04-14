@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Version>3.0.0</Version>
     <TargetFramework>net6.0</TargetFramework>
@@ -20,20 +20,34 @@
   </ItemGroup>
 
   <Target Name="DeployMod" AfterTargets="AfterBuild">
-    <!--get content pack folder-->
-    <ItemGroup>
-      <ContentPackFolder Include="$(TargetDir)\$(ContentPackFolderName)\**\*" />
-    </ItemGroup>
-
-    <!--update Mods folder-->
-    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(GameModsPath)\$(ContentPackFolderName)\%(RecursiveDir)" />
+    <!--get paths-->
+    <PropertyGroup>
+      <SourcePath>$(TargetDir)\$(ContentPackFolderName)</SourcePath>
+      <StagingPath>$(TargetDir)\packaged\$(ContentPackFolderName)</StagingPath>
+      <InstalledPath>$(GameModsPath)\$(ContentPackFolderName)</InstalledPath>
+      <ZippedPath>$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip</ZippedPath>
+    </PropertyGroup>
 
     <!--create release folder-->
-    <RemoveDir Directories="$(TargetDir)\packaged" />
-    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(TargetDir)\packaged\$(ContentPackFolderName)\%(RecursiveDir)" />
+    <ItemGroup>
+      <ContentPackFolder Include="$(SourcePath)\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(StagingPath)" />
+    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(StagingPath)\%(RecursiveDir)" />
+    <WriteLinesToFile
+      File="$(StagingPath)\manifest.json"
+      Lines="$([System.IO.File]::ReadAllText($(StagingPath)\manifest.json).Replace('%ProjectVersion%','$(Version)'))"
+      Overwrite="true"
+    />
+
+    <!--copy to Mods folder-->
+    <ItemGroup>
+      <StagingDirFiles Include="$(StagingPath)\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(StagingDirFiles)" DestinationFolder="$(InstalledPath)\%(RecursiveDir)" />
 
     <!--create release zip-->
-    <Delete Files="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
-    <ZipDirectory SourceDirectory="$(TargetDir)\packaged" DestinationFile="$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip" />
+    <Delete Files="$(ZippedPath)" />
+    <ZipDirectory SourceDirectory="$(StagingPath)\.." DestinationFile="$(ZippedPath)" />
   </Target>
 </Project>
