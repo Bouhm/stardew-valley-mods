@@ -619,8 +619,8 @@ public class ModEntry : Mod
         return villagers;
     }
 
-    // For drawing farm buildings on the map 
-    // and getting positions relative to the farm 
+    // For drawing farm buildings on the map
+    // and getting positions relative to the farm
     private void UpdateFarmBuildingLocations()
     {
         FarmBuildings.Clear();
@@ -750,7 +750,7 @@ public class ModEntry : Mod
                     LocationName = "Town",
                     CropOffset = 0,
                     Sprite = Game1.mouseCursors_1_6,
-                    SpriteSourceRect = new Rectangle(181, 490, 12, 18),
+                    SpriteSourceRect = new Rectangle(180, 490, 14, 18),
                     SpriteZoom = 1.5f,
                     WorldMapPosition = mapPos
                 });
