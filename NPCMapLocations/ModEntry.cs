@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Bouhm.Shared;
 using Bouhm.Shared.Locations;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using Newtonsoft.Json.Linq;
-
 using NPCMapLocations.Framework;
 using NPCMapLocations.Framework.Menus;
 using NPCMapLocations.Framework.Models;
-
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
-
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Characters;
@@ -48,7 +42,7 @@ public class ModEntry : Mod
     /// <summary>Whether to show the minimap.</summary>
     private readonly PerScreen<bool> ShowMinimap = new();
 
-    /// <summary>An integration with Better Game Menu to use NPC Map Locations.</summary>
+    /// <summary>The integration with the Better Game Menu mod.</summary>
     private BetterGameMenuIntegration BetterGameMenuIntegration;
 
     /// <summary>Scans and maps locations in the game world.</summary>
@@ -226,8 +220,8 @@ public class ModEntry : Mod
             .Register();
 
         // register map page with Better Game Menu
-        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage);
-        this.BetterGameMenuIntegration.Register(this.Helper.ModRegistry, this.Monitor);
+        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage)
+            .Register(this.Helper.ModRegistry, this.Monitor);
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
