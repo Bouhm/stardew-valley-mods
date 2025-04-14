@@ -14,8 +14,6 @@ namespace NPCMapLocations.Framework;
 /// <summary>Registers the MapPage provider with Better Game Menu</summary>
 internal class BetterGameMenuIntegration
 {
-    internal delegate IClickableMenu CreateInstanceDelegate(IClickableMenu menu);
-
     /*********
     ** Fields
     *********/
@@ -23,7 +21,7 @@ internal class BetterGameMenuIntegration
     private readonly IBetterGameMenuApi? BetterGameMenu;
 
     /// <summary>A method that's used to create a new instance of the NPC Map Locations menu.</summary>
-    private readonly CreateInstanceDelegate CreateInstance;
+    private readonly Func<IClickableMenu, IClickableMenu> CreateInstance;
 
     /// <summary>A simple value to hold if the menu is active or not.</summary>
     private readonly PerScreen<bool> MenuIsOpen;
@@ -41,7 +39,7 @@ internal class BetterGameMenuIntegration
     /// <summary>Construct an instance.</summary>
     /// <param name="monitor">An API for logging messages.</param>
     /// <param name="modRegistry">An API for fetching APIs from loaded mods.</param>
-    public BetterGameMenuIntegration(CreateInstanceDelegate createInstance, IMonitor monitor, IModRegistry modRegistry)
+    public BetterGameMenuIntegration(Func<IClickableMenu, IClickableMenu> createInstance, IMonitor monitor, IModRegistry modRegistry)
     {
         this.CreateInstance = createInstance;
         this.MenuIsOpen = new();
@@ -69,7 +67,7 @@ internal class BetterGameMenuIntegration
             return;
 
         this.BetterGameMenu.RegisterImplementation(
-            nameof(VanillaTabOrders.Map),
+            "Map",
             priority: 100,
             getPageInstance: this.OnCreate,
             getMenuInvisible: () => true,

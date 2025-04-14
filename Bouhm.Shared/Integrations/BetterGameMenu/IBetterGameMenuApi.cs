@@ -9,27 +9,6 @@ using StardewValley.Menus;
 
 namespace Bouhm.Shared.Integrations.BetterGameMenu;
 
-
-/// <summary>
-/// This enum is included for reference and has the order value for
-/// all the default tabs from the base game. These values are intentionally
-/// spaced out to allow for modded tabs to be inserted at specific points.
-/// </summary>
-public enum VanillaTabOrders
-{
-    Inventory = 0,
-    Skills = 20,
-    Social = 40,
-    Map = 60,
-    Crafting = 80,
-    Animals = 100,
-    Powers = 120,
-    Collections = 140,
-    Options = 160,
-    Exit = 200
-}
-
-
 public interface IBetterGameMenuApi
 {
 
@@ -45,8 +24,7 @@ public interface IBetterGameMenuApi
     /// to override an existing vanilla game tab.
     /// </summary>
     /// <param name="id">The id of the tab to register an implementation for.
-    /// The keys for the vanilla game tabs are the same as those in the
-    /// <see cref="VanillaTabOrders"/> enum.</param>
+    /// The keys for the vanilla game tabs are the same as those in Better Game Menu's <c>VanillaTabOrders</c> enum.</param>
     /// <param name="priority">The priority of this page instance provider
     /// for this tab. When multiple page instance providers are
     /// registered, and the user hasn't explicitly chosen one, then the
