@@ -42,6 +42,9 @@ public class ModEntry : Mod
     /// <summary>Whether to show the minimap.</summary>
     private readonly PerScreen<bool> ShowMinimap = new();
 
+    /// <summary>The integration with the Better Game Menu mod.</summary>
+    private BetterGameMenuIntegration BetterGameMenuIntegration;
+
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil;
 
@@ -212,8 +215,13 @@ public class ModEntry : Mod
     /// <param name="e">The event data.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
+        // register config UI
         new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
             .Register();
+
+        // register map page with Better Game Menu
+        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage)
+            .Register(this.Helper.ModRegistry, this.Monitor);
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
@@ -438,7 +446,7 @@ public class ModEntry : Mod
 
         // toggle mod map
         if (Game1.activeClickableMenu is not GameMenu gameMenu)
-            this.IsModMapOpen.Value = false;
+            this.IsModMapOpen.Value = this.BetterGameMenuIntegration?.IsMenuOpen ?? false;
         else
         {
             this.HasOpenedMap.Value = gameMenu.currentTab == ModConstants.MapTabIndex; // When map accessed by switching GameMenu tab or pressing M
@@ -823,7 +831,7 @@ public class ModEntry : Mod
 
     /// <summary>Create the map page for a menu instance.</summary>
     /// <param name="menu">The game menu for which to create a map view.</param>
-    private ModMapPage CreateMapPage(GameMenu menu)
+    private ModMapPage CreateMapPage(IClickableMenu menu)
     {
         return new ModMapPage(
             menu.xPositionOnScreen,
