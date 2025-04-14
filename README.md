@@ -26,7 +26,7 @@ on the wiki for help contributing translations.
 
 &nbsp;       | NPC Location Compass              | NPC Map Locations
 :----------- | :-------------------------------- | :--------------------------------
-Chinese      | [✓](LocationCompass/i18n/zh.json) | [↻](NPCMapLocations/i18n/zh.json)
+Chinese      | [✓](LocationCompass/i18n/zh.json) | [✓](NPCMapLocations/i18n/zh.json)
 French       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/fr.json)
 German       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/de.json)
 Hungarian    | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
