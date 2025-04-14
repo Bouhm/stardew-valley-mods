@@ -17,9 +17,6 @@ internal class BetterGameMenuIntegration
     /*********
     ** Fields
     *********/
-    /// <summary>The Better Game Menu integration.</summary>
-    private readonly IBetterGameMenuApi? BetterGameMenu;
-
     /// <summary>A method that's used to create a new instance of the NPC Map Locations menu.</summary>
     private readonly Func<IClickableMenu, IClickableMenu> CreateInstance;
 
@@ -37,45 +34,39 @@ internal class BetterGameMenuIntegration
     ** Public methods
     *********/
     /// <summary>Construct an instance.</summary>
-    /// <param name="monitor">An API for logging messages.</param>
-    /// <param name="modRegistry">An API for fetching APIs from loaded mods.</param>
-    public BetterGameMenuIntegration(Func<IClickableMenu, IClickableMenu> createInstance, IMonitor monitor, IModRegistry modRegistry)
+    /// <param name="createInstance">A method that's used to create a new instance of the NPC Map Locations menu.</param>
+    public BetterGameMenuIntegration(Func<IClickableMenu, IClickableMenu> createInstance)
     {
         this.CreateInstance = createInstance;
         this.MenuIsOpen = new();
         this.MenuShouldClose = new();
-
-        try
-        {
-            this.BetterGameMenu = modRegistry.GetApi<IBetterGameMenuApi>("leclair.bettergamemenu");
-        }
-        catch (Exception ex)
-        {
-            monitor.Log($"Unable to get Better Game Menu's API: {ex}", LogLevel.Warn);
-            this.BetterGameMenu = null;
-        }
-
-        this.Register();
     }
 
     /// <summary>Whether or not the current screen has an open menu.</summary>
     public bool IsMenuOpen => this.MenuIsOpen.Value;
 
-    public void Register()
+    /// <summary>Register the integration with Better Game Menu.</summary>
+    /// <param name="modRegistry">An API for fetching APIs from loaded mods.</param>
+    /// <param name="monitor">An API for logging messages.</param>
+    public void Register(IModRegistry modRegistry, IMonitor monitor)
     {
-        if (this.BetterGameMenu == null)
-            return;
-
-        this.BetterGameMenu.RegisterImplementation(
-            "Map",
-            priority: 100,
-            getPageInstance: this.OnCreate,
-            getMenuInvisible: () => true,
-            getWidth: width => width + 128,
-            onResize: this.OnResize,
-            onClose: this.OnClose
-        );
-
+        try
+        {
+            var api = modRegistry.GetApi<IBetterGameMenuApi>("leclair.bettergamemenu");
+            api?.RegisterImplementation(
+                "Map",
+                priority: 100,
+                getPageInstance: this.OnCreate,
+                getMenuInvisible: () => true,
+                getWidth: width => width + 128,
+                onResize: this.OnResize,
+                onClose: this.OnClose
+            );
+        }
+        catch (Exception ex)
+        {
+            monitor.Log($"Unable to integrate with Better Game Menu.\nTechnical details:\n{ex}", LogLevel.Warn);
+        }
     }
 
     private IClickableMenu? OnResize((IClickableMenu Menu, IClickableMenu OldPage) input)

@@ -221,9 +221,13 @@ public class ModEntry : Mod
     /// <param name="e">The event data.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
+        // register config UI
         new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
             .Register();
-        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage, this.Monitor, this.Helper.ModRegistry);
+
+        // register map page with Better Game Menu
+        this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage);
+        this.BetterGameMenuIntegration.Register(this.Helper.ModRegistry, this.Monitor);
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
