@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 using StardewValley.Menus;
 
-namespace Leclair.Stardew.BetterGameMenu;
+namespace Bouhm.Shared.Integrations.BetterGameMenu;
 
 
 /// <summary>

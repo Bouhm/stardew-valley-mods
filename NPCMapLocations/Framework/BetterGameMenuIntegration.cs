@@ -2,7 +2,7 @@
 
 using System;
 
-using Leclair.Stardew.BetterGameMenu;
+using Bouhm.Shared.Integrations.BetterGameMenu;
 
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
