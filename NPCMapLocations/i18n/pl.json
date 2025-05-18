@@ -7,7 +7,7 @@
     "minimap.enabled": "Włączona",
     "minimap.locked": "Zablokuj pozycję minimapy",
     "minimap.width": "Szerokość minimapy",
-    "minimap.height": "Długość minimapy",
+    "minimap.height": "Wysokość minimapy",
 
     // immersion section
     "immersion.label": "Ustawienia:",
@@ -24,29 +24,27 @@
     "extra.show-quests-or-birthdays": "Pokaż zadania lub urodziny",
     "extra.show-hidden-villagers": "Pokaż ukrytych mieszkańców",
     "extra.show-traveling-merchant": "Pokaż wędrownego handlarza",
-    "extra.show-horses": "Show horses", // TODO
+    "extra.show-horses": "Pokaż konie",
 
     // include/exclude villagers section
     "villagers.label": "Uwzględnij/Wyklucz mieszkańców:",
 
     // special NPC markers
-    // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
+    "marker-names.bookseller": "Sprzedawca książek",
+    "marker-names.merchant": "Wędrowny handlarz",
 
 
     /*********
     ** Generic Mod Config Menu UI
     *********/
-    // TODO
-    "config.menu-key.name": "Menu key",
-    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+    "config.menu-key.name": "Przycisk Menu",
+    "config.menu-key.desc": "Naciśnij ten przycisk gdy mapa jest otwarta, żeby pokazać ustawienia moda.",
 
-    "config.minimap-key.name": "Minimap toggle key",
-    "config.minimap-key.desc": "Press this button to show or hide the minimap.",
+    "config.minimap-key.name": "Przycisk przełączania minimapy",
+    "config.minimap-key.desc": "Naciśnij ten przycisk żeby pokazać lub ukryć minimapę.",
 
-    "config.tooltip-key.name": "Tooltip key",
-    "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
+    "config.tooltip-key.name": "Przycisk podpowiedzi",
+    "config.tooltip-key.desc": "Naciśnij ten przycisk żeby zmieniać pozycję podpowiedzi na ekranie mapy.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    "config.other-settings": "W celu zmiany innych ustawień moda, otwórz w grze mapę świata i naciśnij powyższy przycisk menu."
 }
