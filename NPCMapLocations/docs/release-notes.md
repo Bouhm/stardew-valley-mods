@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Reduced performance impact of minimap (thanks to GitHubSnegOk!).
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).
 * Improved translations. Thanks to AugNSo (updated Chinese), CaranudLapin (updated French), and Kondiq (updated Polish)!

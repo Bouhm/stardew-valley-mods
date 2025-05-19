@@ -8,7 +8,7 @@ using StardewValley;
 namespace NPCMapLocations.Framework.Menus;
 
 /// <summary>A minimap UI drawn to the screen.</summary>
-internal class ModMinimap
+internal class ModMinimap : IDisposable
 {
     /*********
     ** Fields
@@ -36,6 +36,9 @@ internal class ModMinimap
 
     /// <summary>The underlying map view to show in the minimap area.</summary>
     private ModMapPage MapPage;
+
+    /// <summary>A cached sprite batch to reuse for drawing the clipped minimap.</summary>
+    private SpriteBatch ClippedSpriteBatch;
 
 
     /*********
@@ -171,7 +174,10 @@ internal class ModMinimap
             try
             {
                 device.ScissorRectangle = mapArea;
-                using SpriteBatch clippedBatch = new SpriteBatch(device);
+
+                SpriteBatch clippedBatch = this.ClippedSpriteBatch;
+                if (clippedBatch is null)
+                    this.ClippedSpriteBatch = clippedBatch = new SpriteBatch(device);
 
                 clippedBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, new RasterizerState { ScissorTestEnable = true });
 
@@ -211,6 +217,12 @@ internal class ModMinimap
             spriteBatch.Draw(Game1.menuTexture, new Rectangle(x + width, y + height, borderWidth, borderWidth), new Rectangle(48, 304, borderWidth, borderWidth), color * 1.5f);
             spriteBatch.Draw(Game1.menuTexture, new Rectangle(x - borderWidth, y + height, borderWidth, borderWidth), new Rectangle(0, 304, borderWidth, borderWidth), color * 1.5f);
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        this.ClippedSpriteBatch?.Dispose();
     }
 
 

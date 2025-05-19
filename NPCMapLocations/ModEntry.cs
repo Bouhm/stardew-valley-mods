@@ -375,6 +375,7 @@ public class ModEntry : Mod
         this.ResetMarkers();
         this.UpdateMarkers(true);
 
+        this.Minimap.Value?.Dispose();
         this.Minimap.Value = new ModMinimap(this.CreateMapPage);
     }
 
