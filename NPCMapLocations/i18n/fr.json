@@ -1,4 +1,4 @@
-﻿{
+{
     /*********
     ** Map options
     *********/
@@ -30,9 +30,8 @@
     "villagers.label": "Inclure/Exclure les villageois:",
 
     // special NPC markers
-    // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
+    "marker-names.bookseller": "Libraire",
+    "marker-names.merchant": "Marchant ambulant",
 
 
     /*********
