@@ -97,7 +97,7 @@ internal class ModMapPage : MapPage
                 {
                     foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                     {
-                        if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
+                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
                             continue;
 
                         newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
@@ -110,7 +110,7 @@ internal class ModMapPage : MapPage
                 {
                     foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                     {
-                        if (farmerMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
+                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
                             continue;
 
                         newHoveredNames.Add(farmerMarker.Name);
@@ -297,7 +297,7 @@ internal class ModMapPage : MapPage
         if (this.NpcMarkers != null)
         {
             var sortedMarkers = this.NpcMarkers
-                .Where(p => p.Value.WorldMapPosition.RegionId == regionId)
+                .Where(p => p.Value.WorldMapRegionId == regionId)
                 .OrderBy(p => p.Value.Layer);
 
             foreach (var npcMarker in sortedMarkers)
@@ -325,7 +325,7 @@ internal class ModMapPage : MapPage
                         ? 32f / spriteRect.Width
                         : 30f / spriteRect.Height;
 
-                    Rectangle destinationRect = new Rectangle(this.mapBounds.X + marker.WorldMapPosition.X, this.mapBounds.Y + marker.WorldMapPosition.Y, (int)(spriteRect.Width * iconScale), (int)(spriteRect.Height * iconScale));
+                    Rectangle destinationRect = new Rectangle(this.mapBounds.X + marker.WorldMapX, this.mapBounds.Y + marker.WorldMapY, (int)(spriteRect.Width * iconScale), (int)(spriteRect.Height * iconScale));
 
                     b.Draw(marker.Sprite, destinationRect, spriteRect, markerColor);
                 }
@@ -337,7 +337,7 @@ internal class ModMapPage : MapPage
                     {
                         // Gift icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapPosition.X + 20, this.mapBounds.Y + marker.WorldMapPosition.Y),
+                            new Vector2(this.mapBounds.X + marker.WorldMapX + 20, this.mapBounds.Y + marker.WorldMapY),
                             new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -346,7 +346,7 @@ internal class ModMapPage : MapPage
                     {
                         // Quest icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapPosition.X + 22, this.mapBounds.Y + marker.WorldMapPosition.Y - 3),
+                            new Vector2(this.mapBounds.X + marker.WorldMapX + 22, this.mapBounds.Y + marker.WorldMapY - 3),
                             new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -359,13 +359,12 @@ internal class ModMapPage : MapPage
         {
             foreach (Farmer farmer in Game1.getOnlineFarmers())
             {
-                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker) && farMarker.WorldMapPosition.RegionId == regionId)
+                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker) && farMarker.WorldMapRegionId == regionId)
                 {
                     if (farMarker is { DrawDelay: 0 }) // Temporary solution to handle desync of farmhand location/tile position when changing location
                     {
-                        farmer.FarmerRenderer.drawMiniPortrat(b,
-                            new Vector2(this.mapBounds.X + farMarker.WorldMapPosition.X - 16, this.mapBounds.Y + farMarker.WorldMapPosition.Y - 15),
-                            0.00011f, 2f, 1, farmer, alpha);
+                        Vector2 position = new Vector2(this.mapBounds.X + farMarker.WorldMapX - 16, this.mapBounds.Y + farMarker.WorldMapY - 15);
+                        farmer.FarmerRenderer.drawMiniPortrat(b, position, 0.00011f, 2f, 1, farmer, alpha);
                     }
                 }
             }

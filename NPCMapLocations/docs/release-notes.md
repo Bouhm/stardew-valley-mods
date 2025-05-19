@@ -5,6 +5,7 @@
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).
 * Improved translations. Thanks to AugNSo (updated Chinese), CaranudLapin (updated French), and Kondiq (updated Polish)!
+* Fixed error if a marker's player or NPC can't be positioned on the map.
 
 ## 3.3.0
 Released 11 January 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.

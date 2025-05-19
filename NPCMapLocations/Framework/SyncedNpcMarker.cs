@@ -20,4 +20,13 @@ public class SyncedNpcMarker
 
     /// <summary>The NPC's character type.</summary>
     public CharacterType Type { get; set; } = CharacterType.Villager;
+
+    /// <summary>The world map region ID, if available.</summary>
+    public string WorldMapRegionId => this.WorldMapPosition?.RegionId;
+
+    /// <summary>The marker's pixel X coordinate relative to the top-left corner of the map.</summary>
+    public int WorldMapX => this.WorldMapPosition?.X ?? 0;
+
+    /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
+    public int WorldMapY => this.WorldMapPosition?.X ?? 0;
 }

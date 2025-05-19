@@ -1083,12 +1083,12 @@ public class ModEntry : Mod
 
             if (this.FarmerMarkers.Value.TryGetValue(farmer.UniqueMultiplayerID, out var farMarker))
             {
-                float deltaX = farmerLoc.X - farMarker.WorldMapPosition.X;
-                float deltaY = farmerLoc.Y - farMarker.WorldMapPosition.Y;
+                float deltaX = farmerLoc.X - farMarker.WorldMapX;
+                float deltaY = farmerLoc.Y - farMarker.WorldMapY;
 
                 // Location changes before tile position, causing farmhands to blink
                 // to the wrong position upon entering new location. Handle this in draw.
-                if (locationName == farMarker.LocationName && farmerLoc.RegionId == farMarker.WorldMapPosition.RegionId && MathHelper.Distance(deltaX, deltaY) > 15)
+                if (locationName == farMarker.LocationName && farmerLoc.RegionId == farMarker.WorldMapRegionId && MathHelper.Distance(deltaX, deltaY) > 15)
                     this.FarmerMarkers.Value[farmerId].DrawDelay = 1;
                 else if (farMarker.DrawDelay > 0)
                     this.FarmerMarkers.Value[farmerId].DrawDelay--;

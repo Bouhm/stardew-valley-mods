@@ -17,4 +17,13 @@ public class FarmerMarker
 
     /// <summary>The number of ticks until the marker should become visible.</summary>
     public int DrawDelay { get; set; }
+
+    /// <summary>The world map region ID, if available.</summary>
+    public string WorldMapRegionId => this.WorldMapPosition?.RegionId;
+
+    /// <summary>The marker's pixel X coordinate relative to the top-left corner of the map.</summary>
+    public int WorldMapX => this.WorldMapPosition?.X ?? 0;
+
+    /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
+    public int WorldMapY => this.WorldMapPosition?.X ?? 0;
 }

@@ -162,8 +162,8 @@ internal static class SummaryCommand
 
                             marker => marker.Value.DisplayName != marker.Key ? $"{marker.Key} ({marker.Value.DisplayName})" : marker.Key,
                             marker => marker.Value.LocationName,
-                            marker => marker.Value.WorldMapPosition.RegionId,
-                            marker => $"{marker.Value.WorldMapPosition.X}, {marker.Value.WorldMapPosition.Y}",
+                            marker => marker.Value.WorldMapRegionId,
+                            marker => $"{marker.Value.WorldMapX}, {marker.Value.WorldMapY}",
                             marker => marker.Value.CropOffset != 0 ? marker.Value.CropOffset.ToString() : "",
                             marker =>
                             {
