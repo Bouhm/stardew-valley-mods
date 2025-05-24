@@ -25,5 +25,5 @@ public class FarmerMarker
     public int WorldMapX => this.WorldMapPosition?.X ?? 0;
 
     /// <summary>The marker's pixel Y coordinate relative to the top-left corner of the map.</summary>
-    public int WorldMapY => this.WorldMapPosition?.X ?? 0;
+    public int WorldMapY => this.WorldMapPosition?.Y ?? 0;
 }
