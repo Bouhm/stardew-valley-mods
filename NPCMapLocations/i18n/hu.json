@@ -2,15 +2,6 @@
     /*********
     ** Map options (Térkép beállítások)
     *********/
-    // immersion section (Merülő szakasz)
-    "immersion.label": "Beállítások:",
-    "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
-    "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
-    "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
-    "immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
-    "immersion.min-heart-level": "Minimális szívszint",
-    "immersion.max-heart-level": "Maximális szívszint",
-
     // extra settings section (Extra beállítások szakasz)
     "extra.label": "További beállítások:",
 
@@ -61,8 +52,23 @@
     ****/
     "config.settings-title": "Beállítások",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "Mindig mutassa a falusiakat",
+    "config.immersion.TalkedTo": "A játékos által beszélt falusiak megjelenítése",
+    "config.immersion.NotTalkedTo": "A játékos által beszélt falusiak elrejtése",
+
     "config.only-in-location.name": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "Csak a beállított szívszinten belüli falusiak megjelenítése",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "Minimális szívszint",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "Maximális szívszint",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "Küldetések vagy születésnapok megjelenítése",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

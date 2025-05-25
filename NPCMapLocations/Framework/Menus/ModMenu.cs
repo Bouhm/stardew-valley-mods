@@ -86,22 +86,22 @@ public class ModMenu : IClickableMenu
         }
 
         this.ImmersionAllButton = new VillagerVisibilityButton(
-            label: I18n.Immersion_AlwaysShowVillagers(),
+            label: I18n.Config_Immersion_All(),
             id: VillagerVisibility.All,
-            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
-            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
+            get: () => ModEntry.Config.ImmersionOption,
+            set: value => ModEntry.Config.ImmersionOption = value
         );
         this.ImmersionTalkedToButton = new VillagerVisibilityButton(
-            label: I18n.Immersion_OnlyVillagersTalkedTo(),
+            label: I18n.Config_Immersion_TalkedTo(),
             id: VillagerVisibility.TalkedTo,
-            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
-            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
+            get: () => ModEntry.Config.ImmersionOption,
+            set: value => ModEntry.Config.ImmersionOption = value
         );
         this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(
-            label: I18n.Immersion_HideVillagersTalkedTo(),
+            label: I18n.Config_Immersion_NotTalkedTo(),
             id: VillagerVisibility.NotTalkedTo,
-            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
-            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
+            get: () => ModEntry.Config.ImmersionOption,
+            set: value => ModEntry.Config.ImmersionOption = value
         );
 
         this.Options.AddRange(new[]
@@ -148,7 +148,7 @@ public class ModMenu : IClickableMenu
             ),
 
             // NPC visibility
-            new OptionsElement(I18n.Immersion_Label()),
+            new OptionsElement(I18n.Config_SettingsTitle()),
             this.ImmersionAllButton,
             this.ImmersionTalkedToButton,
             this.ImmersionNotTalkedToButton,
@@ -158,25 +158,25 @@ public class ModMenu : IClickableMenu
                 set: value => ModEntry.Config.OnlySameLocation = value
             ),
             new ModCheckbox(
-                label: I18n.Immersion_OnlyVillagersWithinHeartLevel(),
-                value: ModEntry.PerPlayerConfig.ByHeartLevel,
-                set: value => ModEntry.PerPlayerConfig.ByHeartLevel = value
+                label: I18n.Config_OnlyHeartLevel_Name(),
+                value: ModEntry.Config.ByHeartLevel,
+                set: value => ModEntry.Config.ByHeartLevel = value
             ),
             new MapModSlider(
-                label: I18n.Immersion_MinHeartLevel(),
-                value: ModEntry.PerPlayerConfig.HeartLevelMin,
+                label: I18n.Config_MinHearts_Name(),
+                value: ModEntry.Config.HeartLevelMin,
                 min: 0,
-                max: PlayerConfig.MaxPossibleHeartLevel,
-                set: value => ModEntry.PerPlayerConfig.HeartLevelMin = value,
-                shouldGrayOut: () => !ModEntry.PerPlayerConfig.ByHeartLevel
+                max: ModConfig.MaxPossibleHeartLevel,
+                set: value => ModEntry.Config.HeartLevelMin = value,
+                shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
             ),
             new MapModSlider(
-                label: I18n.Immersion_MaxHeartLevel(),
-                value: ModEntry.PerPlayerConfig.HeartLevelMax,
+                label: I18n.Config_MaxHearts_Name(),
+                value: ModEntry.Config.HeartLevelMax,
                 min: 0,
-                max: PlayerConfig.MaxPossibleHeartLevel,
-                set: value => ModEntry.PerPlayerConfig.HeartLevelMax = value,
-                shouldGrayOut: () => !ModEntry.PerPlayerConfig.ByHeartLevel
+                max: ModConfig.MaxPossibleHeartLevel,
+                set: value => ModEntry.Config.HeartLevelMax = value,
+                shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
             ),
 
             // extra icons
@@ -412,7 +412,7 @@ public class ModMenu : IClickableMenu
         b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
         Game1.drawDialogueBox(this.xPositionOnScreen, this.yPositionOnScreen, this.width, this.height, false, true);
         this.OkButton.draw(b);
-        int buttonWidth = (int)Game1.dialogueFont.MeasureString(I18n.Immersion_HideVillagersTalkedTo()).X;
+        int buttonWidth = (int)Game1.dialogueFont.MeasureString(I18n.Config_ShowHiddenVillagers_Name()).X;
         if (!GameMenu.forcePreventClose)
         {
             this.UpArrow.draw(b);

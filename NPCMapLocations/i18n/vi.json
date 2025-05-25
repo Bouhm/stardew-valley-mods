@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "Cài đặt:",
-    "immersion.always-show-villagers": "Luôn hiện dân làng",
-    "immersion.only-villagers-talked-to": "Hiện dân làng mà người chơi đã nói chuyện",
-    "immersion.hide-villagers-talked-to": "Ẩn dân làng mà người chơi đã nói chuyện",
-    "immersion.only-villagers-within-heart-level": "Chỉ hiện dân làng dựa theo cấp độ thân mật",
-    "immersion.min-heart-level": "Mức thân mật tối thiểu",
-    "immersion.max-heart-level": "Mức thân mật tối đa",
-
     // extra settings section
     "extra.label": "Cài đặt bổ sung:",
 
@@ -60,8 +51,23 @@
     ****/
     "config.settings-title": "Cài đặt",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "Luôn hiện dân làng",
+    "config.immersion.TalkedTo": "Hiện dân làng mà người chơi đã nói chuyện",
+    "config.immersion.NotTalkedTo": "Ẩn dân làng mà người chơi đã nói chuyện",
+
     "config.only-in-location.name": "Chỉ hiện dân làng ở vị trí người chơi",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "Chỉ hiện dân làng dựa theo cấp độ thân mật",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "Mức thân mật tối thiểu",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "Mức thân mật tối đa",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "Hiện nhiệm vụ và sinh nhật",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

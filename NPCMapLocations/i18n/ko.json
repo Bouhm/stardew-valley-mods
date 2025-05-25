@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "설정:",
-    "immersion.always-show-villagers": "주민들을 항상 표시",
-    "immersion.only-villagers-talked-to": "말해본 주민만 표시",
-    "immersion.hide-villagers-talked-to": "말해본 주민만 제외",
-    "immersion.only-villagers-within-heart-level": "친밀도가 있는 주민만 표시",
-    "immersion.min-heart-level": "최저 친밀도",
-    "immersion.max-heart-level": "최고 친밀도",
-
     // extra settings section
     "extra.label": "기타 설정:",
 
@@ -60,8 +51,23 @@
     ****/
     "config.settings-title": "설정",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "주민들을 항상 표시",
+    "config.immersion.TalkedTo": "말해본 주민만 표시",
+    "config.immersion.NotTalkedTo": "말해본 주민만 제외",
+
     "config.only-in-location.name": "같은 장소에 있는 주민만 표시",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "친밀도가 있는 주민만 표시",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "최저 친밀도",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "최고 친밀도",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "주민 퀘스트나 생일 표시",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

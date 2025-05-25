@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "การตั้งค่า:",
-    "immersion.always-show-villagers": "แสดงชาวบ้านตลอดเวลา",
-    "immersion.only-villagers-talked-to": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
-    "immersion.hide-villagers-talked-to": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
-    "immersion.only-villagers-within-heart-level": "แสดงเฉพาะชาวบ้านที่มีค่าหัวใจระหว่าง",
-    "immersion.min-heart-level": "ค่าหัวใจขั้นต่ำ",
-    "immersion.max-heart-level": "ค่าหัวใจสูงสุด",
-
     // extra settings section
     "extra.label": "การตั้งค่าพิเศษ:",
 
@@ -61,8 +52,23 @@
     ****/
     "config.settings-title": "การตั้งค่า",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "แสดงชาวบ้านตลอดเวลา",
+    "config.immersion.TalkedTo": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "config.immersion.NotTalkedTo": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+
     "config.only-in-location.name": "แสดงเฉพาะชาวบ้านที่อยู่ในสถานที่เดียวกันกับผู้เล่น",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "แสดงเฉพาะชาวบ้านที่มีค่าหัวใจระหว่าง",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "ค่าหัวใจขั้นต่ำ",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "ค่าหัวใจสูงสุด",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "แสดงเควสหรือวันเกิด",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

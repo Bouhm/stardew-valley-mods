@@ -12,6 +12,9 @@ public class ModConfig
     /*********
     ** Accessors
     *********/
+    /// <summary>The maximum heart level that can be configured for <see cref="HeartLevelMin"/> or <see cref="HeartLevelMax"/>.</summary>
+    internal const int MaxPossibleHeartLevel = 14;
+
     /// <summary>The key binding to open the options menu when on the map view.</summary>
     public string MenuKey { get; set; } = "Tab";
 
@@ -29,6 +32,18 @@ public class ModConfig
 
     /// <summary>Whether to only show villagers in the same location as the player.</summary>
     public bool OnlySameLocation { get; set; } = false;
+
+    /// <summary>Which NPCs to display.</summary>
+    public VillagerVisibility ImmersionOption { get; set; } = VillagerVisibility.All;
+
+    /// <summary>Whether to only show villagers whose hearts with the player is between <see cref="HeartLevelMin"/> and <see cref="HeartLevelMax"/>.</summary>
+    public bool ByHeartLevel { get; set; } = false;
+
+    /// <summary>The minimum heart level for <see cref="ByHeartLevel"/>.</summary>
+    public int HeartLevelMin { get; set; } = 0;
+
+    /// <summary>The maximum heart level for <see cref="ByHeartLevel"/>.</summary>
+    public int HeartLevelMax { get; set; } = MaxPossibleHeartLevel;
 
     /// <summary>Whether to show villagers that would normally be hidden. </summary>
     public bool ShowHiddenVillagers { get; set; } = false;

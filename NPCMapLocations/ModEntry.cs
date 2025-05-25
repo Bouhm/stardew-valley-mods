@@ -1052,19 +1052,19 @@ public class ModEntry : Mod
 
         if (ModEntry.ShouldExcludeNpc(name, out string reason))
             Hide($"hidden per config ({reason})");
-        else if (!shownForQuest && PerPlayerConfig.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
+        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
             Hide("hidden per config (didn't talk to them today)");
-        else if (!shownForQuest && PerPlayerConfig.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
+        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
             Hide("hidden per config (talked to them today)");
         else if (Config.OnlySameLocation && !isSameLocation)
             Hide("hidden per config (not in same location)");
-        else if (PerPlayerConfig.ByHeartLevel)
+        else if (Config.ByHeartLevel)
         {
             int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);
-            if (PerPlayerConfig.HeartLevelMin > 0 && hearts < PerPlayerConfig.HeartLevelMin)
-                Hide($"hidden per config (less than {PerPlayerConfig.HeartLevelMin} hearts)");
-            if (PerPlayerConfig.HeartLevelMax < PlayerConfig.MaxPossibleHeartLevel && hearts > PerPlayerConfig.HeartLevelMax)
-                Hide($"hidden per config (more than {PerPlayerConfig.HeartLevelMax} hearts)");
+            if (Config.HeartLevelMin > 0 && hearts < Config.HeartLevelMin)
+                Hide($"hidden per config (less than {Config.HeartLevelMin} hearts)");
+            if (Config.HeartLevelMax < ModConfig.MaxPossibleHeartLevel && hearts > Config.HeartLevelMax)
+                Hide($"hidden per config (more than {Config.HeartLevelMax} hearts)");
         }
     }
 

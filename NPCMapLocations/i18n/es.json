@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "Ajustes:",
-    "immersion.always-show-villagers": "Siempre mostrar aldeanos",
-    "immersion.only-villagers-talked-to": "Mostrar aldeanos con los que se ha hablado",
-    "immersion.hide-villagers-talked-to": "Esconder aldeanos con los que se ha hablado",
-    "immersion.only-villagers-within-heart-level": "Solo mostrar aldeanos dentro de nivel de corazones",
-    "immersion.min-heart-level": "Nivel mínimo de corazones",
-    "immersion.max-heart-level": "Nivel máximo de corazones",
-
     // extra settings section
     "extra.label": "Ajustes Adicionales:",
 
@@ -60,8 +51,23 @@
     ****/
     "config.settings-title": "Ajustes",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "Siempre mostrar aldeanos",
+    "config.immersion.TalkedTo": "Mostrar aldeanos con los que se ha hablado",
+    "config.immersion.NotTalkedTo": "Esconder aldeanos con los que se ha hablado",
+
     "config.only-in-location.name": "Solo mostrar aldeanos en la ubicación del jugador",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "Solo mostrar aldeanos dentro de nivel de corazones",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "Nivel mínimo de corazones",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "Nivel máximo de corazones",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "Mostrar misiones o cumpleaños",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

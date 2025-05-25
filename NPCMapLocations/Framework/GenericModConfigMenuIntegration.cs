@@ -122,12 +122,46 @@ internal class GenericModConfigMenuIntegration
 
         // settings
         menu.AddSectionTitle(this.Manifest, I18n.Config_SettingsTitle);
+        menu.AddTextOption(
+            this.Manifest,
+            name: I18n.Config_Immersion_Name,
+            tooltip: I18n.Config_Immersion_Desc,
+            getValue: () => this.Config.ImmersionOption.ToString(),
+            setValue: value => this.Config.ImmersionOption = Utility.TryParseEnum(value, out VillagerVisibility parsed) ? parsed : VillagerVisibility.All,
+            allowedValues: Enum.GetNames<VillagerVisibility>(),
+            formatAllowedValue: value => I18n.GetByKey($"config.immersion.{value}")
+        );
         menu.AddBoolOption(
             this.Manifest,
             name: I18n.Config_OnlyInLocation_Name,
             tooltip: I18n.Config_OnlyInLocation_Desc,
             getValue: () => this.Config.OnlySameLocation,
             setValue: value => this.Config.OnlySameLocation = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_OnlyHeartLevel_Name,
+            tooltip: () => I18n.Config_OnlyHeartLevel_Desc(minHeartsName: I18n.Config_MinHearts_Name(), maxHeartsName: I18n.Config_MaxHearts_Name()),
+            getValue: () => this.Config.ByHeartLevel,
+            setValue: value => this.Config.ByHeartLevel = value
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinHearts_Name,
+            tooltip: () => I18n.Config_MinHearts_Desc(onlyHeartLevelName: I18n.Config_OnlyHeartLevel_Name()),
+            getValue: () => this.Config.HeartLevelMin,
+            setValue: value => this.Config.HeartLevelMin = value,
+            min: 0,
+            max: ModConfig.MaxPossibleHeartLevel
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MaxHearts_Name,
+            tooltip: () => I18n.Config_MaxHearts_Desc(onlyHeartLevelName: I18n.Config_OnlyHeartLevel_Name()),
+            getValue: () => this.Config.HeartLevelMax,
+            setValue: value => this.Config.HeartLevelMax = value,
+            min: 0,
+            max: ModConfig.MaxPossibleHeartLevel
         );
         menu.AddBoolOption(
             this.Manifest,

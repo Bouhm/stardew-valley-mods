@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "Налаштування:",
-    "immersion.always-show-villagers": "Завжди показувати містян (персонажів)",
-    "immersion.only-villagers-talked-to": "Показувати містян, з якими спілкувався гравець",
-    "immersion.hide-villagers-talked-to": "Приховувати містян, з якими спілкувався гравець",
-    "immersion.only-villagers-within-heart-level": "Показувати містян тільки у вказаному діапазоні дружби",
-    "immersion.min-heart-level": "Мінімальний рівень дружби",
-    "immersion.max-heart-level": "Максимальний рівень дружби",
-
     // extra settings section
     "extra.label": "Додаткові налаштування:",
 
@@ -60,8 +51,23 @@
     ****/
     "config.settings-title": "Налаштування",
 
+    "config.immersion.name": "Immersion", // TODO
+    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
+    "config.immersion.All": "Завжди показувати містян (персонажів)",
+    "config.immersion.TalkedTo": "Показувати містян, з якими спілкувався гравець",
+    "config.immersion.NotTalkedTo": "Приховувати містян, з якими спілкувався гравець",
+
     "config.only-in-location.name": "Показувати містян тільки в поточній локації",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.only-heart-level.name": "Показувати містян тільки у вказаному діапазоні дружби",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+
+    "config.min-hearts.name": "Мінімальний рівень дружби",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+
+    "config.max-hearts.name": "Максимальний рівень дружби",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
 
     "config.show-quests-or-birthdays.name": "Показувати завдання або дні народження",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO

@@ -2,15 +2,6 @@
     /*********
     ** Map options
     *********/
-    // immersion section
-    "immersion.label": "Settings:",
-    "immersion.always-show-villagers": "Always show villagers",
-    "immersion.only-villagers-talked-to": "Show villagers player has talked to",
-    "immersion.hide-villagers-talked-to": "Hide villagers player has talked to",
-    "immersion.only-villagers-within-heart-level": "Only show villagers within heart level",
-    "immersion.min-heart-level": "Minimum heart level",
-    "immersion.max-heart-level": "Maximum heart level",
-
     // extra settings section
     "extra.label": "Extra Settings:",
 
@@ -25,7 +16,7 @@
     /****
     ** Controls section
     ****/
-    "config.controls-title": "Controls", // TODO
+    "config.controls-title": "Controls",
 
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
@@ -59,8 +50,23 @@
     ****/
     "config.settings-title": "Settings",
 
+    "config.immersion.name": "Immersion",
+    "config.immersion.desc": "Choose when villagers should be shown on the map.",
+    "config.immersion.All": "Always show villagers",
+    "config.immersion.TalkedTo": "Show villagers player has talked to",
+    "config.immersion.NotTalkedTo": "Hide villagers player has talked to",
+
     "config.only-in-location.name": "Only NPCs in player's location",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+
+    "config.only-heart-level.name": "Only NPCs within heart level",
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
+
+    "config.min-hearts.name": "Min heart level",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+
+    "config.max-hearts.name": "Max heart level",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
 
     "config.show-quests-or-birthdays.name": "Show quests or birthdays",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
