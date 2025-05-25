@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace NPCMapLocations.Framework;
@@ -25,10 +26,11 @@ public class NpcMarker : SyncedNpcMarker
     public bool HasQuest { get; set; }
 
     /// <summary>Whether to hide the marker from the map.</summary>
+    [MemberNotNullWhen(true, nameof(ReasonHidden))]
     public bool IsHidden { get; set; }
 
     /// <summary>The reason the NPC is hidden, if applicable.</summary>
-    public string ReasonHidden { get; set; }
+    public string? ReasonHidden { get; set; }
 
     /// <summary>The NPC's priority when multiple markers overlap on the map, where higher values are higher priority.</summary>
     public int Layer { get; set; } = 4;

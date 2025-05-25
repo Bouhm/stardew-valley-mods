@@ -26,7 +26,7 @@ internal class ModMapPage : MapPage
     private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
     private Dictionary<string, BuildingMarker> FarmBuildings { get; }
 
-    private readonly Texture2D BuildingMarkers;
+    private readonly Texture2D? BuildingMarkers;
     private readonly ModCustomizations Customizations;
     private string HoveredNames = "";
     private bool HasIndoorCharacter;
@@ -52,7 +52,7 @@ internal class ModMapPage : MapPage
         Dictionary<string, bool> conditionalNpcs,
         Dictionary<long, FarmerMarker> farmerMarkers,
         Dictionary<string, BuildingMarker> farmBuildings,
-        Texture2D buildingMarkers,
+        Texture2D? buildingMarkers,
         ModCustomizations customizations,
         LocationUtil locationUtil
     )
@@ -375,7 +375,7 @@ internal class ModMapPage : MapPage
         {
             foreach (Farmer farmer in Game1.getOnlineFarmers())
             {
-                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker) && farMarker.WorldMapRegionId == regionId)
+                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker? farMarker) && farMarker.WorldMapRegionId == regionId)
                 {
                     if (farMarker is { DrawDelay: 0 }) // Temporary solution to handle desync of farmhand location/tile position when changing location
                     {
@@ -422,7 +422,7 @@ internal class ModMapPage : MapPage
                 y += offsetY;
             }
 
-            // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
+            // If going off-screen on the right, move tooltip to below location tooltip so it can stay inside the screen
             // without the cursor covering the tooltip
             if (x + width > Game1.uiViewport.Width)
             {
@@ -445,7 +445,7 @@ internal class ModMapPage : MapPage
                 x = Game1.uiViewport.Width - width;
             }
 
-            // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
+            // If going off-screen on the bottom, move tooltip to above location tooltip so it stays visible
             if (y + height > Game1.uiViewport.Height)
             {
                 x = Game1.getOldMouseX() + Game1.tileSize / 2;
@@ -473,14 +473,10 @@ internal class ModMapPage : MapPage
         Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
 
         drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None,
-            0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
     }
 
     /// <summary>Get the display name to show for an NPC.</summary>

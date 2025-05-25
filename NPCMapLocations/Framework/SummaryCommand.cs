@@ -51,9 +51,9 @@ internal static class SummaryCommand
         {
             // collect info
             var player = Game1.player;
-            var location = player.currentLocation;
-            string locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
-            LocationContext context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
+            GameLocation? location = player.currentLocation;
+            string? locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
+            LocationContext? context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
             WorldMapPosition worldPos = ModEntry.GetWorldMapPosition(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
             // collect alternate location names
@@ -231,7 +231,7 @@ internal static class SummaryCommand
     /// <param name="linePrefix">A prefix for each line in the table, e.g. for indentation.</param>
     /// <param name="columnHeadings">The column headings to show at the top of the table.</param>
     /// <param name="getValues">Get each column's values for a row.</param>
-    private static StringBuilder BuildTable<TRecord>(IEnumerable<TRecord> records, string linePrefix, string[] columnHeadings, params Func<TRecord, string>[] getValues)
+    private static StringBuilder BuildTable<TRecord>(IEnumerable<TRecord> records, string linePrefix, string[] columnHeadings, params Func<TRecord, string?>[] getValues)
     {
         // validate
         if (columnHeadings.Length != getValues.Length)

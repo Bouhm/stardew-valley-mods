@@ -6,15 +6,13 @@ namespace LocationCompass.Framework;
 
 // Object for keeping track of with NPC to show when
 // there are multiple NPCs in a building
-internal class LocatorScroller
+internal record LocatorScroller(string Location, HashSet<string> Characters, int Index, Rectangle LocatorRect)
 {
     /*********
     ** Accessors
     *********/
-    public string Location { get; set; }
-    public HashSet<string> Characters { get; set; }
-    public int Index { get; set; }
-    public Rectangle LocatorRect { get; set; }
+    public Rectangle LocatorRect { get; set; } = LocatorRect;
+    public int Index { get; set; } = Index;
 
 
     /*********

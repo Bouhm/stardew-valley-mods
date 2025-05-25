@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Bouhm.Shared;
@@ -32,8 +33,8 @@ public class ModEntry : Mod
     /// <summary>The map markers for farm buildings, indexed by the interior unique name.</summary>
     private static readonly Dictionary<string, BuildingMarker> FarmBuildings = [];
 
-    private readonly PerScreen<Texture2D> BuildingMarkers = new();
-    private readonly PerScreen<ModMinimap> Minimap = new();
+    private readonly PerScreen<Texture2D?> BuildingMarkers = new();
+    private readonly PerScreen<ModMinimap?> Minimap = new();
     private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new(() => []);
     private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new(() => []);
     private readonly PerScreen<bool> HasOpenedMap = new();
@@ -44,13 +45,13 @@ public class ModEntry : Mod
     private readonly PerScreen<bool> ShowMinimap = new();
 
     /// <summary>The integration with the Better Game Menu mod.</summary>
-    private BetterGameMenuIntegration BetterGameMenuIntegration;
+    private BetterGameMenuIntegration? BetterGameMenuIntegration;
 
     /// <summary>The integration with the Generic Mod Config Menu mod.</summary>
-    private IGenericModConfigMenuApi GenericModConfigMenu;
+    private IGenericModConfigMenuApi? GenericModConfigMenu;
 
     /// <summary>Scans and maps locations in the game world.</summary>
-    private static LocationUtil LocationUtil;
+    private static LocationUtil LocationUtil = null!; // set in Entry
 
     // External mod settings
     private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
@@ -60,15 +61,15 @@ public class ModEntry : Mod
     private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new(() => []);
 
     // Customizations/Custom mods
-    private ModCustomizations Customizations;
+    private ModCustomizations Customizations = null!; // set in Entry
 
 
     /*********
     ** Accessors
     *********/
     /// <summary>The mod settings.</summary>
-    public static ModConfig Config;
-    public static IModHelper StaticHelper;
+    public static ModConfig Config = null!;        // set in Entry
+    public static IModHelper StaticHelper = null!; // set in Entry
 
 
     /*********
@@ -112,7 +113,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+    private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
     {
         if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
         {
@@ -125,7 +126,7 @@ public class ModEntry : Mod
     /// <param name="tileX">The X tile position within the location to match.</param>
     /// <param name="tileY">The Y tile position within the location to match.</param>
     /// <param name="locationExclusions">The locations to ignore when scanning locations for players and NPCs.</param>
-    public static WorldMapPosition GetWorldMapPosition(string locationName, int tileX = 0, int tileY = 0, HashSet<string> locationExclusions = null)
+    public static WorldMapPosition GetWorldMapPosition(string? locationName, int tileX = 0, int tileY = 0, HashSet<string>? locationExclusions = null)
     {
         Point tile = new Point(tileX, tileY);
 
@@ -144,7 +145,7 @@ public class ModEntry : Mod
                 throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
 
             // special case: inside farm building
-            if (FarmBuildings.TryGetValue(locationName, out BuildingMarker marker))
+            if (FarmBuildings.TryGetValue(locationName, out BuildingMarker? marker))
                 return marker.WorldMapPosition;
 
             // get location
@@ -182,7 +183,7 @@ public class ModEntry : Mod
     /// <param name="name">The NPC name.</param>
     /// <param name="reason">A phrase indicating why the NPC should be excluded, shown by the <see cref="SummaryCommand"/>.</param>
     /// <param name="ignoreConfig">Whether to ignore custom configuration from the player.</param>
-    public static bool ShouldExcludeNpc(string name, out string reason, bool ignoreConfig = false)
+    public static bool ShouldExcludeNpc(string name, [NotNullWhen(true)] out string? reason, bool ignoreConfig = false)
     {
         // from config override
         if (!ignoreConfig && ModEntry.Config.NpcVisibility.TryGetValue(name, out bool forceVisibility))
@@ -211,7 +212,7 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
-    private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+    private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
         // register config UI
         var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
@@ -224,7 +225,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+    private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         //
         // Load config and other one-off data
@@ -285,7 +286,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
-    private void OnBuildingListChanged(object sender, BuildingListChangedEventArgs e)
+    private void OnBuildingListChanged(object? sender, BuildingListChangedEventArgs e)
     {
         if (e.Location.IsFarm)
             this.UpdateFarmBuildingLocations();
@@ -294,7 +295,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
-    private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
+    private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -328,7 +329,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
-    private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+    private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -345,7 +346,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
-    private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
+    private void OnButtonReleased(object? sender, ButtonReleasedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -363,7 +364,7 @@ public class ModEntry : Mod
 
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
     [EventPriority(EventPriority.Low)] // let other mods initialize their locations/NPCs first
-    private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
+    private void OnDayStarted(object? sender, DayStartedEventArgs e)
     {
         // Log any custom locations not handled in content.json
         if (this.IsFirstDay.Value)
@@ -383,7 +384,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
-    private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
+    private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -396,9 +397,13 @@ public class ModEntry : Mod
             // update local minimap display
             if (e.IsMultipleOf(Config.MiniMapCacheTicks))
             {
-                hasMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
-                if (hasMinimap.Value)
+                if (this.ShowMinimap.Value && this.Minimap.Value != null)
+                {
+                    hasMinimap = true;
                     this.Minimap.Value.Update();
+                }
+                else
+                    hasMinimap = false;
             }
 
             // update & sync NPC markers
@@ -460,14 +465,14 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.PeerConnected"/>
-    private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
+    private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
     {
         if (Context.IsMainPlayer)
             this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: [this.ModManifest.UniqueID], playerIDs: [e.Peer.PlayerID]);
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
-    private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+    private void OnModMessageReceived(object? sender, ModMessageReceivedEventArgs e)
     {
         if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
         {
@@ -521,7 +526,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.WindowResized"/>
-    private void OnWindowResized(object sender, WindowResizedEventArgs e)
+    private void OnWindowResized(object? sender, WindowResizedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -535,7 +540,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
-    private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+    private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -544,7 +549,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IPlayerEvents.Warped"/>
-    private void OnWarped(object sender, WarpedEventArgs e)
+    private void OnWarped(object? sender, WarpedEventArgs e)
     {
         if (e.IsLocalPlayer)
         {
@@ -554,7 +559,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.RenderingHud"/>
-    private void OnRenderingHud(object sender, RenderingHudEventArgs e)
+    private void OnRenderingHud(object? sender, RenderingHudEventArgs e)
     {
         if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD && !Game1.game1.takingMapScreenshot)
             this.Minimap.Value?.Draw();
@@ -602,10 +607,10 @@ public class ModEntry : Mod
     {
         FarmBuildings.Clear();
 
-        foreach (var building in Game1.getFarm().buildings)
+        foreach (Building? building in Game1.getFarm().buildings)
         {
             // get building interior
-            GameLocation indoors = building?.indoors.Value;
+            GameLocation? indoors = building?.indoors.Value;
             if (indoors is null && building is GreenhouseBuilding && Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
                 indoors = Game1.getLocationFromName("Greenhouse");
             if (indoors is null)
@@ -646,7 +651,7 @@ public class ModEntry : Mod
 
     /// <summary>Update the <see cref="ShowMinimap"/> value for the current location.</summary>
     /// <param name="location">The location for which to check visibility, or <c>null</c> for the player's current location.</param>
-    private void UpdateMinimapVisibility(GameLocation location = null)
+    private void UpdateMinimapVisibility(GameLocation? location = null)
     {
         if (!Context.IsWorldReady)
             return;
@@ -741,7 +746,7 @@ public class ModEntry : Mod
             }
 
             // villagers
-            foreach (var npc in this.GetVillagers())
+            foreach (NPC npc in this.GetVillagers())
             {
                 var type = npc switch
                 {
@@ -928,10 +933,12 @@ public class ModEntry : Mod
             else
             {
                 npcMarker.Layer = LocationUtil.IsOutdoors(locationName) ? 6 : 2;
-                if (npcMarker.IsHidden) npcMarker.Layer -= 2;
+                if (npcMarker.IsHidden)
+                    npcMarker.Layer -= 2;
             }
 
-            if (npcMarker.HasQuest || npcMarker.IsBirthday) npcMarker.Layer++;
+            if (npcMarker.HasQuest || npcMarker.IsBirthday)
+                npcMarker.Layer++;
 
             if (locationName != null)
             {
@@ -963,7 +970,7 @@ public class ModEntry : Mod
             this.SetMarkerHiddenIfNeeded(marker, name, isSameLocation);
 
             // Check for daily quests
-            foreach (var quest in Game1.player.questLog)
+            foreach (Quest quest in Game1.player.questLog)
             {
                 if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
                     marker.HasQuest = quest switch
@@ -986,10 +993,12 @@ public class ModEntry : Mod
             else
             {
                 marker.Layer = LocationUtil.IsOutdoors(marker.LocationName) ? 6 : 2;
-                if (marker.IsHidden) marker.Layer -= 2;
+                if (marker.IsHidden)
+                    marker.Layer -= 2;
             }
 
-            if (marker.HasQuest || marker.IsBirthday) marker.Layer++;
+            if (marker.HasQuest || marker.IsBirthday)
+                marker.Layer++;
         }
     }
 
@@ -1002,15 +1011,15 @@ public class ModEntry : Mod
         marker.IsHidden = false;
         marker.ReasonHidden = null;
 
-        void Hide(string reason)
+        void Hide(string setReason)
         {
             marker.IsHidden = true;
-            marker.ReasonHidden = reason;
+            marker.ReasonHidden = setReason;
         }
 
         bool shownForQuest = ModEntry.Config.ShowQuests && (marker.HasQuest || marker.IsBirthday);
 
-        if (ModEntry.ShouldExcludeNpc(name, out string reason))
+        if (ModEntry.ShouldExcludeNpc(name, out string? reason))
             Hide($"hidden per config ({reason})");
         else if (!shownForQuest && Config.FilterNpcsSpokenTo != null && Config.FilterNpcsSpokenTo != Game1.player.hasTalkedToFriendToday(name))
             Hide($"hidden per config ({(Config.FilterNpcsSpokenTo is true ? "didn't talk" : "talked")} to them today)");
@@ -1058,11 +1067,7 @@ public class ModEntry : Mod
             }
             else
             {
-                var newMarker = new FarmerMarker
-                {
-                    Name = farmer.Name,
-                    DrawDelay = 0
-                };
+                var newMarker = new FarmerMarker(farmer.Name);
 
                 this.FarmerMarkers.Value.Add(farmerId, newMarker);
             }
@@ -1098,28 +1103,32 @@ public class ModEntry : Mod
         CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
 
         // 3.4.0: `config/globals.json` moved to `config.json`
-        ModConfig config = helper.Data.ReadJsonFile<ModConfig>("config/globals.json");
-        if (config != null)
-            helper.WriteConfig(config);
-        CommonHelper.RemoveObsoleteFiles(this, "config/globals.json");
+        {
+            ModConfig? config = helper.Data.ReadJsonFile<ModConfig>("config/globals.json");
+            if (config != null)
+                helper.WriteConfig(config);
+            CommonHelper.RemoveObsoleteFiles(this, "config/globals.json");
+        }
 
         // 3.4.0: per-save config files no longer used
-        string configDirPath = Path.Combine(dirPath, "config");
-        if (Directory.Exists(configDirPath))
         {
-            if (Directory.GetFileSystemEntries(configDirPath).Length > 0)
+            string configDirPath = Path.Combine(dirPath, "config");
+            if (Directory.Exists(configDirPath))
             {
-                this.Monitor.Log("The 'config' folder is no longer used. Renaming to 'config (unused)' to avoid confusion.");
+                if (Directory.GetFileSystemEntries(configDirPath).Length > 0)
+                {
+                    this.Monitor.Log("The 'config' folder is no longer used. Renaming to 'config (unused)' to avoid confusion.");
 
-                string unusedConfigPath = Path.Combine(dirPath, "config (unused)");
-                if (!Directory.Exists(unusedConfigPath))
-                    Directory.Move(configDirPath, unusedConfigPath);
-            }
-            else
-            {
-                this.Monitor.Log("The 'config' folder is no longer used. Deleting the empty folder to avoid confusion.");
+                    string unusedConfigPath = Path.Combine(dirPath, "config (unused)");
+                    if (!Directory.Exists(unusedConfigPath))
+                        Directory.Move(configDirPath, unusedConfigPath);
+                }
+                else
+                {
+                    this.Monitor.Log("The 'config' folder is no longer used. Deleting the empty folder to avoid confusion.");
 
-                Directory.Delete(configDirPath);
+                    Directory.Delete(configDirPath);
+                }
             }
         }
     }

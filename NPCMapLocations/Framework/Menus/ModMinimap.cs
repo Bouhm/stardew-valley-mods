@@ -32,13 +32,13 @@ internal class ModMinimap : IDisposable
 
     /// <summary>The region for which the <see cref="MapPage"/> was opened.</summary>
     /// <remarks>We deliberately don't check <see cref="StardewValley.Menus.MapPage.mapRegion"/> here, to avoid an infinite loop if the opened map sets a different region for some reason.</remarks>
-    private string MapRegionId;
+    private string? MapRegionId;
 
     /// <summary>The underlying map view to show in the minimap area.</summary>
-    private ModMapPage MapPage;
+    private ModMapPage? MapPage;
 
     /// <summary>A cached sprite batch to reuse for drawing the clipped minimap.</summary>
-    private SpriteBatch ClippedSpriteBatch;
+    private SpriteBatch? ClippedSpriteBatch;
 
 
     /*********
@@ -169,7 +169,7 @@ internal class ModMinimap : IDisposable
             {
                 device.ScissorRectangle = mapArea;
 
-                SpriteBatch clippedBatch = this.ClippedSpriteBatch;
+                SpriteBatch? clippedBatch = this.ClippedSpriteBatch;
                 if (clippedBatch is null)
                     this.ClippedSpriteBatch = clippedBatch = new SpriteBatch(device);
 

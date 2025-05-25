@@ -31,7 +31,7 @@ internal class GenericModConfigMenuIntegration
     ** Public methods
     *********/
     /// <summary>The Generic Mod Config Menu API.</summary>
-    public IGenericModConfigMenuApi ConfigMenu { get; }
+    public IGenericModConfigMenuApi? ConfigMenu { get; }
 
 
     /*********
@@ -327,7 +327,7 @@ internal class GenericModConfigMenuIntegration
 
     private void AddTriStateOption(Func<string> name, Func<string> tooltip, Func<bool?> getValue, Action<bool?> setValue, Func<bool?, string> formatAllowedValue)
     {
-        var menu = this.ConfigMenu;
+        IGenericModConfigMenuApi menu = this.ConfigMenu!;
 
         menu.AddTextOption(
             this.Manifest,
@@ -343,7 +343,7 @@ internal class GenericModConfigMenuIntegration
         {
             bool? value = getValue();
             return value.HasValue
-                ? value.ToString()
+                ? value.Value.ToString()
                 : string.Empty;
         }
 

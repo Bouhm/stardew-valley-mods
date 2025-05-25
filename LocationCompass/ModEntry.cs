@@ -23,17 +23,17 @@ public class ModEntry : Mod
     private readonly int MaxProximity = 4800;
     private readonly bool DebugMode = false;
 
-    private Texture2D Pointer;
-    private ModData Constants;
-    private ModConfig Config;
+    private Texture2D Pointer = null!; // set in Entry
+    private ModData Constants = null!; // set in Entry
+    private ModConfig Config = null!;  // set in Entry
 
     /// <summary>Scans and maps locations in the game world.</summary>
-    private LocationUtil LocationUtil;
+    private LocationUtil LocationUtil = null!; // set in Entry
 
     private readonly List<Character> Characters = [];
     private readonly Dictionary<string, List<Locator>> Locators = [];
     private readonly Dictionary<string, LocatorScroller> ActiveWarpLocators = []; // Active indices of locators of doors
-    private SyncedNpcLocationData SyncedLocationData;
+    private SyncedNpcLocationData? SyncedLocationData;
 
     /// <summary>Whether locators are visible. (This should be set via <see cref="SetShowLocators"/> to toggle the HUD if needed.)</summary>
     private bool ShowLocators;
@@ -42,6 +42,7 @@ public class ModEntry : Mod
     /*********
     ** Public methods
     *********/
+    /// <inheritdoc />
     public override void Entry(IModHelper helper)
     {
         I18n.Init(helper.Translation);
@@ -68,14 +69,14 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
-    private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
+    private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
         new GenericModConfigMenuIntegration(this.Config, this.ModManifest, this.Helper.ModRegistry, () => this.Helper.WriteConfig(this.Config))
             .Register();
     }
 
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
-    private void OnDayStarted(object sender, DayStartedEventArgs e)
+    private void OnDayStarted(object? sender, DayStartedEventArgs e)
     {
         this.Characters.Clear();
         this.Characters.AddRange(this.GetVillagers());
@@ -84,7 +85,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
-    private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
+    private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -120,7 +121,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
-    private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+    private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -137,13 +138,13 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IWorldEvents.LocationListChanged"/>
-    private void OnLocationListChanged(object sender, LocationListChangedEventArgs e)
+    private void OnLocationListChanged(object? sender, LocationListChangedEventArgs e)
     {
         this.LocationUtil.ScanLocationContexts();
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+    private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         this.ActiveWarpLocators.Clear();
         this.SyncedLocationData = new SyncedNpcLocationData();
@@ -169,14 +170,14 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
-    private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
+    private void OnModMessageReceived(object? sender, ModMessageReceivedEventArgs e)
     {
         if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
             this.SyncedLocationData = e.ReadAs<SyncedNpcLocationData>();
     }
 
     /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
-    private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
+    private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
@@ -188,8 +189,7 @@ public class ModEntry : Mod
             {
                 foreach (var farmer in Game1.getOnlineFarmers())
                 {
-                    if (farmer == Game1.player) continue;
-                    if (!this.Characters.Contains(farmer))
+                    if (farmer != Game1.player && !this.Characters.Contains(farmer))
                         this.Characters.Add(farmer);
                 }
             }
@@ -212,7 +212,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.Rendered"/>
-    private void OnRendered(object sender, RenderedEventArgs e)
+    private void OnRendered(object? sender, RenderedEventArgs e)
     {
         //if (!Context.IsWorldReady || locators == null) return;
 
@@ -224,7 +224,7 @@ public class ModEntry : Mod
 
         foreach (List<Locator> locators in this.Locators.Values)
         {
-            foreach (var locator in locators)
+            foreach (Locator locator in locators)
             {
                 if (!locator.IsOnScreen)
                     continue;
@@ -268,7 +268,7 @@ public class ModEntry : Mod
 
     private void GetSyncedLocationData()
     {
-        foreach (var npc in this.GetVillagers())
+        foreach (NPC npc in this.GetVillagers())
         {
             if (npc?.currentLocation != null)
                 this.SyncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
@@ -288,7 +288,7 @@ public class ModEntry : Mod
     {
         this.Locators.Clear();
 
-        foreach (var character in this.Characters)
+        foreach (Character character in this.Characters)
         {
             if (character.currentLocation == null)
                 continue;
@@ -298,7 +298,7 @@ public class ModEntry : Mod
             if (this.Config.ShowFarmersOnly && character is NPC and not Horse)
                 continue;
 
-            if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out LocationData npcLoc) && character is NPC)
+            if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out LocationData? npcLoc) && character is NPC)
                 continue;
 
             if (character is NPC npc && this.Config.ShowQuestsAndBirthdaysOnly)
@@ -311,6 +311,7 @@ public class ModEntry : Mod
                 foreach (var quest in Game1.player.questLog)
                 {
                     if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+                    {
                         hasQuest = quest.questType.Value switch
                         {
                             3 => ((ItemDeliveryQuest)quest).target.Value == npc.Name,
@@ -319,6 +320,7 @@ public class ModEntry : Mod
                             10 => ((ResourceCollectionQuest)quest).target.Value == npc.Name,
                             _ => hasQuest
                         };
+                    }
                 }
 
                 if (!isBirthday && !hasQuest)
@@ -326,18 +328,18 @@ public class ModEntry : Mod
             }
 
             string playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-            string charLocName = character is Farmer
+            string? charLocName = character is Farmer
                 ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
                 : npcLoc.LocationName;
             bool isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
 
-            LocationContext playerLocCtx;
-            LocationContext characterLocCtx;
+            LocationContext? playerLocCtx;
+            LocationContext? characterLocCtx;
 
             // Manually handle mines
             {
-                string charMineName = this.LocationUtil.GetLocationNameFromLevel(charLocName);
-                string playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
+                string? charMineName = this.LocationUtil.GetLocationNameFromLevel(charLocName);
+                string? playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
 
                 if (isPlayerLocOutdoors)
                 {
@@ -403,7 +405,7 @@ public class ModEntry : Mod
 
                 // Finds the upper-most indoor location that the player is in
                 isWarp = true;
-                string indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
+                string? indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                 if (this.Config.SameLocationOnly)
                 {
                     if (indoor == null)
@@ -426,7 +428,7 @@ public class ModEntry : Mod
                         characterPos = characterLocCtx.GetWarpPixelPosition();
                     else
                     {
-                        LocationContext characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
+                        LocationContext? characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
                         characterPos = characterParentContext.GetWarpPixelPosition();
                     }
                 }
@@ -436,7 +438,7 @@ public class ModEntry : Mod
                     {
                         // Point locators to the neighboring outdoor warps and
                         // doors of buildings including nested rooms
-                        LocationContext indoorContext = this.LocationUtil.TryGetContext(indoor);
+                        LocationContext? indoorContext = this.LocationUtil.TryGetContext(indoor);
                         characterPos = indoorContext.GetWarpPixelPosition();
                     }
                     else if (!this.Config.SameLocationOnly)
@@ -454,14 +456,14 @@ public class ModEntry : Mod
                 }
 
                 // Add character to the list of locators inside a building
-                if (!this.ActiveWarpLocators.TryGetValue(charLocName, out LocatorScroller warpLocator))
+                if (!this.ActiveWarpLocators.TryGetValue(charLocName, out LocatorScroller? warpLocator))
                 {
-                    warpLocator = new LocatorScroller
-                    {
-                        Location = charLocName,
-                        Characters = [],
-                        LocatorRect = new Rectangle((int)(characterPos.X - 32), (int)(characterPos.Y - 32), 64, 64)
-                    };
+                    warpLocator = new LocatorScroller(
+                        Location: charLocName,
+                        Characters: [character.Name],
+                        Index: 0,
+                        LocatorRect: new Rectangle((int)(characterPos.X - 32), (int)(characterPos.Y - 32), 64, 64)
+                    );
                     this.ActiveWarpLocators.Add(charLocName, warpLocator);
                 }
                 warpLocator.Characters.Add(character.Name);
@@ -469,28 +471,26 @@ public class ModEntry : Mod
 
             bool isOnScreen = Utility.isOnScreen(characterPos, Game1.tileSize / 4);
 
-            var locator = new Locator
-            {
-                Name = character.Name,
-                Farmer = character as Farmer,
-                Marker = character is NPC ? character.Sprite.Texture : null,
-                Proximity = this.GetDistance(playerPos, characterPos),
-                IsWarp = isWarp,
-                IsOutdoors = isOutdoors,
-                IsOnScreen = isOnScreen,
-                IsHorse = isHorse
-            };
-
             double angle = this.GetPlayerToTargetAngle(playerPos, characterPos);
             int quadrant = this.GetViewportQuadrant(angle, playerPos);
             var locatorPos = this.GetLocatorPosition(angle, quadrant, playerPos, characterPos, isWarp);
 
-            locator.X = locatorPos.X;
-            locator.Y = locatorPos.Y;
-            locator.Angle = angle;
-            locator.Quadrant = quadrant;
+            var locator = new Locator(
+                Name: character.Name,
+                Farmer: character as Farmer,
+                Marker: character is NPC ? character.Sprite.Texture : null,
+                Proximity: this.GetDistance(playerPos, characterPos),
+                IsWarp: isWarp,
+                IsOutdoors: isOutdoors,
+                IsOnScreen: isOnScreen,
+                IsHorse: isHorse,
+                X: locatorPos.X,
+                Y: locatorPos.Y,
+                Angle: angle,
+                Quadrant: quadrant
+            );
 
-            if (this.Locators.TryGetValue(charLocName, out var warpLocators))
+            if (this.Locators.TryGetValue(charLocName, out List<Locator>? warpLocators))
             {
                 if (!warpLocators.Contains(locator))
                     warpLocators.Add(locator);
@@ -575,6 +575,7 @@ public class ModEntry : Mod
 
                 y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
                 return new Vector2(0 + Game1.tileSize * 3 / 4 + 2, y);
+
             case 2:
                 // Left half
                 if (angle < MathHelper.PiOver2)
@@ -585,6 +586,7 @@ public class ModEntry : Mod
 
                 x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2));
                 return new Vector2(x, 0 + Game1.tileSize * 3 / 4 + 2);
+
             case 3:
                 // Top half
                 if (angle < MathHelper.Pi)
@@ -595,6 +597,7 @@ public class ModEntry : Mod
 
                 y = MathHelper.Clamp(y, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
                 return new Vector2(Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2), y);
+
             case 4:
                 // Right half
                 if (angle < 3 * MathHelper.PiOver2)
@@ -607,6 +610,7 @@ public class ModEntry : Mod
 
                 x = MathHelper.Clamp(x, Game1.tileSize * 3 / 4 + 2, Game1.viewport.Width - (Game1.tileSize * 3 / 4 + 2));
                 return new Vector2(x, Game1.viewport.Height - (Game1.tileSize * 3 / 4 + 2));
+
             default:
                 return Vector2.Zero;
         }
@@ -688,9 +692,9 @@ public class ModEntry : Mod
             // Multiple indoor locators in a location, pointing to its door
             else
             {
-                Locator locator;
+                Locator? locator;
 
-                if (this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller activeLocator))
+                if (this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller? activeLocator))
                 {
                     locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
                     activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);
@@ -705,21 +709,26 @@ public class ModEntry : Mod
 
                 // Adjust for offsets used to create padding around edges of screen
                 if (!locator.IsOnScreen)
+                {
                     switch (locator.Quadrant)
                     {
                         case 1:
                             offsetY += 2;
                             break;
+
                         case 2:
                             offsetX -= 0;
                             offsetY += 2;
                             break;
+
                         case 3:
                             offsetY -= 1;
                             break;
+
                         case 4:
                             break;
                     }
+                }
 
                 // Change opacity based on distance from player
                 double alphaLevel = isHovering ? 1f : (locator.IsOutdoors ? locator.Proximity > this.MaxProximity
@@ -807,7 +816,6 @@ public class ModEntry : Mod
                         Color.Black * (float)alphaLevel,
                         new Vector2((int)Game1.tinyFont.MeasureString(distanceString).X / 2, (float)(Game1.tileSize / 4 * 0.5))
                     );
-
                 }
 
                 if (isHovering)
@@ -839,7 +847,7 @@ public class ModEntry : Mod
     }
 
     // Draw outlined text
-    private void DrawText(SpriteFont font, string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
+    private void DrawText(SpriteFont? font, string text, Vector2 pos, Color? color = null, Vector2? origin = null, float scale = 1f)
     {
         //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);
         //Game1.spriteBatch.DrawString(font, text, pos + new Vector2(-1, 1), Color.Black, 0f, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0f);

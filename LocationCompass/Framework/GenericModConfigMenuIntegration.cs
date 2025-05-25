@@ -24,7 +24,7 @@ internal class GenericModConfigMenuIntegration
     private readonly Action Save;
 
     /// <summary>The Generic Mod Config Menu integration.</summary>
-    private readonly IGenericModConfigMenuApi ConfigMenu;
+    private readonly IGenericModConfigMenuApi? ConfigMenu;
 
 
     /*********
@@ -46,7 +46,7 @@ internal class GenericModConfigMenuIntegration
     /// <summary>Register the config menu if available.</summary>
     public void Register()
     {
-        var menu = this.ConfigMenu;
+        IGenericModConfigMenuApi? menu = this.ConfigMenu;
         if (menu is null)
             return;
 

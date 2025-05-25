@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using Bouhm.Shared.Integrations.BetterGameMenu;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
