@@ -90,7 +90,7 @@ public class ModEntry : Mod
         if (!Context.IsWorldReady)
             return;
 
-        // toggle
+        // toggle locators
         if (Context.IsPlayerFree)
         {
             if (this.Config.HoldToToggle)
@@ -99,9 +99,11 @@ public class ModEntry : Mod
                 this.SetShowLocators(!this.ShowLocators);
         }
 
-        // apply locator options
+        // toggle options
         if (this.ShowLocators && this.ActiveWarpLocators != null)
         {
+            bool changed = true;
+
             if (this.Config.SameLocationToggleKey.JustPressed())
                 this.Config.SameLocationOnly = !this.Config.SameLocationOnly;
             else if (this.Config.FarmersOnlyToggleKey.JustPressed())
@@ -110,8 +112,11 @@ public class ModEntry : Mod
                 this.Config.ShowQuestsAndBirthdaysOnly = !this.Config.ShowQuestsAndBirthdaysOnly;
             else if (this.Config.HorsesToggleKey.JustPressed())
                 this.Config.ShowHorses = !this.Config.ShowHorses;
+            else
+                changed = false;
 
-            this.Helper.WriteConfig(this.Config);
+            if (changed)
+                this.Helper.WriteConfig(this.Config);
         }
     }
 
