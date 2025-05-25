@@ -18,9 +18,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "Przycisk Menu",
-    "config.menu-key.desc": "Naciśnij ten przycisk gdy mapa jest otwarta, żeby pokazać ustawienia moda.",
-
     "config.minimap-key.name": "Przycisk przełączania minimapy",
     "config.minimap-key.desc": "Naciśnij ten przycisk żeby pokazać lub ukryć minimapę.",
 

@@ -19,9 +19,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "Menü Taste",
-    "config.menu-key.desc": "Drücken Sie diese Taste, während die Karte im Spiel geöffnet ist, um die Mod Einstellungen anzuzeigen.",
-
     "config.minimap-key.name": "Minimap Umschalttast",
     "config.minimap-key.desc": "Drücken Sie diese Taste, um die Minimap anzuzeigen oder auszublenden.",
 

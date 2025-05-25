@@ -18,9 +18,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "Raccourci de menu",
-    "config.menu-key.desc": "Appuyer sur bouton lorsque la carte du jeu est ouverte pour voir les paramètres du mod.",
-
     "config.minimap-key.name": "Raccourci minimap",
     "config.minimap-key.desc": "Appuyez sur ce bouton pour montrer/cacher la minimap.",
 

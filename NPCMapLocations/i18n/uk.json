@@ -19,9 +19,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "Кнопка меню",
-    "config.menu-key.desc": "Натиснувши цю кнопку на ігровій мапі відкриється меню налаштування модифікації.",
-
     "config.minimap-key.name": "Кнопка перемикання міні-мапи",
     "config.minimap-key.desc": "Натисніть цю кнопку, аби приховати чи показати міні-мапу.",
 

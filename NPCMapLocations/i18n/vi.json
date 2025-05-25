@@ -19,9 +19,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "Phím menu",
-    "config.menu-key.desc": "Nhấn nút này khi bản đồ trong trò chơi đang mở để hiển thị các cài đặt của mod.",
-
     "config.minimap-key.name": "Phím chuyển đổi bản đồ nhỏ",
     "config.minimap-key.desc": "Nhấn nút này để hiển thị hoặc ẩn bản đồ nhỏ.",
 

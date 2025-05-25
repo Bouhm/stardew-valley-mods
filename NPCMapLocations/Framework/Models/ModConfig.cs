@@ -15,9 +15,6 @@ public class ModConfig
     /// <summary>The maximum heart level that can be configured for <see cref="HeartLevelMin"/> or <see cref="HeartLevelMax"/>.</summary>
     internal const int MaxPossibleHeartLevel = 14;
 
-    /// <summary>The key binding to open the options menu when on the map view.</summary>
-    public string MenuKey { get; set; } = "Tab";
-
     /// <summary>The key binding to cycle the tooltip position when on the map view.</summary>
     public string TooltipKey { get; set; } = "Space";
 

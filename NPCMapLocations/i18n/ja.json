@@ -19,9 +19,6 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
-    "config.menu-key.name": "メニュー",
-    "config.menu-key.desc": "ゲーム内のマップが開いているときにこのキーを押すと、MODの設定を表示する。",
-
     "config.minimap-key.name": "ミニマップ切り替え",
     "config.minimap-key.desc": "このキーを押すと、ミニマップの表示・非表示が切り替わる。",
 

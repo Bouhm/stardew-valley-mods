@@ -60,13 +60,6 @@ internal class GenericModConfigMenuIntegration
         menu.AddSectionTitle(this.Manifest, text: I18n.Config_ControlsTitle);
         menu.AddKeybind(
             this.Manifest,
-            name: I18n.Config_MenuKey_Name,
-            tooltip: I18n.Config_MenuKey_Desc,
-            getValue: () => this.GetButton(config => config.MenuKey),
-            setValue: button => this.Config.MenuKey = button.ToString()
-        );
-        menu.AddKeybind(
-            this.Manifest,
             name: I18n.Config_MinimapKey_Name,
             tooltip: I18n.Config_MinimapKey_Desc,
             getValue: () => this.GetButton(config => config.MinimapToggleKey),

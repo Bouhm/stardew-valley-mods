@@ -343,9 +343,7 @@ public class ModEntry : Mod
 
         if (this.Minimap.Value != null && !ModEntry.Config.LockMinimapPosition)
         {
-            if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
-                this.Minimap.Value.Resize();
-            else if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
+            if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
             {
                 MouseUtil.HandleMouseRelease();
                 this.Minimap.Value.HandleMouseRightRelease();
@@ -550,10 +548,6 @@ public class ModEntry : Mod
             return;
 
         MouseUtil.Reset();
-
-        // Check for resize after mod menu closed
-        if (e.OldMenu is ModMenu)
-            this.Minimap.Value?.Resize();
     }
 
     /// <inheritdoc cref="IPlayerEvents.Warped"/>
@@ -654,9 +648,6 @@ public class ModEntry : Mod
     {
         if (menu.currentTab != ModConstants.MapTabIndex)
             return;
-
-        if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
-            Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value, onMinimapToggled: () => this.UpdateMinimapVisibility());
 
         if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
             this.ChangeTooltipConfig();
