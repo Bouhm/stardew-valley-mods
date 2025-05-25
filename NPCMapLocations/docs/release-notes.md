@@ -5,6 +5,8 @@
 * Overhauled mod settings:
   * **Removed custom config UI.** All settings are now available through [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) instead.
   * Moved all settings into a conventional `config.json` file.
+  * Added support for controller/mouse button bindings.
+  * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).
   * Added options for...
     * map marker sizes;
     * and minimap opacity.

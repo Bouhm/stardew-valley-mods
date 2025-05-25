@@ -57,19 +57,19 @@ internal class GenericModConfigMenuIntegration
 
         // controls
         menu.AddSectionTitle(this.Manifest, text: I18n.Config_ControlsTitle);
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_MinimapKey_Name,
             tooltip: I18n.Config_MinimapKey_Desc,
-            getValue: () => this.GetButton(config => config.MinimapToggleKey),
-            setValue: button => this.Config.MinimapToggleKey = button.ToString()
+            getValue: () => this.Config.MinimapToggleKey,
+            setValue: value => this.Config.MinimapToggleKey = value
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_TooltipKey_Name,
             tooltip: I18n.Config_TooltipKey_Desc,
-            getValue: () => this.GetButton(config => config.TooltipKey),
-            setValue: button => this.Config.TooltipKey = button.ToString()
+            getValue: () => this.Config.TooltipKey,
+            setValue: value => this.Config.TooltipKey = value
         );
 
         // minimap
@@ -337,14 +337,5 @@ internal class GenericModConfigMenuIntegration
     private void Save()
     {
         this.OnSaved();
-    }
-
-    /// <summary>Get a parsed key binding from the raw mod settings.</summary>
-    /// <param name="getRawValue">Get the raw value from a settings model.</param>
-    private SButton GetButton(Func<ModConfig, string> getRawValue)
-    {
-        return Utility.TryParseEnum(getRawValue(this.Config), out SButton button)
-            ? button
-            : SButton.None;
     }
 }

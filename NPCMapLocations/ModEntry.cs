@@ -87,6 +87,7 @@ public class ModEntry : Mod
         helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
         helper.Events.GameLoop.DayStarted += this.OnDayStarted;
         helper.Events.World.BuildingListChanged += this.OnBuildingListChanged;
+        helper.Events.Input.ButtonsChanged += this.OnButtonsChanged;
         helper.Events.Input.ButtonPressed += this.OnButtonPressed;
         helper.Events.Input.ButtonReleased += this.OnButtonReleased;
         helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
@@ -107,8 +108,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
     {
         if (e.NameWithoutLocale.IsEquivalentTo(this.LocationCustomizationsPath) || e.NameWithoutLocale.IsEquivalentTo(this.NpcCustomizationsPath))
@@ -208,8 +207,6 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
         // register config UI
@@ -222,8 +219,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         //
@@ -287,8 +282,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnBuildingListChanged(object sender, BuildingListChangedEventArgs e)
     {
         if (e.Location.IsFarm)
@@ -297,19 +290,37 @@ public class ModEntry : Mod
         LocationUtil.ScanLocationContexts();
     }
 
-    /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
-    private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+    /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
+    private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
     {
-        //
-        // Handle opening mod menu and changing tooltip options
-        //
-
         if (!Context.IsWorldReady)
             return;
 
-        // Minimap dragging
+        // toggle minimap
+        if (Config.MinimapToggleKey.JustPressed() && Game1.activeClickableMenu is null)
+        {
+            Config.ShowMinimap = !Config.ShowMinimap;
+            this.UpdateMinimapVisibility();
+            this.Helper.WriteConfig(Config);
+        }
+
+        // change tooltip mode
+        else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex)
+        {
+            if (Config.TooltipKey.JustPressed() || e.Pressed.Contains(SButton.RightShoulder))
+                this.ChangeTooltipConfig();
+            else if (e.Pressed.Contains(SButton.LeftShoulder))
+                this.ChangeTooltipConfig(false);
+        }
+    }
+
+    /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
+    private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+    {
+        if (!Context.IsWorldReady)
+            return;
+
+        // start minimap dragging
         if (this.ShowMinimap.Value && !Config.LockMinimapPosition && this.Minimap.Value != null)
         {
             if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
@@ -318,28 +329,15 @@ public class ModEntry : Mod
                 this.Minimap.Value.HandleMouseRightDown();
             }
         }
-
-        // Minimap toggle
-        if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
-        {
-            Config.ShowMinimap = !Config.ShowMinimap;
-            this.UpdateMinimapVisibility();
-            this.Helper.WriteConfig(Config);
-        }
-
-        // ModMenu
-        if (Game1.activeClickableMenu is GameMenu)
-            this.HandleInput((GameMenu)Game1.activeClickableMenu, e.Button);
     }
 
     /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
 
+        // stop minimap dragging
         if (this.Minimap.Value != null && !ModEntry.Config.LockMinimapPosition)
         {
             if (Game1.activeClickableMenu == null && e.Button == SButton.MouseRight)
@@ -351,8 +349,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     [EventPriority(EventPriority.Low)] // let other mods initialize their locations/NPCs first
     private void OnDayStarted(object sender = null, DayStartedEventArgs e = null)
     {
@@ -374,8 +370,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
         if (!Context.IsWorldReady)
@@ -453,8 +447,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.PeerConnected"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
     {
         if (Context.IsMainPlayer)
@@ -462,8 +454,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
         if (!Context.IsMainPlayer && e.FromModID == this.ModManifest.UniqueID && e.FromPlayerID == Game1.MasterPlayer.UniqueMultiplayerID)
@@ -523,8 +513,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.WindowResized"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnWindowResized(object sender, WindowResizedEventArgs e)
     {
         if (!Context.IsWorldReady)
@@ -539,8 +527,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.MenuChanged"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnMenuChanged(object sender, MenuChangedEventArgs e)
     {
         if (!Context.IsWorldReady)
@@ -550,8 +536,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IPlayerEvents.Warped"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnWarped(object sender, WarpedEventArgs e)
     {
         if (e.IsLocalPlayer)
@@ -562,8 +546,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.RenderingHud"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnRenderingHud(object sender, RenderingHudEventArgs e)
     {
         if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD && !Game1.game1.takingMapScreenshot)
@@ -640,18 +622,6 @@ public class ModEntry : Mod
             position = position with { X = position.X - 6 };
             FarmBuildings["FarmHouse"] = new("FarmHouse", position);
         }
-    }
-
-    // Handle keyboard/controller inputs
-    private void HandleInput(GameMenu menu, SButton input)
-    {
-        if (menu.currentTab != ModConstants.MapTabIndex)
-            return;
-
-        if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
-            this.ChangeTooltipConfig();
-        else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.LeftShoulder)
-            this.ChangeTooltipConfig(false);
     }
 
     private void ChangeTooltipConfig(bool increment = true)

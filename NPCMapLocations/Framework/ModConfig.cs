@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace NPCMapLocations.Framework;
 
@@ -22,10 +24,10 @@ public class ModConfig
     ** Controls
     ****/
     /// <summary>The key binding to toggle the floating minimap.</summary>
-    public string MinimapToggleKey { get; set; } = "OemPipe";
+    public KeybindList MinimapToggleKey { get; set; } = new(SButton.OemPipe);
 
     /// <summary>The key binding to cycle the tooltip position when on the map view.</summary>
-    public string TooltipKey { get; set; } = "Space";
+    public KeybindList TooltipKey { get; set; } = new(SButton.Space);
 
     /****
     ** Minimap
@@ -136,7 +138,9 @@ public class ModConfig
     [OnDeserialized]
     internal void OnDeserializedMethod(StreamingContext context)
     {
-        // make values case-insensitive
+        // make values case-insensitive and non-nullable
+        this.MinimapToggleKey ??= new KeybindList();
+        this.TooltipKey ??= new KeybindList();
         this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
         this.NpcVisibility = new Dictionary<string, bool>(this.NpcVisibility ?? new(), StringComparer.OrdinalIgnoreCase);
         this.NpcMarkerOffsets = new Dictionary<string, int>(this.NpcMarkerOffsets ?? new(), StringComparer.OrdinalIgnoreCase);
