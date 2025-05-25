@@ -151,19 +151,13 @@ internal class ModMinimap : IDisposable
         bool isHoveringMinimap = this.IsHoveringDragZone();
 
         // handle hover
-        float alpha;
-        Color color;
+        float alpha = ModEntry.Config.MinimapOpacity;
         if (isHoveringMinimap)
         {
-            alpha = 0.25f;
-            color = Color.White * alpha;
+            alpha = Math.Min(0.25f, alpha);
             Game1.mouseCursor = Game1.cursor_grab;
         }
-        else
-        {
-            alpha = 1f;
-            color = Color.White;
-        }
+        var color = Color.White * alpha;
 
         // draw map
         var spriteBatch = Game1.spriteBatch;

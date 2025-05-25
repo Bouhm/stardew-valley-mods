@@ -111,6 +111,17 @@ internal class GenericModConfigMenuIntegration
             interval: 15,
             formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
         );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapOpacity_Name,
+            tooltip: I18n.Config_MinimapOpacity_Desc,
+            getValue: () => this.Config.MinimapOpacity,
+            setValue: value => this.Config.MinimapOpacity = value,
+            min: 0.05f,
+            max: 1f,
+            interval: 0.05f,
+            formatValue: this.FormatPercent
+        );
 
         // map display
         menu.AddSectionTitle(this.Manifest, I18n.Config_MapDisplayTitle);
@@ -261,13 +272,21 @@ internal class GenericModConfigMenuIntegration
     /*********
     ** Private methods
     *********/
+    /// <summary>Get a formatted percentage to show in the config UI.</summary>
+    /// <param name="value">The value to format.</param>
+    private string FormatPercent(float value)
+    {
+        int percent = (int)(value * 100);
+        return I18n.Config_Percentage(percent: percent);
+    }
+
     /// <summary>Get a formatted percentage (or 'default' for 100%) to show in the config UI.</summary>
     /// <param name="value">The value to format.</param>
     private string FormatRelativePercent(float value)
     {
         return (decimal)value == 1m
             ? I18n.Config_Percentage_Default()
-            : I18n.Config_Percentage(percent: (int)(value * 100));
+            : this.FormatPercent(value);
     }
 
     /// <summary>Reset the mod's config to its default values.</summary>

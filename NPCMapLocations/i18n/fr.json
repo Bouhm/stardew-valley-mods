@@ -34,20 +34,24 @@
     /****
     ** Minimap section
     ****/
+    // TODO
     "config.minimap-title": "Mini-carte",
 
     "config.minimap-enabled.name": "Activée",
-    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
 
     "config.lock-minimap.name": "Bloquer la position de la mini-carte",
-    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
 
     "config.minimap-width.name": "Largeur de la mini-carte",
-    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
-    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-height-or-width.format": "{{size}} pixels",
 
     "config.minimap-height.name": "Hauteur de la mini-carte",
-    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    "config.minimap-opacity.name": "Minimap opacity",
+    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
 
     /****
     ** Map display section

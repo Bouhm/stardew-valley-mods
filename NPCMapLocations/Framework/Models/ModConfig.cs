@@ -48,6 +48,9 @@ public class ModConfig
     /// <summary>The minimap's pixel height on screen.</summary>
     public int MinimapHeight { get; set; } = 45;
 
+    /// <summary>The default transparency for the minimap, as a value between 0 (invisible) and 1 (opaque).</summary>
+    public float MinimapOpacity { get; set; } = 1f;
+
     /// <summary>Location names in which the minimap should be disabled.</summary>
     public HashSet<string> MinimapExclusions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 

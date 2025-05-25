@@ -49,6 +49,9 @@
     "config.minimap-height.name": "Minimap height",
     "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
 
+    "config.minimap-opacity.name": "Minimap opacity",
+    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
+
     /****
     ** Map display section
     ****/
