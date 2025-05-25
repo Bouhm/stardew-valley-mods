@@ -179,17 +179,10 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.Config.OnlySameLocation,
             setValue: value => this.Config.OnlySameLocation = value
         );
-        menu.AddBoolOption(
-            this.Manifest,
-            name: I18n.Config_OnlyHeartLevel_Name,
-            tooltip: () => I18n.Config_OnlyHeartLevel_Desc(minHeartsName: I18n.Config_MinHearts_Name(), maxHeartsName: I18n.Config_MaxHearts_Name()),
-            getValue: () => this.Config.ByHeartLevel,
-            setValue: value => this.Config.ByHeartLevel = value
-        );
         menu.AddNumberOption(
             this.Manifest,
             name: I18n.Config_MinHearts_Name,
-            tooltip: () => I18n.Config_MinHearts_Desc(onlyHeartLevelName: I18n.Config_OnlyHeartLevel_Name()),
+            tooltip: I18n.Config_MinHearts_Desc,
             getValue: () => this.Config.HeartLevelMin,
             setValue: value => this.Config.HeartLevelMin = value,
             min: 0,
@@ -198,7 +191,7 @@ internal class GenericModConfigMenuIntegration
         menu.AddNumberOption(
             this.Manifest,
             name: I18n.Config_MaxHearts_Name,
-            tooltip: () => I18n.Config_MaxHearts_Desc(onlyHeartLevelName: I18n.Config_OnlyHeartLevel_Name()),
+            tooltip: I18n.Config_MaxHearts_Desc,
             getValue: () => this.Config.HeartLevelMax,
             setValue: value => this.Config.HeartLevelMax = value,
             min: 0,

@@ -85,14 +85,11 @@
     "config.only-in-location.name": "Sadece oyuncunun bölgesindeki köylüleri göster",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
-    "config.only-heart-level.name": "Sadece belirli kalp seviyesi içindeki köylüleri göster",
-    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
-
     "config.min-hearts.name": "En az kalp seviyesi",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
 
     "config.max-hearts.name": "En fazla kalp seviyesi",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
 
     "config.show-quests-or-birthdays.name": "Görevleri ya da doğum günlerini göster",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",

@@ -78,13 +78,10 @@ public class ModConfig
     /// <summary>Whether to only show villagers in the same location as the player.</summary>
     public bool OnlySameLocation { get; set; } = false;
 
-    /// <summary>Whether to only show villagers whose hearts with the player is between <see cref="HeartLevelMin"/> and <see cref="HeartLevelMax"/>.</summary>
-    public bool ByHeartLevel { get; set; } = false;
-
-    /// <summary>The minimum heart level for <see cref="ByHeartLevel"/>.</summary>
+    /// <summary>The minimum heart level for which to show NPCs.</summary>
     public int HeartLevelMin { get; set; } = 0;
 
-    /// <summary>The maximum heart level for <see cref="ByHeartLevel"/>.</summary>
+    /// <summary>The maximum heart level for which to show NPCs.</summary>
     public int HeartLevelMax { get; set; } = MaxPossibleHeartLevel;
 
     /// <summary>Whether to mark NPCs with quests or birthdays today.</summary>

@@ -8,8 +8,8 @@
   * Added options for...
     * map marker sizes;
     * and minimap opacity.
-  * The NPC visibility options are now more intuitive.
-  * Reduced min minimap size from 75px to 45px.
+  * Streamlined various options to be more intuitive.
+  * Reduced smallest minimap size from 75px to 45px.
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
 * Reduced performance impact of minimap (thanks to GitHubSnegOk!).
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).

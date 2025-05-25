@@ -83,14 +83,11 @@
     "config.only-in-location.name": "只显示玩家所在位置的村民",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
-    "config.only-heart-level.name": "显示指定好感度范围内的村民",
-    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
-
     "config.min-hearts.name": "最小好感度",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
 
     "config.max-hearts.name": "最大好感度",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
 
     "config.show-quests-or-birthdays.name": "显示任务或生日",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",

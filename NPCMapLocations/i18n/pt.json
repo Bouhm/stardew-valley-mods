@@ -84,14 +84,11 @@
     "config.only-in-location.name": "Mostrar Somente Moradores na Localização do Jogador",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
-    "config.only-heart-level.name": "Mostrar Somente Moradores Dentro dos Limites de Nível de Relacionamento",
-    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
-
     "config.min-hearts.name": "Nível Mínimo de Relacionamento",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
 
     "config.max-hearts.name": "Nível Máximo de Relacionamento",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
 
     "config.show-quests-or-birthdays.name": "Mostrar Missões ou Aniversários",
     "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
