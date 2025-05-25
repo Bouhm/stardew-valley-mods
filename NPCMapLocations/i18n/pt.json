@@ -53,9 +53,9 @@
 
     "config.immersion.name": "Immersion", // TODO
     "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
-    "config.immersion.All": "Sempre Mostrar Moradores",
-    "config.immersion.TalkedTo": "Mostrar Moradores que o Jogador Já Interagiu",
-    "config.immersion.NotTalkedTo": "Esconder Moradores que o Jogador Já Interagiu",
+    "config.immersion.options.all": "Sempre Mostrar Moradores",
+    "config.immersion.options.talkedTo": "Mostrar Moradores que o Jogador Já Interagiu",
+    "config.immersion.options.notTalkedTo": "Esconder Moradores que o Jogador Já Interagiu",
 
     "config.only-in-location.name": "Mostrar Somente Moradores na Localização do Jogador",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
@@ -86,5 +86,10 @@
     ****/
     "config.toggle-villagers-title": "Incluir/Excluir Moradores",
 
-    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
+    // TODO
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
+    "config.toggle-npc.options.default": "Default",
+    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
+    "config.toggle-npc.options.true": "Always visible",
+    "config.toggle-npc.options.false": "Always hidden"
 }

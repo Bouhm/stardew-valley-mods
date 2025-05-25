@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Bouhm.Shared;
 using Bouhm.Shared.Locations;
@@ -62,7 +63,7 @@ public class ModEntry : Mod
     /*********
     ** Accessors
     *********/
-    public static PlayerConfig PerPlayerConfig;
+    /// <summary>The mod settings.</summary>
     public static ModConfig Config;
     public static IModHelper StaticHelper;
 
@@ -182,23 +183,19 @@ public class ModEntry : Mod
     public static bool ShouldExcludeNpc(string name, out string reason, bool ignoreConfig = false)
     {
         // from config override
-        if (!ignoreConfig && ModEntry.PerPlayerConfig.ForceNpcVisibility != null && ModEntry.PerPlayerConfig.ForceNpcVisibility.TryGetValue(name, out bool forceVisible))
+        if (!ignoreConfig && ModEntry.Config.NpcVisibility.TryGetValue(name, out bool forceVisibility))
         {
-            reason = !forceVisible ? "excluded in player settings" : null;
-            return forceVisible;
+            if (!forceVisibility)
+            {
+                reason = "excluded in player settings";
+                return true;
+            }
         }
 
         // from mod override
-        if (ModEntry.Config.ModNpcExclusions.Contains(name))
+        else if (ModEntry.Config.ModNpcExclusions.Contains(name))
         {
             reason = "excluded by mod override";
-            return true;
-        }
-
-        // from defaults
-        if (ModEntry.Config.NpcExclusions.Contains(name))
-        {
-            reason = "excluded by default";
             return true;
         }
 
@@ -234,7 +231,6 @@ public class ModEntry : Mod
         // Load config and other one-off data
         //
 
-        PerPlayerConfig = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
         this.IsFirstDay.Value = true;
 
         // Initialize these early for multiplayer sync
@@ -329,7 +325,7 @@ public class ModEntry : Mod
         {
             Config.ShowMinimap = !Config.ShowMinimap;
             this.UpdateMinimapVisibility();
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
+            this.Helper.WriteConfig(Config);
         }
 
         // ModMenu
@@ -672,16 +668,16 @@ public class ModEntry : Mod
     {
         if (increment)
         {
-            if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
-
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
+            if (++Config.NameTooltipMode > 3)
+                Config.NameTooltipMode = 1;
         }
         else
         {
-            if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
-
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
+            if (--Config.NameTooltipMode < 1)
+                Config.NameTooltipMode = 3;
         }
+
+        this.Helper.WriteConfig(Config);
     }
 
     /// <summary>Update the <see cref="ShowMinimap"/> value for the current location.</summary>
@@ -1133,13 +1129,36 @@ public class ModEntry : Mod
     /// <summary>Migrate files from older versions of the mod.</summary>
     private void MigrateLegacyFiles()
     {
+        IModHelper helper = this.Helper;
+        string dirPath = helper.DirectoryPath;
+
+        // 2.11.4: PDB embedded into assembly
         CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
 
-        ModConfig config = this.Helper.Data.ReadJsonFile<ModConfig>("config/globals.json");
+        // 3.4.0: `config/globals.json` moved to `config.json`
+        ModConfig config = helper.Data.ReadJsonFile<ModConfig>("config/globals.json");
         if (config != null)
+            helper.WriteConfig(config);
+        CommonHelper.RemoveObsoleteFiles(this, "config/globals.json");
+
+        // 3.4.0: per-save config files no longer used
+        string configDirPath = Path.Combine(dirPath, "config");
+        if (Directory.Exists(configDirPath))
         {
-            this.Helper.WriteConfig(config);
-            CommonHelper.RemoveObsoleteFiles(this, "config/globals.json");
+            if (Directory.GetFileSystemEntries(configDirPath).Length > 0)
+            {
+                this.Monitor.Log("The 'config' folder is no longer used. Renaming to 'config (unused)' to avoid confusion.");
+
+                string unusedConfigPath = Path.Combine(dirPath, "config (unused)");
+                if (!Directory.Exists(unusedConfigPath))
+                    Directory.Move(configDirPath, unusedConfigPath);
+            }
+            else
+            {
+                this.Monitor.Log("The 'config' folder is no longer used. Deleting the empty folder to avoid confusion.");
+
+                Directory.Delete(configDirPath);
+            }
         }
     }
 }

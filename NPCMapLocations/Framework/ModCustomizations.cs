@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
@@ -133,7 +132,6 @@ public class ModCustomizations
             }
         }
 
-        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.PerPlayerConfig);
         this.OnSaved();
     }
 

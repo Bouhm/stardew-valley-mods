@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NPCMapLocations.Framework.Models;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -86,19 +85,19 @@ public class ModMenu : IClickableMenu
         }
 
         this.ImmersionAllButton = new VillagerVisibilityButton(
-            label: I18n.Config_Immersion_All(),
+            label: I18n.Config_Immersion_Options_All(),
             id: VillagerVisibility.All,
             get: () => ModEntry.Config.ImmersionOption,
             set: value => ModEntry.Config.ImmersionOption = value
         );
         this.ImmersionTalkedToButton = new VillagerVisibilityButton(
-            label: I18n.Config_Immersion_TalkedTo(),
+            label: I18n.Config_Immersion_Options_TalkedTo(),
             id: VillagerVisibility.TalkedTo,
             get: () => ModEntry.Config.ImmersionOption,
             set: value => ModEntry.Config.ImmersionOption = value
         );
         this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(
-            label: I18n.Config_Immersion_NotTalkedTo(),
+            label: I18n.Config_Immersion_Options_NotTalkedTo(),
             id: VillagerVisibility.NotTalkedTo,
             get: () => ModEntry.Config.ImmersionOption,
             set: value => ModEntry.Config.ImmersionOption = value
@@ -224,9 +223,9 @@ public class ModMenu : IClickableMenu
                 {
                     bool exclude = !value;
                     if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
-                        ModEntry.PerPlayerConfig.ForceNpcVisibility.Remove(name);
+                        ModEntry.Config.NpcVisibility.Remove(name);
                     else
-                        ModEntry.PerPlayerConfig.ForceNpcVisibility[name] = exclude;
+                        ModEntry.Config.NpcVisibility[name] = exclude;
                 }
             )
         );
@@ -462,7 +461,6 @@ public class ModMenu : IClickableMenu
     /// <summary>Update the mod config files.</summary>
     private void UpdateConfig()
     {
-        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.PerPlayerConfig);
         ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
     }
 

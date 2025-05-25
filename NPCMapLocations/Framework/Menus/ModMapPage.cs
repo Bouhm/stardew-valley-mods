@@ -300,20 +300,26 @@ internal class ModMapPage : MapPage
                 .Where(p => p.Value.WorldMapRegionId == regionId)
                 .OrderBy(p => p.Value.Layer);
 
-            foreach (var npcMarker in sortedMarkers)
+            foreach ((string name, NpcMarker marker) in sortedMarkers)
             {
-                string name = npcMarker.Key;
-                NpcMarker marker = npcMarker.Value;
+                // skip if invalid
+                if (marker.Sprite is null)
+                    continue;
+
+                // apply config
+                if (ModEntry.Config.NpcVisibility.TryGetValue(name, out bool overrideVisible))
+                {
+                    if (!overrideVisible)
+                        continue;
+                }
 
                 // Skip if no specified location or should be hidden
-                if (marker.Sprite == null
-                    || ModEntry.ShouldExcludeNpc(name)
-                    || (!ModEntry.Config.ShowHiddenVillagers && marker.IsHidden)
+                if (
+                    (!overrideVisible && ModEntry.ShouldExcludeNpc(name))
+                    || (!overrideVisible && !ModEntry.Config.ShowHiddenVillagers && marker.IsHidden)
                     || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
-                   )
-                {
+                )
                     continue;
-                }
 
                 // Dim marker for hidden markers
                 var markerColor = (marker.IsHidden ? Color.DarkGray * 0.7f : Color.White) * alpha;

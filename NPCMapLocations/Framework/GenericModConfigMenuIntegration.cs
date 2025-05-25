@@ -4,7 +4,6 @@ using Bouhm.Shared.Integrations.GenericModConfigMenu;
 using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Extensions;
 using StardewValley.GameData.Characters;
 using StardewValley.TokenizableStrings;
 
@@ -129,7 +128,7 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.Config.ImmersionOption.ToString(),
             setValue: value => this.Config.ImmersionOption = Utility.TryParseEnum(value, out VillagerVisibility parsed) ? parsed : VillagerVisibility.All,
             allowedValues: Enum.GetNames<VillagerVisibility>(),
-            formatAllowedValue: value => I18n.GetByKey($"config.immersion.{value}")
+            formatAllowedValue: value => I18n.GetByKey($"config.immersion.options.{value}")
         );
         menu.AddBoolOption(
             this.Manifest,
@@ -199,12 +198,32 @@ internal class GenericModConfigMenuIntegration
             if (data is null || data.SocialTab == SocialTabBehavior.HiddenAlways || this.Config.ModNpcExclusions.Contains(npcName))
                 continue;
 
-            menu.AddBoolOption(
+            menu.AddTextOption(
                 this.Manifest,
                 name: () => TokenParser.ParseText(data.DisplayName),
                 tooltip: () => I18n.Config_ToggleNpc_Desc(displayName: TokenParser.ParseText(data.DisplayName)),
-                getValue: () => !this.Config.NpcExclusions.Contains(npcName),
-                setValue: value => this.Config.NpcExclusions.Toggle(npcName, value)
+                getValue: () => this.Config.NpcVisibility.TryGetValue(npcName, out bool value)
+                    ? value.ToString()
+                    : string.Empty,
+                setValue: value =>
+                {
+                    if (value == string.Empty)
+                        this.Config.NpcVisibility.Remove(npcName);
+                    else
+                        this.Config.NpcVisibility[npcName] = bool.Parse(value);
+                },
+                allowedValues: [true.ToString(), false.ToString(), string.Empty],
+                formatAllowedValue: value =>
+                {
+                    if (value == string.Empty)
+                    {
+                        return this.Config.ModNpcExclusions.Contains(npcName)
+                            ? I18n.Config_ToggleNpc_Options_DefaultHidden()
+                            : I18n.Config_ToggleNpc_Options_Default();
+                    }
+
+                    return I18n.GetByKey($"config.toggle-npc.options.{value}");
+                }
             );
         }
     }

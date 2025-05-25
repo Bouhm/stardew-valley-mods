@@ -90,8 +90,8 @@ public class ModConfig
     /// <summary>Whether to show horses on the map.</summary>
     public bool ShowHorse { get; set; } = true;
 
-    /// <summary>NPC names to hide from the map.</summary>
-    public HashSet<string> NpcExclusions { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Override the visibility for specific NPCs.</summary>
+    public Dictionary<string, bool> NpcVisibility { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>NPC names to hide from the map, specified by mods through the API.</summary>
     [JsonIgnore]
@@ -111,7 +111,7 @@ public class ModConfig
     {
         // make values case-insensitive
         this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
-        this.NpcExclusions = new HashSet<string>(this.NpcExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+        this.NpcVisibility = new Dictionary<string, bool>(this.NpcVisibility ?? new(), StringComparer.OrdinalIgnoreCase);
         this.NpcMarkerOffsets = new Dictionary<string, int>(this.NpcMarkerOffsets ?? new(), StringComparer.OrdinalIgnoreCase);
     }
 }

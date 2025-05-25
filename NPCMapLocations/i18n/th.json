@@ -54,9 +54,9 @@
 
     "config.immersion.name": "Immersion", // TODO
     "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
-    "config.immersion.All": "แสดงชาวบ้านตลอดเวลา",
-    "config.immersion.TalkedTo": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
-    "config.immersion.NotTalkedTo": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "config.immersion.options.all": "แสดงชาวบ้านตลอดเวลา",
+    "config.immersion.options.talkedTo": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "config.immersion.options.notTalkedTo": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
 
     "config.only-in-location.name": "แสดงเฉพาะชาวบ้านที่อยู่ในสถานที่เดียวกันกับผู้เล่น",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
@@ -87,5 +87,10 @@
     ****/
     "config.toggle-villagers-title": "แสดง/ซ่อน ชาวบ้าน",
 
-    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
+    // TODO
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
+    "config.toggle-npc.options.default": "Default",
+    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
+    "config.toggle-npc.options.true": "Always visible",
+    "config.toggle-npc.options.false": "Always hidden"
 }
