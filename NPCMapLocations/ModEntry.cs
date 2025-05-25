@@ -588,8 +588,7 @@ public class ModEntry : Mod
         Utility.ForEachCharacter(npc =>
         {
             bool shouldTrack =
-                npc != null
-                && !npc.IsInvisible
+                npc is { IsInvisible: false }
                 && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
                 && (
                     npc.IsVillager
@@ -933,7 +932,7 @@ public class ModEntry : Mod
             // Establish draw order, higher number in front
             // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
             // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            if (npc is Horse || npc is Child)
+            if (npc is Horse or Child)
             {
                 npcMarker.Layer = 0;
             }
@@ -997,7 +996,7 @@ public class ModEntry : Mod
             // Establish draw order, higher number in front
             // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
             // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            if (marker.Type == CharacterType.Horse || marker.Type == CharacterType.Child)
+            if (marker.Type is CharacterType.Horse or CharacterType.Child)
             {
                 marker.Layer = 0;
             }

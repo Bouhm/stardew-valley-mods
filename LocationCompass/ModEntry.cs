@@ -127,7 +127,7 @@ public class ModEntry : Mod
             return;
 
         // handle scroll click
-        if ((e.Button == SButton.MouseRight || e.Button == SButton.ControllerA) && this.ActiveWarpLocators != null)
+        if (e.Button is SButton.MouseRight or SButton.ControllerA && this.ActiveWarpLocators != null)
         {
             foreach (LocatorScroller doorLocator in this.ActiveWarpLocators.Values)
             {
@@ -293,10 +293,15 @@ public class ModEntry : Mod
         {
             if (character.currentLocation == null)
                 continue;
-            if (!this.Config.ShowHorses && character is Horse || this.Config.ShowFarmersOnly && (character is NPC && !(character is Horse)))
+
+            if (!this.Config.ShowHorses && character is Horse)
                 continue;
-            if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out var npcLoc) && character is NPC)
+            if (this.Config.ShowFarmersOnly && character is NPC and not Horse)
                 continue;
+
+            if (!this.SyncedLocationData.Locations.TryGetValue(character.Name, out LocationData npcLoc) && character is NPC)
+                continue;
+
             if (character is NPC npc && this.Config.ShowQuestsAndBirthdaysOnly)
             {
                 bool isBirthday = false;
