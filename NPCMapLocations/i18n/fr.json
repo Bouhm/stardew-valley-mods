@@ -65,13 +65,16 @@
     "config.map-display-title": "Map display",
 
     "config.npc-marker-size.name": "Map marker size (NPCs)",
-    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
 
     "config.current-player-marker-size.name": "Map marker size (you)",
-    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
 
     "config.other-player-marker-size.name": "Map marker size (other players)",
-    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
+
+    "config.show-farm-buildings.name": "Show farm buildings",
+    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
 
     /****
     ** Filters section
@@ -100,8 +103,14 @@
     "config.show-hidden-villagers.name": "Afficher les villageois cachés",
     "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
 
+    "config.show-bookseller.name": "Show bookseller",
+    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+
     "config.show-traveling-merchant.name": "Afficher les marchands ambulants",
     "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+
+    "config.show-children.name": "Show players' children",
+    "config.show-children.desc": "Whether to show players' children on the map.",
 
     "config.show-horses.name": "Montrer les chevaux",
     "config.show-horses.desc": "Whether to show horses on the map.",
@@ -116,5 +125,19 @@
     "config.toggle-npc.options.default": "Default",
     "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
     "config.toggle-npc.options.always-visible": "Always visible",
-    "config.toggle-npc.options.always-hidden": "Always hidden"
+    "config.toggle-npc.options.always-hidden": "Always hidden",
+
+    /****
+    ** Performance section
+    ****/
+    // TODO
+    "config.performance-title": "Performance",
+
+    "config.minimap-cache-time.name": "Minimap cache time",
+    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+
+    "config.npc-cache-time.name": "NPC cache time",
+    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+
+    "config.cache-time.value": "{{seconds}} seconds"
 }

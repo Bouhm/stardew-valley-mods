@@ -168,8 +168,15 @@ internal class GenericModConfigMenuIntegration
             interval: 0.1f,
             formatValue: this.FormatRelativePercent
         );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowFarmBuildings_Name,
+            tooltip: I18n.Config_ShowFarmBuildings_Name,
+            getValue: () => this.Config.ShowFarmBuildings,
+            setValue: value => this.Config.ShowFarmBuildings = value
+        );
 
-        // settings
+        // filters
         menu.AddSectionTitle(this.Manifest, I18n.Config_FiltersTitle);
         this.AddTriStateOption(
             name: I18n.Config_SpokenToFilter_Name,
@@ -224,10 +231,24 @@ internal class GenericModConfigMenuIntegration
         );
         menu.AddBoolOption(
             this.Manifest,
+            name: I18n.Config_ShowBookseller_Name,
+            tooltip: I18n.Config_ShowBookseller_Desc,
+            getValue: () => this.Config.ShowBookseller,
+            setValue: value => this.Config.ShowBookseller = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
             name: I18n.Config_ShowTravelingMerchant_Name,
             tooltip: I18n.Config_ShowTravelingMerchant_Desc,
             getValue: () => this.Config.ShowTravelingMerchant,
             setValue: value => this.Config.ShowTravelingMerchant = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowChildren_Name,
+            tooltip: I18n.Config_ShowChildren_Desc,
+            getValue: () => this.Config.ShowChildren,
+            setValue: value => this.Config.ShowChildren = value
         );
         menu.AddBoolOption(
             this.Manifest,
@@ -266,6 +287,31 @@ internal class GenericModConfigMenuIntegration
                 }
             );
         }
+
+        // performance
+        menu.AddSectionTitle(this.Manifest, I18n.Config_PerformanceTitle);
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapCacheTime_Name,
+            tooltip: I18n.Config_MinimapCacheTime_Desc,
+            getValue: () => (int)this.Config.MiniMapCacheTicks,
+            setValue: value => this.Config.MiniMapCacheTicks = (uint)value,
+            min: 15,
+            max: 600,
+            interval: 15,
+            formatValue: value => I18n.Config_CacheTime_Value(seconds: value / 60m)
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_NpcCacheTime_Name,
+            tooltip: I18n.Config_NpcCacheTime_Desc,
+            getValue: () => (int)this.Config.NpcCacheTicks,
+            setValue: value => this.Config.NpcCacheTicks = (uint)value,
+            min: 15,
+            max: 600,
+            interval: 15,
+            formatValue: value => I18n.Config_CacheTime_Value(seconds: value / 60m)
+        );
     }
 
 

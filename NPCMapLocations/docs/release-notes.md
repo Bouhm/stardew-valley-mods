@@ -9,8 +9,12 @@
   * Added support for controller/mouse button bindings.
   * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).
   * Added options for...
+    * whether to show the bookseller;
+    * whether to show players' children;
+    * whether to show farm buildings;
     * map marker sizes;
-    * and minimap opacity.
+    * minimap opacity;
+    * and caching for performance.
   * Streamlined various options to be more intuitive.
   * Reduced smallest minimap size from 75px to 45px.
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
