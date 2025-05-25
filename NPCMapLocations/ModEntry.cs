@@ -30,7 +30,7 @@ public class ModEntry : Mod
     ** Fields
     *********/
     /// <summary>The map markers for farm buildings, indexed by the interior unique name.</summary>
-    private static readonly Dictionary<string, BuildingMarker> FarmBuildings = new();
+    private static readonly Dictionary<string, BuildingMarker> FarmBuildings = [];
 
     private readonly PerScreen<Texture2D> BuildingMarkers = new();
     private readonly PerScreen<ModMinimap> Minimap = new();
@@ -129,7 +129,7 @@ public class ModEntry : Mod
     {
         Point tile = new Point(tileX, tileY);
 
-        ISet<string> seen = new HashSet<string>();
+        HashSet<string> seen = [];
         int depth = 0;
 
         while (!string.IsNullOrWhiteSpace(locationName))
@@ -233,8 +233,8 @@ public class ModEntry : Mod
         this.IsFirstDay.Value = true;
 
         // Initialize these early for multiplayer sync
-        this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
-        this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
+        this.NpcMarkers.Value = [];
+        this.FarmerMarkers.Value = [];
 
         if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
         {
@@ -255,7 +255,7 @@ public class ModEntry : Mod
         }
 
         // NPCs that player should meet before being shown
-        this.ConditionalNpcs.Value = new Dictionary<string, bool>();
+        this.ConditionalNpcs.Value = [];
         foreach (string npcName in ModConstants.ConditionalNpcs)
             this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
 
@@ -413,7 +413,7 @@ public class ModEntry : Mod
                 // Sync multiplayer data
                 if (Context.IsMainPlayer && Context.IsMultiplayer)
                 {
-                    var syncedMarkers = new Dictionary<string, SyncedNpcMarker>();
+                    Dictionary<string, SyncedNpcMarker> syncedMarkers = [];
 
                     foreach (var npcMarker in this.NpcMarkers.Value)
                     {
@@ -427,7 +427,7 @@ public class ModEntry : Mod
                         });
                     }
 
-                    this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: new[] { this.ModManifest.UniqueID });
+                    this.Helper.Multiplayer.SendMessage(syncedMarkers, ModConstants.MessageIds.SyncedNpcMarkers, modIDs: [this.ModManifest.UniqueID]);
                 }
             }
         }
@@ -465,7 +465,7 @@ public class ModEntry : Mod
     private void OnPeerConnected(object sender, PeerConnectedEventArgs e)
     {
         if (Context.IsMainPlayer)
-            this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: new[] { this.ModManifest.UniqueID }, playerIDs: new[] { e.Peer.PlayerID });
+            this.Helper.Multiplayer.SendMessage(this.Customizations.Names, ModConstants.MessageIds.SyncedNames, modIDs: [this.ModManifest.UniqueID], playerIDs: [e.Peer.PlayerID]);
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
@@ -583,7 +583,7 @@ public class ModEntry : Mod
     /// <summary>Get only relevant villagers for the world map.</summary>
     private List<NPC> GetVillagers()
     {
-        var villagers = new List<NPC>();
+        List<NPC> villagers = [];
 
         Utility.ForEachCharacter(npc =>
         {
@@ -709,8 +709,8 @@ public class ModEntry : Mod
 
     private void ResetMarkers()
     {
-        this.NpcMarkers.Value = new Dictionary<string, NpcMarker>();
-        this.FarmerMarkers.Value = new Dictionary<long, FarmerMarker>();
+        this.NpcMarkers.Value = [];
+        this.FarmerMarkers.Value = [];
 
         if (Context.IsMainPlayer)
         {

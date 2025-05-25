@@ -21,11 +21,11 @@ public class ModCustomizations
     ** Accessors
     *********/
     /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
-    public Dictionary<string, string> Names { get; set; } = new();
+    public Dictionary<string, string> Names { get; set; } = [];
 
     /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
     /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
-    public HashSet<string> LocationExclusions { get; set; } = new();
+    public HashSet<string> LocationExclusions { get; set; } = [];
 
 
     /*********
@@ -141,7 +141,7 @@ public class ModCustomizations
     /// <returns>Returns a new dictionary instance.</returns>
     private Dictionary<string, TValue> Merge<TValue>(params Dictionary<string, TValue>[] dictionaries)
     {
-        Dictionary<string, TValue> merged = new();
+        Dictionary<string, TValue> merged = [];
 
         foreach (var dictionary in dictionaries)
         {

@@ -89,8 +89,8 @@ internal class ModMapPage : MapPage
                 string regionId = this.RegionId;
                 Point mousePos = Game1.getMousePosition();
 
-                HashSet<string> newHoveredNames = new();
-                HashSet<string> indoorLocationNames = new();
+                HashSet<string> newHoveredNames = [];
+                HashSet<string> indoorLocationNames = [];
 
                 // add markers directly under cursor
                 if (hasNpcMarkers)
@@ -145,7 +145,7 @@ internal class ModMapPage : MapPage
                 hasIndoorCharacters = indoorLocationNames.Count > 0;
                 hoveredNames = newHoveredNames.Count > 0
                     ? newHoveredNames.Distinct().OrderBy(p => p).ToArray()
-                    : Array.Empty<string>();
+                    : [];
             }
 
             // render tooltip
@@ -164,7 +164,7 @@ internal class ModMapPage : MapPage
 
                         int maxLineLength = (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X;
 
-                        List<string> lines = new() { hoveredNames[0] };
+                        List<string> lines = [hoveredNames[0]];
                         for (int i = 1; i < hoveredNames.Length; i++)
                         {
                             string name = hoveredNames[i];

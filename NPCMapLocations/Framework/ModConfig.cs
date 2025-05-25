@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using StardewModdingAPI;
@@ -145,8 +144,8 @@ public class ModConfig
         this.MenuKey ??= new KeybindList();
         this.MinimapToggleKey ??= new KeybindList();
         this.TooltipKey ??= new KeybindList();
-        this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
-        this.NpcVisibility = new Dictionary<string, bool>(this.NpcVisibility ?? new(), StringComparer.OrdinalIgnoreCase);
-        this.NpcMarkerOffsets = new Dictionary<string, int>(this.NpcMarkerOffsets ?? new(), StringComparer.OrdinalIgnoreCase);
+        this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? [], StringComparer.OrdinalIgnoreCase);
+        this.NpcVisibility = new Dictionary<string, bool>(this.NpcVisibility ?? [], StringComparer.OrdinalIgnoreCase);
+        this.NpcMarkerOffsets = new Dictionary<string, int>(this.NpcMarkerOffsets ?? [], StringComparer.OrdinalIgnoreCase);
     }
 }

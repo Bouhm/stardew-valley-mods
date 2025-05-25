@@ -23,10 +23,10 @@ internal class LocationContext
     public string Parent { get; set; }
 
     /// <summary>The names of locations directly reachable via outgoing warps from this location, with the target tile position for each warp.</summary>
-    public Dictionary<string, Vector2> Neighbors { get; } = new();
+    public Dictionary<string, Vector2> Neighbors { get; } = [];
 
     /// <summary>The names of locations directly contained by this location.</summary>
-    public List<string> Children { get; } = new();
+    public List<string> Children { get; } = [];
 
     /// <summary>The warp tile in the parent location which leads to this location.</summary>
     public Vector2 Warp { get; set; }

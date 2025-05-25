@@ -25,7 +25,7 @@ internal class LocationUtil
     /// <remarks>This is a last resort to prevent stack overflows. Normally the mod should prevent infinite recursion automatically by tracking locations it already visited.</remarks>
     public const int MaxRecursionDepth = 500;
 
-    public Dictionary<string, LocationContext> LocationContexts { get; } = new();
+    public Dictionary<string, LocationContext> LocationContexts { get; } = [];
 
 
     /*********
@@ -74,7 +74,7 @@ internal class LocationUtil
     /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
     public string GetBuilding(string startLocationName, int curRecursionDepth)
     {
-        string GetRecursively(string locationName, ISet<string> seen, int depth)
+        string GetRecursively(string locationName, HashSet<string> seen, int depth)
         {
             // break infinite loops
             if (!seen.Add(locationName))
@@ -103,7 +103,7 @@ internal class LocationUtil
             return GetRecursively(building, seen, depth + 1);
         }
 
-        return GetRecursively(startLocationName, new HashSet<string>(), curRecursionDepth);
+        return GetRecursively(startLocationName, [], curRecursionDepth);
     }
 
     /// <summary>Get the context metadata for a location, if known.</summary>
@@ -178,7 +178,7 @@ internal class LocationUtil
     /// <remarks>This traverses in indoor-to-outdoor order because warps and doors are not complete subsets of Game1.locations, which means there will be some rooms left out unless all the locations are iterated.</remarks>
     private void MapRootLocations(GameLocation startLocation, int curRecursionDepth)
     {
-        string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, ISet<string> seen, int depth)
+        string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, HashSet<string> seen, int depth)
         {
             // break infinite loops
             if (location == null || !seen.Add(location.NameOrUniqueName))
@@ -262,7 +262,7 @@ internal class LocationUtil
             return root;
         }
 
-        ScanRecursively(startLocation, null, null, false, Vector2.Zero, new HashSet<string>(), curRecursionDepth);
+        ScanRecursively(startLocation, null, null, false, Vector2.Zero, [], curRecursionDepth);
     }
 
     /// <summary>Get a location instance from its name if it's not a procedurally generated location.</summary>
@@ -295,7 +295,7 @@ internal class LocationUtil
             var entrance = Game1.getLocationFromName("IslandNorth");
             var exitWarp = entrance?.warps.FirstOrDefault(p => p.TargetName == "VolcanoEntrance");
             if (exitWarp != null)
-                return new[] { exitWarp };
+                return [exitWarp];
         }
 
         // normal case

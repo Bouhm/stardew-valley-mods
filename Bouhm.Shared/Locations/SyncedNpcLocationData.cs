@@ -8,5 +8,5 @@ internal class SyncedNpcLocationData
     /*********
     ** Accessors
     *********/
-    public Dictionary<string, LocationData> Locations { get; set; } = new();
+    public Dictionary<string, LocationData> Locations { get; set; } = [];
 }

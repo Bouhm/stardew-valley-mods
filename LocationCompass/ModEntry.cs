@@ -76,7 +76,7 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
     private void OnDayStarted(object sender, DayStartedEventArgs e)
     {
-        this.Characters = new List<Character>();
+        this.Characters = [];
 
         foreach (var npc in this.GetVillagers())
             this.Characters.Add(npc);
@@ -146,7 +146,7 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
     private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-        this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
+        this.ActiveWarpLocators = [];
         this.SyncedLocationData = new SyncedNpcLocationData();
         this.LocationUtil.ScanLocationContexts();
 
@@ -198,7 +198,7 @@ public class ModEntry : Mod
             if (Context.IsMainPlayer && Context.IsMultiplayer && this.SyncedLocationData != null)
             {
                 this.GetSyncedLocationData();
-                this.Helper.Multiplayer.SendMessage(this.SyncedLocationData, "SyncedLocationData", modIDs: new[] { this.ModManifest.UniqueID });
+                this.Helper.Multiplayer.SendMessage(this.SyncedLocationData, "SyncedLocationData", modIDs: [this.ModManifest.UniqueID]);
             }
         }
 
@@ -245,16 +245,16 @@ public class ModEntry : Mod
     // Get only relevant villagers for map
     private List<NPC> GetVillagers()
     {
-        var villagers = new List<NPC>();
-        var excludedNpcs = new List<string>
-        {
+        List<NPC> villagers = [];
+        List<string> excludedNpcs =
+        [
             "Dwarf",
             "Mister Qi",
             "Bouncer",
             "Henchman",
             "Gunther",
             "Krobus"
-        };
+        ];
 
         Utility.ForEachCharacter(npc =>
         {
@@ -287,7 +287,7 @@ public class ModEntry : Mod
 
     private void UpdateLocators()
     {
-        this.Locators = new Dictionary<string, List<Locator>>();
+        this.Locators = [];
 
         foreach (var character in this.Characters)
         {
@@ -464,7 +464,7 @@ public class ModEntry : Mod
                     this.ActiveWarpLocators.Add(charLocName, new LocatorScroller()
                     {
                         Location = charLocName,
-                        Characters = new HashSet<string>() { character.Name },
+                        Characters = [character.Name],
                         LocatorRect = new Rectangle((int)(characterPos.X - 32), (int)(characterPos.Y - 32),
                             64, 64)
                     });
@@ -503,7 +503,7 @@ public class ModEntry : Mod
             }
             else
             {
-                warpLocators = new List<Locator> { locator };
+                warpLocators = [locator];
             }
 
             this.Locators[charLocName] = warpLocators;

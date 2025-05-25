@@ -57,7 +57,7 @@ internal static class SummaryCommand
             WorldMapPosition worldPos = ModEntry.GetWorldMapPosition(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
             // collect alternate location names
-            List<string> altNames = new();
+            List<string> altNames = [];
             if (location.NameOrUniqueName != location.Name)
                 altNames.Add($"unique: {location.NameOrUniqueName}");
             if (location.NameOrUniqueName != locationName)
@@ -115,7 +115,7 @@ internal static class SummaryCommand
                 SummaryCommand.BuildTable(
                     records: locationUtil.LocationContexts.Values.OrderBy(p => p.Root ?? p.Name).ThenBy(p => p.Name),
                     linePrefix: "      ",
-                    columnHeadings: new[] { "root", "name", "type", "notes" },
+                    columnHeadings: ["root", "name", "type", "notes"],
                     p => p.Root ?? p.Name,
                     p => p.Name,
                     p => p.Type.ToString(),
@@ -158,7 +158,7 @@ internal static class SummaryCommand
                         SummaryCommand.BuildTable(
                             typeGroup.OrderBy(p => p.Key),
                             "      ",
-                            new[] { "name", "location", "map region", "map pixel", "crop offset", "notes" },
+                            ["name", "location", "map region", "map pixel", "crop offset", "notes"],
 
                             marker => marker.Value.DisplayName != marker.Key ? $"{marker.Key} ({marker.Value.DisplayName})" : marker.Key,
                             marker => marker.Value.LocationName,
@@ -167,7 +167,7 @@ internal static class SummaryCommand
                             marker => marker.Value.CropOffset != 0 ? marker.Value.CropOffset.ToString() : "",
                             marker =>
                             {
-                                List<string> notes = new();
+                                List<string> notes = [];
                                 if (marker.Value.IsHidden)
                                     notes.Add(marker.Value.ReasonHidden ?? "hidden (reason unknown)");
                                 if (marker.Value.IsBirthday)
@@ -203,7 +203,7 @@ internal static class SummaryCommand
                     SummaryCommand.BuildTable(
                         locationsWithoutMapPositions,
                         "",
-                        new[] { "name", "type", "root location" },
+                        ["name", "type", "root location"],
                         p => p.Name,
                         p => p.Type.ToString(),
                         p => p.Root
@@ -256,7 +256,7 @@ internal static class SummaryCommand
 
                 return row;
             })
-            .ToArray() ?? new string[columnCount][];
+            .ToArray() ?? [];
 
         // build table
         StringBuilder table = new();
