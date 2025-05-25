@@ -75,8 +75,8 @@ internal class ModMapPage : MapPage
         this.HasIndoorCharacter = false;
 
         // apply custom tooltips
-        bool hasNpcMarkers = this.NpcMarkers?.Count > 0;
-        bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers?.Count > 0;
+        bool hasNpcMarkers = this.NpcMarkers.Count > 0;
+        bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers.Count > 0;
         if (hasNpcMarkers || hasFarmerMarkers)
         {
             // get hovered names
@@ -273,7 +273,7 @@ internal class ModMapPage : MapPage
 
         if (regionId == "Valley")
         {
-            if (ModEntry.Config.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+            if (ModEntry.Config.ShowFarmBuildings && this.BuildingMarkers != null)
             {
                 foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.WorldMapPosition.Y))
                 {
@@ -294,7 +294,7 @@ internal class ModMapPage : MapPage
 
         // NPCs
         // Sort by drawing order
-        if (this.NpcMarkers != null)
+        if (this.NpcMarkers.Count > 0)
         {
             float scaleMultiplier = ModEntry.Config.NpcMarkerScale;
 

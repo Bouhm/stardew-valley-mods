@@ -25,6 +25,7 @@
 * Fixed Mr. and Mrs. Raccoon's names not translatable for non-English players.  
   _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
 * Fixed error if a marker's player or NPC can't be positioned on the map.
+* Internal changes to simplify maintenance.
 
 **[Breaking changes]**
 - You should now use [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) to edit the mod options, instead of pressing `Tab` from the map page.

@@ -25,7 +25,7 @@ public class ModCustomizations
 
     /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
     /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
-    public HashSet<string> LocationExclusions { get; set; } = [];
+    public HashSet<string> LocationExclusions { get; } = [];
 
 
     /*********

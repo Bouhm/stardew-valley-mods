@@ -21,21 +21,22 @@ public class ModEntry : Mod
     ** Fields
     *********/
     private readonly int MaxProximity = 4800;
-
     private readonly bool DebugMode = false;
+
     private Texture2D Pointer;
     private ModData Constants;
-    private List<Character> Characters;
-    private SyncedNpcLocationData SyncedLocationData;
-    private Dictionary<string, List<Locator>> Locators;
-    private Dictionary<string, LocatorScroller> ActiveWarpLocators; // Active indices of locators of doors
     private ModConfig Config;
-
-    /// <summary>Whether locators are visible. (This should be set via <see cref="SetShowLocators"/> to toggle the HUD if needed.)</summary>
-    private bool ShowLocators;
 
     /// <summary>Scans and maps locations in the game world.</summary>
     private LocationUtil LocationUtil;
+
+    private readonly List<Character> Characters = [];
+    private readonly Dictionary<string, List<Locator>> Locators = [];
+    private readonly Dictionary<string, LocatorScroller> ActiveWarpLocators = []; // Active indices of locators of doors
+    private SyncedNpcLocationData SyncedLocationData;
+
+    /// <summary>Whether locators are visible. (This should be set via <see cref="SetShowLocators"/> to toggle the HUD if needed.)</summary>
+    private bool ShowLocators;
 
 
     /*********
@@ -76,10 +77,8 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
     private void OnDayStarted(object sender, DayStartedEventArgs e)
     {
-        this.Characters = [];
-
-        foreach (var npc in this.GetVillagers())
-            this.Characters.Add(npc);
+        this.Characters.Clear();
+        this.Characters.AddRange(this.GetVillagers());
 
         this.UpdateLocators();
     }
@@ -100,7 +99,7 @@ public class ModEntry : Mod
         }
 
         // toggle options
-        if (this.ShowLocators && this.ActiveWarpLocators != null)
+        if (this.ShowLocators && this.ActiveWarpLocators.Count > 0)
         {
             bool changed = true;
 
@@ -127,7 +126,7 @@ public class ModEntry : Mod
             return;
 
         // handle scroll click
-        if (e.Button is SButton.MouseRight or SButton.ControllerA && this.ActiveWarpLocators != null)
+        if (e.Button is SButton.MouseRight or SButton.ControllerA)
         {
             foreach (LocatorScroller doorLocator in this.ActiveWarpLocators.Values)
             {
@@ -146,7 +145,7 @@ public class ModEntry : Mod
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
     private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
     {
-        this.ActiveWarpLocators = [];
+        this.ActiveWarpLocators.Clear();
         this.SyncedLocationData = new SyncedNpcLocationData();
         this.LocationUtil.ScanLocationContexts();
 
@@ -185,7 +184,7 @@ public class ModEntry : Mod
         // Quarter-second tick
         if (e.IsMultipleOf(15))
         {
-            if (this.Characters != null && Context.IsMultiplayer)
+            if (this.Characters.Count > 0 && Context.IsMultiplayer)
             {
                 foreach (var farmer in Game1.getOnlineFarmers())
                 {
@@ -223,9 +222,9 @@ public class ModEntry : Mod
         if (!this.DebugMode)
             return;
 
-        foreach (var locPair in this.Locators)
+        foreach (List<Locator> locators in this.Locators.Values)
         {
-            foreach (var locator in locPair.Value)
+            foreach (var locator in locators)
             {
                 if (!locator.IsOnScreen)
                     continue;
@@ -287,7 +286,7 @@ public class ModEntry : Mod
 
     private void UpdateLocators()
     {
-        this.Locators = [];
+        this.Locators.Clear();
 
         foreach (var character in this.Characters)
         {
@@ -691,7 +690,7 @@ public class ModEntry : Mod
             {
                 Locator locator;
 
-                if (this.ActiveWarpLocators != null && this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller activeLocator))
+                if (this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller activeLocator))
                 {
                     locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
                     activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);

@@ -34,8 +34,8 @@ public class ModEntry : Mod
 
     private readonly PerScreen<Texture2D> BuildingMarkers = new();
     private readonly PerScreen<ModMinimap> Minimap = new();
-    private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new();
-    private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new();
+    private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new(() => []);
+    private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new(() => []);
     private readonly PerScreen<bool> HasOpenedMap = new();
     private readonly PerScreen<bool> IsModMapOpen = new();
     private readonly PerScreen<bool> IsFirstDay = new();
@@ -57,7 +57,7 @@ public class ModEntry : Mod
     private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
 
     // Multiplayer
-    private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new();
+    private readonly PerScreen<Dictionary<long, FarmerMarker>> FarmerMarkers = new(() => []);
 
     // Customizations/Custom mods
     private ModCustomizations Customizations;
@@ -231,10 +231,9 @@ public class ModEntry : Mod
         //
 
         this.IsFirstDay.Value = true;
-
-        // Initialize these early for multiplayer sync
-        this.NpcMarkers.Value = [];
-        this.FarmerMarkers.Value = [];
+        this.NpcMarkers.Value.Clear();
+        this.FarmerMarkers.Value.Clear();
+        this.ConditionalNpcs.Value.Clear();
 
         if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
         {
@@ -255,7 +254,6 @@ public class ModEntry : Mod
         }
 
         // NPCs that player should meet before being shown
-        this.ConditionalNpcs.Value = [];
         foreach (string npcName in ModConstants.ConditionalNpcs)
             this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
 
@@ -480,9 +478,6 @@ public class ModEntry : Mod
                     break;
 
                 case ModConstants.MessageIds.SyncedNpcMarkers:
-                    if (this.NpcMarkers.Value == null)
-                        return;
-
                     var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                     foreach ((string internalName, SyncedNpcMarker syncedMarker) in syncedNpcMarkers)
                     {
@@ -704,12 +699,12 @@ public class ModEntry : Mod
 
     private void ResetMarkers()
     {
-        this.NpcMarkers.Value = [];
-        this.FarmerMarkers.Value = [];
+        this.NpcMarkers.Value.Clear();
+        this.FarmerMarkers.Value.Clear();
 
         if (Context.IsMainPlayer)
         {
-            // book seller
+            // bookseller
             if (ModEntry.Config.ShowBookseller && Utility.getDaysOfBooksellerThisSeason().Contains(Game1.dayOfMonth))
             {
                 WorldMapPosition mapPos = GetWorldMapPosition("Town", 108, 25); // hardcoded in Town.draw
@@ -850,7 +845,7 @@ public class ModEntry : Mod
     // Update NPC marker data and names on hover
     private void UpdateNpcs()
     {
-        if (this.NpcMarkers.Value == null)
+        if (this.NpcMarkers.Value.Count == 0)
             return;
 
         List<NPC> npcList = this.GetVillagers();
@@ -863,8 +858,7 @@ public class ModEntry : Mod
 
         foreach (var npc in npcList)
         {
-            if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out var npcMarker)
-                || npc.currentLocation == null)
+            if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out var npcMarker) || npc.currentLocation == null)
             {
                 continue;
             }
@@ -952,9 +946,6 @@ public class ModEntry : Mod
     // Update npc marker properties only relevant to farmhand
     private void UpdateNpcsFarmhand()
     {
-        if (this.NpcMarkers.Value == null)
-            return;
-
         foreach ((string name, NpcMarker marker) in this.NpcMarkers.Value)
         {
             // For show Npcs in player's location option
