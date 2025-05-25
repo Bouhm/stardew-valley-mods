@@ -6,6 +6,7 @@
   * **Removed custom config UI.** All settings are now available through [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) instead.
   * Moved all settings into the conventional `config.json` file.  
     _Your previous `config/globals.json` file will be migrated automatically, so you won't lose those settings. If you edited the few per-save options, you'll need to set them again; any existing `config/*.json` files will be left as-is so you can copy options as needed._
+  * Added options to change map marker sizes.
   * The NPC visibility override options are now more intuitive.
   * Reduced min minimap width from 75px to 45px.
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).

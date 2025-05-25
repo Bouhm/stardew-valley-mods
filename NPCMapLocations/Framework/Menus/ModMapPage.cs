@@ -296,6 +296,8 @@ internal class ModMapPage : MapPage
         // Sort by drawing order
         if (this.NpcMarkers != null)
         {
+            float scaleMultiplier = ModEntry.Config.NpcMarkerScale;
+
             var sortedMarkers = this.NpcMarkers
                 .Where(p => p.Value.WorldMapRegionId == regionId)
                 .OrderBy(p => p.Value.Layer);
@@ -325,15 +327,23 @@ internal class ModMapPage : MapPage
                 var markerColor = (marker.IsHidden ? Color.DarkGray * 0.7f : Color.White) * alpha;
 
                 // Draw NPC marker
+                Rectangle iconDestinationRect;
                 {
-                    Rectangle spriteRect = marker.GetSpriteSourceRect();
-                    float iconScale = spriteRect.Width > spriteRect.Height
-                        ? 32f / spriteRect.Width
-                        : 30f / spriteRect.Height;
+                    Rectangle iconSpriteRect = marker.GetSpriteSourceRect();
+                    float iconScale = iconSpriteRect.Width > iconSpriteRect.Height
+                        ? 32f / iconSpriteRect.Width
+                        : 30f / iconSpriteRect.Height;
 
-                    Rectangle destinationRect = new Rectangle(this.mapBounds.X + marker.WorldMapX, this.mapBounds.Y + marker.WorldMapY, (int)(spriteRect.Width * iconScale), (int)(spriteRect.Height * iconScale));
+                    float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
+                    float iconHeight = (int)(iconSpriteRect.Height * iconScale * scaleMultiplier);
 
-                    b.Draw(marker.Sprite, destinationRect, spriteRect, markerColor);
+                    iconDestinationRect = new Rectangle(
+                        x: this.mapBounds.X + marker.WorldMapX - (int)(iconWidth / 2),
+                        y: this.mapBounds.Y + marker.WorldMapY - (int)(iconHeight / 2),
+                        width: (int)iconWidth,
+                        height: (int)iconHeight
+                    );
+                    b.Draw(marker.Sprite, iconDestinationRect, iconSpriteRect, markerColor);
                 }
 
                 // Draw icons for quests/birthday
@@ -343,7 +353,7 @@ internal class ModMapPage : MapPage
                     {
                         // Gift icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapX + 20, this.mapBounds.Y + marker.WorldMapY),
+                            new Vector2(iconDestinationRect.X + 20, iconDestinationRect.Y),
                             new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -352,7 +362,7 @@ internal class ModMapPage : MapPage
                     {
                         // Quest icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapX + 22, this.mapBounds.Y + marker.WorldMapY - 3),
+                            new Vector2(iconDestinationRect.X + 22, iconDestinationRect.Y - 3),
                             new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -369,17 +379,24 @@ internal class ModMapPage : MapPage
                 {
                     if (farMarker is { DrawDelay: 0 }) // Temporary solution to handle desync of farmhand location/tile position when changing location
                     {
-                        Vector2 position = new Vector2(this.mapBounds.X + farMarker.WorldMapX - 16, this.mapBounds.Y + farMarker.WorldMapY - 15);
-                        farmer.FarmerRenderer.drawMiniPortrat(b, position, 0.00011f, 2f, 1, farmer, alpha);
+                        float scaleMultiplier = farmer.IsLocalPlayer
+                            ? ModEntry.Config.CurrentPlayerMarkerScale
+                            : ModEntry.Config.OtherPlayerMarkerScale;
+
+                        Vector2 position = new Vector2(this.mapBounds.X + farMarker.WorldMapX - (16 * scaleMultiplier), this.mapBounds.Y + farMarker.WorldMapY - (15 * scaleMultiplier));
+
+                        farmer.FarmerRenderer.drawMiniPortrat(b, position, 0.00011f, 2f * scaleMultiplier, 1, farmer, alpha);
                     }
                 }
             }
         }
         else
         {
+            float scaleMultiplier = ModEntry.Config.CurrentPlayerMarkerScale;
+
             WorldMapPosition playerLoc = ModEntry.GetWorldMapPosition(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
 
-            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player, alpha);
+            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - (16 * scaleMultiplier), this.mapBounds.Y + playerLoc.Y - (15 * scaleMultiplier)), 0.00011f, 2f * scaleMultiplier, 1, Game1.player, alpha);
         }
     }
 

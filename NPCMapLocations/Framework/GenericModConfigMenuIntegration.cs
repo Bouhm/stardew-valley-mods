@@ -112,8 +112,44 @@ internal class GenericModConfigMenuIntegration
             formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
         );
 
+        // map display
+        menu.AddSectionTitle(this.Manifest, I18n.Config_MapDisplayTitle);
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_NpcMarkerSize_Name,
+            tooltip: I18n.Config_NpcMarkerSize_Desc,
+            getValue: () => this.Config.NpcMarkerScale,
+            setValue: value => this.Config.NpcMarkerScale = value,
+            min: 0.1f,
+            max: 4f,
+            interval: 0.1f,
+            formatValue: this.FormatRelativePercent
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_CurrentPlayerMarkerSize_Name,
+            tooltip: I18n.Config_CurrentPlayerMarkerSize_Desc,
+            getValue: () => this.Config.CurrentPlayerMarkerScale,
+            setValue: value => this.Config.CurrentPlayerMarkerScale = value,
+            min: 0.1f,
+            max: 4f,
+            interval: 0.1f,
+            formatValue: this.FormatRelativePercent
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_OtherPlayerMarkerSize_Name,
+            tooltip: I18n.Config_OtherPlayerMarkerSize_Desc,
+            getValue: () => this.Config.OtherPlayerMarkerScale,
+            setValue: value => this.Config.OtherPlayerMarkerScale = value,
+            min: 0.1f,
+            max: 4f,
+            interval: 0.1f,
+            formatValue: this.FormatRelativePercent
+        );
+
         // settings
-        menu.AddSectionTitle(this.Manifest, I18n.Config_SettingsTitle);
+        menu.AddSectionTitle(this.Manifest, I18n.Config_FiltersTitle);
         menu.AddTextOption(
             this.Manifest,
             name: I18n.Config_Immersion_Name,
@@ -225,6 +261,15 @@ internal class GenericModConfigMenuIntegration
     /*********
     ** Private methods
     *********/
+    /// <summary>Get a formatted percentage (or 'default' for 100%) to show in the config UI.</summary>
+    /// <param name="value">The value to format.</param>
+    private string FormatRelativePercent(float value)
+    {
+        return (decimal)value == 1m
+            ? I18n.Config_Percentage_Default()
+            : I18n.Config_Percentage(percent: (int)(value * 100));
+    }
+
     /// <summary>Reset the mod's config to its default values.</summary>
     private void Reset()
     {

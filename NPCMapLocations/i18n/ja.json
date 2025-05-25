@@ -15,6 +15,13 @@
     ** Generic Mod Config Menu UI
     *********/
     /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "default",
+
+    /****
     ** Controls section
     ****/
     "config.controls-title": "Controls", // TODO
@@ -44,9 +51,24 @@
     "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
 
     /****
-    ** Settings section
+    ** Map display section
     ****/
-    "config.settings-title": "設定",
+    // TODO
+    "config.map-display-title": "Map display",
+
+    "config.npc-marker-size.name": "Map marker size (NPCs)",
+    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+
+    "config.current-player-marker-size.name": "Map marker size (you)",
+    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+
+    "config.other-player-marker-size.name": "Map marker size (other players)",
+    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default. For example, 0.5 = half size, 1 = default, and 2 = double size.",
+
+    /****
+    ** Filters section
+    ****/
+    "config.filters-title": "Filters", // TODO
 
     "config.immersion.name": "Immersion", // TODO
     "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO

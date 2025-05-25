@@ -87,15 +87,24 @@ public class ModConfig
     /// <summary>Whether to show horses on the map.</summary>
     public bool ShowHorse { get; set; } = true;
 
+    /// <summary>A multiplier to apply to NPC marker sizes on the map, where 1 is the default size.</summary>
+    public float NpcMarkerScale { get; set; } = 1f;
+
+    /// <summary>A multiplier to apply to the current player's marker size on the map, where 1 is the default size.</summary>
+    public float CurrentPlayerMarkerScale { get; set; } = 1f;
+
+    /// <summary>A multiplier to apply to other players' marker sizes on the map, where 1 is the default size.</summary>
+    public float OtherPlayerMarkerScale { get; set; } = 1f;
+
     /// <summary>Override the visibility for specific NPCs.</summary>
     public Dictionary<string, bool> NpcVisibility { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Custom offsets when drawing vanilla NPCs.</summary>
+    public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>NPC names to hide from the map, specified by mods through the API.</summary>
     [JsonIgnore]
     public HashSet<string> ModNpcExclusions { get; } = new(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>Custom offsets when drawing vanilla NPCs.</summary>
-    public Dictionary<string, int> NpcMarkerOffsets { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
 
     /*********
