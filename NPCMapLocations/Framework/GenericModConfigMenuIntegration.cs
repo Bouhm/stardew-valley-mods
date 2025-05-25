@@ -19,10 +19,10 @@ internal class GenericModConfigMenuIntegration
     private readonly IGenericModConfigMenuApi ConfigMenu;
 
     /// <summary>The current mod settings.</summary>
-    private GlobalConfig Config => ModEntry.Globals;
+    private ModConfig Config => ModEntry.Config;
 
     /// <summary>The default mod settings.</summary>
-    private readonly GlobalConfig DefaultConfig = new();
+    private readonly ModConfig DefaultConfig = new();
 
 
     /*********
@@ -91,12 +91,12 @@ internal class GenericModConfigMenuIntegration
     /// <summary>Save the mod's current config to the <c>config.json</c> file.</summary>
     private void Save()
     {
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", this.Config);
+        ModEntry.StaticHelper.WriteConfig(this.Config);
     }
 
     /// <summary>Get a parsed key binding from the raw mod settings.</summary>
     /// <param name="getRawValue">Get the raw value from a settings model.</param>
-    private SButton GetButton(Func<GlobalConfig, string> getRawValue)
+    private SButton GetButton(Func<ModConfig, string> getRawValue)
     {
         return Utility.TryParseEnum(getRawValue(this.Config), out SButton button) || Utility.TryParseEnum(getRawValue(this.DefaultConfig), out button)
             ? button

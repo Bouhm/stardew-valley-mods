@@ -57,7 +57,7 @@ public class ModCustomizations
         // load custom NPC marker offsets and exclusions
         {
             // get defaults
-            var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
+            var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Config.NpcMarkerOffsets);
 
             // get custom data
             foreach (var npcData in customNpcJson)
@@ -66,7 +66,7 @@ public class ModCustomizations
 
                 if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
                 {
-                    ModEntry.Globals.ModNpcExclusions.Add(npcData.Key);
+                    ModEntry.Config.ModNpcExclusions.Add(npcData.Key);
                     continue;
                 }
 
@@ -89,7 +89,7 @@ public class ModCustomizations
             }
 
             // Merge customizations into globals config
-            ModEntry.Globals.NpcMarkerOffsets = markerOffsets;
+            ModEntry.Config.NpcMarkerOffsets = markerOffsets;
         }
 
         foreach (var character in Utility.getAllCharacters())
@@ -117,8 +117,8 @@ public class ModCustomizations
             }
         }
 
-        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.PerPlayerConfig);
+        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
     }
 
     /// <summary>Merge any number of dictionaries into a new dictionary.</summary>

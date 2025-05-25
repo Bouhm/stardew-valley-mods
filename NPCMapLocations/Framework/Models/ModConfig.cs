@@ -6,8 +6,8 @@ using Newtonsoft.Json;
 
 namespace NPCMapLocations.Framework.Models;
 
-/// <summary>The model for global config options.</summary>
-public class GlobalConfig
+/// <summary>The data model for the mod settings.</summary>
+public class ModConfig
 {
     /*********
     ** Accessors

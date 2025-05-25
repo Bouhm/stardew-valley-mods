@@ -214,7 +214,7 @@ internal class ModMapPage : MapPage
                 y += Game1.tileSize / 4;
             }
 
-            if (ModEntry.Globals.NameTooltipMode == 1)
+            if (ModEntry.Config.NameTooltipMode == 1)
             {
                 if (y + height > Game1.uiViewport.Height)
                 {
@@ -224,7 +224,7 @@ internal class ModMapPage : MapPage
 
                 offsetY = 2 - Game1.tileSize;
             }
-            else if (ModEntry.Globals.NameTooltipMode == 2)
+            else if (ModEntry.Config.NameTooltipMode == 2)
             {
                 if (y + height > Game1.uiViewport.Height)
                 {
@@ -244,7 +244,7 @@ internal class ModMapPage : MapPage
             }
 
             // Draw name tooltip positioned around location tooltip
-            this.DrawNames(b, this.HoveredNames, x, y, offsetY, height, ModEntry.Globals.NameTooltipMode);
+            this.DrawNames(b, this.HoveredNames, x, y, offsetY, height, ModEntry.Config.NameTooltipMode);
 
             // Draw location tooltip
             IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont);
@@ -252,7 +252,7 @@ internal class ModMapPage : MapPage
         else
         {
             // Draw name tooltip only
-            this.DrawNames(Game1.spriteBatch, this.HoveredNames, x, y, offsetY, this.height, ModEntry.Globals.NameTooltipMode);
+            this.DrawNames(Game1.spriteBatch, this.HoveredNames, x, y, offsetY, this.height, ModEntry.Config.NameTooltipMode);
         }
 
         // Draw indoor icon
@@ -273,7 +273,7 @@ internal class ModMapPage : MapPage
 
         if (regionId == "Valley")
         {
-            if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+            if (ModEntry.Config.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
             {
                 foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.WorldMapPosition.Y))
                 {
@@ -308,7 +308,7 @@ internal class ModMapPage : MapPage
                 // Skip if no specified location or should be hidden
                 if (marker.Sprite == null
                     || ModEntry.ShouldExcludeNpc(name)
-                    || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
+                    || (!ModEntry.Config.ShowHiddenVillagers && marker.IsHidden)
                     || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                    )
                 {
@@ -331,7 +331,7 @@ internal class ModMapPage : MapPage
                 }
 
                 // Draw icons for quests/birthday
-                if (ModEntry.Globals.ShowQuests)
+                if (ModEntry.Config.ShowQuests)
                 {
                     if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
                     {

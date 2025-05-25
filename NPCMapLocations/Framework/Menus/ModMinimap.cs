@@ -51,10 +51,10 @@ internal class ModMinimap : IDisposable
         this.CreateMapPage = createMapPage;
 
         this.ScreenBounds = new(
-            x: ModEntry.Globals.MinimapX,
-            y: ModEntry.Globals.MinimapY,
-            width: ModEntry.Globals.MinimapWidth * Game1.pixelZoom,
-            height: ModEntry.Globals.MinimapHeight * Game1.pixelZoom
+            x: ModEntry.Config.MinimapX,
+            y: ModEntry.Config.MinimapY,
+            width: ModEntry.Config.MinimapWidth * Game1.pixelZoom,
+            height: ModEntry.Config.MinimapHeight * Game1.pixelZoom
         );
     }
 
@@ -62,7 +62,7 @@ internal class ModMinimap : IDisposable
     public bool IsHoveringDragZone()
     {
         return
-            !ModEntry.Globals.LockMinimapPosition
+            !ModEntry.Config.LockMinimapPosition
             && this.ScreenBounds.Contains(MouseUtil.GetScreenPoint());
     }
 
@@ -102,9 +102,9 @@ internal class ModMinimap : IDisposable
     /// <summary>Handle the player releasing the right mouse button.</summary>
     public void HandleMouseRightRelease()
     {
-        ModEntry.Globals.MinimapX = this.ScreenBounds.X;
-        ModEntry.Globals.MinimapY = this.ScreenBounds.Y;
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        ModEntry.Config.MinimapX = this.ScreenBounds.X;
+        ModEntry.Config.MinimapY = this.ScreenBounds.Y;
+        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
         this.IsDragging = false;
     }
 
@@ -117,8 +117,8 @@ internal class ModMinimap : IDisposable
     public void Resize()
     {
         this.ScreenBounds.SetDesiredBounds(
-            width: ModEntry.Globals.MinimapWidth * Game1.pixelZoom,
-            height: ModEntry.Globals.MinimapHeight * Game1.pixelZoom
+            width: ModEntry.Config.MinimapWidth * Game1.pixelZoom,
+            height: ModEntry.Config.MinimapHeight * Game1.pixelZoom
         );
     }
 

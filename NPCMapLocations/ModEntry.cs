@@ -62,8 +62,8 @@ public class ModEntry : Mod
     /*********
     ** Accessors
     *********/
-    public static PlayerConfig Config;
-    public static GlobalConfig Globals;
+    public static PlayerConfig PerPlayerConfig;
+    public static ModConfig Config;
     public static IModHelper StaticHelper;
 
 
@@ -73,12 +73,13 @@ public class ModEntry : Mod
     /// <inheritdoc />
     public override void Entry(IModHelper helper)
     {
+        this.MigrateLegacyFiles();
+
         I18n.Init(helper.Translation);
-        CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
 
         ModEntry.LocationUtil = new(this.Monitor);
         StaticHelper = helper;
-        Globals = helper.Data.ReadJsonFile<GlobalConfig>("config/globals.json") ?? new GlobalConfig();
+        Config = helper.ReadConfig<ModConfig>();
         this.Customizations = new ModCustomizations();
 
         helper.Events.Content.AssetRequested += this.OnAssetRequested;
@@ -181,21 +182,21 @@ public class ModEntry : Mod
     public static bool ShouldExcludeNpc(string name, out string reason, bool ignoreConfig = false)
     {
         // from config override
-        if (!ignoreConfig && ModEntry.Config.ForceNpcVisibility != null && ModEntry.Config.ForceNpcVisibility.TryGetValue(name, out bool forceVisible))
+        if (!ignoreConfig && ModEntry.PerPlayerConfig.ForceNpcVisibility != null && ModEntry.PerPlayerConfig.ForceNpcVisibility.TryGetValue(name, out bool forceVisible))
         {
             reason = !forceVisible ? "excluded in player settings" : null;
             return forceVisible;
         }
 
         // from mod override
-        if (ModEntry.Globals.ModNpcExclusions.Contains(name))
+        if (ModEntry.Config.ModNpcExclusions.Contains(name))
         {
             reason = "excluded by mod override";
             return true;
         }
 
         // from defaults
-        if (ModEntry.Globals.NpcExclusions.Contains(name))
+        if (ModEntry.Config.NpcExclusions.Contains(name))
         {
             reason = "excluded by default";
             return true;
@@ -233,7 +234,7 @@ public class ModEntry : Mod
         // Load config and other one-off data
         //
 
-        Config = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
+        PerPlayerConfig = this.Helper.Data.ReadJsonFile<PlayerConfig>($"config/{Constants.SaveFolderName}.json") ?? new PlayerConfig();
         this.IsFirstDay.Value = true;
 
         // Initialize these early for multiplayer sync
@@ -314,7 +315,7 @@ public class ModEntry : Mod
             return;
 
         // Minimap dragging
-        if (this.ShowMinimap.Value && !Globals.LockMinimapPosition && this.Minimap.Value != null)
+        if (this.ShowMinimap.Value && !Config.LockMinimapPosition && this.Minimap.Value != null)
         {
             if (this.Minimap.Value.IsHoveringDragZone() && e.Button == SButton.MouseRight)
             {
@@ -324,11 +325,11 @@ public class ModEntry : Mod
         }
 
         // Minimap toggle
-        if (e.Button.ToString().Equals(Globals.MinimapToggleKey) && Game1.activeClickableMenu == null)
+        if (e.Button.ToString().Equals(Config.MinimapToggleKey) && Game1.activeClickableMenu == null)
         {
-            Globals.ShowMinimap = !Globals.ShowMinimap;
+            Config.ShowMinimap = !Config.ShowMinimap;
             this.UpdateMinimapVisibility();
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
         }
 
         // ModMenu
@@ -344,7 +345,7 @@ public class ModEntry : Mod
         if (!Context.IsWorldReady)
             return;
 
-        if (this.Minimap.Value != null && !ModEntry.Globals.LockMinimapPosition)
+        if (this.Minimap.Value != null && !ModEntry.Config.LockMinimapPosition)
         {
             if (Game1.activeClickableMenu is ModMenu && e.Button == SButton.MouseLeft)
                 this.Minimap.Value.Resize();
@@ -393,7 +394,7 @@ public class ModEntry : Mod
             bool? hasMinimap = null;
 
             // update local minimap display
-            if (e.IsMultipleOf(Globals.MiniMapCacheTicks))
+            if (e.IsMultipleOf(Config.MiniMapCacheTicks))
             {
                 hasMinimap = this.ShowMinimap.Value && this.Minimap.Value != null;
                 if (hasMinimap.Value)
@@ -401,7 +402,7 @@ public class ModEntry : Mod
             }
 
             // update & sync NPC markers
-            if (e.IsMultipleOf(Globals.NpcCacheTicks))
+            if (e.IsMultipleOf(Config.NpcCacheTicks))
             {
                 hasMinimap ??= this.ShowMinimap.Value && this.Minimap.Value != null;
 
@@ -488,7 +489,7 @@ public class ModEntry : Mod
                     foreach (var syncedMarker in syncedNpcMarkers)
                     {
                         string internalName = syncedMarker.Key;
-                        if (!ModEntry.Globals.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
+                        if (!ModEntry.Config.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
                             offset = 0;
 
                         if (!this.NpcMarkers.Value.TryGetValue(internalName, out var npcMarker))
@@ -607,8 +608,8 @@ public class ModEntry : Mod
                 && (
                     npc.IsVillager
                     || npc.isMarried()
-                    || (Globals.ShowHorse && npc is Horse)
-                    || (Globals.ShowChildren && npc is Child)
+                    || (Config.ShowHorse && npc is Horse)
+                    || (Config.ShowChildren && npc is Child)
                 );
 
             if (shouldTrack && !villagers.Contains(npc))
@@ -658,12 +659,12 @@ public class ModEntry : Mod
         if (menu.currentTab != ModConstants.MapTabIndex)
             return;
 
-        if (input.ToString().Equals(Globals.MenuKey) || input is SButton.ControllerY)
+        if (input.ToString().Equals(Config.MenuKey) || input is SButton.ControllerY)
             Game1.activeClickableMenu = new ModMenu(this.NpcMarkers.Value, this.ConditionalNpcs.Value, onMinimapToggled: () => this.UpdateMinimapVisibility());
 
-        if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.RightShoulder)
+        if (input.ToString().Equals(Config.TooltipKey) || input is SButton.RightShoulder)
             this.ChangeTooltipConfig();
-        else if (input.ToString().Equals(Globals.TooltipKey) || input is SButton.LeftShoulder)
+        else if (input.ToString().Equals(Config.TooltipKey) || input is SButton.LeftShoulder)
             this.ChangeTooltipConfig(false);
     }
 
@@ -671,15 +672,15 @@ public class ModEntry : Mod
     {
         if (increment)
         {
-            if (++Globals.NameTooltipMode > 3) Globals.NameTooltipMode = 1;
+            if (++Config.NameTooltipMode > 3) Config.NameTooltipMode = 1;
 
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
         }
         else
         {
-            if (--Globals.NameTooltipMode < 1) Globals.NameTooltipMode = 3;
+            if (--Config.NameTooltipMode < 1) Config.NameTooltipMode = 3;
 
-            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", Config);
+            this.Helper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", PerPlayerConfig);
         }
     }
 
@@ -697,37 +698,37 @@ public class ModEntry : Mod
     /// <param name="isOutdoors">Whether the location is outdoors.</param>
     private bool IsMinimapEnabledIn(string location, bool isOutdoors)
     {
-        if (!Globals.ShowMinimap)
+        if (!Config.ShowMinimap)
             return false;
 
         // by exact name
-        if (Globals.MinimapExclusions.Contains(location))
+        if (Config.MinimapExclusions.Contains(location))
             return false;
 
         // mine entrances
         switch (location.ToLower())
         {
-            case "mine" when Globals.MinimapExclusions.Contains("Mines"):
+            case "mine" when Config.MinimapExclusions.Contains("Mines"):
                 return false;
 
             // skull cavern entrance
-            case "skullcave" when Globals.MinimapExclusions.Contains("SkullCavern"):
+            case "skullcave" when Config.MinimapExclusions.Contains("SkullCavern"):
                 return false;
         }
 
         // mine levels
         if (location.StartsWith("UndergroundMine") && int.TryParse(location.Substring("UndergroundMine".Length), out int mineLevel))
         {
-            if (Globals.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
+            if (Config.MinimapExclusions.Contains(mineLevel > 120 ? "SkullCavern" : "Mines"))
                 return false;
         }
 
         // Deep Woods mod
-        if ((location == "DeepWoods" || location.StartsWith("DeepWoods_")) && Globals.MinimapExclusions.Contains("DeepWoods"))
+        if ((location == "DeepWoods" || location.StartsWith("DeepWoods_")) && Config.MinimapExclusions.Contains("DeepWoods"))
             return false;
 
         // indoors/outdoors
-        if (Globals.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
+        if (Config.MinimapExclusions.Contains(isOutdoors ? "Outdoors" : "Indoors"))
             return false;
 
         return true;
@@ -741,7 +742,7 @@ public class ModEntry : Mod
         if (Context.IsMainPlayer)
         {
             // book seller
-            if (ModEntry.Globals.ShowBookseller && Utility.getDaysOfBooksellerThisSeason().Contains(Game1.dayOfMonth))
+            if (ModEntry.Config.ShowBookseller && Utility.getDaysOfBooksellerThisSeason().Contains(Game1.dayOfMonth))
             {
                 WorldMapPosition mapPos = GetWorldMapPosition("Town", 108, 25); // hardcoded in Town.draw
 
@@ -758,7 +759,7 @@ public class ModEntry : Mod
             }
 
             // traveling cart
-            if (ModEntry.Globals.ShowTravelingMerchant && Game1.RequireLocation<Forest>("Forest").ShouldTravelingMerchantVisitToday())
+            if (ModEntry.Config.ShowTravelingMerchant && Game1.RequireLocation<Forest>("Forest").ShouldTravelingMerchantVisitToday())
             {
                 Forest forest = Game1.RequireLocation<Forest>("Forest");
                 Point cartTile = forest.GetTravelingMerchantCartTile();
@@ -787,7 +788,7 @@ public class ModEntry : Mod
                     _ => CharacterType.Villager
                 };
 
-                int offset = ModEntry.Globals.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
+                int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
 
                 if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                 {
@@ -922,7 +923,7 @@ public class ModEntry : Mod
             // For show Npcs in player's location option
             bool isSameLocation = false;
 
-            if (Globals.OnlySameLocation)
+            if (Config.OnlySameLocation)
             {
                 string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
                 if (locationName == playerLocationName)
@@ -986,7 +987,7 @@ public class ModEntry : Mod
 
             // For show Npcs in player's location option
             bool isSameLocation = false;
-            if (Globals.OnlySameLocation)
+            if (Config.OnlySameLocation)
             {
                 string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
                 if (marker.LocationName == playerLocationName)
@@ -1044,23 +1045,23 @@ public class ModEntry : Mod
             marker.ReasonHidden = reason;
         }
 
-        bool shownForQuest = ModEntry.Globals.ShowQuests && (marker.HasQuest || marker.IsBirthday);
+        bool shownForQuest = ModEntry.Config.ShowQuests && (marker.HasQuest || marker.IsBirthday);
 
         if (ModEntry.ShouldExcludeNpc(name, out string reason))
             Hide($"hidden per config ({reason})");
-        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
+        else if (!shownForQuest && PerPlayerConfig.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
             Hide("hidden per config (didn't talk to them today)");
-        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
+        else if (!shownForQuest && PerPlayerConfig.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
             Hide("hidden per config (talked to them today)");
-        else if (Globals.OnlySameLocation && !isSameLocation)
+        else if (Config.OnlySameLocation && !isSameLocation)
             Hide("hidden per config (not in same location)");
-        else if (Config.ByHeartLevel)
+        else if (PerPlayerConfig.ByHeartLevel)
         {
             int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);
-            if (Config.HeartLevelMin > 0 && hearts < Config.HeartLevelMin)
-                Hide($"hidden per config (less than {Config.HeartLevelMin} hearts)");
-            if (Config.HeartLevelMax < PlayerConfig.MaxPossibleHeartLevel && hearts > Config.HeartLevelMax)
-                Hide($"hidden per config (more than {Config.HeartLevelMax} hearts)");
+            if (PerPlayerConfig.HeartLevelMin > 0 && hearts < PerPlayerConfig.HeartLevelMin)
+                Hide($"hidden per config (less than {PerPlayerConfig.HeartLevelMin} hearts)");
+            if (PerPlayerConfig.HeartLevelMax < PlayerConfig.MaxPossibleHeartLevel && hearts > PerPlayerConfig.HeartLevelMax)
+                Hide($"hidden per config (more than {PerPlayerConfig.HeartLevelMax} hearts)");
         }
     }
 
@@ -1107,6 +1108,19 @@ public class ModEntry : Mod
 
             this.FarmerMarkers.Value[farmerId].WorldMapPosition = farmerLoc;
             this.FarmerMarkers.Value[farmerId].LocationName = locationName;
+        }
+    }
+
+    /// <summary>Migrate files from older versions of the mod.</summary>
+    private void MigrateLegacyFiles()
+    {
+        CommonHelper.RemoveObsoleteFiles(this, "NPCMapLocations.pdb");
+
+        ModConfig config = this.Helper.Data.ReadJsonFile<ModConfig>("config/globals.json");
+        if (config != null)
+        {
+            this.Helper.WriteConfig(config);
+            CommonHelper.RemoveObsoleteFiles(this, "config/globals.json");
         }
     }
 }

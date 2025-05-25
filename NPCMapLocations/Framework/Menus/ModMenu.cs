@@ -88,20 +88,20 @@ public class ModMenu : IClickableMenu
         this.ImmersionAllButton = new VillagerVisibilityButton(
             label: I18n.Immersion_AlwaysShowVillagers(),
             id: VillagerVisibility.All,
-            get: () => ModEntry.Config.ImmersionOption,
-            set: value => ModEntry.Config.ImmersionOption = value
+            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
+            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
         );
         this.ImmersionTalkedToButton = new VillagerVisibilityButton(
             label: I18n.Immersion_OnlyVillagersTalkedTo(),
             id: VillagerVisibility.TalkedTo,
-            get: () => ModEntry.Config.ImmersionOption,
-            set: value => ModEntry.Config.ImmersionOption = value
+            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
+            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
         );
         this.ImmersionNotTalkedToButton = new VillagerVisibilityButton(
             label: I18n.Immersion_HideVillagersTalkedTo(),
             id: VillagerVisibility.NotTalkedTo,
-            get: () => ModEntry.Config.ImmersionOption,
-            set: value => ModEntry.Config.ImmersionOption = value
+            get: () => ModEntry.PerPlayerConfig.ImmersionOption,
+            set: value => ModEntry.PerPlayerConfig.ImmersionOption = value
         );
 
         this.Options.AddRange(new[]
@@ -112,10 +112,10 @@ public class ModMenu : IClickableMenu
             new OptionsElement(I18n.Minimap_Label()),
             new ModCheckbox(
                 label: I18n.Minimap_Enabled(),
-                value: ModEntry.Globals.ShowMinimap,
+                value: ModEntry.Config.ShowMinimap,
                 set: value =>
                 {
-                    ModEntry.Globals.ShowMinimap = value;
+                    ModEntry.Config.ShowMinimap = value;
                     onMinimapToggled();
                 }
             ),
@@ -123,28 +123,28 @@ public class ModMenu : IClickableMenu
             // minimap size
             new ModCheckbox(
                 label: I18n.Minimap_Locked(),
-                value: ModEntry.Globals.LockMinimapPosition,
-                set: value => ModEntry.Globals.LockMinimapPosition = value
+                value: ModEntry.Config.LockMinimapPosition,
+                set: value => ModEntry.Config.LockMinimapPosition = value
             ),
             new ModPlusMinus(
                 label: I18n.Minimap_Width(),
-                value: ModEntry.Globals.MinimapWidth,
+                value: ModEntry.Config.MinimapWidth,
                 min: 75,
                 max: 300,
                 step: 15,
-                set: value => ModEntry.Globals.MinimapWidth = value,
+                set: value => ModEntry.Config.MinimapWidth = value,
                 format: value => $"{value}px",
-                shouldGrayOut: () => !ModEntry.Globals.ShowMinimap
+                shouldGrayOut: () => !ModEntry.Config.ShowMinimap
             ),
             new ModPlusMinus(
                 label: I18n.Minimap_Height(),
-                value: ModEntry.Globals.MinimapHeight,
+                value: ModEntry.Config.MinimapHeight,
                 min: 45,
                 max: 180,
                 step: 15,
-                set: value => ModEntry.Globals.MinimapHeight = value,
+                set: value => ModEntry.Config.MinimapHeight = value,
                 format: value => $"{value}px",
-                shouldGrayOut: () => !ModEntry.Globals.ShowMinimap
+                shouldGrayOut: () => !ModEntry.Config.ShowMinimap
             ),
 
             // NPC visibility
@@ -154,52 +154,52 @@ public class ModMenu : IClickableMenu
             this.ImmersionNotTalkedToButton,
             new ModCheckbox(
                 label: I18n.Immersion_OnlyVillagersInPlayerLocation(),
-                value: ModEntry.Globals.OnlySameLocation,
-                set: value => ModEntry.Globals.OnlySameLocation = value
+                value: ModEntry.Config.OnlySameLocation,
+                set: value => ModEntry.Config.OnlySameLocation = value
             ),
             new ModCheckbox(
                 label: I18n.Immersion_OnlyVillagersWithinHeartLevel(),
-                value: ModEntry.Config.ByHeartLevel,
-                set: value => ModEntry.Config.ByHeartLevel = value
+                value: ModEntry.PerPlayerConfig.ByHeartLevel,
+                set: value => ModEntry.PerPlayerConfig.ByHeartLevel = value
             ),
             new MapModSlider(
                 label: I18n.Immersion_MinHeartLevel(),
-                value: ModEntry.Config.HeartLevelMin,
+                value: ModEntry.PerPlayerConfig.HeartLevelMin,
                 min: 0,
                 max: PlayerConfig.MaxPossibleHeartLevel,
-                set: value => ModEntry.Config.HeartLevelMin = value,
-                shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
+                set: value => ModEntry.PerPlayerConfig.HeartLevelMin = value,
+                shouldGrayOut: () => !ModEntry.PerPlayerConfig.ByHeartLevel
             ),
             new MapModSlider(
                 label: I18n.Immersion_MaxHeartLevel(),
-                value: ModEntry.Config.HeartLevelMax,
+                value: ModEntry.PerPlayerConfig.HeartLevelMax,
                 min: 0,
                 max: PlayerConfig.MaxPossibleHeartLevel,
-                set: value => ModEntry.Config.HeartLevelMax = value,
-                shouldGrayOut: () => !ModEntry.Config.ByHeartLevel
+                set: value => ModEntry.PerPlayerConfig.HeartLevelMax = value,
+                shouldGrayOut: () => !ModEntry.PerPlayerConfig.ByHeartLevel
             ),
 
             // extra icons
             new OptionsElement(I18n.Extra_Label()),
             new ModCheckbox(
                 label: I18n.Extra_ShowQuestsOrBirthdays(),
-                value: ModEntry.Globals.ShowQuests,
-                set: value => ModEntry.Globals.ShowQuests = value
+                value: ModEntry.Config.ShowQuests,
+                set: value => ModEntry.Config.ShowQuests = value
             ),
             new ModCheckbox(
                 label: I18n.Extra_ShowHiddenVillagers(),
-                value: ModEntry.Globals.ShowHiddenVillagers,
-                set: value => ModEntry.Globals.ShowHiddenVillagers = value
+                value: ModEntry.Config.ShowHiddenVillagers,
+                set: value => ModEntry.Config.ShowHiddenVillagers = value
             ),
             new ModCheckbox(
                 label: I18n.Extra_ShowTravelingMerchant(),
-                value: ModEntry.Globals.ShowTravelingMerchant,
-                set: value => ModEntry.Globals.ShowTravelingMerchant = value
+                value: ModEntry.Config.ShowTravelingMerchant,
+                set: value => ModEntry.Config.ShowTravelingMerchant = value
             ),
             new ModCheckbox(
                 label: I18n.Extra_ShowHorses(),
-                value: ModEntry.Globals.ShowHorse,
-                set: value => ModEntry.Globals.ShowHorse = value
+                value: ModEntry.Config.ShowHorse,
+                set: value => ModEntry.Config.ShowHorse = value
             ),
 
             new OptionsElement(I18n.Villagers_Label())
@@ -224,9 +224,9 @@ public class ModMenu : IClickableMenu
                 {
                     bool exclude = !value;
                     if (exclude == ModEntry.ShouldExcludeNpc(name, ignoreConfig: true))
-                        ModEntry.Config.ForceNpcVisibility.Remove(name);
+                        ModEntry.PerPlayerConfig.ForceNpcVisibility.Remove(name);
                     else
-                        ModEntry.Config.ForceNpcVisibility[name] = exclude;
+                        ModEntry.PerPlayerConfig.ForceNpcVisibility[name] = exclude;
                 }
             )
         );
@@ -282,7 +282,7 @@ public class ModMenu : IClickableMenu
             return;
         }
 
-        if (key.ToString().Equals(ModEntry.Globals.MenuKey) && this.readyToClose() && this.CanClose)
+        if (key.ToString().Equals(ModEntry.Config.MenuKey) && this.readyToClose() && this.CanClose)
         {
             Game1.exitActiveMenu();
 
@@ -462,8 +462,8 @@ public class ModMenu : IClickableMenu
     /// <summary>Update the mod config files.</summary>
     private void UpdateConfig()
     {
-        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.PerPlayerConfig);
+        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
     }
 
     private void SetScrollBarToCurrentIndex()
