@@ -57,8 +57,8 @@ public class ModEntry : Mod
         helper.Events.World.LocationListChanged += this.OnLocationListChanged;
         helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
         helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
+        helper.Events.Input.ButtonsChanged += this.OnButtonsChanged;
         helper.Events.Input.ButtonPressed += this.OnButtonPressed;
-        helper.Events.Input.ButtonReleased += this.OnButtonReleased;
         helper.Events.Display.Rendered += this.OnRendered;
     }
 
@@ -67,8 +67,6 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
         new GenericModConfigMenuIntegration(this.Config, this.ModManifest, this.Helper.ModRegistry, () => this.Helper.WriteConfig(this.Config))
@@ -76,8 +74,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.DayStarted"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnDayStarted(object sender, DayStartedEventArgs e)
     {
         this.Characters = new List<Character>();
@@ -88,61 +84,61 @@ public class ModEntry : Mod
         this.UpdateLocators();
     }
 
+    /// <inheritdoc cref="IInputEvents.ButtonsChanged"/>
+    private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
+    {
+        if (!Context.IsWorldReady)
+            return;
+
+        // toggle
+        if (Context.IsPlayerFree)
+        {
+            if (this.Config.HoldToToggle)
+                this.SetShowLocators(this.Config.ToggleKeyCode.IsDown());
+            else if (this.Config.ToggleKeyCode.JustPressed())
+                this.SetShowLocators(!this.ShowLocators);
+        }
+
+        // apply locator options
+        if (this.ShowLocators && this.ActiveWarpLocators != null)
+        {
+            if (this.Config.SameLocationToggleKey.JustPressed())
+                this.Config.SameLocationOnly = !this.Config.SameLocationOnly;
+            else if (this.Config.FarmersOnlyToggleKey.JustPressed())
+                this.Config.ShowFarmersOnly = !this.Config.ShowFarmersOnly;
+            else if (this.Config.QuestsOnlyToggleKey.JustPressed())
+                this.Config.ShowQuestsAndBirthdaysOnly = !this.Config.ShowQuestsAndBirthdaysOnly;
+            else if (this.Config.HorsesToggleKey.JustPressed())
+                this.Config.ShowHorses = !this.Config.ShowHorses;
+
+            this.Helper.WriteConfig(this.Config);
+        }
+    }
+
     /// <inheritdoc cref="IInputEvents.ButtonPressed"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
     {
         if (!Context.IsWorldReady)
             return;
 
-        // Handle toggle
-        if (e.Button.ToString().Equals(this.Config.ToggleKeyCode) && Context.IsPlayerFree)
+        // handle scroll click
+        if ((e.Button == SButton.MouseRight || e.Button == SButton.ControllerA) && this.ActiveWarpLocators != null)
         {
-            if (this.Config.HoldToToggle)
-                this.SetShowLocators(true);
-            else
-                this.SetShowLocators(!this.ShowLocators);
-        }
-
-        // Configs
-        if (this.ActiveWarpLocators != null)
-        {
-            // Handle scroll click
-            if (e.Button.Equals(SButton.MouseRight) || e.Button.Equals(SButton.ControllerA))
-                foreach (var doorLocator in this.ActiveWarpLocators)
-                {
-                    if (doorLocator.Value.Characters.Count > 1)
-                        doorLocator.Value.ReceiveLeftClick();
-                }
-
-            if (this.ShowLocators)
+            foreach (LocatorScroller doorLocator in this.ActiveWarpLocators.Values)
             {
-                if (e.Button.ToString() == this.Config.SameLocationToggleKey)
-                    this.Config.SameLocationOnly = !this.Config.SameLocationOnly;
-                else if (e.Button.ToString() == this.Config.FarmersOnlyToggleKey)
-                    this.Config.ShowFarmersOnly = !this.Config.ShowFarmersOnly;
-                else if (e.Button.ToString() == this.Config.QuestsOnlyToggleKey)
-                    this.Config.ShowQuestsAndBirthdaysOnly = !this.Config.ShowQuestsAndBirthdaysOnly;
-                else if (e.Button.ToString() == this.Config.HorsesToggleKey)
-                    this.Config.ShowHorses = !this.Config.ShowHorses;
-
-                this.Helper.Data.WriteJsonFile("config.json", this.Config);
+                if (doorLocator.Characters.Count > 1)
+                    doorLocator.ReceiveLeftClick();
             }
         }
     }
 
     /// <inheritdoc cref="IWorldEvents.LocationListChanged"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnLocationListChanged(object sender, LocationListChangedEventArgs e)
     {
         this.LocationUtil.ScanLocationContexts();
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
     {
         this.ActiveWarpLocators = new Dictionary<string, LocatorScroller>();
@@ -169,29 +165,13 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IMultiplayerEvents.ModMessageReceived"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnModMessageReceived(object sender, ModMessageReceivedEventArgs e)
     {
         if (e.FromModID == this.ModManifest.UniqueID && e.Type == "SyncedLocationData")
             this.SyncedLocationData = e.ReadAs<SyncedNpcLocationData>();
     }
 
-    /// <inheritdoc cref="IInputEvents.ButtonReleased"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
-    private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
-    {
-        if (!Context.IsWorldReady)
-            return;
-
-        if (this.Config.HoldToToggle && e.Button.ToString().Equals(this.Config.ToggleKeyCode) && Context.IsPlayerFree)
-            this.SetShowLocators(false);
-    }
-
     /// <inheritdoc cref="IGameLoopEvents.UpdateTicked"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnUpdateTicked(object sender, UpdateTickedEventArgs e)
     {
         if (!Context.IsWorldReady)
@@ -228,8 +208,6 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IDisplayEvents.Rendered"/>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="e">The event data.</param>
     private void OnRendered(object sender, RenderedEventArgs e)
     {
         //if (!Context.IsWorldReady || locators == null) return;

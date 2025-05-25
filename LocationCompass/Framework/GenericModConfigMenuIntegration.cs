@@ -2,7 +2,6 @@
 using System.Reflection;
 using Bouhm.Shared.Integrations.GenericModConfigMenu;
 using StardewModdingAPI;
-using StardewValley;
 
 namespace LocationCompass.Framework;
 
@@ -100,40 +99,40 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.Config.HoldToToggle,
             setValue: value => this.Config.HoldToToggle = value
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_ToggleKey_Name,
             tooltip: I18n.Config_ToggleKey_Desc,
-            getValue: () => this.GetButton(config => config.ToggleKeyCode),
-            setValue: button => this.Config.ToggleKeyCode = button.ToString()
+            getValue: () => this.Config.ToggleKeyCode,
+            setValue: button => this.Config.ToggleKeyCode = button
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_SameLocationKey_Name,
             tooltip: I18n.Config_SameLocationKey_Desc,
-            getValue: () => this.GetButton(config => config.SameLocationToggleKey),
-            setValue: button => this.Config.SameLocationToggleKey = button.ToString()
+            getValue: () => this.Config.SameLocationToggleKey,
+            setValue: button => this.Config.SameLocationToggleKey = button
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_QuestsAndBirthdaysKey_Name,
             tooltip: I18n.Config_QuestsAndBirthdaysKey_Desc,
-            getValue: () => this.GetButton(config => config.QuestsOnlyToggleKey),
-            setValue: button => this.Config.QuestsOnlyToggleKey = button.ToString()
+            getValue: () => this.Config.QuestsOnlyToggleKey,
+            setValue: button => this.Config.QuestsOnlyToggleKey = button
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_PlayersKey_Name,
             tooltip: I18n.Config_PlayersKey_Desc,
-            getValue: () => this.GetButton(config => config.FarmersOnlyToggleKey),
-            setValue: button => this.Config.FarmersOnlyToggleKey = button.ToString()
+            getValue: () => this.Config.FarmersOnlyToggleKey,
+            setValue: button => this.Config.FarmersOnlyToggleKey = button
         );
-        menu.AddKeybind(
+        menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_HorsesKey_Name,
             tooltip: I18n.Config_HorsesKey_Desc,
-            getValue: () => this.GetButton(config => config.HorsesToggleKey),
-            setValue: button => this.Config.HorsesToggleKey = button.ToString()
+            getValue: () => this.Config.HorsesToggleKey,
+            setValue: button => this.Config.HorsesToggleKey = button
         );
     }
 
@@ -151,14 +150,5 @@ internal class GenericModConfigMenuIntegration
                 property.GetValue(this.DefaultConfig)
             );
         }
-    }
-
-    /// <summary>Get a parsed key binding from the raw mod settings.</summary>
-    /// <param name="getRawValue">Get the raw value from a settings model.</param>
-    private SButton GetButton(Func<ModConfig, string> getRawValue)
-    {
-        return Utility.TryParseEnum(getRawValue(this.Config), out SButton button) || Utility.TryParseEnum(getRawValue(this.DefaultConfig), out button)
-            ? button
-            : SButton.None;
     }
 }

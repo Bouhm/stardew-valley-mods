@@ -2,6 +2,8 @@
 
 # Release notes
 ## Upcoming release
+* Added support for controller/mouse button bindings.
+* Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).
 * Improve translations. Thanks to Kondiq (added Polish)!
 
 ## 1.4.2

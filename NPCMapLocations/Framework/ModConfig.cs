@@ -139,7 +139,7 @@ public class ModConfig
     // <summary>Normalize the model after it's deserialized.</summary>
     /// <param name="context">The deserialization context.</param>
     [OnDeserialized]
-    internal void OnDeserializedMethod(StreamingContext context)
+    internal void OnDeserialized(StreamingContext context)
     {
         // make values case-insensitive and non-nullable
         this.MenuKey ??= new KeybindList();
