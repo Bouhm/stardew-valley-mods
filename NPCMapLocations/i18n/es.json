@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Minimapa",
-    "minimap.enabled": "Activado",
-    "minimap.locked": "Fijar posición del minimapa",
-    "minimap.width": "Anchura del minimapa",
-    "minimap.height": "Altura del minimapa",
-
     // immersion section
     "immersion.label": "Ajustes:",
     "immersion.always-show-villagers": "Siempre mostrar aldeanos",
     "immersion.only-villagers-talked-to": "Mostrar aldeanos con los que se ha hablado",
     "immersion.hide-villagers-talked-to": "Esconder aldeanos con los que se ha hablado",
-    "immersion.only-villagers-in-player-location": "Solo mostrar aldeanos en la ubicación del jugador",
     "immersion.only-villagers-within-heart-level": "Solo mostrar aldeanos dentro de nivel de corazones",
     "immersion.min-heart-level": "Nivel mínimo de corazones",
     "immersion.max-heart-level": "Nivel máximo de corazones",
 
     // extra settings section
     "extra.label": "Ajustes Adicionales:",
-    "extra.show-quests-or-birthdays": "Mostrar misiones o cumpleaños",
-    "extra.show-hidden-villagers": "Mostrar aldeanos ocultos",
-    "extra.show-traveling-merchant": "Mostrar al comerciante ambulante",
-    "extra.show-horses": "Mostrar Caballos",
-
-    // include/exclude villagers section
-    "villagers.label": "Incluir/Excluir aldeanos:",
 
     // special NPC markers
     // TODO
@@ -38,6 +23,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Botón de Menú",
     "config.menu-key.desc": "Pulsa este botón mientras el mapa del juego está abierto para mostrar la configuración del mod.",
 
@@ -47,5 +37,48 @@
     "config.tooltip-key.name": "Botón de Información",
     "config.tooltip-key.desc": "Pulsa este botón para alternar la posición de la información sobre herramientas en la vista de mapa.",
 
-    "config.other-settings": "Para cambiar la configuración de los otros mods, abra el mapa del mundo del juego y pulsa el botón de menú que se muestra arriba."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Minimapa",
+
+    "config.minimap-enabled.name": "Activado",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Fijar posición del minimapa",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Anchura del minimapa",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Altura del minimapa",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Ajustes",
+
+    "config.only-in-location.name": "Solo mostrar aldeanos en la ubicación del jugador",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Mostrar misiones o cumpleaños",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Mostrar aldeanos ocultos",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Mostrar al comerciante ambulante",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Mostrar Caballos",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Incluir/Excluir aldeanos",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

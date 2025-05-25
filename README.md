@@ -26,14 +26,14 @@ on the wiki for help contributing translations.
 
 &nbsp;       | NPC Location Compass              | NPC Map Locations
 :----------- | :-------------------------------- | :--------------------------------
-Chinese      | [✓](LocationCompass/i18n/zh.json) | [✓](NPCMapLocations/i18n/zh.json)
-French       | [❑](LocationCompass/i18n)         | [✓](NPCMapLocations/i18n/fr.json)
+Chinese      | [✓](LocationCompass/i18n/zh.json) | [↻](NPCMapLocations/i18n/zh.json)
+French       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/fr.json)
 German       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/de.json)
 Hungarian    | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
 Italian      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/it.json)
 Japanese     | [✓](LocationCompass/i18n/ja.json) | [↻](NPCMapLocations/i18n/ja.json)
 Korean       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/ko.json)
-[Polish]     | [✓](LocationCompass/i18n/pl.json) | [✓](NPCMapLocations/i18n/pl.json)
+[Polish]     | [✓](LocationCompass/i18n/pl.json) | [↻](NPCMapLocations/i18n/pl.json)
 Portuguese   | [✓](LocationCompass/i18n/pt.json) | [↻](NPCMapLocations/i18n/pt.json)
 Russian      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/ru.json)
 Spanish      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/es.json)

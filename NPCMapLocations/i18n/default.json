@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Minimap",
-    "minimap.enabled": "Enabled",
-    "minimap.locked": "Lock minimap position",
-    "minimap.width": "Minimap width",
-    "minimap.height": "Minimap height",
-
     // immersion section
     "immersion.label": "Settings:",
     "immersion.always-show-villagers": "Always show villagers",
     "immersion.only-villagers-talked-to": "Show villagers player has talked to",
     "immersion.hide-villagers-talked-to": "Hide villagers player has talked to",
-    "immersion.only-villagers-in-player-location": "Only show villagers in player's location",
     "immersion.only-villagers-within-heart-level": "Only show villagers within heart level",
     "immersion.min-heart-level": "Minimum heart level",
     "immersion.max-heart-level": "Maximum heart level",
 
     // extra settings section
     "extra.label": "Extra Settings:",
-    "extra.show-quests-or-birthdays": "Show quests or birthdays",
-    "extra.show-hidden-villagers": "Show hidden villagers",
-    "extra.show-traveling-merchant": "Show traveling merchant",
-    "extra.show-horses": "Show horses",
-
-    // include/exclude villagers section
-    "villagers.label": "Include/Exclude villagers:",
 
     // special NPC markers
     "marker-names.bookseller": "Bookseller",
@@ -37,6 +22,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
 
@@ -46,5 +36,48 @@
     "config.tooltip-key.name": "Tooltip key",
     "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Minimap",
+
+    "config.minimap-enabled.name": "Enabled",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+
+    "config.lock-minimap.name": "Lock minimap position",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+
+    "config.minimap-width.name": "Minimap width",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-height-or-width.format": "{{size}} pixels",
+
+    "config.minimap-height.name": "Minimap height",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Settings",
+
+    "config.only-in-location.name": "Only NPCs in player's location",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+
+    "config.show-quests-or-birthdays.name": "Show quests or birthdays",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+
+    "config.show-hidden-villagers.name": "Show hidden villagers",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+
+    "config.show-traveling-merchant.name": "Show traveling merchant",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+
+    "config.show-horses.name": "Show horses",
+    "config.show-horses.desc": "Whether to show horses on the map.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Include/Exclude villagers",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map."
 }

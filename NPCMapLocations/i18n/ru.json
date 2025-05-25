@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Мини-карта",
-    "minimap.enabled": "Включено",
-    "minimap.locked": "Закрепить положение Мини-карты",
-    "minimap.width": "Ширина мини-карты",
-    "minimap.height": "Высота мини-карты",
-
     // immersion section
     "immersion.label": "Настройки:",
     "immersion.always-show-villagers": "Всегда показывать жителей",
     "immersion.only-villagers-talked-to": "Показывать жителей, с которыми общался игрок",
     "immersion.hide-villagers-talked-to": "Скрывать жителей, с которыми общался игрок",
-    "immersion.only-villagers-in-player-location": "Показывать жителей только в текущей локации",
     "immersion.only-villagers-within-heart-level": "Показывать жителей только в указанном диапазоне сердец",
     "immersion.min-heart-level": "Минимальный уровень сердец",
     "immersion.max-heart-level": "Максимальный уровень сердец",
 
     // extra settings section
     "extra.label": "Дополнительные настройки:",
-    "extra.show-quests-or-birthdays": "Показать задания или дни рождения",
-    "extra.show-hidden-villagers": "Показывать скрытых жителей",
-    "extra.show-traveling-merchant": "Показывать странствующего торговца",
-    "extra.show-horses": "Show horses", // TODO
-
-    // include/exclude villagers section
-    "villagers.label": "Добавить/исключить жителей:",
 
     // special NPC markers
     // TODO
@@ -39,6 +24,11 @@
     ** Generic Mod Config Menu UI
     *********/
     // TODO
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
 
@@ -48,5 +38,48 @@
     "config.tooltip-key.name": "Tooltip key",
     "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Мини-карта",
+
+    "config.minimap-enabled.name": "Включено",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Закрепить положение Мини-карты",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Ширина мини-карты",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Высота мини-карты",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Настройки",
+
+    "config.only-in-location.name": "Показывать жителей только в текущей локации",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Показать задания или дни рождения",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Показывать скрытых жителей",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Показывать странствующего торговца",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Show horses", // TODO
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Добавить/исключить жителей",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

@@ -3,8 +3,10 @@
 # Release notes
 ## Upcoming release
 * Overhauled mod settings:
+  * All settings are now available through Generic Mod Config Menu.
   * Moved `config/globals.json` into the conventional `config.json` file.  
     _Your previous `config/globals.json` file will be migrated automatically, so you won't lose those settings._
+  * Reduced min minimap width from 75px to 45px.
 * Reduced performance impact of minimap (thanks to GitHubSnegOk!).
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).

@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Mini harita",
-    "minimap.enabled": "Etkin",
-    "minimap.locked": "Mini harita konumunu kilitle",
-    "minimap.width": "Mini harita genişliği",
-    "minimap.height": "Mini harita uzunluğu",
-
     // immersion section
     "immersion.label": "Ayarlar:",
     "immersion.always-show-villagers": "Tüm köylüleri göster",
     "immersion.only-villagers-talked-to": "Oyuncunun konuştuğu köylüleri göster",
     "immersion.hide-villagers-talked-to": "Oyuncunun konuştuğu köylüleri gizle",
-    "immersion.only-villagers-in-player-location": "Sadece oyuncunun bölgesindeki köylüleri göster",
     "immersion.only-villagers-within-heart-level": "Sadece belirli kalp seviyesi içindeki köylüleri göster",
     "immersion.min-heart-level": "En az kalp seviyesi",
     "immersion.max-heart-level": "En fazla kalp seviyesi",
 
     // extra settings section
     "extra.label": "Ekstra ayarlar:",
-    "extra.show-quests-or-birthdays": "Görevleri ya da doğum günlerini göster",
-    "extra.show-hidden-villagers": "Gizli köylüleri göster",
-    "extra.show-traveling-merchant": "Gezgin tüccarı göster",
-    "extra.show-horses": "Show horses", // TODO
-
-    // include/exclude villagers section
-    "villagers.label": "Köylüleri ekle/çıkar:",
 
     // special NPC markers
     // TODO
@@ -39,6 +24,11 @@
     ** Generic Mod Config Menu UI
     *********/
     // TODO
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
 
@@ -48,5 +38,48 @@
     "config.tooltip-key.name": "Tooltip key",
     "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Mini harita",
+
+    "config.minimap-enabled.name": "Etkin",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Mini harita konumunu kilitle",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Mini harita genişliği",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Mini harita uzunluğu",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Ayarlar",
+
+    "config.only-in-location.name": "Sadece oyuncunun bölgesindeki köylüleri göster",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Görevleri ya da doğum günlerini göster",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Gizli köylüleri göster",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Gezgin tüccarı göster",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Show horses", // TODO
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Köylüleri ekle/çıkar",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

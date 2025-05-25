@@ -2,32 +2,17 @@
     /*********
     ** Map options (Térkép beállítások)
     *********/
-    // minimap section (Kistárkép szakasz)
-    "minimap.label": "Kistérkép",
-    "minimap.enabled": "Engedélyezve",
-    "minimap.locked": "Kistérkép pozíció zárolás",
-    "minimap.width": "Kistérkép szélesség",
-    "minimap.height": "Kistérkép magasság",
-
     // immersion section (Merülő szakasz)
     "immersion.label": "Beállítások:",
     "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
     "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
     "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
-    "immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
     "immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
     "immersion.min-heart-level": "Minimális szívszint",
     "immersion.max-heart-level": "Maximális szívszint",
 
     // extra settings section (Extra beállítások szakasz)
     "extra.label": "További beállítások:",
-    "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
-    "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
-    "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
-    "extra.show-horses": "Show horses", // TODO
-
-    // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
-    "villagers.label": "Falusiak Engedélyezése/Kizárása:",
 
     // special NPC markers
     // TODO
@@ -39,6 +24,11 @@
     ** Generic Mod Config Menu UI
     *********/
     // TODO
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
 
@@ -48,5 +38,48 @@
     "config.tooltip-key.name": "Tooltip key",
     "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Kistérkép",
+
+    "config.minimap-enabled.name": "Engedélyezve",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Kistérkép pozíció zárolás",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Kistérkép szélesség",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Kistérkép magasság",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Beállítások",
+
+    "config.only-in-location.name": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Küldetések vagy születésnapok megjelenítése",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Rejtett falusiak megjelenítése",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Utazó kereskedő megjelenítése",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Show horses", // TODO
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Falusiak Engedélyezése/Kizárása",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

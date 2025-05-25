@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Mini-Mapa",
-    "minimap.enabled": "Ativo",
-    "minimap.locked": "Travar a Posição do Mini-Mapa",
-    "minimap.width": "Largura do Mini-Mapa",
-    "minimap.height": "Altura do Mini-Mapa",
-
     // immersion section
     "immersion.label": "Configurações:",
     "immersion.always-show-villagers": "Sempre Mostrar Moradores",
     "immersion.only-villagers-talked-to": "Mostrar Moradores que o Jogador Já Interagiu",
     "immersion.hide-villagers-talked-to": "Esconder Moradores que o Jogador Já Interagiu",
-    "immersion.only-villagers-in-player-location": "Mostrar Somente Moradores na Localização do Jogador",
     "immersion.only-villagers-within-heart-level": "Mostrar Somente Moradores Dentro dos Limites de Nível de Relacionamento",
     "immersion.min-heart-level": "Nível Mínimo de Relacionamento",
     "immersion.max-heart-level": "Nível Máximo de Relacionamento",
 
     // extra settings section
     "extra.label": "Configurações Extras:",
-    "extra.show-quests-or-birthdays": "Mostrar Missões ou Aniversários",
-    "extra.show-hidden-villagers": "Mostrar Moradores Escondidos",
-    "extra.show-traveling-merchant": "Mostrar Mercador Viajante",
-    "extra.show-horses": "Mostrar Cavalos",
-
-    // include/exclude villagers section
-    "villagers.label": "Incluir/Excluir Moradores:",
 
     // special NPC markers
     // TODO
@@ -38,6 +23,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Tecla do Menu",
     "config.menu-key.desc": "Pressione esta tecla enquanto o mapa do mundo está aberto para mostrar as configurações do mod.",
 
@@ -47,5 +37,48 @@
     "config.tooltip-key.name": "Tecla do Tooltip",
     "config.tooltip-key.desc": "Pressione esta tecla para alternar entre as possíveis posições do tooltip ao visualizar o mapa.",
 
-    "config.other-settings": "Para alterar outras configurações do mod, abra o mapa do mundo e pressione a tecla do menu informada acima."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Mini-Mapa",
+
+    "config.minimap-enabled.name": "Ativo",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Travar a Posição do Mini-Mapa",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Largura do Mini-Mapa",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Altura do Mini-Mapa",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Configurações",
+
+    "config.only-in-location.name": "Mostrar Somente Moradores na Localização do Jogador",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Mostrar Missões ou Aniversários",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Mostrar Moradores Escondidos",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Mostrar Mercador Viajante",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Mostrar Cavalos",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Incluir/Excluir Moradores",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

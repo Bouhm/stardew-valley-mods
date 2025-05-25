@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using StardewModdingAPI;
@@ -10,6 +11,13 @@ namespace NPCMapLocations.Framework;
 /// <summary>Manages customized map recolors, NPCs, sprites, names, etc.</summary>
 public class ModCustomizations
 {
+    /*********
+    ** Fields
+    *********/
+    /// <summary>A callback to invoke when the settings are saved.</summary>
+    private readonly Action OnSaved;
+
+
     /*********
     ** Accessors
     *********/
@@ -24,6 +32,14 @@ public class ModCustomizations
     /*********
     ** Public methods
     *********/
+    /// <summary>Construct an instance.</summary>
+    /// <param name="onSaved">A callback to invoke when the settings are saved.</param>
+    public ModCustomizations(Action onSaved)
+    {
+        this.OnSaved = onSaved;
+    }
+
+
     /// <summary>Load customizations received from other mods through the content pipeline.</summary>
     /// <param name="customNpcJson">The custom NPC data.</param>
     /// <param name="customLocationJson">The custom location data.</param>
@@ -118,7 +134,7 @@ public class ModCustomizations
         }
 
         ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.PerPlayerConfig);
-        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
+        this.OnSaved();
     }
 
     /// <summary>Merge any number of dictionaries into a new dictionary.</summary>

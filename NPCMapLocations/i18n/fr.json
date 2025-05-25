@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Mini-carte",
-    "minimap.enabled": "Activée",
-    "minimap.locked": "Bloquer la position de la mini-carte",
-    "minimap.width": "Largeur de la mini-carte",
-    "minimap.height": "Hauteur de la mini-carte",
-
     // immersion section
     "immersion.label": "Paramètres:",
     "immersion.always-show-villagers": "Toujours afficher les villageois",
     "immersion.only-villagers-talked-to": "Afficher les villageois avec qui le joueur a parlé",
     "immersion.hide-villagers-talked-to": "Cacher les villageois avec qui le joueur a parlé",
-    "immersion.only-villagers-in-player-location": "Afficher uniquement les villageois à l'emplacement du joueur",
     "immersion.only-villagers-within-heart-level": "Afficher uniquement les villageois selon le niveau de coeur",
     "immersion.min-heart-level": "< Niveau de cœur minimum <",
     "immersion.max-heart-level": "< Niveau de cœur maximum <",
 
     // extra settings section
     "extra.label": "Paramètres supplémentaires :",
-    "extra.show-quests-or-birthdays": "Afficher les quêtes ou les anniversaires",
-    "extra.show-hidden-villagers": "Afficher les villageois cachés",
-    "extra.show-traveling-merchant": "Afficher les marchands ambulants",
-    "extra.show-horses": "Montrer les chevaux",
-
-    // include/exclude villagers section
-    "villagers.label": "Inclure/Exclure les villageois:",
 
     // special NPC markers
     "marker-names.bookseller": "Libraire",
@@ -37,6 +22,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Raccourci de menu",
     "config.menu-key.desc": "Appuyer sur bouton lorsque la carte du jeu est ouverte pour voir les paramètres du mod.",
 
@@ -46,5 +36,48 @@
     "config.tooltip-key.name": "Raccourci infobulle",
     "config.tooltip-key.desc": "Appuyez sur ce bouton pour changer la position de l’infobulle sur la carte du jeu.",
 
-    "config.other-settings": "Pour changer les autres paramètres du mod, ouvrez la carte du jeu et appuyez sur le raccourci de menu défini ci-dessus."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Mini-carte",
+
+    "config.minimap-enabled.name": "Activée",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Bloquer la position de la mini-carte",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Largeur de la mini-carte",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Hauteur de la mini-carte",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Paramètres",
+
+    "config.only-in-location.name": "Afficher uniquement les villageois à l'emplacement du joueur",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Afficher les quêtes ou les anniversaires",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Afficher les villageois cachés",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Afficher les marchands ambulants",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Montrer les chevaux",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Inclure/Exclure les villageois",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

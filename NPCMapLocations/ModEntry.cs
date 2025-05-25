@@ -80,7 +80,7 @@ public class ModEntry : Mod
         ModEntry.LocationUtil = new(this.Monitor);
         StaticHelper = helper;
         Config = helper.ReadConfig<ModConfig>();
-        this.Customizations = new ModCustomizations();
+        this.Customizations = new ModCustomizations(this.OnConfigEdited);
 
         helper.Events.Content.AssetRequested += this.OnAssetRequested;
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
@@ -217,7 +217,7 @@ public class ModEntry : Mod
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
         // register config UI
-        new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry)
+        new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited)
             .Register();
 
         // register map page with Better Game Menu
@@ -688,6 +688,9 @@ public class ModEntry : Mod
     /// <param name="location">The location for which to check visibility, or <c>null</c> for the player's current location.</param>
     private void UpdateMinimapVisibility(GameLocation location = null)
     {
+        if (!Context.IsWorldReady)
+            return;
+
         location ??= Game1.currentLocation;
 
         this.ShowMinimap.Value = this.IsMinimapEnabledIn(location.Name, location.IsOutdoors);
@@ -1109,6 +1112,22 @@ public class ModEntry : Mod
             this.FarmerMarkers.Value[farmerId].WorldMapPosition = farmerLoc;
             this.FarmerMarkers.Value[farmerId].LocationName = locationName;
         }
+    }
+
+    /// <summary>Reset the mod settings to default.</summary>
+    private void ResetConfig()
+    {
+        ModEntry.Config = new ModConfig();
+        this.OnConfigEdited();
+    }
+
+    /// <summary>Handle the config being edited through Generic Mod Config Menu.</summary>
+    private void OnConfigEdited()
+    {
+        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
+
+        this.UpdateMinimapVisibility();
+        this.Minimap.Value?.Resize();
     }
 
     /// <summary>Migrate files from older versions of the mod.</summary>

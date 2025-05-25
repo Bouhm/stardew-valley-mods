@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Minimap",
-    "minimap.enabled": "Đã bật",
-    "minimap.locked": "Khóa vị trí Minimap",
-    "minimap.width": "Chiều rộng Minimap",
-    "minimap.height": "Chiều dài Minimap",
-
     // immersion section
     "immersion.label": "Cài đặt:",
     "immersion.always-show-villagers": "Luôn hiện dân làng",
     "immersion.only-villagers-talked-to": "Hiện dân làng mà người chơi đã nói chuyện",
     "immersion.hide-villagers-talked-to": "Ẩn dân làng mà người chơi đã nói chuyện",
-    "immersion.only-villagers-in-player-location": "Chỉ hiện dân làng ở vị trí người chơi",
     "immersion.only-villagers-within-heart-level": "Chỉ hiện dân làng dựa theo cấp độ thân mật",
     "immersion.min-heart-level": "Mức thân mật tối thiểu",
     "immersion.max-heart-level": "Mức thân mật tối đa",
 
     // extra settings section
     "extra.label": "Cài đặt bổ sung:",
-    "extra.show-quests-or-birthdays": "Hiện nhiệm vụ và sinh nhật",
-    "extra.show-hidden-villagers": "Hiện dân làng đang bị ẩn",
-    "extra.show-traveling-merchant": "hiện thương gia",
-    "extra.show-horses": "Hiện ngựa",
-
-    // include/exclude villagers section
-    "villagers.label": "Bao gồm/Loại trừ dân làng:",
 
     // special NPC markers
     // TODO
@@ -38,6 +23,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Phím menu",
     "config.menu-key.desc": "Nhấn nút này khi bản đồ trong trò chơi đang mở để hiển thị các cài đặt của mod.",
 
@@ -47,5 +37,48 @@
     "config.tooltip-key.name": "Phím chú thích",
     "config.tooltip-key.desc": "Nhấn nút này để chuyển vị trí chú thích khi ở chế độ xem bản đồ.",
 
-    "config.other-settings": "Để thay đổi các cài đặt mod khác, hãy mở bản đồ thế giới trong trò chơi và nhấn phím menu được hiển thị ở trên."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Minimap",
+
+    "config.minimap-enabled.name": "Đã bật",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Khóa vị trí Minimap",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Chiều rộng Minimap",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Chiều dài Minimap",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Cài đặt",
+
+    "config.only-in-location.name": "Chỉ hiện dân làng ở vị trí người chơi",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Hiện nhiệm vụ và sinh nhật",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Hiện dân làng đang bị ẩn",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "hiện thương gia",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Hiện ngựa",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Bao gồm/Loại trừ dân làng",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

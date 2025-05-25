@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Linq;
 using Bouhm.Shared.Integrations.GenericModConfigMenu;
 using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Extensions;
+using StardewValley.GameData.Characters;
+using StardewValley.TokenizableStrings;
 
 namespace NPCMapLocations.Framework;
 
@@ -18,11 +22,14 @@ internal class GenericModConfigMenuIntegration
     /// <summary>The Generic Mod Config Menu integration.</summary>
     private readonly IGenericModConfigMenuApi ConfigMenu;
 
+    /// <summary>A callback to invoke when the settings are reset to default.</summary>
+    private readonly Action OnReset;
+
+    /// <summary>A callback to invoke when the settings are saved.</summary>
+    private readonly Action OnSaved;
+
     /// <summary>The current mod settings.</summary>
     private ModConfig Config => ModEntry.Config;
-
-    /// <summary>The default mod settings.</summary>
-    private readonly ModConfig DefaultConfig = new();
 
 
     /*********
@@ -31,10 +38,14 @@ internal class GenericModConfigMenuIntegration
     /// <summary>Construct an instance.</summary>
     /// <param name="manifest">The NPC Map Locations manifest.</param>
     /// <param name="modRegistry">An API for fetching metadata about loaded mods.</param>
-    public GenericModConfigMenuIntegration(IManifest manifest, IModRegistry modRegistry)
+    /// <param name="onReset">A callback to invoke when the settings are reset to default.</param>
+    /// <param name="onSaved">A callback to invoke when the settings are saved.</param>
+    public GenericModConfigMenuIntegration(IManifest manifest, IModRegistry modRegistry, Action onReset, Action onSaved)
     {
         this.Manifest = manifest;
         this.ConfigMenu = modRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        this.OnReset = onReset;
+        this.OnSaved = onSaved;
     }
 
     /// <summary>Register the config menu if available.</summary>
@@ -46,6 +57,8 @@ internal class GenericModConfigMenuIntegration
 
         menu.Register(this.Manifest, this.Reset, this.Save);
 
+        // controls
+        menu.AddSectionTitle(this.Manifest, text: I18n.Config_ControlsTitle);
         menu.AddKeybind(
             this.Manifest,
             name: I18n.Config_MenuKey_Name,
@@ -53,7 +66,6 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.GetButton(config => config.MenuKey),
             setValue: button => this.Config.MenuKey = button.ToString()
         );
-
         menu.AddKeybind(
             this.Manifest,
             name: I18n.Config_MinimapKey_Name,
@@ -61,7 +73,6 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.GetButton(config => config.MinimapToggleKey),
             setValue: button => this.Config.MinimapToggleKey = button.ToString()
         );
-
         menu.AddKeybind(
             this.Manifest,
             name: I18n.Config_TooltipKey_Name,
@@ -70,10 +81,98 @@ internal class GenericModConfigMenuIntegration
             setValue: button => this.Config.TooltipKey = button.ToString()
         );
 
-        menu.AddParagraph(
+        // minimap
+        menu.AddSectionTitle(this.Manifest, text: I18n.Config_MinimapTitle);
+        menu.AddBoolOption(
             this.Manifest,
-            I18n.Config_OtherSettings
+            name: I18n.Config_MinimapEnabled_Name,
+            tooltip: I18n.Config_MinimapEnabled_Desc,
+            getValue: () => this.Config.ShowMinimap,
+            setValue: value => this.Config.ShowMinimap = value
         );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_LockMinimap_Name,
+            tooltip: I18n.Config_LockMinimap_Desc,
+            getValue: () => this.Config.LockMinimapPosition,
+            setValue: value => this.Config.LockMinimapPosition = value
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapWidth_Name,
+            tooltip: I18n.Config_MinimapWidth_Desc,
+            getValue: () => this.Config.MinimapWidth,
+            setValue: value => this.Config.MinimapWidth = value,
+            min: 45,
+            max: 180,
+            interval: 15,
+            formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapHeight_Name,
+            tooltip: I18n.Config_MinimapHeight_Desc,
+            getValue: () => this.Config.MinimapHeight,
+            setValue: value => this.Config.MinimapHeight = value,
+            min: 45,
+            max: 180,
+            interval: 15,
+            formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
+        );
+
+        // settings
+        menu.AddSectionTitle(this.Manifest, I18n.Config_SettingsTitle);
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_OnlyInLocation_Name,
+            tooltip: I18n.Config_OnlyInLocation_Desc,
+            getValue: () => this.Config.OnlySameLocation,
+            setValue: value => this.Config.OnlySameLocation = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowQuestsOrBirthdays_Name,
+            tooltip: I18n.Config_ShowQuestsOrBirthdays_Desc,
+            getValue: () => this.Config.ShowQuests,
+            setValue: value => this.Config.ShowQuests = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowHiddenVillagers_Name,
+            tooltip: I18n.Config_ShowHiddenVillagers_Desc,
+            getValue: () => this.Config.ShowHiddenVillagers,
+            setValue: value => this.Config.ShowHiddenVillagers = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowTravelingMerchant_Name,
+            tooltip: I18n.Config_ShowTravelingMerchant_Desc,
+            getValue: () => this.Config.ShowTravelingMerchant,
+            setValue: value => this.Config.ShowTravelingMerchant = value
+        );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_ShowHorses_Name,
+            tooltip: I18n.Config_ShowHorses_Desc,
+            getValue: () => this.Config.ShowHorse,
+            setValue: value => this.Config.ShowHorse = value
+        );
+
+        // Include/exclude villagers
+        menu.AddSectionTitle(this.Manifest, I18n.Config_ToggleVillagersTitle);
+        foreach ((string npcName, CharacterData data) in Game1.characterData.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            if (data is null || data.SocialTab == SocialTabBehavior.HiddenAlways || this.Config.ModNpcExclusions.Contains(npcName))
+                continue;
+
+            menu.AddBoolOption(
+                this.Manifest,
+                name: () => TokenParser.ParseText(data.DisplayName),
+                tooltip: () => I18n.Config_ToggleNpc_Desc(displayName: TokenParser.ParseText(data.DisplayName)),
+                getValue: () => !this.Config.NpcExclusions.Contains(npcName),
+                setValue: value => this.Config.NpcExclusions.Toggle(npcName, value)
+            );
+        }
     }
 
 
@@ -83,22 +182,20 @@ internal class GenericModConfigMenuIntegration
     /// <summary>Reset the mod's config to its default values.</summary>
     private void Reset()
     {
-        this.Config.MenuKey = this.DefaultConfig.MenuKey;
-        this.Config.MinimapToggleKey = this.DefaultConfig.MinimapToggleKey;
-        this.Config.TooltipKey = this.DefaultConfig.TooltipKey;
+        this.OnReset();
     }
 
     /// <summary>Save the mod's current config to the <c>config.json</c> file.</summary>
     private void Save()
     {
-        ModEntry.StaticHelper.WriteConfig(this.Config);
+        this.OnSaved();
     }
 
     /// <summary>Get a parsed key binding from the raw mod settings.</summary>
     /// <param name="getRawValue">Get the raw value from a settings model.</param>
     private SButton GetButton(Func<ModConfig, string> getRawValue)
     {
-        return Utility.TryParseEnum(getRawValue(this.Config), out SButton button) || Utility.TryParseEnum(getRawValue(this.DefaultConfig), out button)
+        return Utility.TryParseEnum(getRawValue(this.Config), out SButton button)
             ? button
             : SButton.None;
     }

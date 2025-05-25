@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "미니맵",
-    "minimap.enabled": "사용하기",
-    "minimap.locked": "미니맵 위치 잠금",
-    "minimap.width": "미니맵 가로",
-    "minimap.height": "미니맵 세로",
-
     // immersion section
     "immersion.label": "설정:",
     "immersion.always-show-villagers": "주민들을 항상 표시",
     "immersion.only-villagers-talked-to": "말해본 주민만 표시",
     "immersion.hide-villagers-talked-to": "말해본 주민만 제외",
-    "immersion.only-villagers-in-player-location": "같은 장소에 있는 주민만 표시",
     "immersion.only-villagers-within-heart-level": "친밀도가 있는 주민만 표시",
     "immersion.min-heart-level": "최저 친밀도",
     "immersion.max-heart-level": "최고 친밀도",
 
     // extra settings section
     "extra.label": "기타 설정:",
-    "extra.show-quests-or-birthdays": "주민 퀘스트나 생일 표시",
-    "extra.show-hidden-villagers": "숨어있는 주민 표시",
-    "extra.show-traveling-merchant": "행상인 마차 표시",
-    "extra.show-horses": "말 표시",
-
-    // include/exclude villagers section
-    "villagers.label": "포함/제외할 주민:",
 
     // special NPC markers
     // TODO
@@ -38,6 +23,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "메뉴 키",
     "config.menu-key.desc": "게임 내 지도가 열려 있는 동안 이 버튼을 누르면 모드 설정이 표시됩니다.",
 
@@ -47,5 +37,48 @@
     "config.tooltip-key.name": "도움말 키",
     "config.tooltip-key.desc": "지도 보기에서 도움말을 순환하려면 이 버튼을 누릅니다.",
 
-    "config.other-settings": "다른 모드 설정을 변경하려면 게임 내 세계 지도를 열고 위에 표시된 메뉴 키를 누릅니다."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "미니맵",
+
+    "config.minimap-enabled.name": "사용하기",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "미니맵 위치 잠금",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "미니맵 가로",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "미니맵 세로",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "설정",
+
+    "config.only-in-location.name": "같은 장소에 있는 주민만 표시",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "주민 퀘스트나 생일 표시",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "숨어있는 주민 표시",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "행상인 마차 표시",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "말 표시",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "포함/제외할 주민",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

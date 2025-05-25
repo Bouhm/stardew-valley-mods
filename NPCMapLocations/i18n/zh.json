@@ -2,32 +2,17 @@
     /*********
     ** Map options (地图选项)
     *********/
-    // minimap section (小地图选项)
-    "minimap.label": "小地图",
-    "minimap.enabled": "启用",
-    "minimap.locked": "锁定小地图位置",
-    "minimap.width": "小地图宽",
-    "minimap.height": "小地图高",
-
     // immersion section (拟真体验选项)
     "immersion.label": "设置:",
     "immersion.always-show-villagers": "显示所有村民",
     "immersion.only-villagers-talked-to": "只显示已对话的村民",
     "immersion.hide-villagers-talked-to": "隐藏所有已对话的村民",
-    "immersion.only-villagers-in-player-location": "只显示玩家所在位置的村民",
     "immersion.only-villagers-within-heart-level": "显示指定好感度范围内的村民",
     "immersion.min-heart-level": "最小好感度",
     "immersion.max-heart-level": "最大好感度",
 
     // extra settings section (额外设置选项)
     "extra.label": "额外设定:",
-    "extra.show-quests-or-birthdays": "显示任务或生日",
-    "extra.show-hidden-villagers": "显示隐藏的村民",
-    "extra.show-traveling-merchant": "显示旅行商人",
-    "extra.show-horses": "显示马",
-
-    // include/exclude villagers section (包含/排除 村民选项)
-    "villagers.label": "显示村民列表:",
 
     // special NPC markers
     "marker-names.bookseller": "书摊老板",
@@ -37,6 +22,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "打开菜单",
     "config.menu-key.desc": "在游戏内地图中按此快捷键以打开Mod设置界面",
 
@@ -46,5 +36,48 @@
     "config.tooltip-key.name": "切换提示条位置",
     "config.tooltip-key.desc": "在地图界面按此快捷键以切换角色提示条位置",
 
-    "config.other-settings": "若需更改本Mod其他设置，请在游戏内地图界面按打开菜单键进行更改"
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "小地图",
+
+    "config.minimap-enabled.name": "启用",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "锁定小地图位置",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "小地图宽",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "小地图高",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "设置",
+
+    "config.only-in-location.name": "只显示玩家所在位置的村民",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "显示任务或生日",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "显示隐藏的村民",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "显示旅行商人",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "显示马",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "显示村民列表",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }

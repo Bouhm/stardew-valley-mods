@@ -109,9 +109,9 @@ public class ModMenu : IClickableMenu
             new OptionsElement("NPC Map Locations"),
 
             // minimap enabled
-            new OptionsElement(I18n.Minimap_Label()),
+            new OptionsElement(I18n.Config_MinimapTitle()),
             new ModCheckbox(
-                label: I18n.Minimap_Enabled(),
+                label: I18n.Config_MinimapEnabled_Name(),
                 value: ModEntry.Config.ShowMinimap,
                 set: value =>
                 {
@@ -122,12 +122,12 @@ public class ModMenu : IClickableMenu
 
             // minimap size
             new ModCheckbox(
-                label: I18n.Minimap_Locked(),
+                label: I18n.Config_LockMinimap_Name(),
                 value: ModEntry.Config.LockMinimapPosition,
                 set: value => ModEntry.Config.LockMinimapPosition = value
             ),
             new ModPlusMinus(
-                label: I18n.Minimap_Width(),
+                label: I18n.Config_MinimapWidth_Name(),
                 value: ModEntry.Config.MinimapWidth,
                 min: 75,
                 max: 300,
@@ -137,7 +137,7 @@ public class ModMenu : IClickableMenu
                 shouldGrayOut: () => !ModEntry.Config.ShowMinimap
             ),
             new ModPlusMinus(
-                label: I18n.Minimap_Height(),
+                label: I18n.Config_MinimapHeight_Name(),
                 value: ModEntry.Config.MinimapHeight,
                 min: 45,
                 max: 180,
@@ -153,7 +153,7 @@ public class ModMenu : IClickableMenu
             this.ImmersionTalkedToButton,
             this.ImmersionNotTalkedToButton,
             new ModCheckbox(
-                label: I18n.Immersion_OnlyVillagersInPlayerLocation(),
+                label: I18n.Config_OnlyInLocation_Name(),
                 value: ModEntry.Config.OnlySameLocation,
                 set: value => ModEntry.Config.OnlySameLocation = value
             ),
@@ -182,27 +182,27 @@ public class ModMenu : IClickableMenu
             // extra icons
             new OptionsElement(I18n.Extra_Label()),
             new ModCheckbox(
-                label: I18n.Extra_ShowQuestsOrBirthdays(),
+                label: I18n.Config_ShowQuestsOrBirthdays_Name(),
                 value: ModEntry.Config.ShowQuests,
                 set: value => ModEntry.Config.ShowQuests = value
             ),
             new ModCheckbox(
-                label: I18n.Extra_ShowHiddenVillagers(),
+                label: I18n.Config_ShowHiddenVillagers_Name(),
                 value: ModEntry.Config.ShowHiddenVillagers,
                 set: value => ModEntry.Config.ShowHiddenVillagers = value
             ),
             new ModCheckbox(
-                label: I18n.Extra_ShowTravelingMerchant(),
+                label: I18n.Config_ShowTravelingMerchant_Name(),
                 value: ModEntry.Config.ShowTravelingMerchant,
                 set: value => ModEntry.Config.ShowTravelingMerchant = value
             ),
             new ModCheckbox(
-                label: I18n.Extra_ShowHorses(),
+                label: I18n.Config_ShowHorses_Name(),
                 value: ModEntry.Config.ShowHorse,
                 set: value => ModEntry.Config.ShowHorse = value
             ),
 
-            new OptionsElement(I18n.Villagers_Label())
+            new OptionsElement(I18n.Config_ToggleVillagersTitle() + ":")
         });
 
         this.Options.AddRange(

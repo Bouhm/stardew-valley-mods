@@ -2,32 +2,17 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Міні-мапа",
-    "minimap.enabled": "Ввімкнено",
-    "minimap.locked": "Заблокувати розташування міні-мапи",
-    "minimap.width": "Ширина міні-мапи",
-    "minimap.height": "Висота міні-мапи",
-
     // immersion section
     "immersion.label": "Налаштування:",
     "immersion.always-show-villagers": "Завжди показувати містян (персонажів)",
     "immersion.only-villagers-talked-to": "Показувати містян, з якими спілкувався гравець",
     "immersion.hide-villagers-talked-to": "Приховувати містян, з якими спілкувався гравець",
-    "immersion.only-villagers-in-player-location": "Показувати містян тільки в поточній локації",
     "immersion.only-villagers-within-heart-level": "Показувати містян тільки у вказаному діапазоні дружби",
     "immersion.min-heart-level": "Мінімальний рівень дружби",
     "immersion.max-heart-level": "Максимальний рівень дружби",
 
     // extra settings section
     "extra.label": "Додаткові налаштування:",
-    "extra.show-quests-or-birthdays": "Показувати завдання або дні народження",
-    "extra.show-hidden-villagers": "Показувати прихованих містян",
-    "extra.show-traveling-merchant": "Показувати мандрівного купця",
-    "extra.show-horses": "Показувати коней",
-
-    // include/exclude villagers section
-    "villagers.label": "Додати/Виключити містян:",
 
     // special NPC markers
     // TODO
@@ -38,6 +23,11 @@
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Кнопка меню",
     "config.menu-key.desc": "Натиснувши цю кнопку на ігровій мапі відкриється меню налаштування модифікації.",
 
@@ -47,5 +37,48 @@
     "config.tooltip-key.name": "Кнопка підказки",
     "config.tooltip-key.desc": "Натисніть цю кнопку для циклічного переміщення підказки на мапі.",
 
-    "config.other-settings": "Для зміни інших параметрів модифікації, відкрийте ігрову мапу і натисніть кнопку виклику меню."
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Міні-мапа",
+
+    "config.minimap-enabled.name": "Ввімкнено",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.", // TODO
+
+    "config.lock-minimap.name": "Заблокувати розташування міні-мапи",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.", // TODO
+
+    "config.minimap-width.name": "Ширина міні-мапи",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.", // TODO
+    "config.minimap-height-or-width.format": "{{size}} pixels", // TODO
+
+    "config.minimap-height.name": "Висота міні-мапи",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.", // TODO
+
+    /****
+    ** Settings section
+    ****/
+    "config.settings-title": "Налаштування",
+
+    "config.only-in-location.name": "Показувати містян тільки в поточній локації",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+
+    "config.show-quests-or-birthdays.name": "Показувати завдання або дні народження",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+
+    "config.show-hidden-villagers.name": "Показувати прихованих містян",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+
+    "config.show-traveling-merchant.name": "Показувати мандрівного купця",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+
+    "config.show-horses.name": "Показувати коней",
+    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Додати/Виключити містян",
+
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map." // TODO
 }
