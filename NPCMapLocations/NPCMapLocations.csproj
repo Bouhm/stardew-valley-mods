@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>3.3.0</Version>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-
-    <ModZipPath>$(SolutionDir)\_releases</ModZipPath>
+    <Version>3.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

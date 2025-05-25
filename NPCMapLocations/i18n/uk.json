@@ -2,42 +2,32 @@
     /*********
     ** Map options
     *********/
-    // minimap section
-    "minimap.label": "Міні-мапа",
-    "minimap.enabled": "Ввімкнено",
-    "minimap.locked": "Заблокувати розташування міні-мапи",
-    "minimap.width": "Ширина міні-мапи",
-    "minimap.height": "Висота міні-мапи",
-
-    // immersion section
-    "immersion.label": "Налаштування:",
-    "immersion.always-show-villagers": "Завжди показувати містян (персонажів)",
-    "immersion.only-villagers-talked-to": "Показувати містян, з якими спілкувався гравець",
-    "immersion.hide-villagers-talked-to": "Приховувати містян, з якими спілкувався гравець",
-    "immersion.only-villagers-in-player-location": "Показувати містян тільки в поточній локації",
-    "immersion.only-villagers-within-heart-level": "Показувати містян тільки у вказаному діапазоні дружби",
-    "immersion.min-heart-level": "Мінімальний рівень дружби",
-    "immersion.max-heart-level": "Максимальний рівень дружби",
-
     // extra settings section
     "extra.label": "Додаткові налаштування:",
-    "extra.show-quests-or-birthdays": "Показувати завдання або дні народження",
-    "extra.show-hidden-villagers": "Показувати прихованих містян",
-    "extra.show-traveling-merchant": "Показувати мандрівного купця",
-    "extra.show-horses": "Показувати коней",
-
-    // include/exclude villagers section
-    "villagers.label": "Додати/Виключити містян:",
 
     // special NPC markers
     // TODO
     "marker-names.bookseller": "Bookseller",
     "marker-names.merchant": "Traveling merchant",
+    "marker-names.mister-raccoon": "Mr. Raccoon",
+    "marker-names.mrs-raccoon": "Mrs. Raccoon",
 
 
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "default",
+
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controls", // TODO
+
     "config.menu-key.name": "Кнопка меню",
     "config.menu-key.desc": "Натиснувши цю кнопку на ігровій мапі відкриється меню налаштування модифікації.",
 
@@ -47,5 +37,108 @@
     "config.tooltip-key.name": "Кнопка підказки",
     "config.tooltip-key.desc": "Натисніть цю кнопку для циклічного переміщення підказки на мапі.",
 
-    "config.other-settings": "Для зміни інших параметрів модифікації, відкрийте ігрову мапу і натисніть кнопку виклику меню."
+    /****
+    ** Minimap section
+    ****/
+    // TODO
+    "config.minimap-title": "Міні-мапа",
+
+    "config.minimap-enabled.name": "Ввімкнено",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+
+    "config.lock-minimap.name": "Заблокувати розташування міні-мапи",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+
+    "config.minimap-width.name": "Ширина міні-мапи",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-height-or-width.format": "{{size}} pixels",
+
+    "config.minimap-height.name": "Висота міні-мапи",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    "config.minimap-opacity.name": "Minimap opacity",
+    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
+
+    /****
+    ** Map display section
+    ****/
+    // TODO
+    "config.map-display-title": "Map display",
+
+    "config.npc-marker-size.name": "Map marker size (NPCs)",
+    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
+
+    "config.current-player-marker-size.name": "Map marker size (you)",
+    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
+
+    "config.other-player-marker-size.name": "Map marker size (other players)",
+    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
+
+    "config.show-farm-buildings.name": "Show farm buildings",
+    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
+
+    /****
+    ** Filters section
+    ****/
+    // TODO
+    "config.filters-title": "Filters",
+
+    "config.spoken-to-filter.name": "NPCs spoken to",
+    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
+    "config.spoken-to-filter.options.all": "Show all",
+    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
+    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
+
+    "config.only-in-location.name": "Показувати містян тільки в поточній локації",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+
+    "config.min-hearts.name": "Мінімальний рівень дружби",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+
+    "config.max-hearts.name": "Максимальний рівень дружби",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
+
+    "config.show-quests-or-birthdays.name": "Показувати завдання або дні народження",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+
+    "config.show-hidden-villagers.name": "Показувати прихованих містян",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+
+    "config.show-bookseller.name": "Show bookseller",
+    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+
+    "config.show-traveling-merchant.name": "Показувати мандрівного купця",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+
+    "config.show-children.name": "Show players' children",
+    "config.show-children.desc": "Whether to show players' children on the map.",
+
+    "config.show-horses.name": "Показувати коней",
+    "config.show-horses.desc": "Whether to show horses on the map.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Додати/Виключити містян",
+
+    // TODO
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
+    "config.toggle-npc.options.default": "Default",
+    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
+    "config.toggle-npc.options.always-visible": "Always visible",
+    "config.toggle-npc.options.always-hidden": "Always hidden",
+
+    /****
+    ** Performance section
+    ****/
+    // TODO
+    "config.performance-title": "Performance",
+
+    "config.minimap-cache-time.name": "Minimap cache time",
+    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+
+    "config.npc-cache-time.name": "NPC cache time",
+    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+
+    "config.cache-time.value": "{{seconds}} seconds"
 }

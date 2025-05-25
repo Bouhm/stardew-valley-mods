@@ -2,43 +2,33 @@
     /*********
     ** Map options (Térkép beállítások)
     *********/
-    // minimap section (Kistárkép szakasz)
-    "minimap.label": "Kistérkép",
-    "minimap.enabled": "Engedélyezve",
-    "minimap.locked": "Kistérkép pozíció zárolás",
-    "minimap.width": "Kistérkép szélesség",
-    "minimap.height": "Kistérkép magasság",
-
-    // immersion section (Merülő szakasz)
-    "immersion.label": "Beállítások:",
-    "immersion.always-show-villagers": "Mindig mutassa a falusiakat",
-    "immersion.only-villagers-talked-to": "A játékos által beszélt falusiak megjelenítése",
-    "immersion.hide-villagers-talked-to": "A játékos által beszélt falusiak elrejtése",
-    "immersion.only-villagers-in-player-location": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
-    "immersion.only-villagers-within-heart-level": "Csak a beállított szívszinten belüli falusiak megjelenítése",
-    "immersion.min-heart-level": "Minimális szívszint",
-    "immersion.max-heart-level": "Maximális szívszint",
-
     // extra settings section (Extra beállítások szakasz)
     "extra.label": "További beállítások:",
-    "extra.show-quests-or-birthdays": "Küldetések vagy születésnapok megjelenítése",
-    "extra.show-hidden-villagers": "Rejtett falusiak megjelenítése",
-    "extra.show-traveling-merchant": "Utazó kereskedő megjelenítése",
-    "extra.show-horses": "Show horses", // TODO
-
-    // include/exclude villagers section (Falusiak engedélyezése/kizárása szakasz)
-    "villagers.label": "Falusiak Engedélyezése/Kizárása:",
 
     // special NPC markers
     // TODO
     "marker-names.bookseller": "Bookseller",
     "marker-names.merchant": "Traveling merchant",
+    "marker-names.mister-raccoon": "Mr. Raccoon",
+    "marker-names.mrs-raccoon": "Mrs. Raccoon",
 
 
     /*********
     ** Generic Mod Config Menu UI
     *********/
+    /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "default",
+
+    /****
+    ** Controls section
+    ****/
     // TODO
+    "config.controls-title": "Controls",
+
     "config.menu-key.name": "Menu key",
     "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
 
@@ -48,5 +38,108 @@
     "config.tooltip-key.name": "Tooltip key",
     "config.tooltip-key.desc": "Press this button to cycle the tooltip position when on the map view.",
 
-    "config.other-settings": "To change the other mod settings, open the in-game world map and press the menu key shown above."
+    /****
+    ** Minimap section
+    ****/
+    // TODO
+    "config.minimap-title": "Kistérkép",
+
+    "config.minimap-enabled.name": "Engedélyezve",
+    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+
+    "config.lock-minimap.name": "Kistérkép pozíció zárolás",
+    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+
+    "config.minimap-width.name": "Kistérkép szélesség",
+    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-height-or-width.format": "{{size}} pixels",
+
+    "config.minimap-height.name": "Kistérkép magasság",
+    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    "config.minimap-opacity.name": "Minimap opacity",
+    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
+
+    /****
+    ** Map display section
+    ****/
+    // TODO
+    "config.map-display-title": "Map display",
+
+    "config.npc-marker-size.name": "Map marker size (NPCs)",
+    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
+
+    "config.current-player-marker-size.name": "Map marker size (you)",
+    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
+
+    "config.other-player-marker-size.name": "Map marker size (other players)",
+    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
+
+    "config.show-farm-buildings.name": "Show farm buildings",
+    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
+
+    /****
+    ** Filters section
+    ****/
+    // TODO
+    "config.filters-title": "Filters",
+
+    "config.spoken-to-filter.name": "NPCs spoken to",
+    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
+    "config.spoken-to-filter.options.all": "Show all",
+    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
+    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
+
+    "config.only-in-location.name": "Csak a játékos tartózkodási helyén lévő falusiak megjelenítése",
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+
+    "config.min-hearts.name": "Minimális szívszint",
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+
+    "config.max-hearts.name": "Maximális szívszint",
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
+
+    "config.show-quests-or-birthdays.name": "Küldetések vagy születésnapok megjelenítése",
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+
+    "config.show-hidden-villagers.name": "Rejtett falusiak megjelenítése",
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+
+    "config.show-bookseller.name": "Show bookseller",
+    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+
+    "config.show-traveling-merchant.name": "Utazó kereskedő megjelenítése",
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+
+    "config.show-children.name": "Show players' children",
+    "config.show-children.desc": "Whether to show players' children on the map.",
+
+    "config.show-horses.name": "Show horses",
+    "config.show-horses.desc": "Whether to show horses on the map.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Falusiak Engedélyezése/Kizárása",
+
+    // TODO
+    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
+    "config.toggle-npc.options.default": "Default",
+    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
+    "config.toggle-npc.options.always-visible": "Always visible",
+    "config.toggle-npc.options.always-hidden": "Always hidden",
+
+    /****
+    ** Performance section
+    ****/
+    // TODO
+    "config.performance-title": "Performance",
+
+    "config.minimap-cache-time.name": "Minimap cache time",
+    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+
+    "config.npc-cache-time.name": "NPC cache time",
+    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+
+    "config.cache-time.value": "{{seconds}} seconds"
 }

@@ -1,7 +1,7 @@
 ﻿{
     "Name": "Bouhm's Pet Dogs",
     "Author": "Bouhm",
-    "Version": "3.0.0",
+    "Version": "%ProjectVersion%",
     "Description": "Changes the dog into a Shiba Inu, Shepherd, or Husky.",
     "UniqueID": "Bouhm.PetDogMod",
     "UpdateKeys": [ "Nexus:570" ],

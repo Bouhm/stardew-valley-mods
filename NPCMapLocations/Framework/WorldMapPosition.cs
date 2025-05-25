@@ -6,7 +6,7 @@ namespace NPCMapLocations.Framework;
 /// <param name="RegionId">The world map region containing the marker.</param>
 /// <param name="X">The marker's pixel X coordinate relative to the top-left corner of the map.</param>
 /// <param name="Y">The marker's pixel Y coordinate relative to the top-left corner of the map.</param>
-public record WorldMapPosition(string RegionId, int X, int Y)
+public record WorldMapPosition(string? RegionId, int X, int Y)
 {
     /// <summary>An unknown or invalid map position.</summary>
     public static readonly WorldMapPosition Empty = new WorldMapPosition(null, 0, 0);

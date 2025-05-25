@@ -50,17 +50,17 @@ internal static class SummaryCommand
         // current player
         {
             // collect info
-            var player = Game1.player;
-            var location = player.currentLocation;
-            string locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
-            LocationContext context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
+            Farmer player = Game1.player;
+            GameLocation? location = player.currentLocation;
+            string? locationName = locationUtil.GetLocationNameFromLevel(location?.NameOrUniqueName) ?? location?.NameOrUniqueName;
+            LocationContext? context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
             WorldMapPosition worldPos = ModEntry.GetWorldMapPosition(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
             // collect alternate location names
-            List<string> altNames = new();
-            if (location.NameOrUniqueName != location.Name)
-                altNames.Add($"unique: {location.NameOrUniqueName}");
-            if (location.NameOrUniqueName != locationName)
+            List<string> altNames = [];
+            if (location?.NameOrUniqueName != location?.Name)
+                altNames.Add($"unique: {location?.NameOrUniqueName}");
+            if (location?.NameOrUniqueName != locationName)
                 output.Append($"context: {locationName}");
 
             // build output
@@ -69,10 +69,10 @@ internal static class SummaryCommand
             output.AppendLine("==  Current player  ==");
             output.AppendLine("======================");
             output.AppendLine($"Player: {player.Name} ({player.UniqueMultiplayerID})");
-            output.AppendLine($"Location: {location.Name}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
+            output.AppendLine($"Location: {location?.Name ?? "<unknown>"}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
             output.AppendLine($"Map region: {worldPos.RegionId}");
             output.AppendLine($"Tile: ({player.TilePoint.X}, {player.TilePoint.Y})");
-            output.AppendLine($"Excluded: {customizations.LocationExclusions.Contains(locationName)}");
+            output.AppendLine($"Excluded: {locationName != null && customizations.LocationExclusions.Contains(locationName)}");
             output.AppendLine($"Map pixel: {(!worldPos.IsEmpty ? $"({worldPos.X}, {worldPos.Y})" : "unknown")}");
             output.AppendLine();
 
@@ -115,7 +115,7 @@ internal static class SummaryCommand
                 SummaryCommand.BuildTable(
                     records: locationUtil.LocationContexts.Values.OrderBy(p => p.Root ?? p.Name).ThenBy(p => p.Name),
                     linePrefix: "      ",
-                    columnHeadings: new[] { "root", "name", "type", "notes" },
+                    columnHeadings: ["root", "name", "type", "notes"],
                     p => p.Root ?? p.Name,
                     p => p.Name,
                     p => p.Type.ToString(),
@@ -158,16 +158,16 @@ internal static class SummaryCommand
                         SummaryCommand.BuildTable(
                             typeGroup.OrderBy(p => p.Key),
                             "      ",
-                            new[] { "name", "location", "map region", "map pixel", "crop offset", "notes" },
+                            ["name", "location", "map region", "map pixel", "crop offset", "notes"],
 
                             marker => marker.Value.DisplayName != marker.Key ? $"{marker.Key} ({marker.Value.DisplayName})" : marker.Key,
                             marker => marker.Value.LocationName,
-                            marker => marker.Value.WorldMapPosition.RegionId,
-                            marker => $"{marker.Value.WorldMapPosition.X}, {marker.Value.WorldMapPosition.Y}",
+                            marker => marker.Value.WorldMapRegionId,
+                            marker => $"{marker.Value.WorldMapX}, {marker.Value.WorldMapY}",
                             marker => marker.Value.CropOffset != 0 ? marker.Value.CropOffset.ToString() : "",
                             marker =>
                             {
-                                List<string> notes = new();
+                                List<string> notes = [];
                                 if (marker.Value.IsHidden)
                                     notes.Add(marker.Value.ReasonHidden ?? "hidden (reason unknown)");
                                 if (marker.Value.IsBirthday)
@@ -203,7 +203,7 @@ internal static class SummaryCommand
                     SummaryCommand.BuildTable(
                         locationsWithoutMapPositions,
                         "",
-                        new[] { "name", "type", "root location" },
+                        ["name", "type", "root location"],
                         p => p.Name,
                         p => p.Type.ToString(),
                         p => p.Root
@@ -231,7 +231,7 @@ internal static class SummaryCommand
     /// <param name="linePrefix">A prefix for each line in the table, e.g. for indentation.</param>
     /// <param name="columnHeadings">The column headings to show at the top of the table.</param>
     /// <param name="getValues">Get each column's values for a row.</param>
-    private static StringBuilder BuildTable<TRecord>(IEnumerable<TRecord> records, string linePrefix, string[] columnHeadings, params Func<TRecord, string>[] getValues)
+    private static StringBuilder BuildTable<TRecord>(IEnumerable<TRecord> records, string linePrefix, string[] columnHeadings, params Func<TRecord, string?>[] getValues)
     {
         // validate
         if (columnHeadings.Length != getValues.Length)
@@ -242,7 +242,7 @@ internal static class SummaryCommand
         int[] sizes = columnHeadings.Select(p => p.Length).ToArray();
 
         string[][] rows = records
-            ?.Select(record =>
+            .Select(record =>
             {
                 string[] row = new string[columnCount];
 
@@ -256,7 +256,7 @@ internal static class SummaryCommand
 
                 return row;
             })
-            .ToArray() ?? new string[columnCount][];
+            .ToArray();
 
         // build table
         StringBuilder table = new();
@@ -275,7 +275,7 @@ internal static class SummaryCommand
             }
 
             PrintRow(columnHeadings);
-            PrintRow(columnHeadings.Select(p => "").ToArray(), '-');
+            PrintRow(columnHeadings.Select(_ => "").ToArray(), '-');
             foreach (string[] row in rows)
                 PrintRow(row);
         }

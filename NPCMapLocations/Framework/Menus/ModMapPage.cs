@@ -26,7 +26,7 @@ internal class ModMapPage : MapPage
     private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
     private Dictionary<string, BuildingMarker> FarmBuildings { get; }
 
-    private readonly Texture2D BuildingMarkers;
+    private readonly Texture2D? BuildingMarkers;
     private readonly ModCustomizations Customizations;
     private string HoveredNames = "";
     private bool HasIndoorCharacter;
@@ -52,7 +52,7 @@ internal class ModMapPage : MapPage
         Dictionary<string, bool> conditionalNpcs,
         Dictionary<long, FarmerMarker> farmerMarkers,
         Dictionary<string, BuildingMarker> farmBuildings,
-        Texture2D buildingMarkers,
+        Texture2D? buildingMarkers,
         ModCustomizations customizations,
         LocationUtil locationUtil
     )
@@ -75,8 +75,8 @@ internal class ModMapPage : MapPage
         this.HasIndoorCharacter = false;
 
         // apply custom tooltips
-        bool hasNpcMarkers = this.NpcMarkers?.Count > 0;
-        bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers?.Count > 0;
+        bool hasNpcMarkers = this.NpcMarkers.Count > 0;
+        bool hasFarmerMarkers = Context.IsMultiplayer && this.FarmerMarkers.Count > 0;
         if (hasNpcMarkers || hasFarmerMarkers)
         {
             // get hovered names
@@ -89,20 +89,20 @@ internal class ModMapPage : MapPage
                 string regionId = this.RegionId;
                 Point mousePos = Game1.getMousePosition();
 
-                HashSet<string> newHoveredNames = new();
-                HashSet<string> indoorLocationNames = new();
+                HashSet<string> newHoveredNames = [];
+                HashSet<string> indoorLocationNames = [];
 
                 // add markers directly under cursor
                 if (hasNpcMarkers)
                 {
                     foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                     {
-                        if (npcMarker.IsHidden || npcMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
+                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapX, npcMarker.WorldMapY, markerWidth, markerHeight))
                             continue;
 
                         newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
 
-                        if (!this.LocationUtil.IsOutdoors(npcMarker.LocationName))
+                        if (npcMarker.LocationName != null && !this.LocationUtil.IsOutdoors(npcMarker.LocationName))
                             indoorLocationNames.Add(npcMarker.LocationName);
                     }
                 }
@@ -110,12 +110,12 @@ internal class ModMapPage : MapPage
                 {
                     foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                     {
-                        if (farmerMarker.WorldMapPosition.RegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
+                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapX, farmerMarker.WorldMapY, markerWidth / 2, markerHeight / 2))
                             continue;
 
                         newHoveredNames.Add(farmerMarker.Name);
 
-                        if (!this.LocationUtil.IsOutdoors(farmerMarker.LocationName))
+                        if (farmerMarker.LocationName != null && !this.LocationUtil.IsOutdoors(farmerMarker.LocationName))
                             indoorLocationNames.Add(farmerMarker.LocationName);
                     }
                 }
@@ -127,7 +127,7 @@ internal class ModMapPage : MapPage
                     {
                         foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                         {
-                            if (!npcMarker.IsHidden && indoorLocationNames.Contains(npcMarker.LocationName))
+                            if (!npcMarker.IsHidden && npcMarker.LocationName != null && indoorLocationNames.Contains(npcMarker.LocationName))
                                 newHoveredNames.Add(this.GetNpcDisplayName(npcName));
                         }
                     }
@@ -135,7 +135,7 @@ internal class ModMapPage : MapPage
                     {
                         foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                         {
-                            if (indoorLocationNames.Contains(farmerMarker.LocationName))
+                            if (farmerMarker.LocationName != null && indoorLocationNames.Contains(farmerMarker.LocationName))
                                 newHoveredNames.Add(farmerMarker.Name);
                         }
                     }
@@ -145,7 +145,7 @@ internal class ModMapPage : MapPage
                 hasIndoorCharacters = indoorLocationNames.Count > 0;
                 hoveredNames = newHoveredNames.Count > 0
                     ? newHoveredNames.Distinct().OrderBy(p => p).ToArray()
-                    : Array.Empty<string>();
+                    : [];
             }
 
             // render tooltip
@@ -164,7 +164,7 @@ internal class ModMapPage : MapPage
 
                         int maxLineLength = (int)Game1.smallFont.MeasureString("Home of Robin, Demetrius, Sebastian & Maru").X;
 
-                        List<string> lines = new() { hoveredNames[0] };
+                        List<string> lines = [hoveredNames[0]];
                         for (int i = 1; i < hoveredNames.Length; i++)
                         {
                             string name = hoveredNames[i];
@@ -214,7 +214,7 @@ internal class ModMapPage : MapPage
                 y += Game1.tileSize / 4;
             }
 
-            if (ModEntry.Globals.NameTooltipMode == 1)
+            if (ModEntry.Config.NameTooltipMode == 1)
             {
                 if (y + height > Game1.uiViewport.Height)
                 {
@@ -224,7 +224,7 @@ internal class ModMapPage : MapPage
 
                 offsetY = 2 - Game1.tileSize;
             }
-            else if (ModEntry.Globals.NameTooltipMode == 2)
+            else if (ModEntry.Config.NameTooltipMode == 2)
             {
                 if (y + height > Game1.uiViewport.Height)
                 {
@@ -244,7 +244,7 @@ internal class ModMapPage : MapPage
             }
 
             // Draw name tooltip positioned around location tooltip
-            this.DrawNames(b, this.HoveredNames, x, y, offsetY, height, ModEntry.Globals.NameTooltipMode);
+            this.DrawNames(b, this.HoveredNames, x, y, offsetY, height, ModEntry.Config.NameTooltipMode);
 
             // Draw location tooltip
             IClickableMenu.drawHoverText(b, this.hoverText, Game1.smallFont);
@@ -252,7 +252,7 @@ internal class ModMapPage : MapPage
         else
         {
             // Draw name tooltip only
-            this.DrawNames(Game1.spriteBatch, this.HoveredNames, x, y, offsetY, this.height, ModEntry.Globals.NameTooltipMode);
+            this.DrawNames(Game1.spriteBatch, this.HoveredNames, x, y, offsetY, this.height, ModEntry.Config.NameTooltipMode);
         }
 
         // Draw indoor icon
@@ -273,7 +273,7 @@ internal class ModMapPage : MapPage
 
         if (regionId == "Valley")
         {
-            if (ModEntry.Globals.ShowFarmBuildings && this.FarmBuildings != null && this.BuildingMarkers != null)
+            if (ModEntry.Config.ShowFarmBuildings && this.BuildingMarkers != null)
             {
                 foreach (BuildingMarker building in this.FarmBuildings.Values.OrderBy(p => p.WorldMapPosition.Y))
                 {
@@ -294,42 +294,66 @@ internal class ModMapPage : MapPage
 
         // NPCs
         // Sort by drawing order
-        if (this.NpcMarkers != null)
+        if (this.NpcMarkers.Count > 0)
         {
+            float scaleMultiplier = ModEntry.Config.NpcMarkerScale;
+
             var sortedMarkers = this.NpcMarkers
-                .Where(p => p.Value.WorldMapPosition.RegionId == regionId)
+                .Where(p => p.Value.WorldMapRegionId == regionId)
                 .OrderBy(p => p.Value.Layer);
 
-            foreach (var npcMarker in sortedMarkers)
+            foreach ((string name, NpcMarker marker) in sortedMarkers)
             {
-                string name = npcMarker.Key;
-                NpcMarker marker = npcMarker.Value;
+                // skip if invalid
+                if (marker.Sprite is null)
+                    continue;
+
+                // apply config
+                if (ModEntry.Config.NpcVisibility.TryGetValue(name, out bool overrideVisible))
+                {
+                    if (!overrideVisible)
+                        continue;
+                }
 
                 // Skip if no specified location or should be hidden
-                if (marker.Sprite == null
-                    || ModEntry.ShouldExcludeNpc(name)
-                    || (!ModEntry.Globals.ShowHiddenVillagers && marker.IsHidden)
+                if (
+                    (!overrideVisible && ModEntry.ShouldExcludeNpc(name))
+                    || (!overrideVisible && !ModEntry.Config.ShowHiddenVillagers && marker.IsHidden)
                     || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
-                   )
-                {
+                )
                     continue;
-                }
 
                 // Dim marker for hidden markers
                 var markerColor = (marker.IsHidden ? Color.DarkGray * 0.7f : Color.White) * alpha;
 
                 // Draw NPC marker
-                Rectangle spriteRect = marker.GetSpriteSourceRect();
-                b.Draw(marker.Sprite, new Rectangle(this.mapBounds.X + marker.WorldMapPosition.X, this.mapBounds.Y + marker.WorldMapPosition.Y, 32, 30), spriteRect, markerColor);
+                Rectangle iconDestinationRect;
+                {
+                    Rectangle iconSpriteRect = marker.GetSpriteSourceRect();
+                    float iconScale = iconSpriteRect.Width > iconSpriteRect.Height
+                        ? 32f / iconSpriteRect.Width
+                        : 30f / iconSpriteRect.Height;
+
+                    float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
+                    float iconHeight = (int)(iconSpriteRect.Height * iconScale * scaleMultiplier);
+
+                    iconDestinationRect = new Rectangle(
+                        x: this.mapBounds.X + marker.WorldMapX - (int)(iconWidth / 2),
+                        y: this.mapBounds.Y + marker.WorldMapY - (int)(iconHeight / 2),
+                        width: (int)iconWidth,
+                        height: (int)iconHeight
+                    );
+                    b.Draw(marker.Sprite, iconDestinationRect, iconSpriteRect, markerColor);
+                }
 
                 // Draw icons for quests/birthday
-                if (ModEntry.Globals.ShowQuests)
+                if (ModEntry.Config.ShowQuests)
                 {
-                    if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
+                    if (marker.IsBirthday && Game1.player.friendshipData.GetValueOrDefault(name)?.GiftsToday == 0)
                     {
                         // Gift icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapPosition.X + 20, this.mapBounds.Y + marker.WorldMapPosition.Y),
+                            new Vector2(iconDestinationRect.X + 20, iconDestinationRect.Y),
                             new Rectangle(147, 412, 10, 11), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -338,7 +362,7 @@ internal class ModMapPage : MapPage
                     {
                         // Quest icon
                         b.Draw(Game1.mouseCursors,
-                            new Vector2(this.mapBounds.X + marker.WorldMapPosition.X + 22, this.mapBounds.Y + marker.WorldMapPosition.Y - 3),
+                            new Vector2(iconDestinationRect.X + 22, iconDestinationRect.Y - 3),
                             new Rectangle(403, 496, 5, 14), markerColor, 0f, Vector2.Zero, 1.8f,
                             SpriteEffects.None, 0f);
                     }
@@ -351,22 +375,28 @@ internal class ModMapPage : MapPage
         {
             foreach (Farmer farmer in Game1.getOnlineFarmers())
             {
-                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker farMarker) && farMarker.WorldMapPosition.RegionId == regionId)
+                if (this.FarmerMarkers.TryGetValue(farmer.UniqueMultiplayerID, out FarmerMarker? farMarker) && farMarker.WorldMapRegionId == regionId)
                 {
                     if (farMarker is { DrawDelay: 0 }) // Temporary solution to handle desync of farmhand location/tile position when changing location
                     {
-                        farmer.FarmerRenderer.drawMiniPortrat(b,
-                            new Vector2(this.mapBounds.X + farMarker.WorldMapPosition.X - 16, this.mapBounds.Y + farMarker.WorldMapPosition.Y - 15),
-                            0.00011f, 2f, 1, farmer, alpha);
+                        float scaleMultiplier = farmer.IsLocalPlayer
+                            ? ModEntry.Config.CurrentPlayerMarkerScale
+                            : ModEntry.Config.OtherPlayerMarkerScale;
+
+                        Vector2 position = new Vector2(this.mapBounds.X + farMarker.WorldMapX - (16 * scaleMultiplier), this.mapBounds.Y + farMarker.WorldMapY - (15 * scaleMultiplier));
+
+                        farmer.FarmerRenderer.drawMiniPortrat(b, position, 0.00011f, 2f * scaleMultiplier, 1, farmer, alpha);
                     }
                 }
             }
         }
         else
         {
+            float scaleMultiplier = ModEntry.Config.CurrentPlayerMarkerScale;
+
             WorldMapPosition playerLoc = ModEntry.GetWorldMapPosition(Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name, Game1.player.TilePoint.X, Game1.player.TilePoint.Y, this.Customizations.LocationExclusions);
 
-            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - 16, this.mapBounds.Y + playerLoc.Y - 15), 0.00011f, 2f, 1, Game1.player, alpha);
+            Game1.player.FarmerRenderer.drawMiniPortrat(b, new Vector2(this.mapBounds.X + playerLoc.X - (16 * scaleMultiplier), this.mapBounds.Y + playerLoc.Y - (15 * scaleMultiplier)), 0.00011f, 2f * scaleMultiplier, 1, Game1.player, alpha);
         }
     }
 
@@ -392,7 +422,7 @@ internal class ModMapPage : MapPage
                 y += offsetY;
             }
 
-            // If going off screen on the right, move tooltip to below location tooltip so it can stay inside the screen
+            // If going off-screen on the right, move tooltip to below location tooltip so it can stay inside the screen
             // without the cursor covering the tooltip
             if (x + width > Game1.uiViewport.Width)
             {
@@ -415,7 +445,7 @@ internal class ModMapPage : MapPage
                 x = Game1.uiViewport.Width - width;
             }
 
-            // If going off screen on the bottom, move tooltip to above location tooltip so it stays visible
+            // If going off-screen on the bottom, move tooltip to above location tooltip so it stays visible
             if (y + height > Game1.uiViewport.Height)
             {
                 x = Game1.getOldMouseX() + Game1.tileSize / 2;
@@ -443,14 +473,10 @@ internal class ModMapPage : MapPage
         Vector2 vector = new Vector2(x + (float)(Game1.tileSize / 4), y + (float)(Game1.tileSize / 4 + 4));
 
         drawTextureBox(b, Game1.menuTexture, new Rectangle(0, 256, 60, 60), x, y, width, height, Color.White);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f,
-            SpriteEffects.None, 0f);
-        b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None,
-            0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(0f, 2f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector + new Vector2(2f, 0f), Game1.textShadowColor, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        b.DrawString(Game1.smallFont, names, vector, Game1.textColor * 0.9f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
     }
 
     /// <summary>Get the display name to show for an NPC.</summary>
@@ -462,13 +488,14 @@ internal class ModMapPage : MapPage
 
     /// <summary>Get whether a pixel area on the world map is under the cursor, adjusted for the map offset.</summary>
     /// <param name="mousePos">The pixel position of the mouse, relative to the game window.</param>
-    /// <param name="mapPos">The pixel position on the world map, relative to the top-left corner of the map.</param>
+    /// <param name="worldMapX">The X pixel position on the world map, relative to the top-left corner of the map.</param>
+    /// <param name="worldMapY">The Y pixel position on the world map, relative to the top-left corner of the map.</param>
     /// <param name="markerWidth">The pixel width of the position on the world map.</param>
     /// <param name="markerHeight">The pixel height of the position on the world map.</param>
-    private bool IsMapPixelUnderCursor(Point mousePos, WorldMapPosition mapPos, int markerWidth, int markerHeight)
+    private bool IsMapPixelUnderCursor(Point mousePos, int worldMapX, int worldMapY, int markerWidth, int markerHeight)
     {
-        int x = this.mapBounds.X + mapPos.X;
-        int y = this.mapBounds.Y + mapPos.Y;
+        int x = this.mapBounds.X + worldMapX;
+        int y = this.mapBounds.Y + worldMapY;
 
         return
             mousePos.X >= x

@@ -8,7 +8,7 @@ using StardewValley;
 namespace NPCMapLocations.Framework.Menus;
 
 /// <summary>A minimap UI drawn to the screen.</summary>
-internal class ModMinimap
+internal class ModMinimap : IDisposable
 {
     /*********
     ** Fields
@@ -32,10 +32,13 @@ internal class ModMinimap
 
     /// <summary>The region for which the <see cref="MapPage"/> was opened.</summary>
     /// <remarks>We deliberately don't check <see cref="StardewValley.Menus.MapPage.mapRegion"/> here, to avoid an infinite loop if the opened map sets a different region for some reason.</remarks>
-    private string MapRegionId;
+    private string? MapRegionId;
 
     /// <summary>The underlying map view to show in the minimap area.</summary>
-    private ModMapPage MapPage;
+    private ModMapPage? MapPage;
+
+    /// <summary>A cached sprite batch to reuse for drawing the clipped minimap.</summary>
+    private SpriteBatch? ClippedSpriteBatch;
 
 
     /*********
@@ -48,10 +51,10 @@ internal class ModMinimap
         this.CreateMapPage = createMapPage;
 
         this.ScreenBounds = new(
-            x: ModEntry.Globals.MinimapX,
-            y: ModEntry.Globals.MinimapY,
-            width: ModEntry.Globals.MinimapWidth * Game1.pixelZoom,
-            height: ModEntry.Globals.MinimapHeight * Game1.pixelZoom
+            x: ModEntry.Config.MinimapX,
+            y: ModEntry.Config.MinimapY,
+            width: ModEntry.Config.MinimapWidth * Game1.pixelZoom,
+            height: ModEntry.Config.MinimapHeight * Game1.pixelZoom
         );
     }
 
@@ -59,7 +62,7 @@ internal class ModMinimap
     public bool IsHoveringDragZone()
     {
         return
-            !ModEntry.Globals.LockMinimapPosition
+            !ModEntry.Config.LockMinimapPosition
             && this.ScreenBounds.Contains(MouseUtil.GetScreenPoint());
     }
 
@@ -99,9 +102,9 @@ internal class ModMinimap
     /// <summary>Handle the player releasing the right mouse button.</summary>
     public void HandleMouseRightRelease()
     {
-        ModEntry.Globals.MinimapX = this.ScreenBounds.X;
-        ModEntry.Globals.MinimapY = this.ScreenBounds.Y;
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        ModEntry.Config.MinimapX = this.ScreenBounds.X;
+        ModEntry.Config.MinimapY = this.ScreenBounds.Y;
+        ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
         this.IsDragging = false;
     }
 
@@ -114,17 +117,14 @@ internal class ModMinimap
     public void Resize()
     {
         this.ScreenBounds.SetDesiredBounds(
-            width: ModEntry.Globals.MinimapWidth * Game1.pixelZoom,
-            height: ModEntry.Globals.MinimapHeight * Game1.pixelZoom
+            width: ModEntry.Config.MinimapWidth * Game1.pixelZoom,
+            height: ModEntry.Config.MinimapHeight * Game1.pixelZoom
         );
     }
 
     /// <summary>Update the minimap data if needed. Calls to this method are throttled.</summary>
     public void Update()
     {
-        if (this.MapPage is null || this.MapRegionId != this.GetRegionId())
-            this.UpdateMapPage();
-
         this.UpdateMapPosition();
     }
 
@@ -136,10 +136,7 @@ internal class ModMinimap
 
         // update map if needed
         if (this.MapPage.mapRegion.Id != this.MapRegionId)
-        {
-            this.UpdateMapPage();
             this.UpdateMapPosition();
-        }
 
         // get minimap dimensions
         var screenBounds = this.ScreenBounds;
@@ -148,19 +145,13 @@ internal class ModMinimap
         bool isHoveringMinimap = this.IsHoveringDragZone();
 
         // handle hover
-        float alpha;
-        Color color;
+        float alpha = ModEntry.Config.MinimapOpacity;
         if (isHoveringMinimap)
         {
-            alpha = 0.25f;
-            color = Color.White * alpha;
+            alpha = Math.Min(0.25f, alpha);
             Game1.mouseCursor = Game1.cursor_grab;
         }
-        else
-        {
-            alpha = 1f;
-            color = Color.White;
-        }
+        var color = Color.White * alpha;
 
         // draw map
         var spriteBatch = Game1.spriteBatch;
@@ -171,7 +162,10 @@ internal class ModMinimap
             try
             {
                 device.ScissorRectangle = mapArea;
-                using SpriteBatch clippedBatch = new SpriteBatch(device);
+
+                SpriteBatch? clippedBatch = this.ClippedSpriteBatch;
+                if (clippedBatch is null)
+                    this.ClippedSpriteBatch = clippedBatch = new SpriteBatch(device);
 
                 clippedBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp, null, new RasterizerState { ScissorTestEnable = true });
 
@@ -213,18 +207,16 @@ internal class ModMinimap
         }
     }
 
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        this.ClippedSpriteBatch?.Dispose();
+    }
+
 
     /*********
     ** Private methods
     *********/
-    /// <summary>Recreate the underlying map view.</summary>
-    [MemberNotNull(nameof(MapPage))]
-    private void UpdateMapPage()
-    {
-        this.MapPage = this.CreateMapPage();
-        this.MapRegionId = this.MapPage.mapRegion.Id;
-    }
-
     /// <summary>Get the player's current world map position.</summary>
     private WorldMapPosition GetWorldMapPosition()
     {
@@ -238,12 +230,19 @@ internal class ModMinimap
     /// <summary>Get the world map region which contains the player.</summary>
     private string GetRegionId()
     {
-        return this.GetWorldMapPosition()?.RegionId ?? "Valley";
+        return this.GetWorldMapPosition().RegionId ?? "Valley";
     }
 
     /// <summary>Update the position of the underlying map view so the player is centered within the minimap.</summary>
+    [MemberNotNull(nameof(MapPage))]
     private void UpdateMapPosition()
     {
+        if (this.MapPage is null || this.MapRegionId != this.GetRegionId())
+        {
+            this.MapPage = this.CreateMapPage();
+            this.MapRegionId = this.MapPage.mapRegion.Id;
+        }
+
         // get view dimensions
         var screenBounds = this.ScreenBounds;
         int viewX = screenBounds.X;

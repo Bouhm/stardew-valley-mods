@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -25,7 +26,7 @@ internal class LocationUtil
     /// <remarks>This is a last resort to prevent stack overflows. Normally the mod should prevent infinite recursion automatically by tracking locations it already visited.</remarks>
     public const int MaxRecursionDepth = 500;
 
-    public Dictionary<string, LocationContext> LocationContexts { get; } = new();
+    public Dictionary<string, LocationContext> LocationContexts { get; } = [];
 
 
     /*********
@@ -48,10 +49,9 @@ internal class LocationUtil
                 if (!this.TryGetContext(location.Name, out var context))
                     this.LocationContexts[location.Name] = context = new LocationContext(location) { Root = location.Name, Type = LocationType.Outdoors };
 
-                foreach (var warp in this.GetOutgoingWarpsForScanning(location))
+                foreach (Warp? warp in this.GetOutgoingWarpsForScanning(location))
                 {
-                    GameLocation warpLocation = this.GetStaticLocation(warp?.TargetName);
-                    if (warpLocation?.IsOutdoors == true)
+                    if (this.TryGetStaticLocation(warp?.TargetName, out GameLocation? warpLocation) && warpLocation.IsOutdoors)
                     {
                         if (!context.Neighbors.ContainsKey(warp.TargetName))
                             context.Neighbors.Add(warp.TargetName, new Vector2(warp.X, warp.Y));
@@ -72,9 +72,9 @@ internal class LocationUtil
     /// <summary>Find the uppermost indoor location for a building.</summary>
     /// <param name="startLocationName">The location to scan.</param>
     /// <param name="curRecursionDepth">The current recursion depth when called from a recursive method, or <c>1</c> if called non-recursively.</param>
-    public string GetBuilding(string startLocationName, int curRecursionDepth)
+    public string? GetBuilding(string startLocationName, int curRecursionDepth)
     {
-        string GetRecursively(string locationName, ISet<string> seen, int depth)
+        string? GetRecursively(string locationName, HashSet<string> seen, int depth)
         {
             // break infinite loops
             if (!seen.Add(locationName))
@@ -84,7 +84,7 @@ internal class LocationUtil
 
             // handle generated levels
             {
-                string mineName = this.GetLocationNameFromLevel(locationName);
+                string? mineName = this.GetLocationNameFromLevel(locationName);
                 if (mineName != null)
                     return mineName;
             }
@@ -93,7 +93,7 @@ internal class LocationUtil
             var context = this.TryGetContext(locationName);
             if (context?.Type == LocationType.Building)
                 return locationName;
-            string building = context?.Parent;
+            string? building = context?.Parent;
             if (building == null)
                 return null;
             if (building == context?.Root)
@@ -103,14 +103,14 @@ internal class LocationUtil
             return GetRecursively(building, seen, depth + 1);
         }
 
-        return GetRecursively(startLocationName, new HashSet<string>(), curRecursionDepth);
+        return GetRecursively(startLocationName, [], curRecursionDepth);
     }
 
     /// <summary>Get the context metadata for a location, if known.</summary>
     /// <param name="locationName">The location name.</param>
     /// <param name="mapGeneratedLevels">Whether to automatically map mine levels to their static entrance location.</param>
     /// <returns>Returns the context if found, else <c>null</c>.</returns>
-    public LocationContext TryGetContext(string locationName, bool mapGeneratedLevels = true)
+    public LocationContext? TryGetContext(string? locationName, bool mapGeneratedLevels = true)
     {
         if (mapGeneratedLevels)
             locationName = this.GetLocationNameFromLevel(locationName) ?? locationName;
@@ -118,16 +118,14 @@ internal class LocationUtil
         if (string.IsNullOrWhiteSpace(locationName))
             return null;
 
-        return this.LocationContexts.TryGetValue(locationName, out LocationContext context)
-            ? context
-            : null;
+        return this.LocationContexts.GetValueOrDefault(locationName);
     }
 
     /// <summary>Get the context metadata for a location, if known.</summary>
     /// <param name="locationName">The location name.</param>
     /// <param name="context">The location context, if found.</param>
     /// <returns>Returns whether the context was found.</returns>
-    public bool TryGetContext(string locationName, out LocationContext context)
+    public bool TryGetContext([NotNullWhen(true)] string? locationName, [NotNullWhen(true)] out LocationContext? context)
     {
         context = this.TryGetContext(locationName);
         return context != null;
@@ -136,7 +134,7 @@ internal class LocationUtil
     /// <summary>Get the name of the static entry location for a generated mine or dungeon level, if applicable.</summary>
     /// <param name="locationName">The actual location name, like <c>UndergroundMine35</c>.</param>
     /// <returns>Returns <c>Mine</c>, <c>SkullCave</c>, <c>VolcanoDungeon</c>, or <c>null</c>.</returns>
-    public string GetLocationNameFromLevel(string locationName)
+    public string? GetLocationNameFromLevel(string? locationName)
     {
         const string minePrefix = "UndergroundMine";
         const string volcanoPrefix = "VolcanoDungeon";
@@ -163,7 +161,7 @@ internal class LocationUtil
 
     /// <summary>Get whether a location is outdoors, if known.</summary>
     /// <param name="locationName">The location name.</param>
-    public bool IsOutdoors(string locationName)
+    public bool IsOutdoors([NotNullWhen(true)] string? locationName)
     {
         return this.TryGetContext(locationName)?.Type == LocationType.Outdoors;
     }
@@ -178,7 +176,7 @@ internal class LocationUtil
     /// <remarks>This traverses in indoor-to-outdoor order because warps and doors are not complete subsets of Game1.locations, which means there will be some rooms left out unless all the locations are iterated.</remarks>
     private void MapRootLocations(GameLocation startLocation, int curRecursionDepth)
     {
-        string ScanRecursively(GameLocation location, GameLocation prevLocation, string root, bool hasOutdoorWarp, Vector2 warpPosition, ISet<string> seen, int depth)
+        string? ScanRecursively(GameLocation? location, GameLocation? prevLocation, string? root, bool hasOutdoorWarp, Vector2 warpPosition, HashSet<string> seen, int depth)
         {
             // break infinite loops
             if (location == null || !seen.Add(location.NameOrUniqueName))
@@ -188,8 +186,8 @@ internal class LocationUtil
 
             // get location info
             string curLocationName = location.NameOrUniqueName;
-            string prevLocationName = prevLocation?.NameOrUniqueName;
-            LocationContext prevContext = prevLocationName != null
+            string? prevLocationName = prevLocation?.NameOrUniqueName;
+            LocationContext? prevContext = prevLocationName != null
                 ? this.LocationContexts[prevLocationName]
                 : null;
 
@@ -217,7 +215,7 @@ internal class LocationUtil
                 context.Type = LocationType.Outdoors;
                 context.Root = curLocationName;
 
-                if (prevLocation != null)
+                if (prevLocationName != null)
                 {
                     if (!context.Children.Contains(prevLocationName))
                         context.Children.Add(prevLocationName);
@@ -227,15 +225,17 @@ internal class LocationUtil
             }
 
             // recursively traverse warps from current location
-            foreach (var warp in this.GetOutgoingWarpsForScanning(location))
+            foreach (Warp? warp in this.GetOutgoingWarpsForScanning(location))
             {
+                if (warp is null)
+                    continue;
+
                 // avoid circular loop
                 if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName)
                     continue;
 
                 // get target location
-                var warpLocation = this.GetStaticLocation(warp.TargetName);
-                if (warpLocation == null)
+                if (!this.TryGetStaticLocation(warp.TargetName, out GameLocation? warpLocation))
                     continue;
 
                 // if one of the warps is a root location, current location is an indoor building
@@ -250,8 +250,8 @@ internal class LocationUtil
                 {
                     prevContext.Parent = curLocationName;
 
-                    if (!context.Children.Contains(prevLocationName))
-                        context.Children.Add(prevLocationName);
+                    if (!context.Children.Contains(prevLocationName!))
+                        context.Children.Add(prevLocationName!);
                 }
                 root = ScanRecursively(warpLocation, location, root, hasOutdoorWarp, new Vector2(warp.TargetX, warp.TargetY), seen, depth + 1);
                 context.Root = root;
@@ -262,31 +262,37 @@ internal class LocationUtil
             return root;
         }
 
-        ScanRecursively(startLocation, null, null, false, Vector2.Zero, new HashSet<string>(), curRecursionDepth);
+        ScanRecursively(startLocation, null, null, false, Vector2.Zero, [], curRecursionDepth);
     }
 
     /// <summary>Get a location instance from its name if it's not a procedurally generated location.</summary>
     /// <param name="name">The location name.</param>
-    private GameLocation GetStaticLocation(string name)
+    /// <param name="location">The resolved location.</param>
+    private bool TryGetStaticLocation([NotNullWhen(true)] string? name, [NotNullWhen(true)] out GameLocation? location)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(name) || this.GetLocationNameFromLevel(name) != null)
-                return null;
+            {
+                location = null;
+                return false;
+            }
 
-            return Game1.getLocationFromName(name);
+            location = Game1.getLocationFromName(name);
+            return location != null;
         }
         catch (Exception ex)
         {
             this.Monitor.Log($"Failed loading location '{name}'. See the log file for technical details.", LogLevel.Error);
             this.Monitor.Log(ex.ToString());
-            return null;
+            location = null;
+            return false;
         }
     }
 
     /// <summary>Get the outgoing warps for the purposes of location scanning in <see cref="MapRootLocations"/>.</summary>
     /// <param name="location">The location whose warps to get.</param>
-    private IEnumerable<Warp> GetOutgoingWarpsForScanning(GameLocation location)
+    private IEnumerable<Warp?> GetOutgoingWarpsForScanning(GameLocation location)
     {
         // special case: Caldera is separated from its root location by the generated Volcano
         // Dungeon levels, which will be ignored.
@@ -295,7 +301,7 @@ internal class LocationUtil
             var entrance = Game1.getLocationFromName("IslandNorth");
             var exitWarp = entrance?.warps.FirstOrDefault(p => p.TargetName == "VolcanoEntrance");
             if (exitWarp != null)
-                return new[] { exitWarp };
+                return [exitWarp];
         }
 
         // normal case

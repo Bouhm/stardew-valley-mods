@@ -1,6 +1,15 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 1.5.0
+Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+
+* Added support for controller/mouse button bindings.
+* Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings) (e.g. for split-screen support).
+* Optimized performance.
+* Fixed various errors related to unexpected game or mod state.
+* Improved translations. Thanks to Kondiq (added Polish)!
+
 ## 1.4.2
 Released 04 November 2024 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 

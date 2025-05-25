@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Characters;
 
@@ -11,19 +11,34 @@ namespace NPCMapLocations.Framework;
 public class ModCustomizations
 {
     /*********
+    ** Fields
+    *********/
+    /// <summary>A callback to invoke when the settings are saved.</summary>
+    private readonly Action OnSaved;
+
+
+    /*********
     ** Accessors
     *********/
     /// <summary>The NPC translated or customized display names, indexed by their internal name.</summary>
-    public Dictionary<string, string> Names { get; set; } = new();
+    public Dictionary<string, string> Names { get; set; } = [];
 
     /// <summary>The locations to ignore when scanning locations for players and NPCs.</summary>
     /// <remarks>This removes the location from the location graph entirely. If a player is in an excluded location, NPC Map Locations will treat them as being in an unknown location.</remarks>
-    public HashSet<string> LocationExclusions { get; set; } = new();
+    public HashSet<string> LocationExclusions { get; } = [];
 
 
     /*********
     ** Public methods
     *********/
+    /// <summary>Construct an instance.</summary>
+    /// <param name="onSaved">A callback to invoke when the settings are saved.</param>
+    public ModCustomizations(Action onSaved)
+    {
+        this.OnSaved = onSaved;
+    }
+
+
     /// <summary>Load customizations received from other mods through the content pipeline.</summary>
     /// <param name="customNpcJson">The custom NPC data.</param>
     /// <param name="customLocationJson">The custom location data.</param>
@@ -41,12 +56,11 @@ public class ModCustomizations
     /// <param name="customLocationJson">The raw location asset data.</param>
     private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
     {
-        foreach (var locationData in customLocationJson)
+        foreach ((string key, JObject location) in customLocationJson)
         {
-            JObject location = locationData.Value;
-
-            if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
-                this.LocationExclusions.Add(locationData.Key);
+            JToken? exclude = location.GetValue("Exclude");
+            if (exclude != null && (bool)exclude)
+                this.LocationExclusions.Add(key);
         }
     }
 
@@ -57,29 +71,28 @@ public class ModCustomizations
         // load custom NPC marker offsets and exclusions
         {
             // get defaults
-            var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Globals.NpcMarkerOffsets);
+            var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Config.NpcMarkerOffsets);
 
             // get custom data
-            foreach (var npcData in customNpcJson)
+            foreach ((string npcName, JObject npc) in customNpcJson)
             {
-                var npc = npcData.Value;
-
-                if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
+                JToken? exclude = npc.GetValue("Exclude");
+                if (exclude != null && (bool)exclude)
                 {
-                    ModEntry.Globals.ModNpcExclusions.Add(npcData.Key);
+                    ModEntry.Config.ModNpcExclusions.Add(npcName);
                     continue;
                 }
 
-                if (npc.ContainsKey("MarkerCropOffset"))
-                    markerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
+                JToken? markerCropOffset = npc.GetValue("MarkerCropOffset");
+                if (markerCropOffset != null)
+                    markerOffsets[npcName] = (int)markerCropOffset;
                 else
                 {
-                    NPC gameNpc = Game1.getCharacterFromName(npcData.Key);
+                    NPC gameNpc = Game1.getCharacterFromName(npcName);
                     if (gameNpc != null)
                     {
                         // If custom crop offset is not specified, default to 0
-                        if (!markerOffsets.ContainsKey(gameNpc.Name))
-                            markerOffsets[gameNpc.Name] = 0;
+                        markerOffsets.TryAdd(gameNpc.Name, 0);
 
                         // Children sprites are short so give them a booster seat
                         if (gameNpc is Child)
@@ -89,7 +102,7 @@ public class ModCustomizations
             }
 
             // Merge customizations into globals config
-            ModEntry.Globals.NpcMarkerOffsets = markerOffsets;
+            ModEntry.Config.NpcMarkerOffsets = markerOffsets;
         }
 
         foreach (var character in Utility.getAllCharacters())
@@ -117,8 +130,7 @@ public class ModCustomizations
             }
         }
 
-        ModEntry.StaticHelper.Data.WriteJsonFile($"config/{Constants.SaveFolderName}.json", ModEntry.Config);
-        ModEntry.StaticHelper.Data.WriteJsonFile("config/globals.json", ModEntry.Globals);
+        this.OnSaved();
     }
 
     /// <summary>Merge any number of dictionaries into a new dictionary.</summary>
@@ -127,7 +139,7 @@ public class ModCustomizations
     /// <returns>Returns a new dictionary instance.</returns>
     private Dictionary<string, TValue> Merge<TValue>(params Dictionary<string, TValue>[] dictionaries)
     {
-        Dictionary<string, TValue> merged = new();
+        Dictionary<string, TValue> merged = [];
 
         foreach (var dictionary in dictionaries)
         {
