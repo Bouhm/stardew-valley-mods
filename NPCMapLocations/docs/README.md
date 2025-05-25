@@ -28,7 +28,7 @@ If you install [Generic Mod Config Menu][], you can click the cog button (⚙) o
 or the "mod options" button at the bottom of the in-game menu to configure the mod. Hover the
 cursor over a field for details.
 
-> ![](doc-images/generic-config-menu.png)
+> ![](doc-images/config-menu.png)
 
 ## FAQs
 * **Why do I see duplicate villagers on the map with UI Info Suite?**  
@@ -44,9 +44,11 @@ cursor over a field for details.
   Yep. For mod authors, see the [author guide](author-guide.md) for more info on how this works.
 
 ## Compatibility
-Compatible with Stardew Valley 1.6+ on Linux/macOS/Windows, both single-player and multiplayer.
+Compatible with Stardew Valley 1.6.9+ on Linux/macOS/Windows, both single-player and multiplayer.
 
 **In multiplayer, the mod will only work if the host player has it installed.**
 
 ## See also
 * [Release notes](release-notes.md)
+
+[Generic Mod Config Menu]: https://www.nexusmods.com/stardewvalley/mods/5098

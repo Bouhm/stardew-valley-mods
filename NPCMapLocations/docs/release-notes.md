@@ -1,35 +1,38 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 3.4.0
+Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+
 * Overhauled mod settings:
   * Replaced the custom config UI with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098).  
-    _You must install Generic Mod Config Menu to use the config UI, but otherwise you can open it the same way as before._
-  * Moved all settings into a conventional `config.json` file.
+    _You need Generic Mod Config Menu to use the config UI, but otherwise you can open it the same way as before._
   * Added support for controller/mouse button bindings.
-  * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).
-  * Added options for...
+  * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings) (e.g. for split-screen support).
+  * Added config options for...
     * whether to show the bookseller;
     * whether to show players' children;
     * whether to show farm buildings;
     * map marker sizes;
     * minimap opacity;
-    * and caching for performance.
+    * and performance tweaks.
   * Streamlined various options to be more intuitive.
+  * Moved all settings into one conventional `config.json` file.
   * Reduced smallest minimap size from 75px to 45px.
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
-* Reduced performance impact of minimap (thanks to GitHubSnegOk!).
-* Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).
+* Reduced performance impact of minimap rendering (thanks to GitHubSnegOk!).
+* Improved sizing of non-square NPC markers like the bookseller (thanks to Spiderbuttons!).
 * Improved translations. Thanks to AugNSo (updated Chinese), CaranudLapin (updated French), and Kondiq (updated Polish)!
-* Kent is now shown on the map immediately when he returns.
+* Fixed Kent not always shown on the map immediately when he returns.
 * Fixed Mr. and Mrs. Raccoon's names not translatable for non-English players.  
   _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
 * Fixed various errors related to unexpected game or mod state.
 * Internal changes to simplify maintenance.
 
-**[Breaking changes]**
-- You should now use [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) to edit the mod options, instead of pressing `Tab` from the map page.
-- A few mod settings may get reset due to the scope of the config changes.
+**[Update notes for players]**
+- You now need [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) to edit the mod options (but the mod works fine without it otherwise).
+- A small number of mod settings were previously set per-save in `config/<save id>.json`. These are now in the global `config.json` instead.
+- Some mod settings may get reset due to the scope of the config changes.
 
 ## 3.3.0
 Released 11 January 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
