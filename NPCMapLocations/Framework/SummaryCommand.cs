@@ -50,17 +50,17 @@ internal static class SummaryCommand
         // current player
         {
             // collect info
-            var player = Game1.player;
+            Farmer player = Game1.player;
             GameLocation? location = player.currentLocation;
-            string? locationName = locationUtil.GetLocationNameFromLevel(location.NameOrUniqueName) ?? location?.NameOrUniqueName;
+            string? locationName = locationUtil.GetLocationNameFromLevel(location?.NameOrUniqueName) ?? location?.NameOrUniqueName;
             LocationContext? context = locationUtil.TryGetContext(locationName, mapGeneratedLevels: false);
             WorldMapPosition worldPos = ModEntry.GetWorldMapPosition(locationName, player.TilePoint.X, player.TilePoint.Y, customizations.LocationExclusions);
 
             // collect alternate location names
             List<string> altNames = [];
-            if (location.NameOrUniqueName != location.Name)
-                altNames.Add($"unique: {location.NameOrUniqueName}");
-            if (location.NameOrUniqueName != locationName)
+            if (location?.NameOrUniqueName != location?.Name)
+                altNames.Add($"unique: {location?.NameOrUniqueName}");
+            if (location?.NameOrUniqueName != locationName)
                 output.Append($"context: {locationName}");
 
             // build output
@@ -69,10 +69,10 @@ internal static class SummaryCommand
             output.AppendLine("==  Current player  ==");
             output.AppendLine("======================");
             output.AppendLine($"Player: {player.Name} ({player.UniqueMultiplayerID})");
-            output.AppendLine($"Location: {location.Name}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
+            output.AppendLine($"Location: {location?.Name ?? "<unknown>"}{(altNames.Any() ? $" ({string.Join(", ", altNames)})" : "")}");
             output.AppendLine($"Map region: {worldPos.RegionId}");
             output.AppendLine($"Tile: ({player.TilePoint.X}, {player.TilePoint.Y})");
-            output.AppendLine($"Excluded: {customizations.LocationExclusions.Contains(locationName)}");
+            output.AppendLine($"Excluded: {locationName != null && customizations.LocationExclusions.Contains(locationName)}");
             output.AppendLine($"Map pixel: {(!worldPos.IsEmpty ? $"({worldPos.X}, {worldPos.Y})" : "unknown")}");
             output.AppendLine();
 
@@ -242,7 +242,7 @@ internal static class SummaryCommand
         int[] sizes = columnHeadings.Select(p => p.Length).ToArray();
 
         string[][] rows = records
-            ?.Select(record =>
+            .Select(record =>
             {
                 string[] row = new string[columnCount];
 
@@ -256,7 +256,7 @@ internal static class SummaryCommand
 
                 return row;
             })
-            .ToArray() ?? [];
+            .ToArray();
 
         // build table
         StringBuilder table = new();
@@ -275,7 +275,7 @@ internal static class SummaryCommand
             }
 
             PrintRow(columnHeadings);
-            PrintRow(columnHeadings.Select(p => "").ToArray(), '-');
+            PrintRow(columnHeadings.Select(_ => "").ToArray(), '-');
             foreach (string[] row in rows)
                 PrintRow(row);
         }

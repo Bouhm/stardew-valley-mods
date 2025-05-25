@@ -4,7 +4,8 @@
 ## Upcoming release
 * Added support for controller/mouse button bindings.
 * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).
-* Performance optimizations.
+* Optimized performance.
+* Fixed various errors related to unexpected game or mod state.
 * Internal changes to simplify maintenance.
 * Improve translations. Thanks to Kondiq (added Polish)!
 

@@ -97,12 +97,12 @@ internal class ModMapPage : MapPage
                 {
                     foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                     {
-                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapPosition, markerWidth, markerHeight))
+                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapX, npcMarker.WorldMapY, markerWidth, markerHeight))
                             continue;
 
                         newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
 
-                        if (!this.LocationUtil.IsOutdoors(npcMarker.LocationName))
+                        if (npcMarker.LocationName != null && !this.LocationUtil.IsOutdoors(npcMarker.LocationName))
                             indoorLocationNames.Add(npcMarker.LocationName);
                     }
                 }
@@ -110,12 +110,12 @@ internal class ModMapPage : MapPage
                 {
                     foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                     {
-                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapPosition, markerWidth / 2, markerHeight / 2))
+                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapX, farmerMarker.WorldMapY, markerWidth / 2, markerHeight / 2))
                             continue;
 
                         newHoveredNames.Add(farmerMarker.Name);
 
-                        if (!this.LocationUtil.IsOutdoors(farmerMarker.LocationName))
+                        if (farmerMarker.LocationName != null && !this.LocationUtil.IsOutdoors(farmerMarker.LocationName))
                             indoorLocationNames.Add(farmerMarker.LocationName);
                     }
                 }
@@ -127,7 +127,7 @@ internal class ModMapPage : MapPage
                     {
                         foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                         {
-                            if (!npcMarker.IsHidden && indoorLocationNames.Contains(npcMarker.LocationName))
+                            if (!npcMarker.IsHidden && npcMarker.LocationName != null && indoorLocationNames.Contains(npcMarker.LocationName))
                                 newHoveredNames.Add(this.GetNpcDisplayName(npcName));
                         }
                     }
@@ -135,7 +135,7 @@ internal class ModMapPage : MapPage
                     {
                         foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                         {
-                            if (indoorLocationNames.Contains(farmerMarker.LocationName))
+                            if (farmerMarker.LocationName != null && indoorLocationNames.Contains(farmerMarker.LocationName))
                                 newHoveredNames.Add(farmerMarker.Name);
                         }
                     }
@@ -488,13 +488,14 @@ internal class ModMapPage : MapPage
 
     /// <summary>Get whether a pixel area on the world map is under the cursor, adjusted for the map offset.</summary>
     /// <param name="mousePos">The pixel position of the mouse, relative to the game window.</param>
-    /// <param name="mapPos">The pixel position on the world map, relative to the top-left corner of the map.</param>
+    /// <param name="worldMapX">The X pixel position on the world map, relative to the top-left corner of the map.</param>
+    /// <param name="worldMapY">The Y pixel position on the world map, relative to the top-left corner of the map.</param>
     /// <param name="markerWidth">The pixel width of the position on the world map.</param>
     /// <param name="markerHeight">The pixel height of the position on the world map.</param>
-    private bool IsMapPixelUnderCursor(Point mousePos, WorldMapPosition mapPos, int markerWidth, int markerHeight)
+    private bool IsMapPixelUnderCursor(Point mousePos, int worldMapX, int worldMapY, int markerWidth, int markerHeight)
     {
-        int x = this.mapBounds.X + mapPos.X;
-        int y = this.mapBounds.Y + mapPos.Y;
+        int x = this.mapBounds.X + worldMapX;
+        int y = this.mapBounds.Y + worldMapY;
 
         return
             mousePos.X >= x

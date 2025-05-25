@@ -58,7 +58,8 @@ public class ModCustomizations
     {
         foreach ((string key, JObject location) in customLocationJson)
         {
-            if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
+            JToken? exclude = location.GetValue("Exclude");
+            if (exclude != null && (bool)exclude)
                 this.LocationExclusions.Add(key);
         }
     }
@@ -75,14 +76,16 @@ public class ModCustomizations
             // get custom data
             foreach ((string npcName, JObject npc) in customNpcJson)
             {
-                if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
+                JToken? exclude = npc.GetValue("Exclude");
+                if (exclude != null && (bool)exclude)
                 {
                     ModEntry.Config.ModNpcExclusions.Add(npcName);
                     continue;
                 }
 
-                if (npc.ContainsKey("MarkerCropOffset"))
-                    markerOffsets[npcName] = (int)npc.GetValue("MarkerCropOffset");
+                JToken? markerCropOffset = npc.GetValue("MarkerCropOffset");
+                if (markerCropOffset != null)
+                    markerOffsets[npcName] = (int)markerCropOffset;
                 else
                 {
                     NPC gameNpc = Game1.getCharacterFromName(npcName);

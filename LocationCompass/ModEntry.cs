@@ -268,9 +268,12 @@ public class ModEntry : Mod
 
     private void GetSyncedLocationData()
     {
+        if (this.SyncedLocationData is null)
+            throw new InvalidOperationException($"Can't call {nameof(this.GetSyncedLocationData)} before the location data is initialized on save loaded.");
+
         foreach (NPC npc in this.GetVillagers())
         {
-            if (npc?.currentLocation != null)
+            if (npc.currentLocation != null)
                 this.SyncedLocationData.Locations[npc.Name] = new LocationData(npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name, npc.Position.X, npc.Position.Y);
         }
     }
@@ -286,8 +289,20 @@ public class ModEntry : Mod
 
     private void UpdateLocators()
     {
+        if (this.SyncedLocationData is null)
+            throw new InvalidOperationException($"Can't call {nameof(this.GetSyncedLocationData)} before the location data is initialized on save loaded.");
+
         this.Locators.Clear();
 
+        // get player location
+        string playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+        bool isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
+        string? playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
+        LocationContext? playerLocCtx = this.LocationUtil.TryGetContext(playerMineName ?? playerLocName, mapGeneratedLevels: false); // Leave mine levels distinguished in name if player inside mine
+        if (playerLocCtx is null)
+            return; // invalid state
+
+        // get locators
         foreach (Character character in this.Characters)
         {
             if (character.currentLocation == null)
@@ -327,40 +342,28 @@ public class ModEntry : Mod
                     continue;
             }
 
-            string playerLocName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
             string? charLocName = character is Farmer
                 ? character.currentLocation.uniqueName.Value ?? character.currentLocation.Name
-                : npcLoc.LocationName;
-            bool isPlayerLocOutdoors = Game1.player.currentLocation.IsOutdoors;
+                : npcLoc?.LocationName;
 
-            LocationContext? playerLocCtx;
             LocationContext? characterLocCtx;
 
             // Manually handle mines
             {
                 string? charMineName = this.LocationUtil.GetLocationNameFromLevel(charLocName);
-                string? playerMineName = this.LocationUtil.GetLocationNameFromLevel(playerLocName);
 
                 if (isPlayerLocOutdoors)
-                {
-                    // If inside a generated level, show characters as inside same general mine to player outside
-                    charLocName = charMineName ?? charLocName;
-                }
+                    charLocName = charMineName ?? charLocName; // If inside a generated level, show characters as inside same general mine to player outside
 
                 if (playerMineName != null && charMineName != null)
-                {
-                    // Leave mine levels distinguished in name if player inside mine
-                    playerLocCtx = this.LocationUtil.TryGetContext(playerMineName, mapGeneratedLevels: false);
-                    characterLocCtx = this.LocationUtil.TryGetContext(charMineName, mapGeneratedLevels: false);
-                }
-                else
-                {
-                    if (!this.LocationUtil.TryGetContext(playerLocName, out playerLocCtx))
-                        continue;
-                    if (!this.LocationUtil.TryGetContext(charLocName, out characterLocCtx))
-                        continue;
-                }
+                    characterLocCtx = this.LocationUtil.TryGetContext(charMineName, mapGeneratedLevels: false); // Leave mine levels distinguished in name if player inside mine
+
+                else if (!this.LocationUtil.TryGetContext(charLocName, out characterLocCtx))
+                    continue;
             }
+
+            if (charLocName is null || characterLocCtx is null)
+                continue; // invalid state
 
             if (this.Config.SameLocationOnly && characterLocCtx.Root != playerLocCtx.Root)
                 continue;
@@ -381,7 +384,7 @@ public class ModEntry : Mod
             }
             else
             {
-                charPosition = new Vector2(npcLoc.X, npcLoc.Y);
+                charPosition = new Vector2(npcLoc?.X ?? 0, npcLoc?.Y ?? 0);
                 charSpriteHeight = character.Sprite.SpriteHeight;
             }
 
@@ -403,7 +406,7 @@ public class ModEntry : Mod
                 // ScienceHouse such that the player will know Sebastian is in that building.
                 // Once the player is actually inside, Sebastian will be correctly placed in SebastianRoom.
 
-                // Finds the upper-most indoor location that the player is in
+                // Finds the uppermost indoor location that the player is in
                 isWarp = true;
                 string? indoor = this.LocationUtil.GetBuilding(charLocName, curRecursionDepth: 1);
                 if (this.Config.SameLocationOnly)
@@ -413,9 +416,8 @@ public class ModEntry : Mod
                     if (playerLocName != characterLocCtx.Root && playerLocName != indoor)
                         continue;
                 }
-                charLocName = isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room
-                    ? indoor
-                    : charLocName;
+                if (isPlayerLocOutdoors || characterLocCtx.Type != LocationType.Room)
+                    charLocName = indoor ?? charLocName;
 
                 // Neighboring outdoor warps
                 if (!isPlayerLocOutdoors)
@@ -429,7 +431,8 @@ public class ModEntry : Mod
                     else
                     {
                         LocationContext? characterParentContext = this.LocationUtil.TryGetContext(characterLocCtx.Parent);
-                        characterPos = characterParentContext.GetWarpPixelPosition();
+                        if (characterParentContext != null)
+                            characterPos = characterParentContext.GetWarpPixelPosition();
                     }
                 }
                 else
@@ -439,15 +442,16 @@ public class ModEntry : Mod
                         // Point locators to the neighboring outdoor warps and
                         // doors of buildings including nested rooms
                         LocationContext? indoorContext = this.LocationUtil.TryGetContext(indoor);
-                        characterPos = indoorContext.GetWarpPixelPosition();
+                        if (indoorContext != null)
+                            characterPos = indoorContext.GetWarpPixelPosition();
                     }
                     else if (!this.Config.SameLocationOnly)
                     {
                         // Warps to other outdoor locations
                         isOutdoors = true;
-                        if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out Vector2 warpPos)) || charLocName != null && playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
+                        if ((characterLocCtx.Root != null && playerLocCtx.Neighbors.TryGetValue(characterLocCtx.Root, out Vector2 warpPos)) || playerLocCtx.Neighbors.TryGetValue(charLocName, out warpPos))
                         {
-                            charLocName = characterLocCtx.Root;
+                            charLocName = characterLocCtx.Root ?? charLocName;
                             characterPos = LocationContext.GetWarpPixelPosition(warpPos);
                         }
                         else
@@ -618,7 +622,7 @@ public class ModEntry : Mod
 
     private void DrawLocators()
     {
-        var sortedLocators = this.Locators.OrderBy(x => !x.Value.FirstOrDefault().IsOutdoors);
+        var sortedLocators = this.Locators.OrderBy(x => !x.Value[0].IsOutdoors);
 
         // Individual locators, onscreen or offscreen
         foreach (var locPair in sortedLocators)
@@ -627,7 +631,7 @@ public class ModEntry : Mod
             int offsetY;
 
             // Show outdoor NPCs position in the current location
-            if (!locPair.Value.FirstOrDefault().IsWarp)
+            if (!locPair.Value[0].IsWarp)
             {
                 foreach (var locator in locPair.Value)
                 {
@@ -674,9 +678,7 @@ public class ModEntry : Mod
                         );
                     }
                     else
-                    {
-                        locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
-                    }
+                        locator.Farmer?.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
 
                     // Draw distance text
                     if (locator.Proximity > 0)
@@ -692,15 +694,15 @@ public class ModEntry : Mod
             // Multiple indoor locators in a location, pointing to its door
             else
             {
-                Locator? locator;
+                Locator locator;
 
                 if (this.ActiveWarpLocators.TryGetValue(locPair.Key, out LocatorScroller? activeLocator))
                 {
-                    locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value.FirstOrDefault();
+                    locator = locPair.Value.ElementAtOrDefault(activeLocator.Index) ?? locPair.Value[0];
                     activeLocator.LocatorRect = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64);
                 }
                 else
-                    locator = locPair.Value.FirstOrDefault();
+                    locator = locPair.Value[0];
 
                 bool isHovering = new Rectangle((int)(locator.X - 32), (int)(locator.Y - 32), 64, 64).Contains(Game1.getMouseX(), Game1.getMouseY());
 
@@ -778,9 +780,7 @@ public class ModEntry : Mod
                     );
                 }
                 else
-                {
-                    locator.Farmer.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
-                }
+                    locator.Farmer?.FarmerRenderer.drawMiniPortrat(Game1.spriteBatch, new Vector2(locator.X + offsetX - 48, locator.Y + offsetY - 48), 0f, 3f, 0, locator.Farmer);
 
                 if (locator.IsOnScreen || isHovering)
                 {

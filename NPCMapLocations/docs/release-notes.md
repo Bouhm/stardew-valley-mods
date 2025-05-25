@@ -24,7 +24,7 @@
 * Kent is now shown on the map immediately when he returns.
 * Fixed Mr. and Mrs. Raccoon's names not translatable for non-English players.  
   _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
-* Fixed error if a marker's player or NPC can't be positioned on the map.
+* Fixed various errors related to unexpected game or mod state.
 * Internal changes to simplify maintenance.
 
 **[Breaking changes]**

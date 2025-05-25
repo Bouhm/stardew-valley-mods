@@ -125,9 +125,6 @@ internal class ModMinimap : IDisposable
     /// <summary>Update the minimap data if needed. Calls to this method are throttled.</summary>
     public void Update()
     {
-        if (this.MapPage is null || this.MapRegionId != this.GetRegionId())
-            this.UpdateMapPage();
-
         this.UpdateMapPosition();
     }
 
@@ -139,10 +136,7 @@ internal class ModMinimap : IDisposable
 
         // update map if needed
         if (this.MapPage.mapRegion.Id != this.MapRegionId)
-        {
-            this.UpdateMapPage();
             this.UpdateMapPosition();
-        }
 
         // get minimap dimensions
         var screenBounds = this.ScreenBounds;
@@ -223,14 +217,6 @@ internal class ModMinimap : IDisposable
     /*********
     ** Private methods
     *********/
-    /// <summary>Recreate the underlying map view.</summary>
-    [MemberNotNull(nameof(MapPage))]
-    private void UpdateMapPage()
-    {
-        this.MapPage = this.CreateMapPage();
-        this.MapRegionId = this.MapPage.mapRegion.Id;
-    }
-
     /// <summary>Get the player's current world map position.</summary>
     private WorldMapPosition GetWorldMapPosition()
     {
@@ -244,12 +230,19 @@ internal class ModMinimap : IDisposable
     /// <summary>Get the world map region which contains the player.</summary>
     private string GetRegionId()
     {
-        return this.GetWorldMapPosition()?.RegionId ?? "Valley";
+        return this.GetWorldMapPosition().RegionId ?? "Valley";
     }
 
     /// <summary>Update the position of the underlying map view so the player is centered within the minimap.</summary>
+    [MemberNotNull(nameof(MapPage))]
     private void UpdateMapPosition()
     {
+        if (this.MapPage is null || this.MapRegionId != this.GetRegionId())
+        {
+            this.MapPage = this.CreateMapPage();
+            this.MapRegionId = this.MapPage.mapRegion.Id;
+        }
+
         // get view dimensions
         var screenBounds = this.ScreenBounds;
         int viewX = screenBounds.X;

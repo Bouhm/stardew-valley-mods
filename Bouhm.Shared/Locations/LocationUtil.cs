@@ -215,10 +215,10 @@ internal class LocationUtil
                 context.Type = LocationType.Outdoors;
                 context.Root = curLocationName;
 
-                if (prevLocation != null)
+                if (prevLocationName != null)
                 {
-                    if (!context.Children.Contains(prevLocationName!))
-                        context.Children.Add(prevLocationName!);
+                    if (!context.Children.Contains(prevLocationName))
+                        context.Children.Add(prevLocationName);
                 }
 
                 return curLocationName;
@@ -227,6 +227,9 @@ internal class LocationUtil
             // recursively traverse warps from current location
             foreach (Warp? warp in this.GetOutgoingWarpsForScanning(location))
             {
+                if (warp is null)
+                    continue;
+
                 // avoid circular loop
                 if (curLocationName == warp.TargetName || prevLocationName == warp.TargetName)
                     continue;
@@ -247,8 +250,8 @@ internal class LocationUtil
                 {
                     prevContext.Parent = curLocationName;
 
-                    if (!context.Children.Contains(prevLocationName))
-                        context.Children.Add(prevLocationName);
+                    if (!context.Children.Contains(prevLocationName!))
+                        context.Children.Add(prevLocationName!);
                 }
                 root = ScanRecursively(warpLocation, location, root, hasOutdoorWarp, new Vector2(warp.TargetX, warp.TargetY), seen, depth + 1);
                 context.Root = root;

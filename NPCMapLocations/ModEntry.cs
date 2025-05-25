@@ -609,8 +609,11 @@ public class ModEntry : Mod
 
         foreach (Building? building in Game1.getFarm().buildings)
         {
+            if (building is null)
+                continue;
+
             // get building interior
-            GameLocation? indoors = building?.indoors.Value;
+            GameLocation? indoors = building.indoors.Value;
             if (indoors is null && building is GreenhouseBuilding && Game1.MasterPlayer.hasOrWillReceiveMail("ccPantry"))
                 indoors = Game1.getLocationFromName("Greenhouse");
             if (indoors is null)
