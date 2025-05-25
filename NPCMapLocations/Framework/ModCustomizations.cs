@@ -56,12 +56,10 @@ public class ModCustomizations
     /// <param name="customLocationJson">The raw location asset data.</param>
     private void LoadCustomLocations(Dictionary<string, JObject> customLocationJson)
     {
-        foreach (var locationData in customLocationJson)
+        foreach ((string key, JObject location) in customLocationJson)
         {
-            JObject location = locationData.Value;
-
             if (location.ContainsKey("Exclude") && (bool)location.GetValue("Exclude"))
-                this.LocationExclusions.Add(locationData.Key);
+                this.LocationExclusions.Add(key);
         }
     }
 
@@ -75,21 +73,19 @@ public class ModCustomizations
             var markerOffsets = this.Merge(ModConstants.NpcMarkerOffsets, ModEntry.Config.NpcMarkerOffsets);
 
             // get custom data
-            foreach (var npcData in customNpcJson)
+            foreach ((string npcName, JObject npc) in customNpcJson)
             {
-                var npc = npcData.Value;
-
                 if (npc.ContainsKey("Exclude") && (bool)npc.GetValue("Exclude"))
                 {
-                    ModEntry.Config.ModNpcExclusions.Add(npcData.Key);
+                    ModEntry.Config.ModNpcExclusions.Add(npcName);
                     continue;
                 }
 
                 if (npc.ContainsKey("MarkerCropOffset"))
-                    markerOffsets[npcData.Key] = (int)npc.GetValue("MarkerCropOffset");
+                    markerOffsets[npcName] = (int)npc.GetValue("MarkerCropOffset");
                 else
                 {
-                    NPC gameNpc = Game1.getCharacterFromName(npcData.Key);
+                    NPC gameNpc = Game1.getCharacterFromName(npcName);
                     if (gameNpc != null)
                     {
                         // If custom crop offset is not specified, default to 0

@@ -484,9 +484,8 @@ public class ModEntry : Mod
                         return;
 
                     var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
-                    foreach (var syncedMarker in syncedNpcMarkers)
+                    foreach ((string internalName, SyncedNpcMarker syncedMarker) in syncedNpcMarkers)
                     {
-                        string internalName = syncedMarker.Key;
                         if (!ModEntry.Config.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
                             offset = 0;
 
@@ -496,16 +495,16 @@ public class ModEntry : Mod
                             this.NpcMarkers.Value.Add(internalName, npcMarker);
                         }
 
-                        npcMarker.LocationName = syncedMarker.Value.LocationName;
-                        npcMarker.WorldMapPosition = syncedMarker.Value.WorldMapPosition;
-                        npcMarker.DisplayName = syncedMarker.Value.DisplayName;
+                        npcMarker.LocationName = syncedMarker.LocationName;
+                        npcMarker.WorldMapPosition = syncedMarker.WorldMapPosition;
+                        npcMarker.DisplayName = syncedMarker.DisplayName;
                         npcMarker.CropOffset = offset;
-                        npcMarker.IsBirthday = syncedMarker.Value.IsBirthday;
-                        npcMarker.Type = syncedMarker.Value.Type;
+                        npcMarker.IsBirthday = syncedMarker.IsBirthday;
+                        npcMarker.Type = syncedMarker.Type;
 
                         try
                         {
-                            if (syncedMarker.Value.Type is CharacterType.Villager or CharacterType.Raccoon)
+                            if (syncedMarker.Type is CharacterType.Villager or CharacterType.Raccoon)
                             {
                                 npcMarker.Sprite = internalName == "Leo"
                                     ? new AnimatedSprite("Characters\\ParrotBoy", 0, 16, 32).Texture
@@ -570,11 +569,8 @@ public class ModEntry : Mod
     /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
     private IEnumerable<LocationContext> GetLocationsWithoutMapPosition()
     {
-        foreach (var entry in LocationUtil.LocationContexts)
+        foreach ((string name, LocationContext context) in LocationUtil.LocationContexts)
         {
-            string name = entry.Key;
-            LocationContext context = entry.Value;
-
             if (GetWorldMapPosition(name).IsEmpty && context.Type is not (LocationType.Building or LocationType.Room))
                 yield return context;
         }
@@ -960,11 +956,8 @@ public class ModEntry : Mod
         if (this.NpcMarkers.Value == null)
             return;
 
-        foreach (var npcMarker in this.NpcMarkers.Value)
+        foreach ((string name, NpcMarker marker) in this.NpcMarkers.Value)
         {
-            string name = npcMarker.Key;
-            var marker = npcMarker.Value;
-
             // For show Npcs in player's location option
             bool isSameLocation = false;
             if (Config.OnlySameLocation)
