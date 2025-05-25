@@ -1,0 +1,13 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <!-- common build settings -->
+    <PropertyGroup>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/Bouhm/stardew-valley-mods</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+
+        <ModZipPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)\_releases</ModZipPath>
+    </PropertyGroup>
+</Project>
