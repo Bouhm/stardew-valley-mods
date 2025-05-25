@@ -83,7 +83,6 @@ public static class ModConstants
     public static List<string> ConditionalNpcs => new()
     {
         "Dwarf",
-        "Kent",
         "Krobus",
         "Marlon",
         "Sandy",
