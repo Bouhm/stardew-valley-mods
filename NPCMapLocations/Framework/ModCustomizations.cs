@@ -89,8 +89,7 @@ public class ModCustomizations
                     if (gameNpc != null)
                     {
                         // If custom crop offset is not specified, default to 0
-                        if (!markerOffsets.ContainsKey(gameNpc.Name))
-                            markerOffsets[gameNpc.Name] = 0;
+                        markerOffsets.TryAdd(gameNpc.Name, 0);
 
                         // Children sprites are short so give them a booster seat
                         if (gameNpc is Child)

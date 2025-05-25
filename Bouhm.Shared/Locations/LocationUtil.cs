@@ -118,9 +118,7 @@ internal class LocationUtil
         if (string.IsNullOrWhiteSpace(locationName))
             return null;
 
-        return this.LocationContexts.TryGetValue(locationName, out LocationContext context)
-            ? context
-            : null;
+        return this.LocationContexts.GetValueOrDefault(locationName);
     }
 
     /// <summary>Get the context metadata for a location, if known.</summary>

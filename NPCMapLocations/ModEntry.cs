@@ -486,8 +486,7 @@ public class ModEntry : Mod
                     var syncedNpcMarkers = e.ReadAs<Dictionary<string, SyncedNpcMarker>>();
                     foreach ((string internalName, SyncedNpcMarker syncedMarker) in syncedNpcMarkers)
                     {
-                        if (!ModEntry.Config.NpcMarkerOffsets.TryGetValue(internalName, out int offset))
-                            offset = 0;
+                        int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(internalName, 0);
 
                         if (!this.NpcMarkers.Value.TryGetValue(internalName, out var npcMarker))
                         {

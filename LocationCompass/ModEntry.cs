@@ -304,15 +304,11 @@ public class ModEntry : Mod
 
             if (character is NPC npc && this.Config.ShowQuestsAndBirthdaysOnly)
             {
-                bool isBirthday = false;
-                bool hasQuest = false;
-                // Check if gifted for birthday
-                if (npc.isBirthday())
-                {
-                    isBirthday = Game1.player.friendshipData.ContainsKey(npc.Name) && Game1.player.friendshipData[npc.Name].GiftsToday == 0;
-                }
+                // check if gifted for birthday
+                bool isBirthday = npc.isBirthday() && Game1.player.friendshipData.GetValueOrDefault(npc.Name)?.GiftsToday == 0;
 
-                // Check for daily quests
+                // check for daily quests
+                bool hasQuest = false;
                 foreach (var quest in Game1.player.questLog)
                 {
                     if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
@@ -459,18 +455,17 @@ public class ModEntry : Mod
                 }
 
                 // Add character to the list of locators inside a building
-                if (!this.ActiveWarpLocators.ContainsKey(charLocName))
+                if (!this.ActiveWarpLocators.TryGetValue(charLocName, out LocatorScroller warpLocator))
                 {
-                    this.ActiveWarpLocators.Add(charLocName, new LocatorScroller()
+                    warpLocator = new LocatorScroller
                     {
                         Location = charLocName,
-                        Characters = [character.Name],
-                        LocatorRect = new Rectangle((int)(characterPos.X - 32), (int)(characterPos.Y - 32),
-                            64, 64)
-                    });
+                        Characters = [],
+                        LocatorRect = new Rectangle((int)(characterPos.X - 32), (int)(characterPos.Y - 32), 64, 64)
+                    };
+                    this.ActiveWarpLocators.Add(charLocName, warpLocator);
                 }
-                else
-                    this.ActiveWarpLocators[charLocName].Characters.Add(character.Name);
+                warpLocator.Characters.Add(character.Name);
             }
 
             bool isOnScreen = Utility.isOnScreen(characterPos, Game1.tileSize / 4);
@@ -643,8 +638,7 @@ public class ModEntry : Mod
                         ? 0.35
                         : 0.35 + (this.MaxProximity - locator.Proximity) / this.MaxProximity * 0.65;
 
-                    if (!this.Constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
-                        cropY = 0;
+                    int cropY = this.Constants.MarkerCrop.GetValueOrDefault(locator.Name, 0);
 
                     var npcSrcRect = locator.IsHorse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, cropY, 16, 15);
 
@@ -742,8 +736,7 @@ public class ModEntry : Mod
                     locator.Proximity = 0;
                 }
 
-                if (!this.Constants.MarkerCrop.TryGetValue(locator.Name, out int cropY))
-                    cropY = 0;
+                int cropY = this.Constants.MarkerCrop.GetValueOrDefault(locator.Name, 0);
 
                 var compassSrcRect = locator.IsOutdoors ? new Rectangle(64, 0, 64, 64) : new Rectangle(0, 0, 64, 64); // Different locator color for neighboring outdoor locations
                 var npcSrcRect = locator.IsHorse ? new Rectangle(17, 104, 16, 14) : new Rectangle(0, cropY, 16, 15);

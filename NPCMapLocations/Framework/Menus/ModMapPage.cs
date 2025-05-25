@@ -349,7 +349,7 @@ internal class ModMapPage : MapPage
                 // Draw icons for quests/birthday
                 if (ModEntry.Config.ShowQuests)
                 {
-                    if (marker.IsBirthday && (Game1.player.friendshipData.ContainsKey(name) && Game1.player.friendshipData[name].GiftsToday == 0))
+                    if (marker.IsBirthday && Game1.player.friendshipData.GetValueOrDefault(name)?.GiftsToday == 0)
                     {
                         // Gift icon
                         b.Draw(Game1.mouseCursors,
