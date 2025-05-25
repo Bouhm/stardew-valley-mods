@@ -71,11 +71,12 @@
     ****/
     "config.filters-title": "Filters",
 
-    "config.immersion.name": "Immersion",
-    "config.immersion.desc": "Choose when villagers should be shown on the map.",
-    "config.immersion.options.all": "Always show villagers",
-    "config.immersion.options.talkedTo": "Show villagers player has talked to",
-    "config.immersion.options.notTalkedTo": "Hide villagers player has talked to",
+    // TODO
+    "config.spoken-to-filter.name": "NPCs spoken to",
+    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
+    "config.spoken-to-filter.options.all": "Show all",
+    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
+    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
 
     "config.only-in-location.name": "Only NPCs in player's location",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
@@ -109,6 +110,6 @@
     "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
     "config.toggle-npc.options.default": "Default",
     "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.true": "Always visible",
-    "config.toggle-npc.options.false": "Always hidden"
+    "config.toggle-npc.options.always-visible": "Always visible",
+    "config.toggle-npc.options.always-hidden": "Always hidden"
 }

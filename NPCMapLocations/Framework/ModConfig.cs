@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace NPCMapLocations.Framework.Models;
+namespace NPCMapLocations.Framework;
 
 /// <summary>The data model for the mod settings.</summary>
 public class ModConfig
@@ -72,8 +72,8 @@ public class ModConfig
     /****
     ** Filters
     ****/
-    /// <summary>Which NPCs to display.</summary>
-    public VillagerVisibility ImmersionOption { get; set; } = VillagerVisibility.All;
+    /// <summary>An NPC filter based on whether the player has spoken to each NPC (<c>true</c> for only villagers spoken to, <c>false</c> for only those not spoken to, or <c>null</c> for all NPCs).</summary>
+    public bool? FilterNpcsSpokenTo { get; set; }
 
     /// <summary>Whether to only show villagers in the same location as the player.</summary>
     public bool OnlySameLocation { get; set; } = false;

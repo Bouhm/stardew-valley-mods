@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Bouhm.Shared.Integrations.GenericModConfigMenu;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Characters;
@@ -161,14 +160,17 @@ internal class GenericModConfigMenuIntegration
 
         // settings
         menu.AddSectionTitle(this.Manifest, I18n.Config_FiltersTitle);
-        menu.AddTextOption(
-            this.Manifest,
-            name: I18n.Config_Immersion_Name,
-            tooltip: I18n.Config_Immersion_Desc,
-            getValue: () => this.Config.ImmersionOption.ToString(),
-            setValue: value => this.Config.ImmersionOption = Utility.TryParseEnum(value, out VillagerVisibility parsed) ? parsed : VillagerVisibility.All,
-            allowedValues: Enum.GetNames<VillagerVisibility>(),
-            formatAllowedValue: value => I18n.GetByKey($"config.immersion.options.{value}")
+        this.AddTriStateOption(
+            name: I18n.Config_SpokenToFilter_Name,
+            tooltip: I18n.Config_SpokenToFilter_Desc,
+            getValue: () => this.Config.FilterNpcsSpokenTo,
+            setValue: value => this.Config.FilterNpcsSpokenTo = value,
+            formatAllowedValue: value => value switch
+            {
+                true => I18n.Config_SpokenToFilter_Options_TalkedTo(),
+                false => I18n.Config_SpokenToFilter_Options_NotTalkedTo(),
+                _ => I18n.Config_SpokenToFilter_Options_All()
+            }
         );
         menu.AddBoolOption(
             this.Manifest,
@@ -238,31 +240,25 @@ internal class GenericModConfigMenuIntegration
             if (data is null || data.SocialTab == SocialTabBehavior.HiddenAlways || this.Config.ModNpcExclusions.Contains(npcName))
                 continue;
 
-            menu.AddTextOption(
-                this.Manifest,
+            this.AddTriStateOption(
                 name: () => TokenParser.ParseText(data.DisplayName),
                 tooltip: () => I18n.Config_ToggleNpc_Desc(displayName: TokenParser.ParseText(data.DisplayName)),
                 getValue: () => this.Config.NpcVisibility.TryGetValue(npcName, out bool value)
-                    ? value.ToString()
-                    : string.Empty,
+                    ? value
+                    : null,
                 setValue: value =>
                 {
-                    if (value == string.Empty)
+                    if (value is null)
                         this.Config.NpcVisibility.Remove(npcName);
                     else
-                        this.Config.NpcVisibility[npcName] = bool.Parse(value);
+                        this.Config.NpcVisibility[npcName] = value.Value;
                 },
-                allowedValues: [true.ToString(), false.ToString(), string.Empty],
-                formatAllowedValue: value =>
+                formatAllowedValue: value => value switch
                 {
-                    if (value == string.Empty)
-                    {
-                        return this.Config.ModNpcExclusions.Contains(npcName)
-                            ? I18n.Config_ToggleNpc_Options_DefaultHidden()
-                            : I18n.Config_ToggleNpc_Options_Default();
-                    }
-
-                    return I18n.GetByKey($"config.toggle-npc.options.{value}");
+                    true => I18n.Config_ToggleNpc_Options_AlwaysVisible(),
+                    false => I18n.Config_ToggleNpc_Options_AlwaysHidden(),
+                    null when this.Config.ModNpcExclusions.Contains(npcName) => I18n.Config_ToggleNpc_Options_DefaultHidden(),
+                    _ => I18n.Config_ToggleNpc_Options_Default()
                 }
             );
         }
@@ -272,6 +268,55 @@ internal class GenericModConfigMenuIntegration
     /*********
     ** Private methods
     *********/
+    /// <summary>Add a config option with a tri-state boolean dropdown.</summary>
+    /// <param name="name">The label text to show in the form.</param>
+    /// <param name="tooltip">The tooltip text shown when the cursor hovers on the field, or <c>null</c> to disable the tooltip.</param>
+    /// <param name="getValue">Get the current value from the mod config.</param>
+    /// <param name="setValue">Set a new value in the mod config.</param>
+    /// <param name="formatAllowedValue">Get the display text to show for a value.</param>
+
+    private void AddTriStateOption(Func<string> name, Func<string> tooltip, Func<bool?> getValue, Action<bool?> setValue, Func<bool?, string> formatAllowedValue)
+    {
+        var menu = this.ConfigMenu;
+
+        menu.AddTextOption(
+            this.Manifest,
+            name: name,
+            tooltip: tooltip,
+            getValue: GetValue,
+            setValue: SetValue,
+            allowedValues: [string.Empty, bool.TrueString, bool.FalseString],
+            formatAllowedValue: FormatValue
+        );
+
+        string GetValue()
+        {
+            bool? value = getValue();
+            return value.HasValue
+                ? value.ToString()
+                : string.Empty;
+        }
+
+        void SetValue(string rawValue)
+        {
+            bool? value = FromString(rawValue);
+            setValue(value);
+        }
+
+        string FormatValue(string rawValue)
+        {
+            bool? value = FromString(rawValue);
+            return formatAllowedValue(value);
+        }
+
+        bool? FromString(string rawValue)
+        {
+            return rawValue == string.Empty
+                ? null
+                : bool.Parse(rawValue);
+        }
+    }
+
     /// <summary>Get a formatted percentage to show in the config UI.</summary>
     /// <param name="value">The value to format.</param>
     private string FormatPercent(float value)

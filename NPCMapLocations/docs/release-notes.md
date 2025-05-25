@@ -4,17 +4,22 @@
 ## Upcoming release
 * Overhauled mod settings:
   * **Removed custom config UI.** All settings are now available through [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) instead.
-  * Moved all settings into the conventional `config.json` file.  
-    _Your previous `config/globals.json` file will be migrated automatically, so you won't lose those settings. If you edited the few per-save options, you'll need to set them again; any existing `config/*.json` files will be left as-is so you can copy options as needed._
-  * Added options to change map marker sizes and minimap opacity.
-  * The NPC visibility override options are now more intuitive.
-  * Reduced min minimap width from 75px to 45px.
+  * Moved all settings into a conventional `config.json` file.
+  * Added options for...
+    * map marker sizes;
+    * and minimap opacity.
+  * The NPC visibility options are now more intuitive.
+  * Reduced min minimap size from 75px to 45px.
 * Added integration with Better Game Menu (thanks to KhloeLeclair!).
 * Reduced performance impact of minimap (thanks to GitHubSnegOk!).
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).
 * Improved translations. Thanks to AugNSo (updated Chinese), CaranudLapin (updated French), and Kondiq (updated Polish)!
 * Kent is now shown on the map immediately when he returns.
 * Fixed error if a marker's player or NPC can't be positioned on the map.
+
+**[Breaking changes]**
+- You should now use [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) to edit the mod options, instead of pressing `Tab` from the map page.
+- A few mod settings may get reset due to the scope of the config changes.
 
 ## 3.3.0
 Released 11 January 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.

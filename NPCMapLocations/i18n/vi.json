@@ -72,37 +72,38 @@
     /****
     ** Filters section
     ****/
-    "config.filters-title": "Filters", // TODO
+    // TODO
+    "config.filters-title": "Filters",
 
-    "config.immersion.name": "Immersion", // TODO
-    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
-    "config.immersion.options.all": "Luôn hiện dân làng",
-    "config.immersion.options.talkedTo": "Hiện dân làng mà người chơi đã nói chuyện",
-    "config.immersion.options.notTalkedTo": "Ẩn dân làng mà người chơi đã nói chuyện",
+    "config.spoken-to-filter.name": "NPCs spoken to",
+    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
+    "config.spoken-to-filter.options.all": "Show all",
+    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
+    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
 
     "config.only-in-location.name": "Chỉ hiện dân làng ở vị trí người chơi",
-    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
     "config.only-heart-level.name": "Chỉ hiện dân làng dựa theo cấp độ thân mật",
-    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
 
     "config.min-hearts.name": "Mức thân mật tối thiểu",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
 
     "config.max-hearts.name": "Mức thân mật tối đa",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
 
     "config.show-quests-or-birthdays.name": "Hiện nhiệm vụ và sinh nhật",
-    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
 
     "config.show-hidden-villagers.name": "Hiện dân làng đang bị ẩn",
-    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
 
     "config.show-traveling-merchant.name": "hiện thương gia",
-    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
 
     "config.show-horses.name": "Hiện ngựa",
-    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+    "config.show-horses.desc": "Whether to show horses on the map.",
 
     /****
     ** Include/exclude villagers
@@ -113,6 +114,6 @@
     "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
     "config.toggle-npc.options.default": "Default",
     "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.true": "Always visible",
-    "config.toggle-npc.options.false": "Always hidden"
+    "config.toggle-npc.options.always-visible": "Always visible",
+    "config.toggle-npc.options.always-hidden": "Always hidden"
 }

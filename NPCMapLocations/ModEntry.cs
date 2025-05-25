@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using NPCMapLocations.Framework;
 using NPCMapLocations.Framework.Menus;
-using NPCMapLocations.Framework.Models;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
@@ -1039,10 +1038,8 @@ public class ModEntry : Mod
 
         if (ModEntry.ShouldExcludeNpc(name, out string reason))
             Hide($"hidden per config ({reason})");
-        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.TalkedTo && !Game1.player.hasTalkedToFriendToday(name))
-            Hide("hidden per config (didn't talk to them today)");
-        else if (!shownForQuest && Config.ImmersionOption == VillagerVisibility.NotTalkedTo && Game1.player.hasTalkedToFriendToday(name))
-            Hide("hidden per config (talked to them today)");
+        else if (!shownForQuest && Config.FilterNpcsSpokenTo != null && Config.FilterNpcsSpokenTo != Game1.player.hasTalkedToFriendToday(name))
+            Hide($"hidden per config ({(Config.FilterNpcsSpokenTo is true ? "didn't talk" : "talked")} to them today)");
         else if (Config.OnlySameLocation && !isSameLocation)
             Hide("hidden per config (not in same location)");
         else if (Config.ByHeartLevel)

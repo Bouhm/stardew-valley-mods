@@ -73,37 +73,38 @@
     /****
     ** Filters section
     ****/
-    "config.filters-title": "Filters", // TODO
+    // TODO
+    "config.filters-title": "Filters",
 
-    "config.immersion.name": "Immersion", // TODO
-    "config.immersion.desc": "Choose when villagers should be shown on the map.", // TODO
-    "config.immersion.options.all": "แสดงชาวบ้านตลอดเวลา",
-    "config.immersion.options.talkedTo": "แสดงชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
-    "config.immersion.options.notTalkedTo": "ซ่อนชาวบ้านที่ผู้เล่นได้พูดคุยไปแล้ว",
+    "config.spoken-to-filter.name": "NPCs spoken to",
+    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
+    "config.spoken-to-filter.options.all": "Show all",
+    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
+    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
 
     "config.only-in-location.name": "แสดงเฉพาะชาวบ้านที่อยู่ในสถานที่เดียวกันกับผู้เล่น",
-    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.", // TODO
+    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
     "config.only-heart-level.name": "แสดงเฉพาะชาวบ้านที่มีค่าหัวใจระหว่าง",
-    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.", // TODO
+    "config.only-heart-level.desc": "Whether to only show villagers on the map if their friendship level is between the '{{minHeartsName}}' and '{{maxHeartsName}}' options inclusively.",
 
     "config.min-hearts.name": "ค่าหัวใจขั้นต่ำ",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
 
     "config.max-hearts.name": "ค่าหัวใจสูงสุด",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).", // TODO
+    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map (if you enabled the '{{onlyHeartLevelName}}' option).",
 
     "config.show-quests-or-birthdays.name": "แสดงเควสหรือวันเกิด",
-    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.", // TODO
+    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
 
     "config.show-hidden-villagers.name": "แสดงชาวบ้านที่ซ่อนอยู่",
-    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.", // TODO
+    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
 
     "config.show-traveling-merchant.name": "แสดงพ่อค้าเร่",
-    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.", // TODO
+    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
 
-    "config.show-horses.name": "Show horses", // TODO
-    "config.show-horses.desc": "Whether to show horses on the map.", // TODO
+    "config.show-horses.name": "Show horses",
+    "config.show-horses.desc": "Whether to show horses on the map.",
 
     /****
     ** Include/exclude villagers
@@ -114,6 +115,6 @@
     "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
     "config.toggle-npc.options.default": "Default",
     "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.true": "Always visible",
-    "config.toggle-npc.options.false": "Always hidden"
+    "config.toggle-npc.options.always-visible": "Always visible",
+    "config.toggle-npc.options.always-hidden": "Always hidden"
 }
