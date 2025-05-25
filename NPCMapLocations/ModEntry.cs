@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Bouhm.Shared;
+using Bouhm.Shared.Integrations.GenericModConfigMenu;
 using Bouhm.Shared.Locations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -44,6 +45,9 @@ public class ModEntry : Mod
 
     /// <summary>The integration with the Better Game Menu mod.</summary>
     private BetterGameMenuIntegration BetterGameMenuIntegration;
+
+    /// <summary>The integration with the Generic Mod Config Menu mod.</summary>
+    private IGenericModConfigMenuApi GenericModConfigMenu;
 
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil;
@@ -210,8 +214,9 @@ public class ModEntry : Mod
     private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
     {
         // register config UI
-        new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited)
-            .Register();
+        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
+        configMenu.Register();
+        this.GenericModConfigMenu = configMenu.ConfigMenu;
 
         // register map page with Better Game Menu
         this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage)
@@ -304,10 +309,20 @@ public class ModEntry : Mod
             this.Helper.WriteConfig(Config);
         }
 
-        // change tooltip mode
+        // check map keybinds
         else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex)
         {
-            if (Config.TooltipKey.JustPressed() || e.Pressed.Contains(SButton.RightShoulder))
+            // open config UI
+            if (Config.MenuKey.JustPressed())
+            {
+                if (this.GenericModConfigMenu is null)
+                    this.Monitor.LogOnce("You must install Generic Mod Config Menu to configure this mod.", LogLevel.Warn);
+                else
+                    this.GenericModConfigMenu.OpenModMenuAsChildMenu(this.ModManifest);
+            }
+
+            // change tooltip mode
+            else if (Config.TooltipKey.JustPressed() || e.Pressed.Contains(SButton.RightShoulder))
                 this.ChangeTooltipConfig();
             else if (e.Pressed.Contains(SButton.LeftShoulder))
                 this.ChangeTooltipConfig(false);

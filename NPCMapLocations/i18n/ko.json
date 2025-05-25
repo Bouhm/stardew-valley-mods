@@ -28,6 +28,9 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
+    "config.menu-key.name": "메뉴 키",
+    "config.menu-key.desc": "게임 내 지도가 열려 있는 동안 이 버튼을 누르면 모드 설정이 표시됩니다.",
+
     "config.minimap-key.name": "미니맵 전환 키",
     "config.minimap-key.desc": "미니맵을 표시하거나 숨기려면 이 버튼을 누릅니다.",
 

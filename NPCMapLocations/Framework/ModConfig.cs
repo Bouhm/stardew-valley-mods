@@ -23,6 +23,9 @@ public class ModConfig
     /****
     ** Controls
     ****/
+    /// <summary>The key binding to open the options menu when on the map view.</summary>
+    public KeybindList MenuKey { get; set; } = new(SButton.Tab);
+
     /// <summary>The key binding to toggle the floating minimap.</summary>
     public KeybindList MinimapToggleKey { get; set; } = new(SButton.OemPipe);
 
@@ -139,6 +142,7 @@ public class ModConfig
     internal void OnDeserializedMethod(StreamingContext context)
     {
         // make values case-insensitive and non-nullable
+        this.MenuKey ??= new KeybindList();
         this.MinimapToggleKey ??= new KeybindList();
         this.TooltipKey ??= new KeybindList();
         this.MinimapExclusions = new HashSet<string>(this.MinimapExclusions ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);

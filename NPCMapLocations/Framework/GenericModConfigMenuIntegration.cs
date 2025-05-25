@@ -17,9 +17,6 @@ internal class GenericModConfigMenuIntegration
     /// <summary>The NPC Map Locations manifest.</summary>
     private readonly IManifest Manifest;
 
-    /// <summary>The Generic Mod Config Menu integration.</summary>
-    private readonly IGenericModConfigMenuApi ConfigMenu;
-
     /// <summary>A callback to invoke when the settings are reset to default.</summary>
     private readonly Action OnReset;
 
@@ -28,6 +25,13 @@ internal class GenericModConfigMenuIntegration
 
     /// <summary>The current mod settings.</summary>
     private ModConfig Config => ModEntry.Config;
+
+
+    /*********
+    ** Public methods
+    *********/
+    /// <summary>The Generic Mod Config Menu API.</summary>
+    public IGenericModConfigMenuApi ConfigMenu { get; }
 
 
     /*********
@@ -57,6 +61,13 @@ internal class GenericModConfigMenuIntegration
 
         // controls
         menu.AddSectionTitle(this.Manifest, text: I18n.Config_ControlsTitle);
+        menu.AddKeybindList(
+            this.Manifest,
+            name: I18n.Config_MenuKey_Name,
+            tooltip: I18n.Config_MenuKey_Desc,
+            getValue: () => this.Config.MenuKey,
+            setValue: value => this.Config.MenuKey = value
+        );
         menu.AddKeybindList(
             this.Manifest,
             name: I18n.Config_MinimapKey_Name,

@@ -27,6 +27,9 @@
     ****/
     "config.controls-title": "Controls",
 
+    "config.menu-key.name": "Menu key",
+    "config.menu-key.desc": "Press this button while the in-game map is open to show the mod settings.",
+
     "config.minimap-key.name": "Minimap toggle key",
     "config.minimap-key.desc": "Press this button to show or hide the minimap.",
 

@@ -3,7 +3,8 @@
 # Release notes
 ## Upcoming release
 * Overhauled mod settings:
-  * **Removed custom config UI.** All settings are now available through [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) instead.
+  * Replaced the custom config UI with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098).  
+    _You must install Generic Mod Config Menu to use the config UI, but otherwise you can open it the same way as before._
   * Moved all settings into a conventional `config.json` file.
   * Added support for controller/mouse button bindings.
   * Added support for [multi-key-bindings](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings#Multi-key_bindings).

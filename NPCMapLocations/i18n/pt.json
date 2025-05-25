@@ -28,6 +28,9 @@
     ****/
     "config.controls-title": "Controls", // TODO
 
+    "config.menu-key.name": "Tecla do Menu",
+    "config.menu-key.desc": "Pressione esta tecla enquanto o mapa do mundo está aberto para mostrar as configurações do mod.",
+
     "config.minimap-key.name": "Tecla de ativação do Mini-Mapa",
     "config.minimap-key.desc": "Pressione esta tecla para mostrar ou esconder o Mini-Mapa.",
 

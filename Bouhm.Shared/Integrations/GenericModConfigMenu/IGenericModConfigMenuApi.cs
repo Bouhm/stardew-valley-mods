@@ -93,4 +93,8 @@ public interface IGenericModConfigMenuApi
     /// <param name="formatAllowedValue">Get the display text to show for a value from <paramref name="allowedValues"/>, or <c>null</c> to show the values as-is.</param>
     /// <param name="fieldId">The unique field ID for use with <c>OnFieldChanged</c>, or <c>null</c> to auto-generate a randomized ID.</param>
     void AddTextOption(IManifest mod, Func<string> getValue, Action<string> setValue, Func<string> name, Func<string> tooltip = null, string[] allowedValues = null, Func<string, string> formatAllowedValue = null, string fieldId = null);
+
+    /// <summary>Open the config UI for a specific mod, as a child menu if there is an existing menu.</summary>
+    /// <param name="mod">The mod's manifest.</param>
+    void OpenModMenuAsChildMenu(IManifest mod);
 }
