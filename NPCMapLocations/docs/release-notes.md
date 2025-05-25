@@ -15,6 +15,8 @@
 * Improved marker sizing for non-square NPC icons (thanks to Spiderbuttons!).
 * Improved translations. Thanks to AugNSo (updated Chinese), CaranudLapin (updated French), and Kondiq (updated Polish)!
 * Kent is now shown on the map immediately when he returns.
+* Fixed Mr. and Mrs. Raccoon's names not translatable for non-English players.  
+  _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
 * Fixed error if a marker's player or NPC can't be positioned on the map.
 
 **[Breaking changes]**
@@ -26,8 +28,7 @@ Released 11 January 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
 * Added bookseller to world map when he visits.
 * Fixed map markers not reflecting custom NPCs' override names/textures in some cases (e.g. the tractor from Tractor Mod).
-* Fixed traveling merchant tooltip not translated for non-English players.  
-  _Note: it'll still be untranslated for [languages which don't have a translation for it yet](https://github.com/Bouhm/stardew-valley-mods#translating-the-mods)._
+* Fixed traveling merchant tooltip not translated for non-English players.
 * Fixed support for mods setting override NPC/horse textures.
 
 ## 3.2.2

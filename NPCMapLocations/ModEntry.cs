@@ -781,9 +781,16 @@ public class ModEntry : Mod
 
                 if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
                 {
+                    string displayName = npc.Name switch
+                    {
+                        "Raccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MisterRaccoon(),
+                        "MrsRaccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MrsRaccoon(),
+                        _ => string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName
+                    };
+
                     var newMarker = new NpcMarker
                     {
-                        DisplayName = string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName,
+                        DisplayName = displayName,
                         CropOffset = offset,
                         IsBirthday = npc.isBirthday(),
                         Type = type

@@ -8,6 +8,8 @@
     // special NPC markers
     "marker-names.bookseller": "Libraire",
     "marker-names.merchant": "Marchant ambulant",
+    "marker-names.mister-raccoon": "Mr. Raccoon", // TODO
+    "marker-names.mrs-raccoon": "Mrs. Raccoon", // TODO
 
 
     /*********
