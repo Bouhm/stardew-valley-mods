@@ -944,12 +944,7 @@ public class ModEntry : Mod
                 npcMarker.Layer++;
 
             if (locationName != null)
-            {
-                // Get center of NPC marker
-                var mapPos = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
-                mapPos = mapPos with { X = mapPos.X - 16, Y = mapPos.Y - 15 };
-                npcMarker.WorldMapPosition = mapPos;
-            }
+                npcMarker.WorldMapPosition = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
         }
     }
 
