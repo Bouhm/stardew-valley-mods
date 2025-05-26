@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed NPC marker positions being offset in 3.4.0.
+
 ## 3.4.0
 Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 
