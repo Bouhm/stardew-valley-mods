@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Fixed NPCs not shown on map if they appeared after the day started (e.g. Little NPCs).
 * Fixed map tooltips sometimes showing an NPC's internal name.
 
 ## 3.4.1
