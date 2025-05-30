@@ -128,7 +128,7 @@ internal class ModMapPage : MapPage
                         foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                         {
                             if (!npcMarker.IsHidden && npcMarker.LocationName != null && indoorLocationNames.Contains(npcMarker.LocationName))
-                                newHoveredNames.Add(this.GetNpcDisplayName(npcName));
+                                newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
                         }
                     }
                     if (hasFarmerMarkers)

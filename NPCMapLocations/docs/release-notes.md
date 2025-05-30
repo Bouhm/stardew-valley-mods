@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed map tooltips sometimes showing an NPC's internal name.
+
 ## 3.4.1
 Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 
