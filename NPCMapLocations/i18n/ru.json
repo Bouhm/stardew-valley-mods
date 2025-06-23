@@ -22,7 +22,7 @@
     ****/
     // formatted values for percentage fields (e.g. map marker size)
     "config.percentage": "{{percent}}%",
-    "config.percentage.default": "по умолчанию",
+    "config.percentage.default": "По умолчанию",
 
     /****
     ** Controls section
