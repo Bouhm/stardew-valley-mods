@@ -1,4 +1,4 @@
-﻿{
+{
     /*********
     ** Map options
     *********/
@@ -6,11 +6,10 @@
     "extra.label": "その他の設定:",
 
     // special NPC markers
-    // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
-    "marker-names.mister-raccoon": "Mr. Raccoon",
-    "marker-names.mrs-raccoon": "Mrs. Raccoon",
+    "marker-names.bookseller": "マルチェロ書店",
+    "marker-names.merchant": "行商人",
+    "marker-names.mister-raccoon": "アライグマ",
+    "marker-names.mrs-raccoon": "アライグマの奥さん",
 
 
     /*********
@@ -21,12 +20,12 @@
     ****/
     // formatted values for percentage fields (e.g. map marker size)
     "config.percentage": "{{percent}}%",
-    "config.percentage.default": "default",
+    "config.percentage.default": "デフォルト",
 
     /****
     ** Controls section
     ****/
-    "config.controls-title": "Controls", // TODO
+    "config.controls-title": "操作",
 
     "config.menu-key.name": "メニュー",
     "config.menu-key.desc": "ゲーム内のマップが開いているときにこのキーを押すと、MODの設定を表示する。",
@@ -40,105 +39,100 @@
     /****
     ** Minimap section
     ****/
-    // TODO
     "config.minimap-title": "ミニマップ",
 
     "config.minimap-enabled.name": "有効化",
-    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+    "config.minimap-enabled.desc": "ミニマップを表示するかどうか。",
 
     "config.lock-minimap.name": "ミニマップの位置を固定",
-    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+    "config.lock-minimap.desc": "ミニマップの表示を現在の位置に固定するかどうか。固定するとゲーム中に右クリックで動かせない。",
 
     "config.minimap-width.name": "ミニマップの幅",
-    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
-    "config.minimap-height-or-width.format": "{{size}} pixels",
+    "config.minimap-width.desc": "画面上に表示されるミニマップの幅をピクセル単位で設定。",
+    "config.minimap-height-or-width.format": "{{size}} ピクセル",
 
     "config.minimap-height.name": "ミニマップの高さ",
-    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+    "config.minimap-height.desc": "画面上に表示されるミニマップの高さをピクセル単位で設定。",
 
-    "config.minimap-opacity.name": "Minimap opacity",
-    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
+    "config.minimap-opacity.name": "ミニマップの不透明度",
+    "config.minimap-opacity.desc": "ミニマップのデフォルトの不透明度を0%（透明）～100%（不透明）で設定。",
 
     /****
     ** Map display section
     ****/
-    // TODO
-    "config.map-display-title": "Map display",
+    "config.map-display-title": "マップの表示",
 
-    "config.npc-marker-size.name": "Map marker size (NPCs)",
-    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
+    "config.npc-marker-size.name": "マーカーサイズ (住人)",
+    "config.npc-marker-size.desc": "デフォルトサイズを基準にした住人のマーカーサイズを設定。",
 
-    "config.current-player-marker-size.name": "Map marker size (you)",
-    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
+    "config.current-player-marker-size.name": "マーカーサイズ (プレイヤー)",
+    "config.current-player-marker-size.desc": "デフォルトサイズを基準にしたプレイヤーのマーカーサイズを設定。",
 
-    "config.other-player-marker-size.name": "Map marker size (other players)",
-    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
+    "config.other-player-marker-size.name": "マーカーサイズ (マルチプレイヤー)",
+    "config.other-player-marker-size.desc": "デフォルトサイズを基準にしたマルチプレイヤーのマーカーサイズを設定。",
 
-    "config.show-farm-buildings.name": "Show farm buildings",
-    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
+    "config.show-farm-buildings.name": "牧場の建物を表示",
+    "config.show-farm-buildings.desc": "マップに建設済みの農場建物のアイコンを表示するかどうか。",
 
     /****
     ** Filters section
     ****/
-    // TODO
-    "config.filters-title": "Filters",
+    "config.filters-title": "フィルター",
 
-    "config.spoken-to-filter.name": "NPCs spoken to",
-    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
-    "config.spoken-to-filter.options.all": "Show all",
-    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
-    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
+    "config.spoken-to-filter.name": "今日会話した住人",
+    "config.spoken-to-filter.desc": "今日会話したかどうかで、マップに表示する住人を切り替える。",
+    "config.spoken-to-filter.options.all": "すべて表示",
+    "config.spoken-to-filter.options.talkedTo": "今日会話した住人のみマップに表示",
+    "config.spoken-to-filter.options.notTalkedTo": "今日会話していない住人のみマップに表示",
 
     "config.only-in-location.name": "プレイヤーがいる場所の住人のみ表示",
-    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+    "config.only-in-location.desc": "プレイヤーと同じ場所にいる住人だけをマップに表示するかどうか。",
 
     "config.min-hearts.name": "最小友好度",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+    "config.min-hearts.desc": "マップに表示する住人の最小友好度を設定。",
 
     "config.max-hearts.name": "最大友好度",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
+    "config.max-hearts.desc": "マップに表示する住人の最大友好度を設定。",
 
     "config.show-quests-or-birthdays.name": "クエストや誕生日を表示",
-    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+    "config.show-quests-or-birthdays.desc": "クエストや誕生日の住人のマーカーにアイコンを表示するかどうか。",
 
     "config.show-hidden-villagers.name": "隠された住人を表示",
-    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+    "config.show-hidden-villagers.desc": "通常は隠されている住人を表示するどうか。",
 
-    "config.show-bookseller.name": "Show bookseller",
-    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+    "config.show-bookseller.name": "マルチェロ書店を表示",
+    "config.show-bookseller.desc": "マルチェロ書店が町にいるときマップに表示するかどうか。",
 
     "config.show-traveling-merchant.name": "行商人を表示",
-    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+    "config.show-traveling-merchant.desc": "森に行商人がいるときにマップに表示するかどうか。",
 
-    "config.show-children.name": "Show players' children",
-    "config.show-children.desc": "Whether to show players' children on the map.",
+    "config.show-children.name": "プレイヤーの子どもを表示",
+    "config.show-children.desc": "プレイヤーの子どもをマップに表示するかどうか。",
 
     "config.show-horses.name": "馬を表示",
-    "config.show-horses.desc": "Whether to show horses on the map.",
+    "config.show-horses.desc": "馬をマップに表示するかどうか。",
 
     /****
     ** Include/exclude villagers
     ****/
     "config.toggle-villagers-title": "住人の表示・非表示",
 
-    // TODO
-    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
-    "config.toggle-npc.options.default": "Default",
-    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.always-visible": "Always visible",
-    "config.toggle-npc.options.always-hidden": "Always hidden",
+    "config.toggle-npc.desc": "{{displayName}} をマップに表示するかどうか。",
+    "config.toggle-npc.options.default": "デフォルト",
+    "config.toggle-npc.options.default-hidden": "デフォルト（MODで非表示）",
+    "config.toggle-npc.options.always-visible": "常に表示",
+    "config.toggle-npc.options.always-hidden": "常に非表示",
 
     /****
     ** Performance section
     ****/
-    // TODO
-    "config.performance-title": "Performance",
+    "config.performance-title": "パフォーマンス",
 
-    "config.minimap-cache-time.name": "Minimap cache time",
-    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+    "config.minimap-cache-time.name": "ミニマップのキャッシュ時間",
+    "config.minimap-cache-time.desc": "ミニマップの描画更新間隔。値を小さくするとミニマップの動きが滑らかになり、大きくすると動作が軽くなる場合がある。",
 
-    "config.npc-cache-time.name": "NPC cache time",
-    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+    "config.npc-cache-time.name": "NPCのキャッシュ時間",
+    "config.npc-cache-time.desc": "NPCマーカーの更新間隔。値を小さくするとマップ上のNPCの動きが滑らかになり、大きくすると動作が軽くなる場合がある。",
 
-    "config.cache-time.value": "{{seconds}} seconds"
+    "config.cache-time.value": "{{seconds}} 秒"
 }
