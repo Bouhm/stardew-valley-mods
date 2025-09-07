@@ -1,0 +1,43 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Настройки",
+
+    "config.hide-hud.name": "Скрыть HUD",
+    "config.hide-hud.desc": "Скрывать интерфейс, когда отображаются иконки компаса",
+
+    "config.same-location-only.name": "Только одинаковая локация",
+    "config.same-location-only.desc": "Показывать только локаторы в текущей локации. Если значение ложно, персонажи в соседних локациях будут отображаться в сером цвете.",
+
+    "config.quests-and-birthdays-only.name": "Только задания и дни рождения",
+    "config.quests-and-birthdays-only.desc": "Показывать только локаторы для NPC, у которых сегодня задание или день рождения.",
+
+    "config.players-only.name": "Только игроки",
+    "config.players-only.desc": "Показывать ли локаторы только для игроков",
+
+    "config.show-horses.name": "Показывать лошадей",
+    "config.show-horses.desc": "Показывать ли локаторы для лошадей",
+
+    // controls
+    "config.title.controls": "Управление",
+
+    "config.hold-to-toggle.name": "Удерживать для переключения",
+    "config.hold-to-toggle.desc": "Нужно ли удерживать кнопку для отображения иконок локатора (иначе кнопка будет переключать их).",
+
+    "config.toggle-key.name": "Кнопка переключения",
+    "config.toggle-key.desc": "Кнопка, которая показывает или скрывает иконки локатора.",
+
+    "config.same-location-key.name": "Кнопка 'Только в той же локации'",
+    "config.same-location-key.desc": "Кнопка, которая включает или выключает опцию 'только в той же локации' выше",
+
+    "config.quests-and-birthdays-key.name": "Кнопка 'Только задания и дни рождения'",
+    "config.quests-and-birthdays-key.desc": "Кнопка, которая включает или выключает опцию 'только задания и дни рождения' выше.",
+
+    "config.players-key.name": "Кнопка 'Только игроки'",
+    "config.players-key.desc": "Кнопка, которая включает или выключает опцию 'только игроки' выше.",
+
+    "config.horses-key.name": "Кнопка 'Показывать лошадей'",
+    "config.horses-key.desc": "Кнопка, которая включает или выключает опцию 'показывать лошадей' выше."
+}

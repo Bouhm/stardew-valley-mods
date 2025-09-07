@@ -47,9 +47,6 @@ public class ModEntry : Mod
     /// <summary>The integration with the Better Game Menu mod.</summary>
     private BetterGameMenuIntegration? BetterGameMenuIntegration;
 
-    /// <summary>The integration with the Generic Mod Config Menu mod.</summary>
-    private IGenericModConfigMenuApi? GenericModConfigMenu;
-
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil = null!; // set in Entry
 
@@ -212,12 +209,11 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
+    [EventPriority(EventPriority.Low)]
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
         // register config UI
-        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
-        configMenu.Register();
-        this.GenericModConfigMenu = configMenu.ConfigMenu;
+        this.RegisterConfigMenu();
 
         // register map page with Better Game Menu
         this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage)
@@ -225,6 +221,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+    [EventPriority(EventPriority.Low)]
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         //
@@ -283,6 +280,9 @@ public class ModEntry : Mod
 
         // enable minimap
         this.UpdateMinimapVisibility();
+
+        // update
+        this.RegisterConfigMenu();
     }
 
     /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
@@ -314,10 +314,10 @@ public class ModEntry : Mod
             // open config UI
             if (Config.MenuKey.JustPressed())
             {
-                if (this.GenericModConfigMenu is null)
-                    this.Monitor.LogOnce("You must install Generic Mod Config Menu to configure this mod.", LogLevel.Warn);
+                if (this.RegisterConfigMenu() is { } configMenu)
+                    configMenu.OpenModMenuAsChildMenu(this.ModManifest);
                 else
-                    this.GenericModConfigMenu.OpenModMenuAsChildMenu(this.ModManifest);
+                    this.Monitor.LogOnce("You must install Generic Mod Config Menu to configure this mod.", LogLevel.Warn);
             }
 
             // change tooltip mode
@@ -565,6 +565,14 @@ public class ModEntry : Mod
             this.Minimap.Value?.Draw();
     }
 
+    /// <summary>Register or update the config UI with Generic Mod Config Menu.</summary>
+    private IGenericModConfigMenuApi? RegisterConfigMenu()
+    {
+        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
+        configMenu.Register();
+        return configMenu.ConfigMenu;
+    }
+
     /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>
     private IEnumerable<LocationContext> GetLocationsWithoutMapPosition()
     {
@@ -705,6 +713,7 @@ public class ModEntry : Mod
         return true;
     }
 
+    /// <summary>Scan the world for NPCs and initialize the map markers for the day.</summary>
     private void ResetMarkers()
     {
         this.NpcMarkers.Value.Clear();
@@ -750,48 +759,52 @@ public class ModEntry : Mod
 
             // villagers
             foreach (NPC npc in this.GetVillagers())
-            {
-                var type = npc switch
-                {
-                    Horse => CharacterType.Horse,
-                    Child => CharacterType.Child,
-                    Raccoon => CharacterType.Raccoon,
-                    _ => CharacterType.Villager
-                };
-
-                int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
-
-                if (!this.NpcMarkers.Value.ContainsKey(npc.Name))
-                {
-                    string displayName = npc.Name switch
-                    {
-                        "Raccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MisterRaccoon(),
-                        "MrsRaccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MrsRaccoon(),
-                        _ => string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName
-                    };
-
-                    var newMarker = new NpcMarker
-                    {
-                        DisplayName = displayName,
-                        CropOffset = offset,
-                        IsBirthday = npc.isBirthday(),
-                        Type = type
-                    };
-
-                    try
-                    {
-                        newMarker.Sprite = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'.", LogLevel.Warn);
-                        this.Monitor.Log(ex.ToString());
-                    }
-
-                    this.NpcMarkers.Value.Add(npc.Name, newMarker);
-                }
-            }
+                this.ResetMarker(npc);
         }
+    }
+
+    /// <summary>Add or reset the map marker for an NPC.</summary>
+    /// <returns>Returns the created NPC marker.</returns>
+    private NpcMarker ResetMarker(NPC npc)
+    {
+        var type = npc switch
+        {
+            Horse => CharacterType.Horse,
+            Child => CharacterType.Child,
+            Raccoon => CharacterType.Raccoon,
+            _ => CharacterType.Villager
+        };
+
+        int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
+
+        string displayName = npc.Name switch
+        {
+            "Raccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MisterRaccoon(),
+            "MrsRaccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MrsRaccoon(),
+            _ => string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName
+        };
+
+        NpcMarker newMarker = new()
+        {
+            DisplayName = displayName,
+            CropOffset = offset,
+            IsBirthday = npc.isBirthday(),
+            Type = type
+        };
+
+        try
+        {
+            newMarker.Sprite = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
+        }
+        catch (Exception ex)
+        {
+            this.Monitor.Log($"Couldn't load marker for NPC '{npc.Name}'.", LogLevel.Warn);
+            this.Monitor.Log(ex.ToString());
+        }
+
+        this.NpcMarkers.Value[npc.Name] = newMarker;
+
+        return newMarker;
     }
 
     private void OpenModMap()
@@ -856,43 +869,24 @@ public class ModEntry : Mod
         if (this.NpcMarkers.Value.Count == 0)
             return;
 
+        // get NPCs in the world
         List<NPC> npcList = this.GetVillagers();
-
-        // If player is riding a horse, add it to list
         if (Game1.player.isRidingHorse())
-        {
-            npcList.Add(Game1.player.mount);
-        }
+            npcList.Add(Game1.player.mount); // add horse if player is riding it
 
-        foreach (var npc in npcList)
+        // update each NPC
+        foreach (NPC npc in npcList)
         {
-            if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out var npcMarker) || npc.currentLocation == null)
+            if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out NpcMarker? npcMarker))
             {
-                continue;
+                // If an NPC appears after we initialized markers, add it to the list now.
+                // This mainly affects custom NPCs added to the game outside the normal game lifecycle (e.g. via Little
+                // NPCs).
+                if (Context.IsMainPlayer)
+                    npcMarker = this.ResetMarker(npc);
             }
-
-            /* // Hide horse if being ridden
-            if (npc is Horse horse)
-            {
-              /*var isRiding = false;
-
-              // If horse is being ridden, hide it
-              foreach (var farmer in Game1.getOnlineFarmers())
-              {
-                if (farmer.isRidingHorse())
-                {
-                  isRiding = true;
-                  break;
-                }
-              }
-
-              if (horse.rider != null)
-              {
-                npcMarker.MapX = -9999;
-                npcMarker.MapY = -9999;
+            if (npcMarker is null || npc.currentLocation is null)
                 continue;
-              }
-            } */
 
             string locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
             npcMarker.LocationName = locationName;

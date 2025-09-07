@@ -22,7 +22,7 @@ cursor over a field for details.
 > ![](images/config-menu.png)
 
 ## Compatibility
-Compatible with Stardew Valley 1.6.9+ on Linux/macOS/Windows, both single-player and multiplayer.
+Compatible with Stardew Valley 1.6.15+ on Linux/macOS/Windows, both single-player and multiplayer.
 
 ## See also
 * [Release notes](release-notes.md)

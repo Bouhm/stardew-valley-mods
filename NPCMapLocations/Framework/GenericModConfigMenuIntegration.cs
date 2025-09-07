@@ -57,6 +57,7 @@ internal class GenericModConfigMenuIntegration
         if (menu is null)
             return;
 
+        menu.Unregister(this.Manifest);
         menu.Register(this.Manifest, this.Reset, this.Save);
 
         // controls
@@ -171,7 +172,7 @@ internal class GenericModConfigMenuIntegration
         menu.AddBoolOption(
             this.Manifest,
             name: I18n.Config_ShowFarmBuildings_Name,
-            tooltip: I18n.Config_ShowFarmBuildings_Name,
+            tooltip: I18n.Config_ShowFarmBuildings_Desc,
             getValue: () => this.Config.ShowFarmBuildings,
             setValue: value => this.Config.ShowFarmBuildings = value
         );

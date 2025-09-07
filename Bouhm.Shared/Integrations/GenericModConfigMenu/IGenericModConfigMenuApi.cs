@@ -94,7 +94,15 @@ public interface IGenericModConfigMenuApi
     /// <param name="fieldId">The unique field ID for use with <c>OnFieldChanged</c>, or <c>null</c> to auto-generate a randomized ID.</param>
     void AddTextOption(IManifest mod, Func<string> getValue, Action<string> setValue, Func<string> name, Func<string>? tooltip = null, string[]? allowedValues = null, Func<string, string>? formatAllowedValue = null, string? fieldId = null);
 
+
+    /****
+    ** Advanced
+    ****/
     /// <summary>Open the config UI for a specific mod, as a child menu if there is an existing menu.</summary>
     /// <param name="mod">The mod's manifest.</param>
     void OpenModMenuAsChildMenu(IManifest mod);
+
+    /// <summary>Remove a mod from the config UI and delete all its options and pages.</summary>
+    /// <param name="mod">The mod's manifest.</param>
+    void Unregister(IManifest mod);
 }
