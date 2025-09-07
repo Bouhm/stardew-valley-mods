@@ -57,6 +57,7 @@ internal class GenericModConfigMenuIntegration
         if (menu is null)
             return;
 
+        menu.Unregister(this.Manifest);
         menu.Register(this.Manifest, this.Reset, this.Save);
 
         // controls

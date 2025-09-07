@@ -47,9 +47,6 @@ public class ModEntry : Mod
     /// <summary>The integration with the Better Game Menu mod.</summary>
     private BetterGameMenuIntegration? BetterGameMenuIntegration;
 
-    /// <summary>The integration with the Generic Mod Config Menu mod.</summary>
-    private IGenericModConfigMenuApi? GenericModConfigMenu;
-
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil = null!; // set in Entry
 
@@ -212,12 +209,11 @@ public class ModEntry : Mod
     ** Private methods
     *********/
     /// <inheritdoc cref="IGameLoopEvents.GameLaunched"/>
+    [EventPriority(EventPriority.Low)]
     private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
     {
         // register config UI
-        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
-        configMenu.Register();
-        this.GenericModConfigMenu = configMenu.ConfigMenu;
+        this.RegisterConfigMenu();
 
         // register map page with Better Game Menu
         this.BetterGameMenuIntegration = new BetterGameMenuIntegration(this.CreateMapPage)
@@ -225,6 +221,7 @@ public class ModEntry : Mod
     }
 
     /// <inheritdoc cref="IGameLoopEvents.SaveLoaded"/>
+    [EventPriority(EventPriority.Low)]
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         //
@@ -283,6 +280,9 @@ public class ModEntry : Mod
 
         // enable minimap
         this.UpdateMinimapVisibility();
+
+        // update
+        this.RegisterConfigMenu();
     }
 
     /// <inheritdoc cref="IWorldEvents.BuildingListChanged"/>
@@ -314,10 +314,10 @@ public class ModEntry : Mod
             // open config UI
             if (Config.MenuKey.JustPressed())
             {
-                if (this.GenericModConfigMenu is null)
-                    this.Monitor.LogOnce("You must install Generic Mod Config Menu to configure this mod.", LogLevel.Warn);
+                if (this.RegisterConfigMenu() is { } configMenu)
+                    configMenu.OpenModMenuAsChildMenu(this.ModManifest);
                 else
-                    this.GenericModConfigMenu.OpenModMenuAsChildMenu(this.ModManifest);
+                    this.Monitor.LogOnce("You must install Generic Mod Config Menu to configure this mod.", LogLevel.Warn);
             }
 
             // change tooltip mode
@@ -563,6 +563,14 @@ public class ModEntry : Mod
     {
         if (Context.IsWorldReady && this.ShowMinimap.Value && Game1.displayHUD && !Game1.game1.takingMapScreenshot)
             this.Minimap.Value?.Draw();
+    }
+
+    /// <summary>Register or update the config UI with Generic Mod Config Menu.</summary>
+    private IGenericModConfigMenuApi? RegisterConfigMenu()
+    {
+        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
+        configMenu.Register();
+        return configMenu.ConfigMenu;
     }
 
     /// <summary>Get the outdoor location contexts which don't have any map vectors.</summary>

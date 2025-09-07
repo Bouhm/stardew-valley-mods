@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed NPCs not shown on map if they appeared after the day started (e.g. Little NPCs).
+* Fixed NPCs not shown in config UI if they were added after the game starts.
 * Fixed map tooltips sometimes showing an NPC's internal name.
 * Fixed config UI tooltip for 'show farm buildings' setting (thanks to Miruiro!).
 * Improved translations. Thanks to honbregordo (updated Russian), Miruiro (updated Japanese), and trucpham04 (updated Vietnamese)!
