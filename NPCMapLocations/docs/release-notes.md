@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 3.4.2
+Released 07 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+
 * Fixed NPCs not shown on map if they appeared after the day started (e.g. Little NPCs).
 * Fixed NPCs not shown in config UI if they were added after the game starts.
 * Fixed map tooltips sometimes showing an NPC's internal name.

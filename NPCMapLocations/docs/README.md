@@ -44,7 +44,7 @@ cursor over a field for details.
   Yep. For mod authors, see the [author guide](author-guide.md) for more info on how this works.
 
 ## Compatibility
-Compatible with Stardew Valley 1.6.9+ on Linux/macOS/Windows, both single-player and multiplayer.
+Compatible with Stardew Valley 1.6.15+ on Linux/macOS/Windows, both single-player and multiplayer.
 
 **In multiplayer, the mod will only work if the host player has it installed.**
 
