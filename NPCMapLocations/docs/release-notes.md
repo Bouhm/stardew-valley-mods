@@ -4,6 +4,8 @@
 ## Upcoming release
 * Fixed NPCs not shown on map if they appeared after the day started (e.g. Little NPCs).
 * Fixed map tooltips sometimes showing an NPC's internal name.
+* Fixed config UI tooltip for 'show farm buildings' setting (thanks to Miruiro!).
+* Improved translations. Thanks to honbregordo (updated Russian), Miruiro (updated Japanese), and trucpham04 (updated Vietnamese)!
 
 ## 3.4.1
 Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.

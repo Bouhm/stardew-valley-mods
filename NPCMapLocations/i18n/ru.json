@@ -1,4 +1,3 @@
-
 ﻿{
     /*********
     ** Map options
@@ -7,7 +6,6 @@
     "extra.label": "Дополнительные настройки:",
 
     // special NPC markers
-    // TODO
     "marker-names.bookseller": "Продавец книг",
     "marker-names.merchant": "Странствующий торговец",
     "marker-names.mister-raccoon": "Мистер Енот",
@@ -27,7 +25,6 @@
     /****
     ** Controls section
     ****/
-    // TODO
     "config.controls-title": "Управление",
 
     "config.menu-key.name": "Кнопка меню",
@@ -42,7 +39,6 @@
     /****
     ** Minimap section
     ****/
-    // TODO
     "config.minimap-title": "Мини-карта",
 
     "config.minimap-enabled.name": "Включено",
@@ -56,7 +52,7 @@
     "config.minimap-height-or-width.format": "{{size}} пиксель",
 
     "config.minimap-height.name": "Высота мини-карты",
-    "config.minimap-height.desc": ""Высота мини-карты в пикселях.",
+    "config.minimap-height.desc": "Высота мини-карты в пикселях.",
 
     "config.minimap-opacity.name": "Прозрачность мини-карты",
     "config.minimap-opacity.desc": "Уровень прозрачности от 0% (невидимая) до 100% (непрозрачная).",
@@ -64,7 +60,6 @@
     /****
     ** Map display section
     ****/
-    // TODO
     "config.map-display-title": "Отображение карты",
 
     "config.npc-marker-size.name": "Размер маркеров (NPC)",
@@ -82,8 +77,7 @@
     /****
     ** Filters section
     ****/
-    // TODO
-    "config.filters-title": "Фильтры"
+    "config.filters-title": "Фильтры",
 
     "config.spoken-to-filter.name": "NPC, с которыми говорили",
     "config.spoken-to-filter.desc": "Каких NPC показывать в зависимости от общения.",
@@ -110,20 +104,19 @@
     "config.show-bookseller.desc": "Отображать продавца книг, когда он в городе.",
 
     "config.show-traveling-merchant.name": "Показывать Странствующего торговца",
-    "config.show-traveling-merchant.desc": "Отображать Странствующего торговца в Лесу.
+    "config.show-traveling-merchant.desc": "Отображать Странствующего торговца в Лесу.",
 
     "config.show-children.name": "Показывать детей",
     "config.show-children.desc": "Отображать детей игроков на карте.",
 
     "config.show-horses.name": "Показывать лошадей",
-    "config.show-horses.desc": "Отображать лошадей на карте."
+    "config.show-horses.desc": "Отображать лошадей на карте.",
 
     /****
     ** Include/exclude villagers
     ****/
     "config.toggle-villagers-title": "Добавить/исключить жителей",
 
-    // TODO
     "config.toggle-npc.desc": "Отображать ли {{displayName}} на карте.",
     "config.toggle-npc.options.default": "По умолчанию",
     "config.toggle-npc.options.default-hidden": "По умолчанию (скрыто)",
@@ -133,7 +126,6 @@
     /****
     ** Performance section
     ****/
-    // TODO
     "config.performance-title": "Производительность",
 
     "config.minimap-cache-time.name": "Частота обновления мини-карты",
