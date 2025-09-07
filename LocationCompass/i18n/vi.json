@@ -1,0 +1,43 @@
+{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Tùy chọn",
+
+    "config.hide-hud.name": "Ẩn HUD",
+    "config.hide-hud.desc": "Ẩn HUD của game khi các biểu tượng định vị đang hiển thị.",
+
+    "config.same-location-only.name": "Chỉ hiện cùng khu vực",
+    "config.same-location-only.desc": "Chỉ hiển thị các biểu tượng định vị trong khu vực hiện tại của bạn. Nếu tắt, các nhân vật ở những khu vực lân cận sẽ hiển thị màu xám.",
+
+    "config.quests-and-birthdays-only.name": "Chỉ hiện nhiệm vụ & sinh nhật",
+    "config.quests-and-birthdays-only.desc": "Chỉ hiển thị các biểu tượng định vị cho những NPC có nhiệm vụ hoặc có sinh nhật hôm nay.",
+
+    "config.players-only.name": "Chỉ hiện người chơi",
+    "config.players-only.desc": "Chỉ hiển thị các biểu tượng định vị cho người chơi.",
+
+    "config.show-horses.name": "Hiển thị ngựa",
+    "config.show-horses.desc": "Hiển thị các biểu tượng định vị cho ngựa.",
+
+    // controls
+    "config.title.controls": "Điều khiển",
+
+    "config.hold-to-toggle.name": "Giữ để bật/tắt",
+    "config.hold-to-toggle.desc": "Giữ nút để hiển thị các biểu tượng định vị (nếu không, nhấn nút sẽ bật/tắt chúng).",
+
+    "config.toggle-key.name": "Phím bật/tắt",
+    "config.toggle-key.desc": "Nút dùng để hiển thị hoặc ẩn các biểu tượng định vị.",
+
+    "config.same-location-key.name": "Phím 'Chỉ hiện cùng khu vực'",
+    "config.same-location-key.desc": "Nút dùng để bật hoặc tắt tùy chọn 'Chỉ hiện cùng khu vực' ở trên.",
+
+    "config.quests-and-birthdays-key.name": "Phím 'Chỉ hiện nhiệm vụ & sinh nhật'",
+    "config.quests-and-birthdays-key.desc": "Nút dùng để bật hoặc tắt tùy chọn 'Chỉ hiện nhiệm vụ & sinh nhật' ở trên.",
+
+    "config.players-key.name": "Phím 'Chỉ hiện người chơi'",
+    "config.players-key.desc": "Nút dùng để bật hoặc tắt tùy chọn 'Chỉ hiện người chơi' ở trên.",
+
+    "config.horses-key.name": "Phím 'Hiển thị ngựa'",
+    "config.horses-key.desc": "Nút dùng để bật hoặc tắt tùy chọn 'Hiển thị ngựa' ở trên."
+}
