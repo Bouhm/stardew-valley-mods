@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed NPCs from Custom Companions being shown on the map.
+
 ## 3.4.2
 Released 07 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 
