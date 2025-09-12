@@ -790,6 +790,9 @@ public class ModEntry : Mod
     /// <returns>Returns the created NPC marker, or <c>null</c> if the NPC should be ignored.</returns>
     private NpcMarker? ResetMarker(NPC npc)
     {
+        if (npc.SimpleNonVillagerNPC)
+            return null;
+
         string? typeName = npc.GetType().FullName;
         if (typeName is null || this.Data.IgnoreNpcTypes.Contains(typeName))
             return null;

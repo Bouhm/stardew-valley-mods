@@ -3,7 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed the config UI not sorting NPCs alphabetically by translated name.
-* Fixed NPCs from Custom Companions being shown on the map.
+* Fixed NPCs from Custom Companions or some passive festivals being shown on the map.
 * Fixed the config UI being openable multiple times using the keybind.
 
 ## 3.4.2
