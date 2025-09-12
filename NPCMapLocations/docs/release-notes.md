@@ -1,6 +1,13 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.4.3
+Released 11 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+
+* Fixed the config UI not sorting NPCs alphabetically by translated name.
+* Fixed the config UI being openable multiple times using the keybind.
+* Fixed NPCs from Custom Companions or some passive festivals being shown on the map.
+
 ## 3.4.2
 Released 07 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 

@@ -50,6 +50,9 @@ public class ModEntry : Mod
     /// <summary>Scans and maps locations in the game world.</summary>
     private static LocationUtil LocationUtil = null!; // set in Entry
 
+    /// <summary>The internal mod data.</summary>
+    private DataModel Data = null!; // set in Entry
+
     // External mod settings
     private readonly string NpcCustomizationsPath = "Mods/Bouhm.NPCMapLocations/NPCs";
     private readonly string LocationCustomizationsPath = "Mods/Bouhm.NPCMapLocations/Locations";
@@ -75,15 +78,34 @@ public class ModEntry : Mod
     /// <inheritdoc />
     public override void Entry(IModHelper helper)
     {
+        // init
         this.MigrateLegacyFiles();
-
         I18n.Init(helper.Translation);
-
         ModEntry.LocationUtil = new(this.Monitor);
         StaticHelper = helper;
         Config = helper.ReadConfig<ModConfig>();
         this.Customizations = new ModCustomizations(this.OnConfigEdited);
 
+        // read data file
+        const string dataPath = "assets/data.json";
+        try
+        {
+            DataModel? data = this.Helper.Data.ReadJsonFile<DataModel>(dataPath);
+            if (data == null)
+            {
+                data = new DataModel(null);
+                this.Monitor.Log($"The {dataPath} file seems to be missing or invalid. You can reinstall the mod to fix that.", LogLevel.Warn);
+            }
+            this.Data = data;
+        }
+        catch (Exception ex)
+        {
+            this.Data = new DataModel(null);
+            this.Monitor.Log($"The {dataPath} file seems to be missing or invalid. You can reinstall the mod to fix that.", LogLevel.Warn);
+            this.Monitor.Log(ex.ToString());
+        }
+
+        // hook events
         helper.Events.Content.AssetRequested += this.OnAssetRequested;
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
         helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
@@ -100,6 +122,7 @@ public class ModEntry : Mod
         helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
         helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
 
+        // add console command
         helper.ConsoleCommands.Add(SummaryCommand.Name, SummaryCommand.GetDescription(), (_, _) => SummaryCommand.Handle(
             monitor: this.Monitor,
             locationUtil: ModEntry.LocationUtil,
@@ -309,7 +332,7 @@ public class ModEntry : Mod
         }
 
         // check map keybinds
-        else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex)
+        else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex && menu.GetChildMenu() is null)
         {
             // open config UI
             if (Config.MenuKey.JustPressed())
@@ -763,10 +786,17 @@ public class ModEntry : Mod
         }
     }
 
-    /// <summary>Add or reset the map marker for an NPC.</summary>
-    /// <returns>Returns the created NPC marker.</returns>
-    private NpcMarker ResetMarker(NPC npc)
+    /// <summary>Add or reset the map marker for an NPC, if it's valid.</summary>
+    /// <returns>Returns the created NPC marker, or <c>null</c> if the NPC should be ignored.</returns>
+    private NpcMarker? ResetMarker(NPC npc)
     {
+        if (npc.SimpleNonVillagerNPC)
+            return null;
+
+        string? typeName = npc.GetType().FullName;
+        if (typeName is null || this.Data.IgnoreNpcTypes.Contains(typeName))
+            return null;
+
         var type = npc switch
         {
             Horse => CharacterType.Horse,

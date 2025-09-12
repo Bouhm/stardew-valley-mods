@@ -261,7 +261,7 @@ internal class GenericModConfigMenuIntegration
 
         // Include/exclude villagers
         menu.AddSectionTitle(this.Manifest, I18n.Config_ToggleVillagersTitle);
-        foreach ((string npcName, CharacterData data) in Game1.characterData.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase))
+        foreach ((string npcName, CharacterData data) in Game1.characterData.OrderBy(p => TokenParser.ParseText(p.Value.DisplayName) ?? p.Key, StringComparer.OrdinalIgnoreCase))
         {
             if (data is null || data.SocialTab == SocialTabBehavior.HiddenAlways || this.Config.ModNpcExclusions.Contains(npcName))
                 continue;
