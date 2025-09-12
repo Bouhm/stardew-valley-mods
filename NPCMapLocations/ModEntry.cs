@@ -332,7 +332,7 @@ public class ModEntry : Mod
         }
 
         // check map keybinds
-        else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex)
+        else if (Game1.activeClickableMenu is GameMenu menu && menu.currentTab == ModConstants.MapTabIndex && menu.GetChildMenu() is null)
         {
             // open config UI
             if (Config.MenuKey.JustPressed())
