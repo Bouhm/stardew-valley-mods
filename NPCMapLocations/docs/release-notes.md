@@ -1,19 +1,21 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 3.4.4
+Released 21 October 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
+
 * Fixed the config UI not listing some custom NPCs.
 * Fixed vague error message if getting a world map position fails.
 
 ## 3.4.3
-Released 11 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+Released 11 September 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
 * Fixed the config UI not sorting NPCs alphabetically by translated name.
 * Fixed the config UI being openable multiple times using the keybind.
 * Fixed NPCs from Custom Companions or some passive festivals being shown on the map.
 
 ## 3.4.2
-Released 07 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+Released 07 September 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
 * Fixed NPCs not shown on map if they appeared after the day started (e.g. Little NPCs).
 * Fixed NPCs not shown in config UI if they were added after the game starts.
@@ -22,12 +24,12 @@ Released 07 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
 * Improved translations. Thanks to honbregordo (updated Russian), Miruiro (updated Japanese), and trucpham04 (updated Vietnamese)!
 
 ## 3.4.1
-Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+Released 25 May 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
 * Fixed NPC marker positions being offset in 3.4.0.
 
 ## 3.4.0
-Released 25 May 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
+Released 25 May 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
 * Overhauled mod settings:
   * Replaced the custom config UI with [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098).  
