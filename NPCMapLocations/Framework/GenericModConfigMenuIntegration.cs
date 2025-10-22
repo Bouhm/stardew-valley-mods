@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Bouhm.Shared.Integrations.GenericModConfigMenu;
 using StardewModdingAPI;
@@ -23,6 +24,9 @@ internal class GenericModConfigMenuIntegration
     /// <summary>A callback to invoke when the settings are saved.</summary>
     private readonly Action OnSaved;
 
+    /// <summary>Get the current NPC markers, if any.</summary>
+    private readonly Func<IReadOnlyDictionary<string, NpcMarker>> GetNpcMarkers;
+
     /// <summary>The current mod settings.</summary>
     private ModConfig Config => ModEntry.Config;
 
@@ -42,12 +46,14 @@ internal class GenericModConfigMenuIntegration
     /// <param name="modRegistry">An API for fetching metadata about loaded mods.</param>
     /// <param name="onReset">A callback to invoke when the settings are reset to default.</param>
     /// <param name="onSaved">A callback to invoke when the settings are saved.</param>
-    public GenericModConfigMenuIntegration(IManifest manifest, IModRegistry modRegistry, Action onReset, Action onSaved)
+    /// <param name="getNpcMarkers">Get the current NPC markers, if any.</param>
+    public GenericModConfigMenuIntegration(IManifest manifest, IModRegistry modRegistry, Action onReset, Action onSaved, Func<IReadOnlyDictionary<string, NpcMarker>> getNpcMarkers)
     {
         this.Manifest = manifest;
         this.ConfigMenu = modRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         this.OnReset = onReset;
         this.OnSaved = onSaved;
+        this.GetNpcMarkers = getNpcMarkers;
     }
 
     /// <summary>Register the config menu if available.</summary>
@@ -261,29 +267,26 @@ internal class GenericModConfigMenuIntegration
 
         // Include/exclude villagers
         menu.AddSectionTitle(this.Manifest, I18n.Config_ToggleVillagersTitle);
-        foreach ((string npcName, CharacterData data) in Game1.characterData.OrderBy(p => TokenParser.ParseText(p.Value.DisplayName) ?? p.Key, StringComparer.OrdinalIgnoreCase))
+        foreach ((string internalName, string displayName) in this.GetNpcNames().OrderBy(p => p.DisplayName, StringComparer.OrdinalIgnoreCase))
         {
-            if (data is null || data.SocialTab == SocialTabBehavior.HiddenAlways || this.Config.ModNpcExclusions.Contains(npcName))
-                continue;
-
             this.AddTriStateOption(
-                name: () => TokenParser.ParseText(data.DisplayName),
-                tooltip: () => I18n.Config_ToggleNpc_Desc(displayName: TokenParser.ParseText(data.DisplayName)),
-                getValue: () => this.Config.NpcVisibility.TryGetValue(npcName, out bool value)
+                name: () => displayName,
+                tooltip: () => I18n.Config_ToggleNpc_Desc(displayName: displayName),
+                getValue: () => this.Config.NpcVisibility.TryGetValue(internalName, out bool value)
                     ? value
                     : null,
                 setValue: value =>
                 {
                     if (value is null)
-                        this.Config.NpcVisibility.Remove(npcName);
+                        this.Config.NpcVisibility.Remove(internalName);
                     else
-                        this.Config.NpcVisibility[npcName] = value.Value;
+                        this.Config.NpcVisibility[internalName] = value.Value;
                 },
                 formatAllowedValue: value => value switch
                 {
                     true => I18n.Config_ToggleNpc_Options_AlwaysVisible(),
                     false => I18n.Config_ToggleNpc_Options_AlwaysHidden(),
-                    null when this.Config.ModNpcExclusions.Contains(npcName) => I18n.Config_ToggleNpc_Options_DefaultHidden(),
+                    null when this.Config.ModNpcExclusions.Contains(internalName) => I18n.Config_ToggleNpc_Options_DefaultHidden(),
                     _ => I18n.Config_ToggleNpc_Options_Default()
                 }
             );
@@ -319,13 +322,49 @@ internal class GenericModConfigMenuIntegration
     /*********
     ** Private methods
     *********/
+    /// <summary>Get the NPCs which can be shown on the world map.</summary>
+    private IEnumerable<(string InternalName, string DisplayName)> GetNpcNames()
+    {
+        // if we haven't loaded save yet, get NPCs from data
+        if (!Context.IsWorldReady)
+        {
+            foreach ((string internalName, CharacterData data) in Game1.characterData)
+            {
+                bool canShow =
+                    !this.Config.ModNpcExclusions.Contains(internalName)
+                    && data != null
+                    && data.SocialTab != SocialTabBehavior.HiddenAlways;
+
+                if (canShow)
+                {
+                    string displayName = TokenParser.ParseText(data!.DisplayName) ?? internalName;
+                    yield return (internalName, displayName);
+                }
+            }
+        }
+
+        // else show the actual markers
+        else
+        {
+            foreach ((string internalName, NpcMarker marker) in this.GetNpcMarkers())
+            {
+                bool canShow = !this.Config.ModNpcExclusions.Contains(internalName);
+
+                if (canShow)
+                {
+                    string displayName = marker.DisplayName ?? internalName;
+                    yield return (internalName, displayName);
+                }
+            }
+        }
+    }
+
     /// <summary>Add a config option with a tri-state boolean dropdown.</summary>
     /// <param name="name">The label text to show in the form.</param>
     /// <param name="tooltip">The tooltip text shown when the cursor hovers on the field, or <c>null</c> to disable the tooltip.</param>
     /// <param name="getValue">Get the current value from the mod config.</param>
     /// <param name="setValue">Set a new value in the mod config.</param>
     /// <param name="formatAllowedValue">Get the display text to show for a value.</param>
-
     private void AddTriStateOption(Func<string> name, Func<string> tooltip, Func<bool?> getValue, Action<bool?> setValue, Func<bool?, string> formatAllowedValue)
     {
         IGenericModConfigMenuApi menu = this.ConfigMenu!;

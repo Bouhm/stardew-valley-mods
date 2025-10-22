@@ -591,7 +591,7 @@ public class ModEntry : Mod
     /// <summary>Register or update the config UI with Generic Mod Config Menu.</summary>
     private IGenericModConfigMenuApi? RegisterConfigMenu()
     {
-        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited);
+        var configMenu = new GenericModConfigMenuIntegration(this.ModManifest, this.Helper.ModRegistry, this.ResetConfig, this.OnConfigEdited, () => this.NpcMarkers.Value);
         configMenu.Register();
         return configMenu.ConfigMenu;
     }
