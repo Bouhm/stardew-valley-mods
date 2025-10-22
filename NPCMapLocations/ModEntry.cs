@@ -148,47 +148,65 @@ public class ModEntry : Mod
     /// <param name="locationExclusions">The locations to ignore when scanning locations for players and NPCs.</param>
     public static WorldMapPosition GetWorldMapPosition(string? locationName, int tileX = 0, int tileY = 0, HashSet<string>? locationExclusions = null)
     {
-        Point tile = new Point(tileX, tileY);
-
+        string? originalLocationName = locationName;
         HashSet<string> seen = [];
-        int depth = 0;
 
-        while (!string.IsNullOrWhiteSpace(locationName))
+        try
         {
-            // special case: map generated level to single name
-            locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
+            Point tile = new Point(tileX, tileY);
+            int depth = 0;
 
-            // break infinite loops
-            if (!seen.Add(locationName))
-                return WorldMapPosition.Empty;
-            if (++depth > LocationUtil.MaxRecursionDepth)
-                throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
-
-            // special case: inside farm building
-            if (FarmBuildings.TryGetValue(locationName, out BuildingMarker? marker))
-                return marker.WorldMapPosition;
-
-            // get location
-            GameLocation location = Game1.getLocationFromName(locationName);
-            if (location is null)
-                return WorldMapPosition.Empty;
-
-            // get map pixel from game data if found
-            MapAreaPositionWithContext? mapAreaPos = WorldMapManager.GetPositionData(location, tile);
-            if (mapAreaPos != null)
-                return WorldMapPosition.Create(mapAreaPos.Value);
-
-            // else try from parent, unless this location is blacklisted
-            if (locationExclusions?.Contains(locationName) != true && !locationName.Contains("WarpRoom") && LocationUtil.TryGetContext(locationName, out var loc))
+            while (!string.IsNullOrWhiteSpace(locationName))
             {
-                locationName = loc.Parent;
-                tile = Utility.Vector2ToPoint(loc.Warp);
-            }
-            else
-                break; // not found
-        }
+                // special case: map generated level to single name
+                locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
 
-        return WorldMapPosition.Empty;
+                // break infinite loops
+                if (!seen.Add(locationName))
+                    return WorldMapPosition.Empty;
+                if (++depth > LocationUtil.MaxRecursionDepth)
+                    throw new InvalidOperationException($"Infinite recursion detected in location scan. Technical details:\n{nameof(locationName)}: {locationName}\n{nameof(tileX)}: {tileX}\n{nameof(tileY)}: {tileY}\n\n{Environment.StackTrace}");
+
+                // special case: inside farm building
+                if (FarmBuildings.TryGetValue(locationName, out BuildingMarker? marker))
+                    return marker.WorldMapPosition;
+
+                // get location
+                GameLocation location = Game1.getLocationFromName(locationName);
+                if (location is null)
+                    return WorldMapPosition.Empty;
+
+                // get map pixel from game data if found
+                MapAreaPositionWithContext? mapAreaPos = WorldMapManager.GetPositionData(location, tile);
+                if (mapAreaPos != null)
+                    return WorldMapPosition.Create(mapAreaPos.Value);
+
+                // else try from parent, unless this location is blacklisted
+                if (locationExclusions?.Contains(locationName) != true && !locationName.Contains("WarpRoom") && LocationUtil.TryGetContext(locationName, out var loc))
+                {
+                    locationName = loc.Parent;
+                    tile = Utility.Vector2ToPoint(loc.Warp);
+                }
+                else
+                    break; // not found
+            }
+
+            return WorldMapPosition.Empty;
+        }
+        catch (Exception ex)
+        {
+            string locationPath;
+            if (seen.Count == 0)
+                locationPath = $"'{locationName}'";
+            else
+            {
+                locationPath = $"'{string.Join("' > '", seen)}'";
+                if (originalLocationName != seen.First())
+                    locationPath = $"'{originalLocationName}' -> {locationPath}";
+            }
+
+            throw new InvalidOperationException($"Failed getting world map position for location {locationPath} ({tileX}, {tileY}).", ex);
+        }
     }
 
     /// <summary>Get whether an NPC is configured to be excluded when rendering markers on the map.</summary>

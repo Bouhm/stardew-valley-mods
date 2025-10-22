@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Fixed the config UI not listing some custom NPCs.
+* Fixed vague error message if getting a world map position fails.
 
 ## 3.4.3
 Released 11 September 2025 for SMAPI 4.1.2 or later. Updated by Pathoschild.
