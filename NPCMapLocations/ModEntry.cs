@@ -465,6 +465,7 @@ public class ModEntry : Mod
                         {
                             DisplayName = npcMarker.Value.DisplayName,
                             LocationName = npcMarker.Value.LocationName,
+                            IsOutdoors = LocationUtil.IsOutdoors(npcMarker.Value.LocationName),
                             WorldMapPosition = npcMarker.Value.WorldMapPosition,
                             IsBirthday = npcMarker.Value.IsBirthday,
                             Type = npcMarker.Value.Type
@@ -536,6 +537,7 @@ public class ModEntry : Mod
                         }
 
                         npcMarker.LocationName = syncedMarker.LocationName;
+                        npcMarker.IsOutdoors = syncedMarker.IsOutdoors;
                         npcMarker.WorldMapPosition = syncedMarker.WorldMapPosition;
                         npcMarker.DisplayName = syncedMarker.DisplayName;
                         npcMarker.CropOffset = offset;
@@ -771,6 +773,7 @@ public class ModEntry : Mod
                 {
                     DisplayName = I18n.MarkerNames_Bookseller(),
                     LocationName = "Town",
+                    IsOutdoors = true,
                     CropOffset = 0,
                     Sprite = Game1.mouseCursors_1_6,
                     SpriteSourceRect = new Rectangle(180, 490, 14, 18),
@@ -790,6 +793,7 @@ public class ModEntry : Mod
                 {
                     DisplayName = I18n.MarkerNames_Merchant(),
                     LocationName = "Forest",
+                    IsOutdoors = true,
                     CropOffset = 0,
                     Sprite = Game1.mouseCursors,
                     SpriteSourceRect = new Rectangle(191, 1410, 22, 21),
@@ -925,6 +929,7 @@ public class ModEntry : Mod
         // update each NPC
         foreach (NPC npc in npcList)
         {
+            // handle NPCs added later
             if (!this.NpcMarkers.Value.TryGetValue(npc.Name, out NpcMarker? npcMarker))
             {
                 // If an NPC appears after we initialized markers, add it to the list now.
@@ -936,57 +941,32 @@ public class ModEntry : Mod
             if (npcMarker is null || npc.currentLocation is null)
                 continue;
 
+            // update info
             string locationName = npc.currentLocation.uniqueName.Value ?? npc.currentLocation.Name;
             npcMarker.LocationName = locationName;
-
-            // For show Npcs in player's location option
-            bool isSameLocation = false;
-
-            if (Config.OnlySameLocation)
-            {
-                string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-                if (locationName == playerLocationName)
-                    isSameLocation = true;
-                else if (LocationUtil.TryGetContext(locationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
-                    isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
-            }
-
-            // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-            this.SetMarkerHiddenIfNeeded(npcMarker, npc.Name, isSameLocation);
-
-            // Check for daily quests
-            foreach (var quest in Game1.player.questLog)
-            {
-                if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-                    npcMarker.HasQuest = quest switch
-                    {
-                        ItemDeliveryQuest itemDeliveryQuest => itemDeliveryQuest.target.Value == npc.Name,
-                        SlayMonsterQuest slayMonsterQuest => slayMonsterQuest.target.Value == npc.Name,
-                        FishingQuest fishingQuest => fishingQuest.target.Value == npc.Name,
-                        ResourceCollectionQuest resourceCollectionQuest => resourceCollectionQuest.target.Value == npc.Name,
-                        _ => npcMarker.HasQuest
-                    };
-            }
-
-            // Establish draw order, higher number in front
-            // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            if (npc is Horse or Child)
-            {
-                npcMarker.Layer = 0;
-            }
-            else
-            {
-                npcMarker.Layer = LocationUtil.IsOutdoors(locationName) ? 6 : 2;
-                if (npcMarker.IsHidden)
-                    npcMarker.Layer -= 2;
-            }
-
-            if (npcMarker.HasQuest || npcMarker.IsBirthday)
-                npcMarker.Layer++;
-
+            npcMarker.IsOutdoors = LocationUtil.IsOutdoors(locationName);
+            npcMarker.HasQuest = this.HasQuest(npc.Name);
             if (locationName != null)
                 npcMarker.WorldMapPosition = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
+
+            // apply 'show NPCs in location' option
+            {
+                bool isSameLocation = false;
+
+                if (Config.OnlySameLocation)
+                {
+                    string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+                    if (locationName == playerLocationName)
+                        isSameLocation = true;
+                    else if (LocationUtil.TryGetContext(locationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
+                        isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
+                }
+
+                this.SetMarkerHiddenIfNeeded(npcMarker, npc.Name, isSameLocation);
+            }
+
+            // set draw layer
+            npcMarker.RecalculateDrawLayer();
         }
     }
 
@@ -995,51 +975,51 @@ public class ModEntry : Mod
     {
         foreach ((string name, NpcMarker marker) in this.NpcMarkers.Value)
         {
-            // For show Npcs in player's location option
-            bool isSameLocation = false;
-            if (Config.OnlySameLocation)
+            // apply 'show NPCs in location' option
             {
-                string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
-                if (marker.LocationName == playerLocationName)
-                    isSameLocation = true;
-                else if (LocationUtil.TryGetContext(marker.LocationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
-                    isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
+                bool isSameLocation = false;
+
+                if (Config.OnlySameLocation)
+                {
+                    string playerLocationName = Game1.player.currentLocation.uniqueName.Value ?? Game1.player.currentLocation.Name;
+                    if (marker.LocationName == playerLocationName)
+                        isSameLocation = true;
+                    else if (LocationUtil.TryGetContext(marker.LocationName, out var npcLocCtx) && LocationUtil.TryGetContext(playerLocationName, out var playerLocCtx))
+                        isSameLocation = npcLocCtx.Root == playerLocCtx.Root;
+                }
+
+                this.SetMarkerHiddenIfNeeded(marker, name, isSameLocation);
             }
 
-            // NPCs that won't be shown on the map unless 'Show Hidden NPCs' is checked
-            this.SetMarkerHiddenIfNeeded(marker, name, isSameLocation);
-
-            // Check for daily quests
-            foreach (Quest quest in Game1.player.questLog)
-            {
-                if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
-                    marker.HasQuest = quest switch
-                    {
-                        ItemDeliveryQuest itemDeliveryQuest => itemDeliveryQuest.target.Value == name,
-                        SlayMonsterQuest slayMonsterQuest => slayMonsterQuest.target.Value == name,
-                        FishingQuest fishingQuest => fishingQuest.target.Value == name,
-                        ResourceCollectionQuest resourceCollectionQuest => resourceCollectionQuest.target.Value == name,
-                        _ => marker.HasQuest
-                    };
-            }
-
-            // Establish draw order, higher number in front
-            // Layers 4 - 7: Outdoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            // Layers 0 - 3: Indoor NPCs in order of hidden, hidden w/ quest/birthday, standard, standard w/ quest/birthday
-            if (marker.Type is CharacterType.Horse or CharacterType.Child)
-            {
-                marker.Layer = 0;
-            }
-            else
-            {
-                marker.Layer = LocationUtil.IsOutdoors(marker.LocationName) ? 6 : 2;
-                if (marker.IsHidden)
-                    marker.Layer -= 2;
-            }
-
-            if (marker.HasQuest || marker.IsBirthday)
-                marker.Layer++;
+            // update info
+            marker.HasQuest = this.HasQuest(name);
+            marker.RecalculateDrawLayer();
         }
+    }
+
+    /// <summary>Get whether an NPC has an active quest.</summary>
+    /// <param name="npcName">The NPC internal name to match.</param>
+    private bool HasQuest(string npcName)
+    {
+        foreach (Quest quest in Game1.player.questLog)
+        {
+            if (quest.accepted.Value && quest.dailyQuest.Value && !quest.completed.Value)
+            {
+                string? questTarget = quest switch
+                {
+                    ItemDeliveryQuest itemDeliveryQuest => itemDeliveryQuest.target.Value,
+                    SlayMonsterQuest slayMonsterQuest => slayMonsterQuest.target.Value,
+                    FishingQuest fishingQuest => fishingQuest.target.Value,
+                    ResourceCollectionQuest resourceCollectionQuest => resourceCollectionQuest.target.Value,
+                    _ => null
+                };
+
+                if (questTarget == npcName)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Set an NPC marker to hidden if applicable based on the current config.</summary>

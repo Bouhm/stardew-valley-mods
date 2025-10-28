@@ -6,20 +6,23 @@ public class SyncedNpcMarker
     /*********
     ** Accessors
     *********/
+    /// <summary>The NPC's character type.</summary>
+    public CharacterType Type { get; set; } = CharacterType.Villager;
+
     /// <summary>The NPC's translated display name.</summary>
     public string? DisplayName { get; set; }
 
     /// <summary>The name of the location containing the NPC.</summary>
     public string? LocationName { get; set; }
 
+    /// <summary>Whether the NPC is outdoors.</summary>
+    public bool IsOutdoors { get; set; }
+
     /// <summary>The NPC's marker position on the world map.</summary>
     public WorldMapPosition? WorldMapPosition { get; set; }
 
     /// <summary>Whether the NPC's birthday is today.</summary>
     public bool IsBirthday { get; set; }
-
-    /// <summary>The NPC's character type.</summary>
-    public CharacterType Type { get; set; } = CharacterType.Villager;
 
     /// <summary>The world map region ID, if available.</summary>
     public string? WorldMapRegionId => this.WorldMapPosition?.RegionId;
