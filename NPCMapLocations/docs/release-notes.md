@@ -1,6 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Fixed Marlon not shown on world map; he's now shown after you see his intro event.
+
 ## 3.4.4
 Released 21 October 2025 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 
