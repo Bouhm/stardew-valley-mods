@@ -66,30 +66,6 @@ public static class ModConstants
         ["Wizard"] = 0
     };
 
-    /// <summary>NPCs with no schedules.</summary>
-    public static List<string> ExcludedNpcs =>
-    [
-        // "Dwarf",
-        "Mister Qi",
-        "Bouncer",
-        "Henchman",
-        "Birdie"
-        // "Gunther",
-        // "Krobus",
-        // "Dusty"
-    ];
-
-    /// <summary>Spoiler characters that are unlocked later in the game.</summary>
-    public static List<string> ConditionalNpcs =>
-    [
-        "Dwarf",
-        "Krobus",
-        "Marlon",
-        "Sandy",
-        "Wizard",
-        "Leo"
-    ];
-
     /// <summary>Custom farm markers. Also used to do a quick check for currentLocation is farm building.</summary>
     public static Dictionary<string, Rectangle> FarmBuildingRects { get; } = GetFarmBuildingRects();
 

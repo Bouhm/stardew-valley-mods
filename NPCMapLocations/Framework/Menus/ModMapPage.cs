@@ -21,7 +21,6 @@ internal class ModMapPage : MapPage
     /*********
     ** Fields
     *********/
-    private Dictionary<string, bool> ConditionalNpcs { get; }
     private Dictionary<string, NpcMarker> NpcMarkers { get; }
     private Dictionary<long, FarmerMarker> FarmerMarkers { get; }
     private Dictionary<string, BuildingMarker> FarmBuildings { get; }
@@ -49,7 +48,6 @@ internal class ModMapPage : MapPage
         int width,
         int height,
         Dictionary<string, NpcMarker> npcMarkers,
-        Dictionary<string, bool> conditionalNpcs,
         Dictionary<long, FarmerMarker> farmerMarkers,
         Dictionary<string, BuildingMarker> farmBuildings,
         Texture2D? buildingMarkers,
@@ -59,7 +57,6 @@ internal class ModMapPage : MapPage
         : base(x, y, width, height)
     {
         this.NpcMarkers = npcMarkers;
-        this.ConditionalNpcs = conditionalNpcs;
         this.FarmerMarkers = farmerMarkers;
         this.FarmBuildings = farmBuildings;
         this.BuildingMarkers = buildingMarkers;
@@ -319,7 +316,6 @@ internal class ModMapPage : MapPage
                 if (
                     (!overrideVisible && ModEntry.ShouldExcludeNpc(name))
                     || (!overrideVisible && !ModEntry.Config.ShowHiddenVillagers && marker.IsHidden)
-                    || (this.ConditionalNpcs.ContainsKey(name) && !this.ConditionalNpcs[name])
                 )
                     continue;
 

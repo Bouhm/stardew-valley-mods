@@ -36,7 +36,6 @@ public class ModEntry : Mod
     private readonly PerScreen<Texture2D?> BuildingMarkers = new();
     private readonly PerScreen<ModMinimap?> Minimap = new();
     private readonly PerScreen<Dictionary<string, NpcMarker>> NpcMarkers = new(() => []);
-    private readonly PerScreen<Dictionary<string, bool>> ConditionalNpcs = new(() => []);
     private readonly PerScreen<bool> HasOpenedMap = new();
     private readonly PerScreen<bool> IsModMapOpen = new();
     private readonly PerScreen<bool> IsFirstDay = new();
@@ -93,14 +92,14 @@ public class ModEntry : Mod
             DataModel? data = this.Helper.Data.ReadJsonFile<DataModel>(dataPath);
             if (data == null)
             {
-                data = new DataModel(null);
+                data = new DataModel(null, null);
                 this.Monitor.Log($"The {dataPath} file seems to be missing or invalid. You can reinstall the mod to fix that.", LogLevel.Warn);
             }
             this.Data = data;
         }
         catch (Exception ex)
         {
-            this.Data = new DataModel(null);
+            this.Data = new DataModel(null, null);
             this.Monitor.Log($"The {dataPath} file seems to be missing or invalid. You can reinstall the mod to fix that.", LogLevel.Warn);
             this.Monitor.Log(ex.ToString());
         }
@@ -272,7 +271,6 @@ public class ModEntry : Mod
         this.IsFirstDay.Value = true;
         this.NpcMarkers.Value.Clear();
         this.FarmerMarkers.Value.Clear();
-        this.ConditionalNpcs.Value.Clear();
 
         if (!(Context.IsSplitScreen && !Context.IsMainPlayer))
         {
@@ -291,10 +289,6 @@ public class ModEntry : Mod
         {
             this.BuildingMarkers.Value = null;
         }
-
-        // NPCs that player should meet before being shown
-        foreach (string npcName in ModConstants.ConditionalNpcs)
-            this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
 
         // Get context of all locations (indoor, outdoor, relativity)
         LocationUtil.ScanLocationContexts();
@@ -477,18 +471,6 @@ public class ModEntry : Mod
             }
         }
 
-        // enable conditional NPCs who've been talked to
-        if (e.IsOneSecond)
-        {
-            foreach (string npcName in ModConstants.ConditionalNpcs)
-            {
-                if (this.ConditionalNpcs.Value[npcName])
-                    continue;
-
-                this.ConditionalNpcs.Value[npcName] = Game1.player.friendshipData.ContainsKey(npcName);
-            }
-        }
-
         // handle minimap drag
         if (this.ShowMinimap.Value && this.Minimap.Value?.IsHoveringDragZone() == true && this.Helper.Input.GetState(SButton.MouseRight) == SButtonState.Held)
             this.Minimap.Value.HandleMouseRightDrag();
@@ -635,7 +617,6 @@ public class ModEntry : Mod
         {
             bool shouldTrack =
                 npc is { IsInvisible: false }
-                && !ModConstants.ExcludedNpcs.Contains(npc.Name) // note: don't check Globals.NPCExclusions here, so player can still reenable them in the map options UI
                 && (
                     npc.IsVillager
                     || npc.isMarried()
@@ -885,7 +866,6 @@ public class ModEntry : Mod
             menu.height,
 
             this.NpcMarkers.Value,
-            this.ConditionalNpcs.Value,
             this.FarmerMarkers.Value,
             FarmBuildings,
             this.BuildingMarkers.Value,
@@ -949,6 +929,16 @@ public class ModEntry : Mod
             if (locationName != null)
                 npcMarker.WorldMapPosition = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
 
+            // apply NPC conditions
+            if (!Config.ShowHiddenVillagers)
+            {
+                if (this.Data.Npcs.TryGetValue(npc.Name, out DataNpcModel? data) && data.Visible != null)
+                {
+                    bool hidden = !GameStateQuery.CheckConditions(data.Visible);
+                    this.SetMarkerHiddenIfNeeded(npcMarker, npc.Name, hidden);
+                }
+            }
+
             // apply 'show NPCs in location' option
             {
                 bool isSameLocation = false;
@@ -975,6 +965,16 @@ public class ModEntry : Mod
     {
         foreach ((string name, NpcMarker marker) in this.NpcMarkers.Value)
         {
+            // apply NPC conditions
+            if (!Config.ShowHiddenVillagers)
+            {
+                if (this.Data.Npcs.TryGetValue(name, out DataNpcModel? data) && data.Visible != null)
+                {
+                    bool hidden = !GameStateQuery.CheckConditions(data.Visible);
+                    this.SetMarkerHiddenIfNeeded(marker, name, hidden);
+                }
+            }
+
             // apply 'show NPCs in location' option
             {
                 bool isSameLocation = false;
