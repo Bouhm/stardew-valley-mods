@@ -1,0 +1,43 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Impostazioni",
+
+    "config.hide-hud.name": "Nascondi Interfaccia",
+    "config.hide-hud.desc": "Se nascondere l'interfaccia di gioco quando gli indicatori sono su schermo.", 
+
+    "config.same-location-only.name": "Solo nella stessa zona",
+    "config.same-location-only.desc": "Se mostrare solo gli indicatori nella stessa zona del giocatore. Se disabilitato, i personaggi nelle zone vicine saranno mostrati in grigio.",
+
+    "config.quests-and-birthdays-only.name": "Solo missioni e compleanni",
+    "config.quests-and-birthdays-only.desc": "Se mostrare solo gli indicatori per gli NPC con una missione o un compleanno oggi.",
+
+    "config.players-only.name": "Solo giocatori",
+    "config.players-only.desc": "Se mostrare solo gli indicatori per i giocatori.",
+
+    "config.show-horses.name": "Mostra cavalli", 
+    "config.show-horses.desc": "Se mostrare gli indicatori per i cavalli.",
+
+    // controls
+    "config.title.controls": "Controlli",
+
+    "config.hold-to-toggle.name": "Tieni premuto per attivare", 
+    "config.hold-to-toggle.desc": "Se mantenere premuto il tasto per mostrare le icone degli indicatori (altrimenti il tasto le attiva/disattiva).",
+
+    "config.toggle-key.name": "Tasto di attivazione",
+    "config.toggle-key.desc": "Il tasto che mostra o nasconde le icone degli indicatori.",
+
+    "config.same-location-key.name": "Tasto 'Solo nella stessa zona'",
+    "config.same-location-key.desc": "Il tasto che attiva o disattiva l'opzione 'Solo nella stessa zona' sovrastante.",
+
+    "config.quests-and-birthdays-key.name": "Tasto 'Solo missioni e compleanni'",
+    "config.quests-and-birthdays-key.desc": "Il tasto che attiva o disattiva l'opzione 'Solo missioni e compleanni' sovrastante.",
+
+    "config.players-key.name": "Tasto 'Solo giocatori'",
+    "config.players-key.desc": "Il tasto che attiva o disattiva l'opzione 'Solo giocatori' sovrastante.",
+
+    "config.horses-key.name": "Tasto 'Mostra cavalli'",
+    "config.horses-key.desc": "Il tasto che attiva o disattiva l'opzione 'Mostra cavalli' sovrastante."
+}
