@@ -326,11 +326,22 @@ internal class ModMapPage : MapPage
                 Rectangle iconDestinationRect;
                 {
                     Rectangle iconSpriteRect = marker.GetSpriteSourceRect();
-                    float iconScale = iconSpriteRect.Width > iconSpriteRect.Height
-                        ? 32f / iconSpriteRect.Width
-                        : 30f / iconSpriteRect.Height;
+                    float iconScale;
 
-                    float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
+                    if (ModEntry.Config.NpcIconStyle == NpcIconStyle.Vanilla)
+                    {
+                        iconScale = iconSpriteRect.Width > iconSpriteRect.Height
+                            ? 36f / iconSpriteRect.Width
+                            : 34f / iconSpriteRect.Height;
+                    }
+                    else
+                    {
+                        iconScale = iconSpriteRect.Width > iconSpriteRect.Height
+                            ? 32f / iconSpriteRect.Width
+                            : 30f / iconSpriteRect.Height;
+                    }
+
+                        float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
                     float iconHeight = (int)(iconSpriteRect.Height * iconScale * scaleMultiplier);
 
                     iconDestinationRect = new Rectangle(

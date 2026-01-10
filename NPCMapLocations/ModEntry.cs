@@ -796,11 +796,13 @@ public class ModEntry : Mod
         if (npc.SimpleNonVillagerNPC)
             return null;
 
+        // get type name
         string? typeName = npc.GetType().FullName;
         if (typeName is null || this.Data.IgnoreNpcTypes.Contains(typeName))
             return null;
 
-        var type = npc switch
+        // get type
+        CharacterType type = npc switch
         {
             Horse => CharacterType.Horse,
             Child => CharacterType.Child,
@@ -808,8 +810,7 @@ public class ModEntry : Mod
             _ => CharacterType.Villager
         };
 
-        int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
-
+        // get display name
         string displayName = npc.Name switch
         {
             "Raccoon" when type is CharacterType.Raccoon => I18n.MarkerNames_MisterRaccoon(),
@@ -817,17 +818,11 @@ public class ModEntry : Mod
             _ => string.IsNullOrWhiteSpace(npc.displayName) ? npc.Name : npc.displayName
         };
 
-        NpcMarker newMarker = new()
-        {
-            DisplayName = displayName,
-            CropOffset = offset,
-            IsBirthday = npc.isBirthday(),
-            Type = type
-        };
-
+        // get texture
+        Texture2D? texture = null;
         try
         {
-            newMarker.Sprite = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
+            texture = new AnimatedSprite(npc.Sprite.loadedTexture, 0, 16, 32).Texture;
         }
         catch (Exception ex)
         {
@@ -835,8 +830,23 @@ public class ModEntry : Mod
             this.Monitor.Log(ex.ToString());
         }
 
-        this.NpcMarkers.Value[npc.Name] = newMarker;
+        // get crop area
+        int offset = ModEntry.Config.NpcMarkerOffsets.GetValueOrDefault(npc.Name, 0);
+        Rectangle? vanillaMugShotSourceRect = type is CharacterType.Villager
+            ? npc.getMugShotSourceRect()
+            : null;
 
+        // build marker
+        NpcMarker newMarker = new()
+        {
+            DisplayName = displayName,
+            CropOffset = offset,
+            IsBirthday = npc.isBirthday(),
+            Sprite = texture,
+            VanillaMugShotSourceRect = vanillaMugShotSourceRect,
+            Type = type
+        };
+        this.NpcMarkers.Value[npc.Name] = newMarker;
         return newMarker;
     }
 

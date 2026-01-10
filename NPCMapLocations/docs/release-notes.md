@@ -2,6 +2,10 @@
 
 # Release notes
 ## Upcoming release
+* Added experimental 'Vanilla' icon style in the mod settings.  
+  _This draws NPC icons using the base game's [`MugShotSourceRect` NPC data field](https://stardewvalleywiki.com/Modding:NPC_data#Main_data),
+  which should fix cropped icons for many custom NPCs. However the base game uses a different NPC
+  icon style which results in smaller NPCs on the map._
 * Added minimap position to config UI so split-screen players can edit it.
 * Fixed Marlon not shown on world map; he's now shown after you see his intro event.
 * Improved translations. Thanks to Christian1904 (updated Italian)!

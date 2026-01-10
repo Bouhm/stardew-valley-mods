@@ -164,6 +164,15 @@ internal class GenericModConfigMenuIntegration
 
         // map display
         menu.AddSectionTitle(this.Manifest, I18n.Config_MapDisplayTitle);
+        menu.AddTextOption(
+            this.Manifest,
+            name: I18n.Config_NpcMarkerStyle_Name,
+            tooltip: I18n.Config_NpcMarkerStyle_Desc,
+            getValue: () => this.Config.NpcIconStyle.ToString(),
+            setValue: value => this.Config.NpcIconStyle = Utility.TryParseEnum(value, out NpcIconStyle parsed) ? parsed : NpcIconStyle.Default,
+            allowedValues: [nameof(NpcIconStyle.Default), nameof(NpcIconStyle.Vanilla)],
+            formatAllowedValue: value => I18n.GetByKey($"config.npc-marker-style.options.{value}").Default(value)
+        );
         menu.AddNumberOption(
             this.Manifest,
             name: I18n.Config_NpcMarkerSize_Name,

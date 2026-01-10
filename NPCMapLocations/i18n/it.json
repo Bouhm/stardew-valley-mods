@@ -70,6 +70,12 @@
     ****/
     "config.map-display-title": "Visualizzazione mappa",
 
+    // TODO
+    "config.npc-marker-style.name": "NPC marker style",
+    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
+    "config.npc-marker-style.options.default": "Default",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+
     "config.npc-marker-size.name": "Grandezza icona (NPC)",
     "config.npc-marker-size.desc": "La grandezza degli indicatori degli NPC sulla mappa rispetto al valore predefinito.",
 

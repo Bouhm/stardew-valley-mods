@@ -78,8 +78,17 @@ or [SMAPI's content API](https://stardewvalleywiki.com/Modding:Modder_Guide/APIs
 ```
 
 ## Customize an NPC icon
-NPC Map Locations automatically creates the marker icon for any NPC by cropping the head from its
-sprite. However custom sprites might not always line up correctly:
+Players can choose between two NPC map icon styles: **Vanilla** and **Custom**.
+
+### Vanilla mode (experimental)
+In the experimental Vanilla mode, NPC Map Locations automatically creates the marker icon for any
+NPC based on their [`MugShotSourceRect` field in `Data/Characters`](https://stardewvalleywiki.com/Modding:NPC_data#Main_data).
+You can edit that field if needed to customize the icon (which will also apply to other UIs like
+the base game's social menu).
+
+### Custom mode
+In the default Custom mode, NPC Map Locations automatically creates the marker icon for any NPC
+by cropping the head from its sprite. However custom sprites might not always line up correctly:
 
 > <img src="doc-images/npc-crop-offset-before.png" width="500" />
 

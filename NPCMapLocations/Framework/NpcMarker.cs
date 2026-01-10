@@ -16,6 +16,9 @@ public class NpcMarker : SyncedNpcMarker
     /// <summary>The pixel area within the <see cref="Sprite"/> to draw, or <c>null</c> to use the first sprite in the NPC spritesheet.</summary>
     public Rectangle? SpriteSourceRect { get; set; }
 
+    /// <summary>The pixel area within the <see cref="Sprite"/> for the vanilla mugshot, if applicable.</summary>
+    public Rectangle? VanillaMugShotSourceRect { get; set; }
+
     /// <summary>The zoom to apply when drawing the <see cref="Sprite"/>.</summary>
     public float? SpriteZoom { get; set; }
 
@@ -42,6 +45,9 @@ public class NpcMarker : SyncedNpcMarker
     /// <summary>Get the pixel area within the <see cref="Sprite"/> to draw.</summary>
     public Rectangle GetSpriteSourceRect()
     {
+        if (ModEntry.Config.NpcIconStyle == NpcIconStyle.Vanilla && this.VanillaMugShotSourceRect.HasValue)
+            return this.VanillaMugShotSourceRect.Value;
+
         if (this.SpriteSourceRect.HasValue)
             return this.SpriteSourceRect.Value;
 

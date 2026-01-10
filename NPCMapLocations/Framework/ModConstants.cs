@@ -25,6 +25,7 @@ public static class ModConstants
     public static int MapTabIndex => Constants.TargetPlatform == GamePlatform.Android ? 4 : GameMenu.mapTab;
 
     /// <summary>The offset to apply when cropping NPC heads for markers. These shift the head up (negative) or down (positive).</summary>
+    /// <remarks>This only applies in the <see cref="NpcIconStyle.Default"/> icon mode.</remarks>
     public static Dictionary<string, int> NpcMarkerOffsets => new()
     {
         ["Abigail"] = 3,
@@ -73,7 +74,7 @@ public static class ModConstants
     /*********
     ** Private methods
     *********/
-    /// <summary>Get the map icons each each farm building type.</summary>
+    /// <summary>Get the map icons for each farm building type.</summary>
     private static Dictionary<string, Rectangle> GetFarmBuildingRects()
     {
         // base source rects
