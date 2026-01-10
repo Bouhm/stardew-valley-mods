@@ -159,6 +159,8 @@ public class ModEntry : Mod
             {
                 // special case: map generated level to single name
                 locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
+                if (locationName is "VolcanoDungeon0")
+                    locationName = "Caldera"; // avoid generating volcano level
 
                 // break infinite loops
                 if (!seen.Add(locationName))
@@ -1074,6 +1076,8 @@ public class ModEntry : Mod
 
             string locationName = farmer.currentLocation.uniqueName.Value ?? farmer.currentLocation.Name;
             locationName = LocationUtil.GetLocationNameFromLevel(locationName) ?? locationName;
+            if (locationName == "VolcanoDungeon0")
+                locationName = "Caldera"; // avoid generating volcano dungeon level
 
             long farmerId = farmer.UniqueMultiplayerID;
             var farmerLoc = GetWorldMapPosition(

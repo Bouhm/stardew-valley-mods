@@ -8,6 +8,7 @@
   icon style which results in smaller NPCs on the map._
 * Added minimap position to config UI so split-screen players can edit it.
 * Fixed Marlon not shown on world map; he's now shown after you see his intro event.
+* Fixed "_Failed getting world map position for location_" error for volcano dungeon levels in some cases.
 * Improved translations. Thanks to Christian1904 (updated Italian)!
 
 ## 3.4.4
