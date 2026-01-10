@@ -49,10 +49,18 @@
 
     "config.minimap-width.name": "Larghezza Minimappa",
     "config.minimap-width.desc": "La larghezza in pixel della minimappa quando viene mostrata a schermo.",
-    "config.minimap-height-or-width.format": "{{size}} pixel",
 
     "config.minimap-height.name": "Altezza Minimappa",
     "config.minimap-height.desc": "L'altezza in pixel della minimappa quando viene mostrata a schermo.",
+
+    // TODO
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} pixel",
 
     "config.minimap-opacity.name": "Opacità Minimappa",
     "config.minimap-opacity.desc": "Il livello di opacità predefinito per la minimappa, in un valore compreso tra 0% (trasparente) e 100% (opaco).",

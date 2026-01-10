@@ -2,6 +2,7 @@
 
 # Release notes
 ## Upcoming release
+* Added minimap position to config UI so split-screen players can edit it.
 * Fixed Marlon not shown on world map; he's now shown after you see his intro event.
 * Improved translations. Thanks to Christian1904 (updated Italian)!
 

@@ -1110,7 +1110,7 @@ public class ModEntry : Mod
         ModEntry.StaticHelper.WriteConfig(ModEntry.Config);
 
         this.UpdateMinimapVisibility();
-        this.Minimap.Value?.Resize();
+        this.Minimap.Value?.ApplyConfig();
     }
 
     /// <summary>Migrate files from older versions of the mod.</summary>

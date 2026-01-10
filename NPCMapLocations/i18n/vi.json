@@ -49,10 +49,19 @@
 
     "config.minimap-width.name": "Chiều rộng bản đồ nhỏ",
     "config.minimap-width.desc": "Chiều rộng (pixel) của bản đồ nhỏ khi hiển thị.",
-    "config.minimap-height-or-width.format": "{{size}} pixel",
 
     "config.minimap-height.name": "Chiều cao bản đồ nhỏ",
     "config.minimap-height.desc": "Chiều cao (pixel) của bản đồ nhỏ khi hiển thị.",
+
+    // TODO
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    // TODO
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} pixel",
 
     "config.minimap-opacity.name": "Độ mờ bản đồ nhỏ",
     "config.minimap-opacity.desc": "Mức độ mờ mặc định của bản đồ nhỏ (từ 0% - trong suốt đến 100% - không trong suốt).",

@@ -50,10 +50,17 @@
 
     "config.minimap-width.name": "小地图宽",
     "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
-    "config.minimap-height-or-width.format": "{{size}} pixels",
 
     "config.minimap-height.name": "小地图高",
     "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} pixels",
 
     "config.minimap-opacity.name": "Minimap opacity",
     "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
