@@ -95,7 +95,7 @@
     "config.max-hearts.desc": "Il livello massimo di amicizia da avere con gli NPC per essere mostrati sulla mappa.",
 
     "config.show-quests-or-birthdays.name": "Mostra missioni e compleanni",
-    "config.show-quests-or-birthdays.desc": "Se mostrare o meno un'icona sull'indicatore dell'NPC quando è il suo compleanno o ha una missione attiva.", 
+    "config.show-quests-or-birthdays.desc": "Se mostrare o meno un'icona sull'indicatore dell'NPC quando è il suo compleanno o ha una missione attiva.",
 
     "config.show-hidden-villagers.name": "Mostra gli abitanti nascosti",
     "config.show-hidden-villagers.desc": "Se mostrare gli abitanti che normalmente sarebbero nascosti.",

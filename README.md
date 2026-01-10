@@ -30,7 +30,7 @@ Chinese      | [✓](LocationCompass/i18n/zh.json) | [↻](NPCMapLocations/i18n/
 French       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/fr.json)
 German       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/de.json)
 Hungarian    | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/hu.json)
-Italian      | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/it.json)
+Italian      | [✓](LocationCompass/i18n/it.json) | [✓](NPCMapLocations/i18n/it.json)
 Japanese     | [✓](LocationCompass/i18n/ja.json) | [✓](NPCMapLocations/i18n/ja.json)
 Korean       | [❑](LocationCompass/i18n)         | [↻](NPCMapLocations/i18n/ko.json)
 [Polish]     | [✓](LocationCompass/i18n/pl.json) | [↻](NPCMapLocations/i18n/pl.json)
