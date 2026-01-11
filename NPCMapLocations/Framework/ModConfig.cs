@@ -61,6 +61,9 @@ public class ModConfig
     /****
     ** Map display
     ****/
+    /// <summary>The icon marker style to draw.</summary>
+    public NpcIconStyle NpcIconStyle = NpcIconStyle.Default;
+
     /// <summary>The tooltip position when pointing at something on the map.</summary>
     public int NameTooltipMode { get; set; } = 1;
 

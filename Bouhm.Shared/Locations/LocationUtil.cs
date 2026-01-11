@@ -133,7 +133,7 @@ internal class LocationUtil
 
     /// <summary>Get the name of the static entry location for a generated mine or dungeon level, if applicable.</summary>
     /// <param name="locationName">The actual location name, like <c>UndergroundMine35</c>.</param>
-    /// <returns>Returns <c>Mine</c>, <c>SkullCave</c>, <c>VolcanoDungeon</c>, or <c>null</c>.</returns>
+    /// <returns>Returns <c>Mine</c>, <c>SkullCave</c>, <c>VolcanoDungeon0</c>, or <c>null</c>.</returns>
     public string? GetLocationNameFromLevel(string? locationName)
     {
         const string minePrefix = "UndergroundMine";

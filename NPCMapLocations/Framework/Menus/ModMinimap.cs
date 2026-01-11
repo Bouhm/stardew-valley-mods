@@ -114,9 +114,12 @@ internal class ModMinimap : IDisposable
         this.ScreenBounds.Recalculate();
     }
 
-    public void Resize()
+    /// <summary>Update the minimap position and size for the current config options.</summary>
+    public void ApplyConfig()
     {
         this.ScreenBounds.SetDesiredBounds(
+            x: ModEntry.Config.MinimapX,
+            y: ModEntry.Config.MinimapY,
             width: ModEntry.Config.MinimapWidth * Game1.pixelZoom,
             height: ModEntry.Config.MinimapHeight * Game1.pixelZoom
         );

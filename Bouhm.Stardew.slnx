@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/root/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Bouhm.Shared/Bouhm.Shared.shproj" />
+  <Project Path="LocationCompass/LocationCompass.csproj" />
+  <Project Path="NPCMapLocations/NPCMapLocations.csproj" />
+  <Project Path="PetDogs/PetDogs.csproj" />
+</Solution>

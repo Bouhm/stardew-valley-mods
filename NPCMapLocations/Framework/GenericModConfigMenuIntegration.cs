@@ -115,7 +115,7 @@ internal class GenericModConfigMenuIntegration
             min: 45,
             max: 180,
             interval: 15,
-            formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
+            formatValue: value => I18n.Config_MinimapPixels_Format(size: value)
         );
         menu.AddNumberOption(
             this.Manifest,
@@ -126,7 +126,29 @@ internal class GenericModConfigMenuIntegration
             min: 45,
             max: 180,
             interval: 15,
-            formatValue: value => I18n.Config_MinimapHeightOrWidth_Format(size: value)
+            formatValue: value => I18n.Config_MinimapPixels_Format(size: value)
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapX_Name,
+            tooltip: I18n.Config_MinimapX_Desc,
+            getValue: () => this.Config.MinimapX,
+            setValue: value => this.Config.MinimapX = value,
+            min: 0,
+            max: Game1.graphics.GraphicsDevice.DisplayMode.Width - 45,
+            interval: 15,
+            formatValue: value => I18n.Config_MinimapPixels_Format(size: value)
+        );
+        menu.AddNumberOption(
+            this.Manifest,
+            name: I18n.Config_MinimapY_Name,
+            tooltip: I18n.Config_MinimapY_Desc,
+            getValue: () => this.Config.MinimapY,
+            setValue: value => this.Config.MinimapY = value,
+            min: 0,
+            max: Game1.graphics.GraphicsDevice.DisplayMode.Height - 45,
+            interval: 15,
+            formatValue: value => I18n.Config_MinimapPixels_Format(size: value)
         );
         menu.AddNumberOption(
             this.Manifest,
@@ -142,6 +164,15 @@ internal class GenericModConfigMenuIntegration
 
         // map display
         menu.AddSectionTitle(this.Manifest, I18n.Config_MapDisplayTitle);
+        menu.AddTextOption(
+            this.Manifest,
+            name: I18n.Config_NpcMarkerStyle_Name,
+            tooltip: I18n.Config_NpcMarkerStyle_Desc,
+            getValue: () => this.Config.NpcIconStyle.ToString(),
+            setValue: value => this.Config.NpcIconStyle = Utility.TryParseEnum(value, out NpcIconStyle parsed) ? parsed : NpcIconStyle.Default,
+            allowedValues: [nameof(NpcIconStyle.Default), nameof(NpcIconStyle.Vanilla)],
+            formatAllowedValue: value => I18n.GetByKey($"config.npc-marker-style.options.{value}").Default(value)
+        );
         menu.AddNumberOption(
             this.Manifest,
             name: I18n.Config_NpcMarkerSize_Name,

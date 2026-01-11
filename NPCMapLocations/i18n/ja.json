@@ -49,10 +49,19 @@
 
     "config.minimap-width.name": "ミニマップの幅",
     "config.minimap-width.desc": "画面上に表示されるミニマップの幅をピクセル単位で設定。",
-    "config.minimap-height-or-width.format": "{{size}} ピクセル",
 
     "config.minimap-height.name": "ミニマップの高さ",
     "config.minimap-height.desc": "画面上に表示されるミニマップの高さをピクセル単位で設定。",
+
+    // TODO
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    // TODO
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} ピクセル",
 
     "config.minimap-opacity.name": "ミニマップの不透明度",
     "config.minimap-opacity.desc": "ミニマップのデフォルトの不透明度を0%（透明）～100%（不透明）で設定。",
@@ -61,6 +70,12 @@
     ** Map display section
     ****/
     "config.map-display-title": "マップの表示",
+
+    // TODO
+    "config.npc-marker-style.name": "NPC marker style",
+    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
+    "config.npc-marker-style.options.default": "Default",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
 
     "config.npc-marker-size.name": "マーカーサイズ (住人)",
     "config.npc-marker-size.desc": "デフォルトサイズを基準にした住人のマーカーサイズを設定。",

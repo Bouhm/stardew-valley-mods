@@ -51,10 +51,17 @@
 
     "config.minimap-width.name": "Largura do Mini-Mapa",
     "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
-    "config.minimap-height-or-width.format": "{{size}} pixels",
 
     "config.minimap-height.name": "Altura do Mini-Mapa",
     "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} pixels",
 
     "config.minimap-opacity.name": "Minimap opacity",
     "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
@@ -64,6 +71,11 @@
     ****/
     // TODO
     "config.map-display-title": "Map display",
+
+    "config.npc-marker-style.name": "NPC marker style",
+    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
+    "config.npc-marker-style.options.default": "Default",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
 
     "config.npc-marker-size.name": "Map marker size (NPCs)",
     "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",

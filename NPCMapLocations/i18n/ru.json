@@ -49,10 +49,19 @@
 
     "config.minimap-width.name": "Ширина мини-карты",
     "config.minimap-width.desc": "Ширина мини-карты в пикселях.",
-    "config.minimap-height-or-width.format": "{{size}} пиксель",
 
     "config.minimap-height.name": "Высота мини-карты",
     "config.minimap-height.desc": "Высота мини-карты в пикселях.",
+
+    // TODO
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    // TODO
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} пиксель",
 
     "config.minimap-opacity.name": "Прозрачность мини-карты",
     "config.minimap-opacity.desc": "Уровень прозрачности от 0% (невидимая) до 100% (непрозрачная).",
@@ -61,6 +70,12 @@
     ** Map display section
     ****/
     "config.map-display-title": "Отображение карты",
+
+    // TODO
+    "config.npc-marker-style.name": "NPC marker style",
+    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
+    "config.npc-marker-style.options.default": "Default",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
 
     "config.npc-marker-size.name": "Размер маркеров (NPC)",
     "config.npc-marker-size.desc": "Размер маркеров NPC относительно стандартного.",
