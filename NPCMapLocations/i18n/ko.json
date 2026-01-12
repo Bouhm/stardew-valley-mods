@@ -7,10 +7,10 @@
 
     // special NPC markers
     // TODO
-    "marker-names.bookseller": "Bookseller",
-    "marker-names.merchant": "Traveling merchant",
-    "marker-names.mister-raccoon": "Mr. Raccoon",
-    "marker-names.mrs-raccoon": "Mrs. Raccoon",
+    "marker-names.bookseller": "서적상",
+    "marker-names.merchant": "행상인 마차",
+    "marker-names.mister-raccoon": "너구리",
+    "marker-names.mrs-raccoon": "너구리 아내",
 
 
     /*********
@@ -21,12 +21,12 @@
     ****/
     // formatted values for percentage fields (e.g. map marker size)
     "config.percentage": "{{percent}}%",
-    "config.percentage.default": "default",
+    "config.percentage.default": "기본값",
 
     /****
     ** Controls section
     ****/
-    "config.controls-title": "Controls", // TODO
+    "config.controls-title": "조작", // TODO
 
     "config.menu-key.name": "메뉴 키",
     "config.menu-key.desc": "게임 내 지도가 열려 있는 동안 이 버튼을 누르면 모드 설정이 표시됩니다.",
@@ -44,89 +44,89 @@
     "config.minimap-title": "미니맵",
 
     "config.minimap-enabled.name": "사용하기",
-    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+    "config.minimap-enabled.desc": "미니맵을 화면에 표시할지 여부입니다.",
 
     "config.lock-minimap.name": "미니맵 위치 잠금",
-    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+    "config.lock-minimap.desc": "미니맵을 현재 위치에 고정할지 여부입니다. 고정하면 게임 내에서 우클릭으로 드래그해 이동할 수 없습니다.",
 
     "config.minimap-width.name": "미니맵 가로",
-    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-width.desc": "화면에 표시되는 미니맵의 가로 크기(픽셀)입니다.",
 
     "config.minimap-height.name": "미니맵 세로",
-    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+    "config.minimap-height.desc": "화면에 표시되는 미니맵의 세로 크기(픽셀)입니다.",
 
-    "config.minimap-x.name": "Minimap X position",
-    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+    "config.minimap-x.name": "미니맵 X 위치",
+    "config.minimap-x.desc": "화면에 표시되는 미니맵의 X 좌표(픽셀)입니다.",
 
-    "config.minimap-y.name": "Minimap Y position",
-    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+    "config.minimap-y.name": "미니맵 Y 위치",
+    "config.minimap-y.desc": "화면에 표시되는 미니맵의 Y 좌표(픽셀)입니다.",
 
-    "config.minimap-pixels.format": "{{size}} pixels",
+    "config.minimap-pixels.format": "{{size}} 픽셀",
 
-    "config.minimap-opacity.name": "Minimap opacity",
-    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
+    "config.minimap-opacity.name": "미니맵 투명도",
+    "config.minimap-opacity.desc": "미니맵의 기본 투명도입니다. 0%는 완전 투명하며, 100%는 완전 불투명합니다.",
 
     /****
     ** Map display section
     ****/
     // TODO
-    "config.map-display-title": "Map display",
+    "config.map-display-title": "지도 표시",
 
-    "config.npc-marker-style.name": "NPC marker style",
-    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
-    "config.npc-marker-style.options.default": "Default",
-    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+    "config.npc-marker-style.name": "NPC 마커 스타일",
+    "config.npc-marker-style.desc": "지도에 표시할 NPC 마커 스타일입니다. '기본' 스타일은 지도용으로 최적화된 아이콘 표시 영역을 사용하지만, 커스텀 NPC는 올바르게 표시되지 않을 수 있습니다. '바닐라' 스타일은 게임 기본 NPC 아이콘을 사용하며, 호환성은 더 좋지만 지도에서는 더 작은 아이콘으로 표시됩니다.",
+    "config.npc-marker-style.options.default": "기본",
+    "config.npc-marker-style.options.vanilla": "바닐라(실험적)",
 
-    "config.npc-marker-size.name": "Map marker size (NPCs)",
-    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
+    "config.npc-marker-size.name": "지도 마커 크기(NPC)",
+    "config.npc-marker-size.desc": "기본 크기를 기준으로 한 NPC 지도 마커의 크기입니다.",
 
-    "config.current-player-marker-size.name": "Map marker size (you)",
-    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
+    "config.current-player-marker-size.name": "지도 마커 크기(플레이어)",
+    "config.current-player-marker-size.desc": "기본 크기를 기준으로 한 내 캐릭터의 지도 마커 크기입니다.",
 
-    "config.other-player-marker-size.name": "Map marker size (other players)",
-    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
+    "config.other-player-marker-size.name": "지도 마커 크기(다른 플레이어)",
+    "config.other-player-marker-size.desc": "기본 크기를 기준으로 한 다른 플레이어의 지도 마커 크기입니다.",
 
-    "config.show-farm-buildings.name": "Show farm buildings",
-    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
+    "config.show-farm-buildings.name": "농장 건물 표시",
+    "config.show-farm-buildings.desc": "건설된 농장 건물의 아이콘을 지도에 표시할지 여부입니다.",
 
     /****
     ** Filters section
     ****/
     // TODO
-    "config.filters-title": "Filters",
+    "config.filters-title": "필터",
 
-    "config.spoken-to-filter.name": "NPCs spoken to",
-    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
-    "config.spoken-to-filter.options.all": "Show all",
-    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
-    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
+    "config.spoken-to-filter.name": "대화 여부",
+    "config.spoken-to-filter.desc": "오늘 대화를 나눈 NPC인지 여부에 따라 표시할 NPC를 선택합니다.",
+    "config.spoken-to-filter.options.all": "모두 표시",
+    "config.spoken-to-filter.options.talkedTo": "오늘 대화한 NPC만 표시",
+    "config.spoken-to-filter.options.notTalkedTo": "오늘 대화하지 않은 NPC만 표시",
 
     "config.only-in-location.name": "같은 장소에 있는 주민만 표시",
-    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+    "config.only-in-location.desc": "플레이어와 같은 위치에 있는 주민만 지도에 표시할지 여부입니다.",
 
-    "config.min-hearts.name": "최저 친밀도",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+    "config.min-hearts.name": "친밀도 낮음",
+    "config.min-hearts.desc": "지도에 표시할 NPC의 최소 우정 레벨입니다.",
 
-    "config.max-hearts.name": "최고 친밀도",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
+    "config.max-hearts.name": "친밀도 높음",
+    "config.max-hearts.desc": "지도에 표시할 NPC의 최대 우정 레벨입니다.",
 
     "config.show-quests-or-birthdays.name": "주민 퀘스트나 생일 표시",
-    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+    "config.show-quests-or-birthdays.desc": "NPC의 생일이거나 진행 중인 퀘스트가 있을 때 마커에 아이콘을 표시할지 여부입니다.",
 
     "config.show-hidden-villagers.name": "숨어있는 주민 표시",
-    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+    "config.show-hidden-villagers.desc": "기본적으로 숨겨지는 주민도 지도에 표시할지 여부입니다.",
 
-    "config.show-bookseller.name": "Show bookseller",
-    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+    "config.show-bookseller.name": "서적상 표시",
+    "config.show-bookseller.desc": "서적상이 마을에 있을 때 지도에 표시할지 여부입니다.",
 
     "config.show-traveling-merchant.name": "행상인 마차 표시",
-    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+    "config.show-traveling-merchant.desc": "행상인 마차가 숲에 있을 때 지도에 표시할지 여부입니다.",
 
-    "config.show-children.name": "Show players' children",
-    "config.show-children.desc": "Whether to show players' children on the map.",
+    "config.show-children.name": "농장주의 아이 표시",
+    "config.show-children.desc": "농장주의 아이를 지도에 표시할지 여부입니다.",
 
-    "config.show-horses.name": "말 표시",
-    "config.show-horses.desc": "Whether to show horses on the map.",
+    "config.show-horses.name": "탈 것 표시",
+    "config.show-horses.desc": "말을 지도에 표시할지 여부입니다.",
 
     /****
     ** Include/exclude villagers
@@ -134,23 +134,23 @@
     "config.toggle-villagers-title": "포함/제외할 주민",
 
     // TODO
-    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
-    "config.toggle-npc.options.default": "Default",
-    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.always-visible": "Always visible",
-    "config.toggle-npc.options.always-hidden": "Always hidden",
+    "config.toggle-npc.desc": "{{displayName}}을(를) 지도에 표시할지 여부입니다.",
+    "config.toggle-npc.options.default": "기본값",
+    "config.toggle-npc.options.default-hidden": "기본값(모드에 의해 숨김)",
+    "config.toggle-npc.options.always-visible": "항상 표시",
+    "config.toggle-npc.options.always-hidden": "항상 숨김",
 
     /****
     ** Performance section
     ****/
     // TODO
-    "config.performance-title": "Performance",
+    "config.performance-title": "성능",
 
-    "config.minimap-cache-time.name": "Minimap cache time",
-    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+    "config.minimap-cache-time.name": "미니맵 새로고침 간격",
+    "config.minimap-cache-time.desc": "미니맵을 새로 고치는 시간 간격입니다. 값이 낮을수록 이동이 더 부드럽게 반영되며, 값이 높을수록 성능이 향상될 수 있습니다.",
 
-    "config.npc-cache-time.name": "NPC cache time",
-    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+    "config.npc-cache-time.name": "NPC 새로고침 간격",
+    "config.npc-cache-time.desc": "NPC 마커를 업데이트하는 시간 간격입니다. 값이 낮을수록 지도나 미니맵에서 NPC 이동이 더 부드럽게 표시되며, 값이 높을수록 성능이 향상될 수 있습니다.",
 
-    "config.cache-time.value": "{{seconds}} seconds"
+    "config.cache-time.value": "{{seconds}}초"
 }
