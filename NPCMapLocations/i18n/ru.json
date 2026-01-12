@@ -1,4 +1,4 @@
-﻿{
+{
     /*********
     ** Map options
     *********/
@@ -7,7 +7,7 @@
 
     // special NPC markers
     "marker-names.bookseller": "Продавец книг",
-    "marker-names.merchant": "Странствующий торговец",
+    "marker-names.merchant": "Странствующая торговка",
     "marker-names.mister-raccoon": "Мистер Енот",
     "marker-names.mrs-raccoon": "Миссис Енот",
 
@@ -20,74 +20,71 @@
     ****/
     // formatted values for percentage fields (e.g. map marker size)
     "config.percentage": "{{percent}}%",
-    "config.percentage.default": "По умолчанию",
+    "config.percentage.default": "по умолчанию",
 
     /****
     ** Controls section
     ****/
     "config.controls-title": "Управление",
 
-    "config.menu-key.name": "Кнопка меню",
-    "config.menu-key.desc": "Нажмите эту кнопку при открытой карте, чтобы показать настройки мода.",
+    "config.menu-key.name": "Клавиша меню",
+    "config.menu-key.desc": "Нажмите эту клавишу при открытой внутриигровой карте, чтобы показать настройки мода.",
 
-    "config.minimap-key.name": "Кнопка мини-карты",
-    "config.minimap-key.desc": "Нажмите эту кнопку, чтобы показать/скрыть мини-карту.",
+    "config.minimap-key.name": "Клавиша переключения мини-карты",
+    "config.minimap-key.desc": "Нажмите эту клавишу, чтобы показать или скрыть мини-карту.",
 
-    "config.tooltip-key.name": "Кнопка подсказки",
-    "config.tooltip-key.desc": "Нажмите эту кнопку, чтобы изменить положение подсказки на карте.",
+    "config.tooltip-key.name": "Клавиша подсказки",
+    "config.tooltip-key.desc": "Нажмите эту клавишу, чтобы изменить положение подсказки на карте.",
 
     /****
     ** Minimap section
     ****/
     "config.minimap-title": "Мини-карта",
 
-    "config.minimap-enabled.name": "Включено",
-    "config.minimap-enabled.desc": "Отображать ли мини-карту на экране.",
+    "config.minimap-enabled.name": "Включена",
+    "config.minimap-enabled.desc": "Отображать ли мини-карту.",
 
-    "config.lock-minimap.name": "Закрепить положение Мини-карты",
-    "config.lock-minimap.desc": "Зафиксировать позицию мини-карты (нельзя перемещать).",
+    "config.lock-minimap.name": "Зафиксировать позицию мини-карты",
+    "config.lock-minimap.desc": "Зафиксировать мини-карту в текущей позиции, чтобы нельзя было перемещать её в игре, удерживая правую кнопку мыши.",
 
     "config.minimap-width.name": "Ширина мини-карты",
-    "config.minimap-width.desc": "Ширина мини-карты в пикселях.",
+    "config.minimap-width.desc": "Ширина мини-карты в пикселях при отображении на экране.",
 
     "config.minimap-height.name": "Высота мини-карты",
-    "config.minimap-height.desc": "Высота мини-карты в пикселях.",
+    "config.minimap-height.desc": "Высота мини-карты в пикселях при отображении на экране.",
 
-    // TODO
-    "config.minimap-x.name": "Minimap X position",
-    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+    "config.minimap-x.name": "Позиция мини-карты по X",
+    "config.minimap-x.desc": "Позиция мини-карты по оси X (в пикселях) на экране.",
 
-    // TODO
-    "config.minimap-y.name": "Minimap Y position",
-    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+    "config.minimap-y.name": "Позиция мини-карты по Y",
+    "config.minimap-y.desc": "Позиция мини-карты по оси Y (в пикселях) на экране.",
 
-    "config.minimap-pixels.format": "{{size}} пиксель",
+    "config.minimap-pixels.format": "{{size}} пикселей",
 
-    "config.minimap-opacity.name": "Прозрачность мини-карты",
-    "config.minimap-opacity.desc": "Уровень прозрачности от 0% (невидимая) до 100% (непрозрачная).",
+    "config.minimap-opacity.name": "Непрозрачность мини-карты",
+    "config.minimap-opacity.desc": "Уровень непрозрачности мини-карты от 0% (полностью прозрачная) до 100% (непрозрачная).",
 
     /****
     ** Map display section
     ****/
     "config.map-display-title": "Отображение карты",
 
-    // TODO
-    "config.npc-marker-style.name": "NPC marker style",
-    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
-    "config.npc-marker-style.options.default": "Default",
-    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+    "config.npc-marker-style.name": "Стиль маркеров NPC",
+    "config.npc-marker-style.desc": "Стиль маркеров NPC на карте. Стиль 'По умолчанию' использует индивидуальную обрезку для каждого NPC, но пользовательские NPC могут отображаться некорректно. Стиль 'Ванильный' использует встроенные в игру иконки NPC, что обеспечивает лучшую совместимость, но иконки на карте будут меньше.",
+    "config.npc-marker-style.options.default": "По умолчанию",
+    "config.npc-marker-style.options.vanilla": "Ванильный (экспериментальный)",
 
     "config.npc-marker-size.name": "Размер маркеров (NPC)",
-    "config.npc-marker-size.desc": "Размер маркеров NPC относительно стандартного.",
+    "config.npc-marker-size.desc": "Размер маркеров NPC на карте относительно стандартного.",
 
     "config.current-player-marker-size.name": "Размер маркера (игрок)",
-    "config.current-player-marker-size.desc": "Размер вашего маркера на карте.",
+    "config.current-player-marker-size.desc": "Размер маркера вашего персонажа на карте относительно стандартного.",
 
     "config.other-player-marker-size.name": "Размер маркеров (другие игроки)",
-    "config.other-player-marker-size.desc": "Размер маркеров других игроков.",
+    "config.other-player-marker-size.desc": "Размер маркеров других игроков на карте относительно стандартного.",
 
     "config.show-farm-buildings.name": "Показывать постройки фермы",
-    "config.show-farm-buildings.desc": "Отображать иконки построек фермы на карте.",
+    "config.show-farm-buildings.desc": "Отображать ли иконки построенных зданий фермы на карте.",
 
     /****
     ** Filters section
@@ -95,46 +92,46 @@
     "config.filters-title": "Фильтры",
 
     "config.spoken-to-filter.name": "NPC, с которыми говорили",
-    "config.spoken-to-filter.desc": "Каких NPC показывать в зависимости от общения.",
-    "config.spoken-to-filter.options.all": "Всех",
-    "config.spoken-to-filter.options.talkedTo": "Только тех, с кем говорили",
-    "config.spoken-to-filter.options.notTalkedTo": "Только тех, с кем не говорили",
+    "config.spoken-to-filter.desc": "Выберите, каких NPC показывать в зависимости от того, говорили ли вы с ними сегодня.",
+    "config.spoken-to-filter.options.all": "Показать всех",
+    "config.spoken-to-filter.options.talkedTo": "Только те, с кем говорили сегодня",
+    "config.spoken-to-filter.options.notTalkedTo": "Только те, с кем не говорили сегодня",
 
-    "config.only-in-location.name": "Показывать жителей только в текущей локации",
-    "config.only-in-location.desc": "Показывать жителей только если вы в той же локации.",
+    "config.only-in-location.name": "Только NPC в локации игрока",
+    "config.only-in-location.desc": "Показывать ли жителей на карте только если игрок находится в той же локации, что и они.",
 
     "config.min-hearts.name": "Минимальный уровень сердец",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+    "config.min-hearts.desc": "Минимальный уровень дружбы для отображения NPC на карте.",
 
     "config.max-hearts.name": "Максимальный уровень сердец",
-    "config.max-hearts.desc": "Максимальный уровень дружбы для отображения NPC.",
+    "config.max-hearts.desc": "Максимальный уровень дружбы для отображения NPC на карте.",
 
-    "config.show-quests-or-birthdays.name": "Показать задания или дни рождения",
-    "config.show-quests-or-birthdays.desc": "Отображать иконки для дней рождения и активных квестов.",
+    "config.show-quests-or-birthdays.name": "Показывать задания или дни рождения",
+    "config.show-quests-or-birthdays.desc": "Показывать ли иконку на маркерах NPC, когда у них день рождения или активный квест.",
 
     "config.show-hidden-villagers.name": "Показывать скрытых жителей",
-    "config.show-hidden-villagers.desc": "Отображать NPC, которые обычно скрыты.",
+    "config.show-hidden-villagers.desc": "Показывать ли жителей, которые обычно скрыты.",
 
     "config.show-bookseller.name": "Показывать продавца книг",
-    "config.show-bookseller.desc": "Отображать продавца книг, когда он в городе.",
+    "config.show-bookseller.desc": "Показывать ли продавца книг, когда он в городе.",
 
     "config.show-traveling-merchant.name": "Показывать Странствующего торговца",
-    "config.show-traveling-merchant.desc": "Отображать Странствующего торговца в Лесу.",
+    "config.show-traveling-merchant.desc": "Показывать ли Странствующего торговца, когда он в лесу.",
 
-    "config.show-children.name": "Показывать детей",
-    "config.show-children.desc": "Отображать детей игроков на карте.",
+    "config.show-children.name": "Показывать детей игроков",
+    "config.show-children.desc": "Показывать ли детей игроков на карте.",
 
     "config.show-horses.name": "Показывать лошадей",
-    "config.show-horses.desc": "Отображать лошадей на карте.",
+    "config.show-horses.desc": "Показывать ли лошадей на карте.",
 
     /****
     ** Include/exclude villagers
     ****/
-    "config.toggle-villagers-title": "Добавить/исключить жителей",
+    "config.toggle-villagers-title": "Включить/исключить жителей",
 
-    "config.toggle-npc.desc": "Отображать ли {{displayName}} на карте.",
+    "config.toggle-npc.desc": "Должен ли {{displayName}} отображаться на карте.",
     "config.toggle-npc.options.default": "По умолчанию",
-    "config.toggle-npc.options.default-hidden": "По умолчанию (скрыто)",
+    "config.toggle-npc.options.default-hidden": "По умолчанию (скрыто модами)",
     "config.toggle-npc.options.always-visible": "Всегда видимый",
     "config.toggle-npc.options.always-hidden": "Всегда скрытый",
 
@@ -143,11 +140,11 @@
     ****/
     "config.performance-title": "Производительность",
 
-    "config.minimap-cache-time.name": "Частота обновления мини-карты",
-    "config.minimap-cache-time.desc": "Интервал обновления мини-карты. Меньшие значения - плавнее движение, большие - лучше производительность.",
+    "config.minimap-cache-time.name": "Время кэширования мини-карты",
+    "config.minimap-cache-time.desc": "Время между обновлениями мини-карты. Меньшие значения означают, что мини-карта будет плавнее следовать за движением, а большие значения могут улучшить производительность.",
 
-    "config.npc-cache-time.name": "Частота обновления NPC",
-    "config.npc-cache-time.desc": "Интервал обновления маркеров NPC. Меньшие значения - плавнее движение NPC.",
+    "config.npc-cache-time.name": "Время кэширования NPC",
+    "config.npc-cache-time.desc": "Время между обновлениями маркеров NPC. Меньшие значения означают более плавное движение NPC на карте или мини-карте, а большие значения могут улучшить производительность.",
 
     "config.cache-time.value": "{{seconds}} секунд"
 }
