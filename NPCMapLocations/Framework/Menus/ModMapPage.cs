@@ -80,8 +80,7 @@ internal class ModMapPage : MapPage
             string[] hoveredNames;
             bool hasIndoorCharacters;
             {
-                const int markerWidth = 32;
-                const int markerHeight = 30;
+                Point markerSize = this.GetNpcIconSize();
 
                 string regionId = this.RegionId;
                 Point mousePos = Game1.getMousePosition();
@@ -94,7 +93,7 @@ internal class ModMapPage : MapPage
                 {
                     foreach ((string npcName, NpcMarker npcMarker) in this.NpcMarkers)
                     {
-                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapX, npcMarker.WorldMapY, markerWidth, markerHeight))
+                        if (npcMarker.IsHidden || npcMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, npcMarker.WorldMapX, npcMarker.WorldMapY, markerSize.X, markerSize.Y))
                             continue;
 
                         newHoveredNames.Add(this.GetNpcDisplayName(npcMarker.DisplayName ?? npcName));
@@ -107,7 +106,7 @@ internal class ModMapPage : MapPage
                 {
                     foreach (FarmerMarker farmerMarker in this.FarmerMarkers.Values)
                     {
-                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapX, farmerMarker.WorldMapY, markerWidth / 2, markerHeight / 2))
+                        if (farmerMarker.WorldMapRegionId != regionId || !this.IsMapPixelUnderCursor(mousePos, farmerMarker.WorldMapX, farmerMarker.WorldMapY, markerSize.X, markerSize.Y))
                             continue;
 
                         newHoveredNames.Add(farmerMarker.Name);
@@ -254,8 +253,7 @@ internal class ModMapPage : MapPage
 
         // Draw indoor icon
         if (this.HasIndoorCharacter && !string.IsNullOrEmpty(this.HoveredNames))
-            b.Draw(Game1.mouseCursors, this.IndoorIconVector, new Rectangle(448, 64, 32, 32), Color.White, 0f,
-                Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+            b.Draw(Game1.mouseCursors, this.IndoorIconVector, new Rectangle(448, 64, 32, 32), Color.White, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
     }
 
 
@@ -299,6 +297,8 @@ internal class ModMapPage : MapPage
                 .Where(p => p.Value.WorldMapRegionId == regionId)
                 .OrderBy(p => p.Value.Layer);
 
+            Point markerSize = this.GetNpcIconSize();
+
             foreach ((string name, NpcMarker marker) in sortedMarkers)
             {
                 // skip if invalid
@@ -326,22 +326,11 @@ internal class ModMapPage : MapPage
                 Rectangle iconDestinationRect;
                 {
                     Rectangle iconSpriteRect = marker.GetSpriteSourceRect();
-                    float iconScale;
+                    float iconScale = iconSpriteRect.Width > iconSpriteRect.Height
+                        ? markerSize.X / ((float)iconSpriteRect.Width)
+                        : markerSize.Y / ((float)iconSpriteRect.Height);
 
-                    if (ModEntry.Config.NpcIconStyle == NpcIconStyle.Vanilla)
-                    {
-                        iconScale = iconSpriteRect.Width > iconSpriteRect.Height
-                            ? 36f / iconSpriteRect.Width
-                            : 34f / iconSpriteRect.Height;
-                    }
-                    else
-                    {
-                        iconScale = iconSpriteRect.Width > iconSpriteRect.Height
-                            ? 32f / iconSpriteRect.Width
-                            : 30f / iconSpriteRect.Height;
-                    }
-
-                        float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
+                    float iconWidth = (int)(iconSpriteRect.Width * iconScale * scaleMultiplier);
                     float iconHeight = (int)(iconSpriteRect.Height * iconScale * scaleMultiplier);
 
                     iconDestinationRect = new Rectangle(
@@ -505,9 +494,17 @@ internal class ModMapPage : MapPage
         int y = this.mapBounds.Y + worldMapY;
 
         return
-            mousePos.X >= x
-            && mousePos.X <= x + markerWidth
-            && mousePos.Y >= y
-            && mousePos.Y <= y + markerHeight;
+            mousePos.X >= x - (markerWidth / 2)
+            && mousePos.X <= x + (markerWidth / 2)
+            && mousePos.Y >= y - (markerHeight / 2)
+            && mousePos.Y <= y + (markerHeight / 2);
+    }
+
+    /// <summary>Get the NPC icon sprite size, before scaling.</summary>
+    private Point GetNpcIconSize()
+    {
+        return ModEntry.Config.NpcIconStyle == NpcIconStyle.Vanilla
+            ? new Point(36, 34)
+            : new Point(32, 30);
     }
 }
