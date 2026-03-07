@@ -6,7 +6,6 @@
     "extra.label": "기타 설정:",
 
     // special NPC markers
-    // TODO
     "marker-names.bookseller": "서적상",
     "marker-names.merchant": "행상인 마차",
     "marker-names.mister-raccoon": "너구리",
@@ -26,7 +25,7 @@
     /****
     ** Controls section
     ****/
-    "config.controls-title": "조작", // TODO
+    "config.controls-title": "조작",
 
     "config.menu-key.name": "메뉴 키",
     "config.menu-key.desc": "게임 내 지도가 열려 있는 동안 이 버튼을 누르면 모드 설정이 표시됩니다.",
@@ -40,7 +39,6 @@
     /****
     ** Minimap section
     ****/
-    // TODO
     "config.minimap-title": "미니맵",
 
     "config.minimap-enabled.name": "사용하기",
@@ -69,7 +67,6 @@
     /****
     ** Map display section
     ****/
-    // TODO
     "config.map-display-title": "지도 표시",
 
     "config.npc-marker-style.name": "NPC 마커 스타일",
@@ -92,7 +89,6 @@
     /****
     ** Filters section
     ****/
-    // TODO
     "config.filters-title": "필터",
 
     "config.spoken-to-filter.name": "대화 여부",
@@ -133,7 +129,6 @@
     ****/
     "config.toggle-villagers-title": "포함/제외할 주민",
 
-    // TODO
     "config.toggle-npc.desc": "{{displayName}}을(를) 지도에 표시할지 여부입니다.",
     "config.toggle-npc.options.default": "기본값",
     "config.toggle-npc.options.default-hidden": "기본값(모드에 의해 숨김)",
@@ -143,7 +138,6 @@
     /****
     ** Performance section
     ****/
-    // TODO
     "config.performance-title": "성능",
 
     "config.minimap-cache-time.name": "미니맵 새로고침 간격",
