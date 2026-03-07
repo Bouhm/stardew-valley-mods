@@ -43,6 +43,7 @@ public static class ModConstants
         ["Gunther"] = 3,
         ["Haley"] = 2,
         ["Harvey"] = -1,
+        ["Fizz"] = 4,
         ["Jas"] = 7,
         ["Jodi"] = 3,
         ["Kent"] = -1,

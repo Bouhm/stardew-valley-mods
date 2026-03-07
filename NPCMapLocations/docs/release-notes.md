@@ -3,6 +3,7 @@
 # Release notes
 ## Upcoming release
 * Improved NPC marker hover positions for tooltips.
+* Fixed Fizz icon crop in default mode.
 * Improved translations. Thanks to ellatuk (updated Russian), jjongleee (updated Korean), and shirutan (updated Japanese)!
 
 ## 3.5.0
