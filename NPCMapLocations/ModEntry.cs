@@ -941,17 +941,7 @@ public class ModEntry : Mod
             if (locationName != null)
                 npcMarker.WorldMapPosition = GetWorldMapPosition(locationName, npc.TilePoint.X, npc.TilePoint.Y, this.Customizations.LocationExclusions);
 
-            // apply NPC conditions
-            if (!Config.ShowHiddenVillagers)
-            {
-                if (this.Data.Npcs.TryGetValue(npc.Name, out DataNpcModel? data) && data.Visible != null)
-                {
-                    bool hidden = !GameStateQuery.CheckConditions(data.Visible);
-                    this.SetMarkerHiddenIfNeeded(npcMarker, npc.Name, hidden);
-                }
-            }
-
-            // apply 'show NPCs in location' option
+            // check if NPC hidden
             {
                 bool isSameLocation = false;
 
@@ -1051,7 +1041,14 @@ public class ModEntry : Mod
 
         bool shownForQuest = ModEntry.Config.ShowQuests && (marker.HasQuest || marker.IsBirthday);
 
-        if (ModEntry.ShouldExcludeNpc(name, out string? reason))
+        if (!Config.ShowHiddenVillagers && this.Data.Npcs.TryGetValue(name, out DataNpcModel? data) && !GameStateQuery.CheckConditions(data.Visible))
+        {
+            Hide(GameStateQuery.IsImmutablyFalse(data.Visible)
+                ? "hidden by default"
+                : $"conditional by default (\"{data.Visible}\")"
+            );
+        }
+        else if (ModEntry.ShouldExcludeNpc(name, out string? reason))
             Hide($"hidden per config ({reason})");
         else if (!shownForQuest && Config.FilterNpcsSpokenTo != null && Config.FilterNpcsSpokenTo != Game1.player.hasTalkedToFriendToday(name))
             Hide($"hidden per config ({(Config.FilterNpcsSpokenTo is true ? "didn't talk" : "talked")} to them today)");
