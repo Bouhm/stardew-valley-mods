@@ -45,10 +45,10 @@
 
     "config.minimap-enabled.name": "Ativo",
     "config.minimap-enabled.desc": "Define se o minimapa deve ser exibido.",
-     
+
     "config.lock-minimap.name": "Travar a Posição do Mini-Mapa",
     "config.lock-minimap.desc": "Define se o minimapa deve ficar travado na posição atual, impedindo que ele seja movido no jogo ao segurar o botão direito do mouse e arrastá-lo.",
-     
+
     "config.minimap-width.name": "Largura do Mini-Mapa",
     "config.minimap-width.desc": "Define a largura, em pixels, do minimapa quando exibido na tela.",
 
@@ -79,7 +79,7 @@
 
     "config.npc-marker-size.name": "Tamanho do marcador no mapa (NPCs)",
     "config.npc-marker-size.desc": "Define o tamanho dos marcadores de NPC no mapa em relação ao tamanho padrão.",
-     
+
     "config.current-player-marker-size.name": "Tamanho do marcador no mapa (você)",
     "config.current-player-marker-size.desc": "Define o tamanho do marcador do seu personagem no mapa em relação ao tamanho padrão.",
 
