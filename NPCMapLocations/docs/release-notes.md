@@ -5,7 +5,7 @@
 * Improved NPC marker hover positions for tooltips.
 * Fixed hidden NPCs not hidden correctly in 3.5.0.
 * Fixed Fizz icon crop in default mode.
-* Improved translations. Thanks to ellatuk (updated Russian), jjongleee (updated Korean), and shirutan (updated Japanese)!
+* Improved translations. Thanks to ellatuk (updated Russian), jjongleee (updated Korean), Maatsuki (updated Portuguese), and shirutan (updated Japanese)!
 
 ## 3.5.0
 Released 11 January 2026 for SMAPI 4.1.10 or later. Updated by Pathoschild.

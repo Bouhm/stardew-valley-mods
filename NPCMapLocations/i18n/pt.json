@@ -6,7 +6,6 @@
     "extra.label": "Configurações Extras:",
 
     // special NPC markers
-    // TODO
     "marker-names.bookseller": "Vendedor de Livros",
     "marker-names.merchant": "Mercadora Viajante",
     "marker-names.mister-raccoon": "Sr. Guaxinim",
@@ -26,7 +25,7 @@
     /****
     ** Controls section
     ****/
-    "config.controls-title": "Controles", // TODO
+    "config.controls-title": "Controles",
 
     "config.menu-key.name": "Tecla do Menu",
     "config.menu-key.desc": "Pressione esta tecla enquanto o mapa do mundo está aberto para mostrar as configurações do mod.",
@@ -40,7 +39,6 @@
     /****
     ** Minimap section
     ****/
-    // TODO
     "config.minimap-title": "Mini-Mapa",
 
     "config.minimap-enabled.name": "Ativo",
@@ -69,7 +67,6 @@
     /****
     ** Map display section
     ****/
-    // TODO
     "config.map-display-title": "Exibição do mapa",
 
     "config.npc-marker-style.name": "Estilo do marcador de NPC",
@@ -92,7 +89,6 @@
     /****
     ** Filters section
     ****/
-    // TODO
     "config.filters-title": "Filtros",
 
     "config.spoken-to-filter.name": "NPCs com quem você falou",
@@ -133,7 +129,6 @@
     ****/
     "config.toggle-villagers-title": "Incluir/Excluir Moradores",
 
-    // TODO
     "config.toggle-npc.desc": "Define se {{displayName}} deve ser exibido no mapa.",
     "config.toggle-npc.options.default": "Padrão",
     "config.toggle-npc.options.default-hidden": "Padrão (oculto por mods)",
@@ -143,7 +138,6 @@
     /****
     ** Performance section
     ****/
-    // TODO
     "config.performance-title": "Desempenho",
 
     "config.minimap-cache-time.name": "Tempo de cache do Mini-Mapa",
