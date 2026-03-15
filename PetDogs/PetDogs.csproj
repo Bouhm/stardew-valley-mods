@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 
@@ -25,7 +25,8 @@
       <SourcePath>$(TargetDir)\$(ContentPackFolderName)</SourcePath>
       <StagingPath>$(TargetDir)\packaged\$(ContentPackFolderName)</StagingPath>
       <InstalledPath>$(GameModsPath)\$(ContentPackFolderName)</InstalledPath>
-      <ZippedPath>$(SolutionDir)\_releases\$(ContentPackFolderName) $(Version).zip</ZippedPath>
+      <ZipToFolderPath>$(SolutionDir)\_releases</ZipToFolderPath>
+      <ZipToFileName>$(ContentPackFolderName) $(Version).zip</ZipToFileName>
     </PropertyGroup>
 
     <!--create release folder-->
@@ -47,7 +48,8 @@
     <Copy SourceFiles="@(StagingDirFiles)" DestinationFolder="$(InstalledPath)\%(RecursiveDir)" />
 
     <!--create release zip-->
-    <Delete Files="$(ZippedPath)" />
-    <ZipDirectory SourceDirectory="$(StagingPath)\.." DestinationFile="$(ZippedPath)" />
+    <MakeDir Directories="$(ZipToFolderPath)" />
+    <Delete Files="$(ZipToFolderPath)\$(ZipToFileName)" />
+    <ZipDirectory SourceDirectory="$(StagingPath)\.." DestinationFile="$(ZipToFolderPath)\$(ZipToFileName)" />
   </Target>
 </Project>

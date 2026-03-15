@@ -1,6 +1,16 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.5.1
+Released 15 March 2026 for SMAPI 4.1.10 or later. Updated by Pathoschild.
+
+* Improved NPC marker hover positions for tooltips.
+* NPC Map Locations downloads are now created via [automated and attested builds](https://www.patreon.com/posts/automated-builds-148417912).  
+  _This guarantees that the download only contains what's in the public source code and hasn't been tampered with._
+* Fixed hidden NPCs not hidden correctly in 3.5.0.
+* Fixed Fizz icon crop in default mode.
+* Improved translations. Thanks to ellatuk (updated Russian), jjongleee (updated Korean), Maatsuki (updated Portuguese), and shirutan (updated Japanese)!
+
 ## 3.5.0
 Released 11 January 2026 for SMAPI 4.1.10 or later. Updated by Pathoschild.
 

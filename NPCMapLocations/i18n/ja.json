@@ -53,13 +53,11 @@
     "config.minimap-height.name": "ミニマップの高さ",
     "config.minimap-height.desc": "画面上に表示されるミニマップの高さをピクセル単位で設定。",
 
-    // TODO
-    "config.minimap-x.name": "Minimap X position",
-    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+    "config.minimap-x.name": "ミニマップのX座標",
+    "config.minimap-x.desc": "画面上に表示されるミニマップのX座標をピクセル単位で設定。",
 
-    // TODO
-    "config.minimap-y.name": "Minimap Y position",
-    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+    "config.minimap-y.name": "ミニマップのY座標",
+    "config.minimap-y.desc": "画面上に表示されるミニマップのY座標をピクセル単位で設定。",
 
     "config.minimap-pixels.format": "{{size}} ピクセル",
 
@@ -71,11 +69,10 @@
     ****/
     "config.map-display-title": "マップの表示",
 
-    // TODO
-    "config.npc-marker-style.name": "NPC marker style",
-    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
-    "config.npc-marker-style.options.default": "Default",
-    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+    "config.npc-marker-style.name": "マーカースタイル (住人)",
+    "config.npc-marker-style.desc": "マップマーカーの描画スタイル。「デフォルト」スタイルでは、各住人に合わせて切り抜き位置が調整されますが、カスタム住人は正しく表示されない場合があります。「バニラ」スタイルでは、ゲームに標準装備されている住人アイコンを使用します。互換性は高くなりますが、マップ上のアイコンは小さくなります。",
+    "config.npc-marker-style.options.default": "デフォルト",
+    "config.npc-marker-style.options.vanilla": "バニラ (実験的)",
 
     "config.npc-marker-size.name": "マーカーサイズ (住人)",
     "config.npc-marker-size.desc": "デフォルトサイズを基準にした住人のマーカーサイズを設定。",

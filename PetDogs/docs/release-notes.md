@@ -1,13 +1,19 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## 3.0.2
+Released 15 March 2026 for Content Patcher 2.0.0 or later. Updated by Pathoschild.
+
+* Bouhm's Pet Dogs downloads are now created via [automated and attested builds](https://www.patreon.com/posts/automated-builds-148417912).  
+  _This guarantees that the download only contains what's in the public source code and hasn't been tampered with._
+
 ## 3.0.1
-Released 25 May 2025 for SMAPI 4.0.0 or later. Updated by Pathoschild.
+Released 25 May 2025 for Content Patcher 2.0.0 or later. Updated by Pathoschild.
 
 * Internal changes to simplify maintenance.
 
 ## 3.0.0
-Released 19 March 2024 for SMAPI 4.0.0 or later. Updated by Pathoschild.
+Released 19 March 2024 for Content Patcher 2.0.0 or later. Updated by Pathoschild.
 
 * Updated for Stardew Valley 1.6 and Content Patcher 2.0.0.
 * The mod now adds separate dog breeds to the options you can choose, instead of replacing the default dogs.
@@ -18,7 +24,7 @@ If you previously used the mod, see [_use pet breeds_ in the readme](README.md#u
 one of the new breeds.
 
 ## 2.0.5
-Released 25 June 2023 for SMAPI 3.14.0 or later. Updated by Pathoschild.
+Released 25 June 2023 for Content Patcher 1.19.0 or later. Updated by Pathoschild.
 
 * Improved translations. Thanks to Hacktix (added German)!
 
