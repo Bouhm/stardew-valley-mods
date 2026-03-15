@@ -31,7 +31,7 @@ internal static class SummaryCommand
     }
 
     /// <summary>Handle the console command.</summary>
-    /// <param name="monitor">The monitor with which to write output..</param>
+    /// <param name="monitor">The monitor with which to write output.</param>
     /// <param name="locationUtil">Scans and maps locations in the game world.</param>
     /// <param name="customizations">Manages customized map recolors, NPCs, sprites, names, etc.</param>
     /// <param name="npcMarkers">The tracked NPC markers.</param>

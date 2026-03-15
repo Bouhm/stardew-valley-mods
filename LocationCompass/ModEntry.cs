@@ -401,7 +401,7 @@ public class ModEntry : Mod
             {
                 // Indoor locations
                 // Intended behavior is for all characters in a building, including rooms within the building
-                // to show up when the player is outside. So even if an character is not in the same location
+                // to show up when the player is outside. So even if a character is not in the same location
                 // ex. Maru in ScienceHouse, Sebastian in SebastianRoom, Sebastian will be placed in
                 // ScienceHouse such that the player will know Sebastian is in that building.
                 // Once the player is actually inside, Sebastian will be correctly placed in SebastianRoom.
