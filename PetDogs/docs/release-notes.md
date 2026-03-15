@@ -1,6 +1,10 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
+## Upcoming release
+* Bouhm's Pet Dogs downloads are now created via [automated and attested builds](https://www.patreon.com/posts/automated-builds-148417912).  
+  _This guarantees that the download only contains what's in the public source code and hasn't been tampered with._
+
 ## 3.0.1
 Released 25 May 2025 for SMAPI 4.0.0 or later. Updated by Pathoschild.
 
