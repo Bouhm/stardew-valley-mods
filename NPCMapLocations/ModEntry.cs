@@ -415,6 +415,7 @@ public class ModEntry : Mod
 
         this.ResetMarkers();
         this.UpdateMarkers(true);
+        this.RegisterConfigMenu(); // reset NPCs shown in config UI
 
         this.Minimap.Value?.Dispose();
         this.Minimap.Value = new ModMinimap(this.CreateMapPage);
