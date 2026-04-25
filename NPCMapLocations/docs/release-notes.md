@@ -1,7 +1,9 @@
 ﻿﻿﻿[← back to readme](README.md)
 
 # Release notes
-## Upcoming release
+## 3.5.2
+Released 25 April 2026 for SMAPI 4.1.10 or later. Updated by Pathoschild.
+
 * Fixed empty "include/exclude villagers" list in the config UI in some cases when it's opened through Generic Mod Config Menu instead of the map page.
 
 ## 3.5.1
