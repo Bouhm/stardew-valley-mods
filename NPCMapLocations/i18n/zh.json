@@ -1,155 +1,150 @@
-﻿{
+{
     /*********
-    ** Map options (地图选项)
+    ** 地图选项
     *********/
-    // extra settings section (额外设置选项)
-    "extra.label": "额外设定:",
+    // 额外设置区域
+    "extra.label": "额外设置：",
 
-    // special NPC markers
-    "marker-names.bookseller": "书摊老板",
+    // 特殊NPC标记名称
+    "marker-names.bookseller": "书商",
     "marker-names.merchant": "旅行商人",
-    "marker-names.mister-raccoon": "Mr. Raccoon", // TODO
-    "marker-names.mrs-raccoon": "Mrs. Raccoon", // TODO
+    "marker-names.mister-raccoon": "浣熊先生",
+    "marker-names.mrs-raccoon": "浣熊夫人",
 
 
     /*********
-    ** Generic Mod Config Menu UI
+    ** 通用模组配置菜单界面
     *********/
     /****
-    ** Generic
+    ** 通用设置
     ****/
-    // formatted values for percentage fields (e.g. map marker size)
+    // 百分比字段的格式化值（例如：地图标记大小）
     "config.percentage": "{{percent}}%",
-    "config.percentage.default": "default",
+    "config.percentage.default": "默认",
 
     /****
-    ** Controls section
+    ** 控制设置区域
     ****/
-    "config.controls-title": "Controls", // TODO
+    "config.controls-title": "控制设置",
 
-    "config.menu-key.name": "打开菜单",
-    "config.menu-key.desc": "在游戏内地图中按此快捷键以打开Mod设置界面",
+    "config.menu-key.name": "菜单快捷键",
+    "config.menu-key.desc": "在游戏内打开地图时，按下此按键可显示模组设置界面。",
 
-    "config.minimap-key.name": "切换小地图显示",
-    "config.minimap-key.desc": "按此快捷键以显示/隐藏小地图",
+    "config.minimap-key.name": "小地图切换快捷键",
+    "config.minimap-key.desc": "按下此按键可显示或隐藏小地图。",
 
-    "config.tooltip-key.name": "切换提示条位置",
-    "config.tooltip-key.desc": "在地图界面按此快捷键以切换角色提示条位置",
+    "config.tooltip-key.name": "提示框切换快捷键",
+    "config.tooltip-key.desc": "在地图视图下，按下此按键可切换提示框的显示位置。",
 
     /****
-    ** Minimap section
+    ** 小地图设置区域
     ****/
-    // TODO
     "config.minimap-title": "小地图",
 
-    "config.minimap-enabled.name": "启用",
-    "config.minimap-enabled.desc": "Whether the minimap should be displayed.",
+    "config.minimap-enabled.name": "启用小地图",
+    "config.minimap-enabled.desc": "是否显示小地图。",
 
     "config.lock-minimap.name": "锁定小地图位置",
-    "config.lock-minimap.desc": "Whether the minimap should be locked in its current position, so you can't move it in-game by holding right-click and dragging it.",
+    "config.lock-minimap.desc": "是否将小地图锁定在当前位置（锁定后无法通过右键按住拖拽的方式在游戏内移动小地图）。",
 
-    "config.minimap-width.name": "小地图宽",
-    "config.minimap-width.desc": "The width in pixels of the minimap when shown on-screen.",
+    "config.minimap-width.name": "小地图宽度",
+    "config.minimap-width.desc": "小地图在屏幕上显示时的宽度（以像素为单位）。",
 
-    "config.minimap-height.name": "小地图高",
-    "config.minimap-height.desc": "The height in pixels of the minimap when shown on-screen.",
+    "config.minimap-height.name": "小地图高度",
+    "config.minimap-height.desc": "小地图在屏幕上显示时的高度（以像素为单位）。",
 
-    "config.minimap-x.name": "Minimap X position",
-    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+    "config.minimap-x.name": "小地图X轴坐标",
+    "config.minimap-x.desc": "小地图在屏幕上显示时的X轴像素坐标。",
 
-    "config.minimap-y.name": "Minimap Y position",
-    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+    "config.minimap-y.name": "小地图Y轴坐标",
+    "config.minimap-y.desc": "小地图在屏幕上显示时的Y轴像素坐标。",
 
-    "config.minimap-pixels.format": "{{size}} pixels",
+    "config.minimap-pixels.format": "{{size}} 像素",
 
-    "config.minimap-opacity.name": "Minimap opacity",
-    "config.minimap-opacity.desc": "The default opacity level for the minimap, as a value between 0% (transparent) and 100% (opaque).",
-
-    /****
-    ** Map display section
-    ****/
-    // TODO
-    "config.map-display-title": "Map display",
-
-    "config.npc-marker-style.name": "NPC marker style",
-    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
-    "config.npc-marker-style.options.default": "Default",
-    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
-
-    "config.npc-marker-size.name": "Map marker size (NPCs)",
-    "config.npc-marker-size.desc": "The size of NPC map markers relative to the default.",
-
-    "config.current-player-marker-size.name": "Map marker size (you)",
-    "config.current-player-marker-size.desc": "The size of your character's map marker relative to the default.",
-
-    "config.other-player-marker-size.name": "Map marker size (other players)",
-    "config.other-player-marker-size.desc": "The size of other players' map marker relative to the default.",
-
-    "config.show-farm-buildings.name": "Show farm buildings",
-    "config.show-farm-buildings.desc": "Whether to show icons for constructed farm buildings on the map.",
+    "config.minimap-opacity.name": "小地图不透明度",
+    "config.minimap-opacity.desc": "小地图的默认不透明度（取值范围：0%[完全透明] - 100%[完全不透明]）。",
 
     /****
-    ** Filters section
+    ** 地图显示设置区域
     ****/
-    // TODO
-    "config.filters-title": "Filters",
+    "config.map-display-title": "地图显示",
 
-    "config.spoken-to-filter.name": "NPCs spoken to",
-    "config.spoken-to-filter.desc": "Choose which NPCs are shown based on whether you've spoken to them today.",
-    "config.spoken-to-filter.options.all": "Show all",
-    "config.spoken-to-filter.options.talkedTo": "Only show those spoken to today",
-    "config.spoken-to-filter.options.notTalkedTo": "Only show those not spoken to today",
+    "config.npc-marker-style.name": "NPC标记样式",
+    "config.npc-marker-style.desc": "绘制NPC地图标记时使用的样式。「默认」样式为每个NPC适配了专属的裁剪位置，但自定义NPC可能显示异常；「原版」样式使用游戏内置的NPC图标，兼容性更好，但地图上的图标尺寸会更小。",
+    "config.npc-marker-style.options.default": "默认",
+    "config.npc-marker-style.options.vanilla": "原版（实验性）",
 
-    "config.only-in-location.name": "只显示玩家所在位置的村民",
-    "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
+    "config.npc-marker-size.name": "NPC地图标记大小",
+    "config.npc-marker-size.desc": "NPC地图标记相对于默认尺寸的缩放比例。",
 
-    "config.min-hearts.name": "最小好感度",
-    "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
+    "config.current-player-marker-size.name": "自身地图标记大小",
+    "config.current-player-marker-size.desc": "你所操控角色的地图标记相对于默认尺寸的缩放比例。",
 
-    "config.max-hearts.name": "最大好感度",
-    "config.max-hearts.desc": "The maximum friendship level for NPCs shown on the map.",
+    "config.other-player-marker-size.name": "其他玩家地图标记大小",
+    "config.other-player-marker-size.desc": "其他玩家角色的地图标记相对于默认尺寸的缩放比例。",
 
-    "config.show-quests-or-birthdays.name": "显示任务或生日",
-    "config.show-quests-or-birthdays.desc": "Whether to show an icon on NPC markers when it's their birthday or they have an active quest.",
+    "config.show-farm-buildings.name": "显示农场建筑",
+    "config.show-farm-buildings.desc": "是否在地图上显示已建造的农场建筑图标。",
 
-    "config.show-hidden-villagers.name": "显示隐藏的村民",
-    "config.show-hidden-villagers.desc": "Whether to show villagers that would normally be hidden.",
+    /****
+    ** 筛选设置区域
+    ****/
+    "config.filters-title": "筛选条件",
 
-    "config.show-bookseller.name": "Show bookseller",
-    "config.show-bookseller.desc": "Whether to show the bookseller when he's in town.",
+    "config.spoken-to-filter.name": "按对话状态筛选NPC",
+    "config.spoken-to-filter.desc": "根据是否与NPC今日对话过，筛选地图上显示的NPC。",
+    "config.spoken-to-filter.options.all": "显示全部",
+    "config.spoken-to-filter.options.talkedTo": "仅显示今日已对话的",
+    "config.spoken-to-filter.options.notTalkedTo": "仅显示今日未对话的",
+
+    "config.only-in-location.name": "仅显示同区域NPC",
+    "config.only-in-location.desc": "是否仅在玩家与村民处于同一区域时，才在地图上显示该村民。",
+
+    "config.min-hearts.name": "最低好感度",
+    "config.min-hearts.desc": "地图上显示的NPC所需满足的最低好感度等级。",
+
+    "config.max-hearts.name": "最高好感度",
+    "config.max-hearts.desc": "地图上显示的NPC所需满足的最高好感度等级。",
+
+    "config.show-quests-or-birthdays.name": "显示任务/生日标记",
+    "config.show-quests-or-birthdays.desc": "当NPC生日当天或有活跃任务时，是否在其地图标记上显示特殊图标。",
+
+    "config.show-hidden-villagers.name": "显示隐藏村民",
+    "config.show-hidden-villagers.desc": "是否显示通常情况下隐藏的村民。",
+
+    "config.show-bookseller.name": "显示书商",
+    "config.show-bookseller.desc": "书商在城镇时，是否在地图上显示他。",
 
     "config.show-traveling-merchant.name": "显示旅行商人",
-    "config.show-traveling-merchant.desc": "Whether to show the Traveling Merchant when she's in the forest.",
+    "config.show-traveling-merchant.desc": "旅行商人在森林时，是否在地图上显示她。",
 
-    "config.show-children.name": "Show players' children",
-    "config.show-children.desc": "Whether to show players' children on the map.",
+    "config.show-children.name": "显示玩家子女",
+    "config.show-children.desc": "是否在地图上显示玩家的子女。",
 
-    "config.show-horses.name": "显示马",
-    "config.show-horses.desc": "Whether to show horses on the map.",
-
-    /****
-    ** Include/exclude villagers
-    ****/
-    "config.toggle-villagers-title": "显示村民列表",
-
-    // TODO
-    "config.toggle-npc.desc": "Whether {{displayName}} should be visible on the map.",
-    "config.toggle-npc.options.default": "Default",
-    "config.toggle-npc.options.default-hidden": "Default (hidden by mods)",
-    "config.toggle-npc.options.always-visible": "Always visible",
-    "config.toggle-npc.options.always-hidden": "Always hidden",
+    "config.show-horses.name": "显示马匹",
+    "config.show-horses.desc": "是否在地图上显示马匹。",
 
     /****
-    ** Performance section
+    ** 村民显示/隐藏设置
     ****/
-    // TODO
-    "config.performance-title": "Performance",
+    "config.toggle-villagers-title": "村民显示开关",
 
-    "config.minimap-cache-time.name": "Minimap cache time",
-    "config.minimap-cache-time.desc": "The time between each minimap render update. Lower values mean the minimap will follow your movement more smoothly, while higher values may improve performance.",
+    "config.toggle-npc.desc": "是否在地图上显示{{displayName}}。",
+    "config.toggle-npc.options.default": "默认",
+    "config.toggle-npc.options.default-hidden": "默认（被模组隐藏）",
+    "config.toggle-npc.options.always-visible": "始终显示",
+    "config.toggle-npc.options.always-hidden": "始终隐藏",
 
-    "config.npc-cache-time.name": "NPC cache time",
-    "config.npc-cache-time.desc": "The time between each NPC marker update. Lower values mean smoother NPC movement on the map or minimap, while higher values may improve performance.",
+    /****
+    ** 性能设置区域
+    ****/
+    "config.performance-title": "性能设置",
 
-    "config.cache-time.value": "{{seconds}} seconds"
+    "config.minimap-cache-time.name": "小地图缓存更新间隔",
+    "config.minimap-cache-time.desc": "小地图渲染更新的时间间隔。数值越小，小地图跟随角色移动越流畅；数值越大，可能提升游戏性能。",
+
+    "config.npc-cache-time.name": "NPC缓存更新间隔",
+    "config.npc-cache-time.desc": "NPC标记更新的时间间隔。数值越小，NPC在地图/小地图上的移动显示越流畅；数值越大，可能提升游戏性能。",
+
+    "config.cache-time.value": "{{seconds}} 秒"
 }
