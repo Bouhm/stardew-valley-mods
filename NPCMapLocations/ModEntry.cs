@@ -1055,6 +1055,8 @@ public class ModEntry : Mod
             Hide($"hidden per config ({(Config.FilterNpcsSpokenTo is true ? "didn't talk" : "talked")} to them today)");
         else if (Config.OnlySameLocation && !isSameLocation)
             Hide("hidden per config (not in same location)");
+        else if (Config.OnlyKnown && !Game1.player.friendshipData.ContainsKey(name))
+            Hide("hidden per config (not met yet)");
         else if (Config.HeartLevelMin > 0 || Config.HeartLevelMax < ModConfig.MaxPossibleHeartLevel)
         {
             int hearts = Game1.player.getFriendshipHeartLevelForNPC(name);

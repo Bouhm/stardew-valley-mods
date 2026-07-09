@@ -100,6 +100,10 @@
     "config.only-in-location.name": "같은 장소에 있는 주민만 표시",
     "config.only-in-location.desc": "플레이어와 같은 위치에 있는 주민만 지도에 표시할지 여부입니다.",
 
+    // TODO
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "친밀도 낮음",
     "config.min-hearts.desc": "지도에 표시할 NPC의 최소 우정 레벨입니다.",
 

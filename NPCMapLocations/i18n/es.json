@@ -104,6 +104,10 @@
     "config.only-in-location.name": "Solo mostrar aldeanos en la ubicación del jugador",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
+    // TODO
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "Nivel mínimo de corazones",
     "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
 

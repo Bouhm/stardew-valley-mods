@@ -100,6 +100,10 @@
     "config.only-in-location.name": "Mostrar Somente Moradores na Localização do Jogador",
     "config.only-in-location.desc": "Define se os moradores serão exibidos no mapa apenas quando o jogador estiver na mesma localização que eles.",
 
+    // TODO
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "Nível Mínimo de Relacionamento",
     "config.min-hearts.desc": "Define o nível mínimo de amizade para que os NPCs sejam exibidos no mapa.",
 

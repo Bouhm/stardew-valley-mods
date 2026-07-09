@@ -100,6 +100,10 @@
     "config.only-in-location.name": "プレイヤーがいる場所の住人のみ表示",
     "config.only-in-location.desc": "プレイヤーと同じ場所にいる住人だけをマップに表示するかどうか。",
 
+    // TODO
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "最小友好度",
     "config.min-hearts.desc": "マップに表示する住人の最小友好度を設定。",
 
