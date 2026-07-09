@@ -100,6 +100,10 @@
     "config.only-in-location.name": "Только NPC в локации игрока",
     "config.only-in-location.desc": "Показывать ли жителей на карте только если игрок находится в той же локации, что и они.",
 
+    // TODO
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "Минимальный уровень сердец",
     "config.min-hearts.desc": "Минимальный уровень дружбы для отображения NPC на карте.",
 

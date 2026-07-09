@@ -85,6 +85,9 @@ public class ModConfig
     /// <summary>Whether to only show villagers in the same location as the player.</summary>
     public bool OnlySameLocation { get; set; } = false;
 
+    /// <summary>Whether to only show villagers the player has met before.</summary>
+    public bool OnlyKnown { get; set; } = false;
+
     /// <summary>The minimum heart level for which to show NPCs.</summary>
     public int HeartLevelMin { get; set; } = 0;
 

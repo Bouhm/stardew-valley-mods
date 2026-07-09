@@ -235,6 +235,13 @@ internal class GenericModConfigMenuIntegration
             getValue: () => this.Config.OnlySameLocation,
             setValue: value => this.Config.OnlySameLocation = value
         );
+        menu.AddBoolOption(
+            this.Manifest,
+            name: I18n.Config_OnlyKnown_Name,
+            tooltip: I18n.Config_OnlyKnown_Desc,
+            getValue: () => this.Config.OnlyKnown,
+            setValue: value => this.Config.OnlyKnown = value
+        );
         menu.AddNumberOption(
             this.Manifest,
             name: I18n.Config_MinHearts_Name,

@@ -100,6 +100,9 @@
     "config.only-in-location.name": "Only NPCs in player's location",
     "config.only-in-location.desc": "Whether to only show villagers on the map if the player is in the same location they're in.",
 
+    "config.only-known.name": "Only NPCs the player has met",
+    "config.only-known.desc": "Whether to only show villagers on the map if the player has met them before.",
+
     "config.min-hearts.name": "Min heart level",
     "config.min-hearts.desc": "The minimum friendship level for NPCs shown on the map.",
 
