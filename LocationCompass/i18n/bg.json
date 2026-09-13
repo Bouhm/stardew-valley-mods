@@ -1,0 +1,43 @@
+{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Опции",
+
+    "config.hide-hud.name": "Скриване на интерфейса",
+    "config.hide-hud.desc": "Дали да се скрива интерфейсът на играта, когато се показват иконите за посока.",
+
+    "config.same-location-only.name": "Само текущата локация",
+    "config.same-location-only.desc": "Дали да се показват указатели само за героите в текущата локация. Ако е изключено, героите в съседни локации се показват в сиво.",
+
+    "config.quests-and-birthdays-only.name": "Само задачи и рождени дни",
+    "config.quests-and-birthdays-only.desc": "Дали да се показват указатели само за NPC с активна задача или рожден ден днес.",
+
+    "config.players-only.name": "Само играчи",
+    "config.players-only.desc": "Дали да се показват указатели само за играчи.",
+
+    "config.show-horses.name": "Показване на коне",
+    "config.show-horses.desc": "Дали да се показват указатели за коне.",
+
+    // controls
+    "config.title.controls": "Управление",
+
+    "config.hold-to-toggle.name": "Задържане за показване",
+    "config.hold-to-toggle.desc": "Дали бутонът трябва да се задържи, за да се покажат иконите за посока. В противен случай ги включва или изключва.",
+
+    "config.toggle-key.name": "Бутон за показване",
+    "config.toggle-key.desc": "Бутонът, който показва или скрива иконите за посока.",
+
+    "config.same-location-key.name": "Бутон за „Само текущата локация“",
+    "config.same-location-key.desc": "Бутонът, който включва или изключва настройката „Само текущата локация“.",
+
+    "config.quests-and-birthdays-key.name": "Бутон за „Само задачи и рождени дни“",
+    "config.quests-and-birthdays-key.desc": "Бутонът, който включва или изключва настройката „Само задачи и рождени дни“.",
+
+    "config.players-key.name": "Бутон за „Само играчи“",
+    "config.players-key.desc": "Бутонът, който включва или изключва настройката „Само играчи“.",
+
+    "config.horses-key.name": "Бутон за „Показване на коне“",
+    "config.horses-key.desc": "Бутонът, който включва или изключва настройката „Показване на коне“."
+}
