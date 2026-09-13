@@ -18,6 +18,9 @@ internal class GenericModConfigMenuIntegration
     /// <summary>The NPC Map Locations manifest.</summary>
     private readonly IManifest Manifest;
 
+    /// <summary>Provides access to game content after Content Patcher and other mods apply their edits.</summary>
+    private readonly IModHelper Helper;
+
     /// <summary>A callback to invoke when the settings are reset to default.</summary>
     private readonly Action OnReset;
 
@@ -43,14 +46,15 @@ internal class GenericModConfigMenuIntegration
     *********/
     /// <summary>Construct an instance.</summary>
     /// <param name="manifest">The NPC Map Locations manifest.</param>
-    /// <param name="modRegistry">An API for fetching metadata about loaded mods.</param>
+    /// <param name="helper">Provides mod APIs and game content.</param>
     /// <param name="onReset">A callback to invoke when the settings are reset to default.</param>
     /// <param name="onSaved">A callback to invoke when the settings are saved.</param>
     /// <param name="getNpcMarkers">Get the current NPC markers, if any.</param>
-    public GenericModConfigMenuIntegration(IManifest manifest, IModRegistry modRegistry, Action onReset, Action onSaved, Func<IReadOnlyDictionary<string, NpcMarker>> getNpcMarkers)
+    public GenericModConfigMenuIntegration(IManifest manifest, IModHelper helper, Action onReset, Action onSaved, Func<IReadOnlyDictionary<string, NpcMarker>> getNpcMarkers)
     {
         this.Manifest = manifest;
-        this.ConfigMenu = modRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        this.Helper = helper;
+        this.ConfigMenu = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
         this.OnReset = onReset;
         this.OnSaved = onSaved;
         this.GetNpcMarkers = getNpcMarkers;
@@ -356,6 +360,17 @@ internal class GenericModConfigMenuIntegration
     /// <summary>Get the NPCs which can be shown on the world map.</summary>
     private IEnumerable<(string InternalName, string DisplayName)> GetNpcNames()
     {
+        Dictionary<string, string>? localizedNames = null;
+        try
+        {
+            localizedNames = this.Helper.GameContent.Load<Dictionary<string, string>>("Strings/NPCNames");
+        }
+        catch
+        {
+            // Custom content providers or an early game load can make the vanilla name data unavailable.
+            // Fall back to the marker or character display name in that case.
+        }
+
         // if we haven't loaded save yet, get NPCs from data
         if (!Context.IsWorldReady)
         {
@@ -368,7 +383,9 @@ internal class GenericModConfigMenuIntegration
 
                 if (canShow)
                 {
-                    string displayName = TokenParser.ParseText(data!.DisplayName) ?? internalName;
+                    string displayName = localizedNames?.GetValueOrDefault(internalName)
+                        ?? TokenParser.ParseText(data!.DisplayName)
+                        ?? internalName;
                     yield return (internalName, displayName);
                 }
             }
@@ -383,7 +400,9 @@ internal class GenericModConfigMenuIntegration
 
                 if (canShow)
                 {
-                    string displayName = marker.DisplayName ?? internalName;
+                    string displayName = localizedNames?.GetValueOrDefault(internalName)
+                        ?? marker.DisplayName
+                        ?? internalName;
                     yield return (internalName, displayName);
                 }
             }
