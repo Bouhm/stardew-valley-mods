@@ -1,0 +1,150 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // extra settings section
+    "extra.label": "Допълнителни настройки:",
+
+    // special NPC markers
+    "marker-names.bookseller": "Продавач на книги",
+    "marker-names.merchant": "Пътуващ търговец",
+    "marker-names.mister-raccoon": "Г-н Миеща мечка",
+    "marker-names.mrs-raccoon": "Г-жа Миеща мечка",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "по подразбиране",
+
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Управление",
+
+    "config.menu-key.name": "Клавиш за менюто",
+    "config.menu-key.desc": "Натисни този бутон, докато картата в играта е отворена, за да видиш настройките на мода.",
+
+    "config.minimap-key.name": "Клавиш за мини-карта",
+    "config.minimap-key.desc": "Натисни този бутон, за да покажеш или скриеш мини-картата.",
+
+    "config.tooltip-key.name": "Клавиш за подсказки",
+    "config.tooltip-key.desc": "Натисни този бутон, за да превключиш позицията на подсказките в изгледа на картата.",
+
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Мини-карта",
+
+    "config.minimap-enabled.name": "Показване на мини-картата",
+    "config.minimap-enabled.desc": "Дали мини-картата да се показва на екрана.",
+
+    "config.lock-minimap.name": "Заключване на мини-картата",
+    "config.lock-minimap.desc": "Дали позицията на мини-картата да бъде заключена, за да не може да се мести чрез влачене с десен бутон.",
+
+    "config.minimap-width.name": "Ширина на мини-картата",
+    "config.minimap-width.desc": "Ширината на мини-картата в пиксели.",
+
+    "config.minimap-height.name": "Височина на мини-картата",
+    "config.minimap-height.desc": "Височината на мини-картата в пиксели.",
+
+    "config.minimap-x.name": "Хоризонтална позиция",
+    "config.minimap-x.desc": "Хоризонтална позиция на мини-картата в пиксели.",
+
+    "config.minimap-y.name": "Вертикална позиция",
+    "config.minimap-y.desc": "Вертикална позиция на мини-картата в пиксели.",
+
+    "config.minimap-pixels.format": "{{size}} пиксела",
+
+    "config.minimap-opacity.name": "Прозрачност",
+    "config.minimap-opacity.desc": "Нивото на прозрачност на мини-картата от 0% (прозрачна) до 100% (плътна).",
+
+    /****
+    ** Map display section
+    ****/
+    "config.map-display-title": "Показване на картата",
+
+    "config.npc-marker-style.name": "Стил на маркерите за NPC",
+    "config.npc-marker-style.desc": "Стилът на маркерите за жителите. Стилът „По подразбиране“ използва индивидуално изрязване за всеки жител, но добавените от други модове може да не се показват правилно. Стилът „Ванила“ използва вградените икони от играта. Той е по-съвместим, но иконите на картата са по-малки.",
+    "config.npc-marker-style.options.default": "По подразбиране",
+    "config.npc-marker-style.options.vanilla": "Ванила (експериментално)",
+
+    "config.npc-marker-size.name": "Размер на маркерите за жители",
+    "config.npc-marker-size.desc": "Размерът на маркерите за жителите спрямо стандартния.",
+
+    "config.current-player-marker-size.name": "Размер на твоя маркер",
+    "config.current-player-marker-size.desc": "Размерът на твоя маркер на картата спрямо стандартния.",
+
+    "config.other-player-marker-size.name": "Размер на маркерите на другите играчи",
+    "config.other-player-marker-size.desc": "Размерът на маркерите на другите играчи спрямо стандартния.",
+
+    "config.show-farm-buildings.name": "Показване на сгради във фермата",
+    "config.show-farm-buildings.desc": "Дали на картата да се показват икони за построените сгради във фермата.",
+
+    /****
+    ** Filters section
+    ****/
+    "config.filters-title": "Филтри",
+
+    "config.spoken-to-filter.name": "Разговори",
+    "config.spoken-to-filter.desc": "Избери кои жители да се показват според това дали днес е проведен разговор с тях.",
+    "config.spoken-to-filter.options.all": "Покажи всички",
+    "config.spoken-to-filter.options.talkedTo": "Само тези, с които е проведен разговор днес",
+    "config.spoken-to-filter.options.notTalkedTo": "Само тези, с които не е проведен разговор днес",
+
+    "config.only-in-location.name": "Само жители в твоята локация",
+    "config.only-in-location.desc": "Дали да се виждат жители само ако се намират в същата зона като теб.",
+
+    "config.min-hearts.name": "Мин. ниво на сърца",
+    "config.min-hearts.desc": "Минималното ниво на приятелство на показваните жители.",
+
+    "config.max-hearts.name": "Макс. ниво на сърца",
+    "config.max-hearts.desc": "Максималното ниво на приятелство на показваните жители.",
+
+    "config.show-quests-or-birthdays.name": "Показване на задачи или рождени дни",
+    "config.show-quests-or-birthdays.desc": "Дали да се показва иконка върху маркера, ако жителят има рожден ден или активна задача.",
+
+    "config.show-hidden-villagers.name": "Показване на скрити жители",
+    "config.show-hidden-villagers.desc": "Дали да се виждат жителите, които обикновено биха били скрити.",
+
+    "config.show-bookseller.name": "Показване на продавача на книги",
+    "config.show-bookseller.desc": "Дали да се показва продавачът на книги, когато е в града.",
+
+    "config.show-traveling-merchant.name": "Показване на пътуващия търговец",
+    "config.show-traveling-merchant.desc": "Дали да се показва пътуващият търговец, когато е в гората.",
+
+    "config.show-children.name": "Показване на децата на играчите",
+    "config.show-children.desc": "Дали да се показват децата на играчите на картата.",
+
+    "config.show-horses.name": "Показване на коне",
+    "config.show-horses.desc": "Дали да се показват конете на картата.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Показване/скриване на жители",
+
+    "config.toggle-npc.desc": "Дали {{displayName}} да се показва на картата.",
+    "config.toggle-npc.options.default": "По подразбиране",
+    "config.toggle-npc.options.default-hidden": "По подразбиране (скрито от модове)",
+    "config.toggle-npc.options.always-visible": "Винаги се показва",
+    "config.toggle-npc.options.always-hidden": "Никога не се показва",
+
+    /****
+    ** Performance section
+    ****/
+    "config.performance-title": "Производителност",
+
+    "config.minimap-cache-time.name": "Интервал на обновяване на мини-картата",
+    "config.minimap-cache-time.desc": "Времето между всяко обновяване на мини-картата. Ниските стойности помагат на мини-картата да следва по-плавно движението ти, а високите може да подобрят производителността.",
+
+    "config.npc-cache-time.name": "Интервал на обновяване на маркерите",
+    "config.npc-cache-time.desc": "Времето между всяко обновяване на маркерите. По-ниските стойности правят движението на жителите по картата или мини-картата по-плавно, а по-високите може да подобрят производителността.",
+
+    "config.cache-time.value": "{{seconds}} сек."
+}
