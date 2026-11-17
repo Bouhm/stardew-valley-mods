@@ -112,8 +112,8 @@
     "config.show-hidden-villagers.name": "显示隐藏的村民",
     "config.show-hidden-villagers.desc": "是否显示正常情况下应隐藏的村民。",
 
-    "config.show-bookseller.name": "显示书商",
-    "config.show-bookseller.desc": "书商在镇上时，是否在地图上显示他。",
+    "config.show-bookseller.name": "显示书摊老板",
+    "config.show-bookseller.desc": "书摊老板在镇上时，是否在地图上显示他。",
 
     "config.show-traveling-merchant.name": "显示旅行商人",
     "config.show-traveling-merchant.desc": "旅行商人在森林中时，是否在地图上显示她。",
