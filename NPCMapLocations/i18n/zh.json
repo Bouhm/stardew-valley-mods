@@ -131,9 +131,9 @@
 
     "config.toggle-npc.desc": "{{displayName}}是否应显示在地图上。",
     "config.toggle-npc.options.default": "默认",
-    "config.toggle-npc.options.default-hidden": "默认（由模组控制）",
-    "config.toggle-npc.options.always-visible": "永远显示",
-    "config.toggle-npc.options.always-hidden": "永远隐藏",
+    "config.toggle-npc.options.default-hidden": "默认（由其他模组隐藏）",
+    "config.toggle-npc.options.always-visible": "始终显示",
+    "config.toggle-npc.options.always-hidden": "始终隐藏",
 
     /****
     ** Performance section
