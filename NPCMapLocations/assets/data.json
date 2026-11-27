@@ -1,0 +1,47 @@
+﻿{
+    /**
+     * The NPC C# types which should be ignored by the mod.
+     */
+    "IgnoreNpcTypes": [
+        "CustomCompanions.Framework.Companions.MapCompanion"
+    ],
+
+    /**
+     * The overrides to apply to specific NPCs by default.
+     */
+    "Npcs": {
+        // hidden
+        "Mister Qi": {
+            "Visible": false
+        },
+        "Bouncer": {
+            "Visible": false
+        },
+        "Henchman": {
+            "Visible": false
+        },
+        "Birdie": {
+            "Visible": false
+        },
+
+        // hidden until met
+        "Dwarf": {
+            "Visible": "PLAYER_HAS_MET Current Dwarf"
+        },
+        "Krobus": {
+            "Visible": "PLAYER_HAS_MET Current Krobus"
+        },
+        "Leo": {
+            "Visible": "PLAYER_HAS_MET Current Leo"
+        },
+        "Marlon": {
+            "Visible": "PLAYER_HAS_SEEN_EVENT Current 100162" // intro event in mine
+        },
+        "Sandy": {
+            "Visible": "PLAYER_HAS_MET Current Sandy"
+        },
+        "Wizard": {
+            "Visible": "PLAYER_HAS_MET Current Wizard"
+        }
+    }
+}

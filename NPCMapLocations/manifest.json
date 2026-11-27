@@ -1,0 +1,10 @@
+﻿{
+    "Name": "NPC Map Locations",
+    "Author": "Bouhm",
+    "Version": "%ProjectVersion%",
+    "MinimumApiVersion": "4.1.10",
+    "Description": "Shows NPCs and farmers on a modified map page for accurate tracking.",
+    "UniqueID": "Bouhm.NPCMapLocations",
+    "EntryDll": "NPCMapLocations.dll",
+    "UpdateKeys": [ "Nexus:239" ]
+}

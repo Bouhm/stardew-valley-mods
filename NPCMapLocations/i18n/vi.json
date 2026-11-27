@@ -1,0 +1,153 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // extra settings section
+    "extra.label": "Cài đặt bổ sung:",
+
+    // special NPC markers
+    "marker-names.bookseller": "Chủ tiệm sách",
+    "marker-names.merchant": "Thương nhân du hành",
+    "marker-names.mister-raccoon": "Mr. Raccoon",
+    "marker-names.mrs-raccoon": "Mrs. Raccoon",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "mặc định",
+
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Điều khiển",
+
+    "config.menu-key.name": "Phím Menu",
+    "config.menu-key.desc": "Nhấn phím này khi bản đồ trong game đang mở để hiện cài đặt mod.",
+
+    "config.minimap-key.name": "Phím bật/tắt bản đồ nhỏ",
+    "config.minimap-key.desc": "Nhấn phím này để hiện hoặc ẩn bản đồ nhỏ.",
+
+    "config.tooltip-key.name": "Phím chú thích",
+    "config.tooltip-key.desc": "Nhấn phím này để đổi vị trí chú thích khi xem bản đồ.",
+
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Bản đồ nhỏ",
+
+    "config.minimap-enabled.name": "Bật",
+    "config.minimap-enabled.desc": "Có hiển thị bản đồ nhỏ hay không.",
+
+    "config.lock-minimap.name": "Khóa vị trí bản đồ nhỏ",
+    "config.lock-minimap.desc": "Khóa bản đồ nhỏ ở vị trí hiện tại, để bạn không thể di chuyển nó trong game bằng cách giữ chuột phải và kéo.",
+
+    "config.minimap-width.name": "Chiều rộng bản đồ nhỏ",
+    "config.minimap-width.desc": "Chiều rộng (pixel) của bản đồ nhỏ khi hiển thị.",
+
+    "config.minimap-height.name": "Chiều cao bản đồ nhỏ",
+    "config.minimap-height.desc": "Chiều cao (pixel) của bản đồ nhỏ khi hiển thị.",
+
+    // TODO
+    "config.minimap-x.name": "Minimap X position",
+    "config.minimap-x.desc": "The X pixel position of the minimap when shown on-screen.",
+
+    // TODO
+    "config.minimap-y.name": "Minimap Y position",
+    "config.minimap-y.desc": "The Y pixel position of the minimap when shown on-screen.",
+
+    "config.minimap-pixels.format": "{{size}} pixel",
+
+    "config.minimap-opacity.name": "Độ mờ bản đồ nhỏ",
+    "config.minimap-opacity.desc": "Mức độ mờ mặc định của bản đồ nhỏ (từ 0% - trong suốt đến 100% - không trong suốt).",
+
+    /****
+    ** Map display section
+    ****/
+    "config.map-display-title": "Hiển thị bản đồ",
+
+    // TODO
+    "config.npc-marker-style.name": "NPC marker style",
+    "config.npc-marker-style.desc": "The NPC map marker style to draw. The 'Default' style uses a tailored crop position for each NPC, but custom NPCs may not appear correctly. The 'Vanilla' style uses the game's built-in NPC icons, which has better compatibility but results in smaller icons on the map.",
+    "config.npc-marker-style.options.default": "Default",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+
+    "config.npc-marker-size.name": "Kích thước dấu bản đồ (NPC)",
+    "config.npc-marker-size.desc": "Kích thước dấu NPC trên bản đồ so với mặc định.",
+
+    "config.current-player-marker-size.name": "Kích thước dấu bản đồ (bạn)",
+    "config.current-player-marker-size.desc": "Kích thước dấu nhân vật của bạn trên bản đồ so với mặc định.",
+
+    "config.other-player-marker-size.name": "Kích thước dấu bản đồ (người chơi khác)",
+    "config.other-player-marker-size.desc": "Kích thước dấu của người chơi khác trên bản đồ so với mặc định.",
+
+    "config.show-farm-buildings.name": "Hiện công trình nông trại",
+    "config.show-farm-buildings.desc": "Có hiện biểu tượng các công trình nông trại đã xây trên bản đồ hay không.",
+
+    /****
+    ** Filters section
+    ****/
+    "config.filters-title": "Bộ lọc",
+
+    "config.spoken-to-filter.name": "NPC đã nói chuyện",
+    "config.spoken-to-filter.desc": "Chọn NPC hiển thị dựa trên việc bạn đã nói chuyện với họ hôm nay chưa.",
+    "config.spoken-to-filter.options.all": "Hiện tất cả",
+    "config.spoken-to-filter.options.talkedTo": "Chỉ hiện người đã nói chuyện hôm nay",
+    "config.spoken-to-filter.options.notTalkedTo": "Chỉ hiện người chưa nói chuyện hôm nay",
+
+    "config.only-in-location.name": "Chỉ NPC ở cùng vị trí với người chơi",
+    "config.only-in-location.desc": "Chỉ hiện dân làng trên bản đồ nếu họ ở cùng vị trí với bạn.",
+
+    "config.min-hearts.name": "Mức tim tối thiểu",
+    "config.min-hearts.desc": "Mức thân thiện tối thiểu để NPC hiện trên bản đồ.",
+
+    "config.max-hearts.name": "Mức tim tối đa",
+    "config.max-hearts.desc": "Mức thân thiện tối đa để NPC hiện trên bản đồ.",
+
+    "config.show-quests-or-birthdays.name": "Hiện nhiệm vụ hoặc sinh nhật",
+    "config.show-quests-or-birthdays.desc": "Có hiện biểu tượng trên dấu NPC khi đến sinh nhật hoặc có nhiệm vụ đang làm hay không.",
+
+    "config.show-hidden-villagers.name": "Hiện dân làng bị ẩn",
+    "config.show-hidden-villagers.desc": "Có hiện những dân làng thường bị ẩn hay không.",
+
+    "config.show-bookseller.name": "Hiện Chủ tiệm sách",
+    "config.show-bookseller.desc": "Có hiện Chủ tiệm sách khi người đó ở thị trấn hay không.",
+
+    "config.show-traveling-merchant.name": "Hiện Thương nhân du hành",
+    "config.show-traveling-merchant.desc": "Có hiện Thương nhân du hành khi người đó ở trong rừng hay không.",
+
+    "config.show-children.name": "Hiện con của người chơi",
+    "config.show-children.desc": "Có hiện con của người chơi trên bản đồ hay không.",
+
+    "config.show-horses.name": "Hiện ngựa",
+    "config.show-horses.desc": "Có hiện ngựa trên bản đồ hay không.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Bao gồm/Loại trừ dân làng",
+
+    "config.toggle-npc.desc": "Có hiện {{displayName}} trên bản đồ hay không.",
+    "config.toggle-npc.options.default": "Mặc định",
+    "config.toggle-npc.options.default-hidden": "Mặc định (ẩn bởi mod)",
+    "config.toggle-npc.options.always-visible": "Luôn hiện",
+    "config.toggle-npc.options.always-hidden": "Luôn ẩn",
+
+    /****
+    ** Performance section
+    ****/
+    "config.performance-title": "Hiệu suất",
+
+    "config.minimap-cache-time.name": "Thời gian cache bản đồ nhỏ",
+    "config.minimap-cache-time.desc": "Khoảng thời gian giữa mỗi lần cập nhật bản đồ nhỏ. Giá trị thấp giúp bản đồ nhỏ theo sát chuyển động của bạn mượt hơn, giá trị cao có thể cải thiện hiệu suất.",
+
+    "config.npc-cache-time.name": "Thời gian cache NPC",
+    "config.npc-cache-time.desc": "Khoảng thời gian giữa mỗi lần cập nhật dấu NPC. Giá trị thấp giúp NPC di chuyển mượt hơn trên bản đồ/bản đồ nhỏ, giá trị cao có thể cải thiện hiệu suất.",
+
+    "config.cache-time.value": "{{seconds}} giây"
+}

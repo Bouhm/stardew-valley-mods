@@ -1,0 +1,150 @@
+﻿{
+    /*********
+    ** Map options
+    *********/
+    // extra settings section
+    "extra.label": "Configurações Extras:",
+
+    // special NPC markers
+    "marker-names.bookseller": "Vendedor de Livros",
+    "marker-names.merchant": "Mercadora Viajante",
+    "marker-names.mister-raccoon": "Sr. Guaxinim",
+    "marker-names.mrs-raccoon": "Sra. Guaxinim",
+
+
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    /****
+    ** Generic
+    ****/
+    // formatted values for percentage fields (e.g. map marker size)
+    "config.percentage": "{{percent}}%",
+    "config.percentage.default": "padrão",
+
+    /****
+    ** Controls section
+    ****/
+    "config.controls-title": "Controles",
+
+    "config.menu-key.name": "Tecla do Menu",
+    "config.menu-key.desc": "Pressione esta tecla enquanto o mapa do mundo está aberto para mostrar as configurações do mod.",
+
+    "config.minimap-key.name": "Tecla de ativação do Mini-Mapa",
+    "config.minimap-key.desc": "Pressione esta tecla para mostrar ou esconder o Mini-Mapa.",
+
+    "config.tooltip-key.name": "Tecla do Tooltip",
+    "config.tooltip-key.desc": "Pressione esta tecla para alternar entre as possíveis posições do tooltip ao visualizar o mapa.",
+
+    /****
+    ** Minimap section
+    ****/
+    "config.minimap-title": "Mini-Mapa",
+
+    "config.minimap-enabled.name": "Ativo",
+    "config.minimap-enabled.desc": "Define se o minimapa deve ser exibido.",
+
+    "config.lock-minimap.name": "Travar a Posição do Mini-Mapa",
+    "config.lock-minimap.desc": "Define se o minimapa deve ficar travado na posição atual, impedindo que ele seja movido no jogo ao segurar o botão direito do mouse e arrastá-lo.",
+
+    "config.minimap-width.name": "Largura do Mini-Mapa",
+    "config.minimap-width.desc": "Define a largura, em pixels, do minimapa quando exibido na tela.",
+
+    "config.minimap-height.name": "Altura do Mini-Mapa",
+    "config.minimap-height.desc": "Define a altura, em pixels, do minimapa quando exibido na tela.",
+
+    "config.minimap-x.name": "Posição X do Mini-Mapa",
+    "config.minimap-x.desc": "Define a posição X, em pixels, do minimapa quando exibido na tela.",
+
+    "config.minimap-y.name": "Posição Y do Mini-Mapa",
+    "config.minimap-y.desc": "Define a posição Y, em pixels, do minimapa quando exibido na tela.",
+
+    "config.minimap-pixels.format": "{{size}} pixels",
+
+    "config.minimap-opacity.name": "Opacidade do Mini-Mapa",
+    "config.minimap-opacity.desc": "Define o nível padrão de opacidade do Mini-Mapa, como um valor entre 0% (transparente) e 100% (opaco).",
+
+    /****
+    ** Map display section
+    ****/
+    "config.map-display-title": "Exibição do mapa",
+
+    "config.npc-marker-style.name": "Estilo do marcador de NPC",
+    "config.npc-marker-style.desc": "Define o estilo do marcador de NPC exibido no mapa. O estilo 'Padrão' usa uma posição de recorte personalizada para cada NPC, mas NPCs personalizados podem não aparecer corretamente. O estilo 'Vanilla' usa os ícones de NPC integrados do jogo, que têm melhor compatibilidade, mas resultam em ícones menores no mapa.",
+    "config.npc-marker-style.options.default": "Padrão",
+    "config.npc-marker-style.options.vanilla": "Vanilla (experimental)",
+
+    "config.npc-marker-size.name": "Tamanho do marcador no mapa (NPCs)",
+    "config.npc-marker-size.desc": "Define o tamanho dos marcadores de NPC no mapa em relação ao tamanho padrão.",
+
+    "config.current-player-marker-size.name": "Tamanho do marcador no mapa (você)",
+    "config.current-player-marker-size.desc": "Define o tamanho do marcador do seu personagem no mapa em relação ao tamanho padrão.",
+
+    "config.other-player-marker-size.name": "Tamanho do marcador no mapa (outros jogadores)",
+    "config.other-player-marker-size.desc": "Define o tamanho do marcador de outros jogadores no mapa em relação ao tamanho padrão.",
+
+    "config.show-farm-buildings.name": "Mostrar construções da fazenda",
+    "config.show-farm-buildings.desc": "Define se os ícones das construções da fazenda devem ser exibidos no mapa.",
+
+    /****
+    ** Filters section
+    ****/
+    "config.filters-title": "Filtros",
+
+    "config.spoken-to-filter.name": "NPCs com quem você falou",
+    "config.spoken-to-filter.desc": "Escolha quais NPCs serão exibidos com base em se você falou com eles hoje.",
+    "config.spoken-to-filter.options.all": "Mostrar todos",
+    "config.spoken-to-filter.options.talkedTo": "Mostrar apenas os com quem você falou hoje",
+    "config.spoken-to-filter.options.notTalkedTo": "Mostrar apenas os com quem você ainda não falou hoje",
+
+    "config.only-in-location.name": "Mostrar Somente Moradores na Localização do Jogador",
+    "config.only-in-location.desc": "Define se os moradores serão exibidos no mapa apenas quando o jogador estiver na mesma localização que eles.",
+
+    "config.min-hearts.name": "Nível Mínimo de Relacionamento",
+    "config.min-hearts.desc": "Define o nível mínimo de amizade para que os NPCs sejam exibidos no mapa.",
+
+    "config.max-hearts.name": "Nível Máximo de Relacionamento",
+    "config.max-hearts.desc": "Define o nível máximo de amizade para que os NPCs sejam exibidos no mapa.",
+
+    "config.show-quests-or-birthdays.name": "Mostrar Missões ou Aniversários",
+    "config.show-quests-or-birthdays.desc": "Define se um ícone será exibido nos marcadores de NPC quando for o aniversário deles ou quando tiverem uma missão ativa.",
+
+    "config.show-hidden-villagers.name": "Mostrar Moradores Escondidos",
+    "config.show-hidden-villagers.desc": "Define se moradores que normalmente ficariam ocultos devem ser exibidos.",
+
+    "config.show-bookseller.name": "Mostrar vendedor de livros",
+    "config.show-bookseller.desc": "Define se o vendedor de livros será exibido quando estiver na cidade.",
+
+    "config.show-traveling-merchant.name": "Mostrar Mercador Viajante",
+    "config.show-traveling-merchant.desc": "Define se a Mercadora Viajante será exibida quando estiver na floresta.",
+
+    "config.show-children.name": "Mostrar filhos dos jogadores",
+    "config.show-children.desc": "Define se os filhos dos jogadores serão exibidos no mapa.",
+
+    "config.show-horses.name": "Mostrar Cavalos",
+    "config.show-horses.desc": "Define se os cavalos serão exibidos no mapa.",
+
+    /****
+    ** Include/exclude villagers
+    ****/
+    "config.toggle-villagers-title": "Incluir/Excluir Moradores",
+
+    "config.toggle-npc.desc": "Define se {{displayName}} deve ser exibido no mapa.",
+    "config.toggle-npc.options.default": "Padrão",
+    "config.toggle-npc.options.default-hidden": "Padrão (oculto por mods)",
+    "config.toggle-npc.options.always-visible": "Sempre visível",
+    "config.toggle-npc.options.always-hidden": "Sempre oculto",
+
+    /****
+    ** Performance section
+    ****/
+    "config.performance-title": "Desempenho",
+
+    "config.minimap-cache-time.name": "Tempo de cache do Mini-Mapa",
+    "config.minimap-cache-time.desc": "O intervalo entre cada atualização de renderização do Mini-Mapa. Valores menores fazem com que o Mini-Mapa acompanhe seu movimento de forma mais suave, enquanto valores maiores podem melhorar o desempenho.",
+
+    "config.npc-cache-time.name": "Tempo de cache dos NPCs",
+    "config.npc-cache-time.desc": "O intervalo entre cada atualização dos marcadores de NPC. Valores menores deixam o movimento dos NPCs no Mapa ou Mini-Mapa mais suave, enquanto valores maiores podem melhorar o desempenho.",
+
+    "config.cache-time.value": "{{seconds}} segundos"
+}

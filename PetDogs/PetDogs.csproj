@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Version>3.0.2</Version>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+
+    <EnableGameDebugging>false</EnableGameDebugging>
+    <EnableModDeploy>false</EnableModDeploy>
+    <EnableModZip>false</EnableModZip>
+
+    <ContentPackFolderName>[CP] Bouhm's Pet Dogs</ContentPackFolderName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="$(ContentPackFolderName)\**\*" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <Target Name="DeployMod" AfterTargets="AfterBuild">
+    <!--get paths-->
+    <PropertyGroup>
+      <SourcePath>$(TargetDir)\$(ContentPackFolderName)</SourcePath>
+      <StagingPath>$(TargetDir)\packaged\$(ContentPackFolderName)</StagingPath>
+      <InstalledPath>$(GameModsPath)\$(ContentPackFolderName)</InstalledPath>
+      <ZipToFolderPath>$(SolutionDir)\_releases</ZipToFolderPath>
+      <ZipToFileName>$(ContentPackFolderName) $(Version).zip</ZipToFileName>
+    </PropertyGroup>
+
+    <!--create release folder-->
+    <ItemGroup>
+      <ContentPackFolder Include="$(SourcePath)\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(StagingPath)" />
+    <Copy SourceFiles="@(ContentPackFolder)" DestinationFolder="$(StagingPath)\%(RecursiveDir)" />
+    <WriteLinesToFile
+      File="$(StagingPath)\manifest.json"
+      Lines="$([System.IO.File]::ReadAllText($(StagingPath)\manifest.json).Replace('%ProjectVersion%','$(Version)'))"
+      Overwrite="true"
+    />
+
+    <!--copy to Mods folder-->
+    <ItemGroup>
+      <StagingDirFiles Include="$(StagingPath)\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(StagingDirFiles)" DestinationFolder="$(InstalledPath)\%(RecursiveDir)" />
+
+    <!--create release zip-->
+    <MakeDir Directories="$(ZipToFolderPath)" />
+    <Delete Files="$(ZipToFolderPath)\$(ZipToFileName)" />
+    <ZipDirectory SourceDirectory="$(StagingPath)\.." DestinationFile="$(ZipToFolderPath)\$(ZipToFileName)" />
+  </Target>
+</Project>

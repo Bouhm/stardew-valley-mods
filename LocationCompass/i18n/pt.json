@@ -1,0 +1,43 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Opções",
+
+    "config.hide-hud.name": "Esconder HUD",
+    "config.hide-hud.desc": "Esconder o HUD do jogo enquanto os localizadores são mostrados.",
+
+    "config.same-location-only.name": "Apenas mesma localização",
+    "config.same-location-only.desc": "Mostrar apenas localizadores do local atual. Quando desativado, personagens em locais vizinhos ficarão acinzentados.",
+
+    "config.quests-and-birthdays-only.name": "Apenas Missões e Aniversários",
+    "config.quests-and-birthdays-only.desc": "Mostrar apenas localizadores para personagens com missão ou aniversário hoje.",
+
+    "config.players-only.name": "Apenas Jogadores",
+    "config.players-only.desc": "Mostrar apenas localizadores de jogadores.",
+
+    "config.show-horses.name": "Mostrar cavalos",
+    "config.show-horses.desc": "Mostrar localizadores para cavalos.",
+
+    // controls
+    "config.title.controls": "Controles",
+
+    "config.hold-to-toggle.name": "Manter pressionado p/ ativar",
+    "config.hold-to-toggle.desc": "Quando é preciso manter pressionado para mostrar os localizadores (também os ativa e desativa).",
+
+    "config.toggle-key.name": "Tecla de ativação",
+    "config.toggle-key.desc": "Tecla que mostra ou esconde os localizadores.",
+
+    "config.same-location-key.name": "Tecla de 'Apenas mesma localização'",
+    "config.same-location-key.desc": "Tecla que ativa ou desativa a opção 'Apenas mesma localização' acima.",
+
+    "config.quests-and-birthdays-key.name": "Tecla de 'Apenas Missões e Aniversários'",
+    "config.quests-and-birthdays-key.desc": "Tecla que ativa ou desativa a opção 'Apenas Missões e Aniversários' acima.",
+
+    "config.players-key.name": "Tecla de 'Apenas Jogadores'",
+    "config.players-key.desc": "Tecla que ativa ou desativa a opção 'Apenas Jogadores' acima.",
+
+    "config.horses-key.name": "Tecla de 'Mostrar cavalos'",
+    "config.horses-key.desc": "Tecla que ativa ou desativa a opção 'Mostrar cavalos' acima."
+}

@@ -1,0 +1,43 @@
+﻿{
+    /*********
+    ** Generic Mod Config Menu UI
+    *********/
+    // options
+    "config.title.options": "Ustawienia",
+
+    "config.hide-hud.name": "Ukryj Interfejs",
+    "config.hide-hud.desc": "Ukrycie interfejsu gry, gdy ikony lokacji są widoczne.",
+
+    "config.same-location-only.name": "Tylko obecna lokacja",
+    "config.same-location-only.desc": "Wyświetlanie ikon lokacji tylko dla obecnej lokacji. Gdy wyłączone, postacie z sąsiednich lokacji wyświetlą się na szaro.",
+
+    "config.quests-and-birthdays-only.name": "Tylko zadania i urodziny",
+    "config.quests-and-birthdays-only.desc": "Pokazywanie ikon lokacji tylko dla postaci z zadaniem lub obchodzacymi urodziny.",
+
+    "config.players-only.name": "Tylko gracze",
+    "config.players-only.desc": "Pokazywanie tylko ikon lokacji innych graczy.",
+
+    "config.show-horses.name": "Pokaż konie",
+    "config.show-horses.desc": "Pokazywanie ikon lokacji koni.",
+
+    // controls
+    "config.title.controls": "Sterowanie",
+
+    "config.hold-to-toggle.name": "Przytrzymaj lub przełącz",
+    "config.hold-to-toggle.desc": "Przytrzymanie przycisku powoduje wyświetlanie ikon lokacji (gdy wyłączone, naciśnięcie przycisku włącza lub wyłącza ikony).",
+
+    "config.toggle-key.name": "Przycisk przełączania",
+    "config.toggle-key.desc": "Przycisk, który włącza lub wyłącza ikony lokacji.",
+
+    "config.same-location-key.name": "Przycisk 'Obecna lokacja'",
+    "config.same-location-key.desc": "Przycisk, który włącza lub wyłącza powyższą opcję 'Tylko obecna lokacja'.",
+
+    "config.quests-and-birthdays-key.name": "Przycisk 'Tylko zadania i urodziny'",
+    "config.quests-and-birthdays-key.desc": "Przycisk, który włącza lub wyłącza powyższą opcję 'Tylko zadania i urodziny'.",
+
+    "config.players-key.name": "Przycisk 'Tylko gracze'",
+    "config.players-key.desc": "Przycisk, który włącza lub wyłącza powyższą opcję 'Tylko gracze'.",
+
+    "config.horses-key.name": "Przycisk 'Pokaż konie'",
+    "config.horses-key.desc": "Przycisk, który włącza lub wyłącza powyższą opcję 'Pokaż konie'."
+}

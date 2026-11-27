@@ -1,0 +1,63 @@
+﻿{
+    "Format": "2.0.0",
+    "Changes": [
+        // pet breed data
+        {
+            "Action": "EditData",
+            "Target": "Data/Pets",
+            "TargetField": [ "Dog", "Breeds" ],
+            "Entries": {
+                "{{ModId}}_Husky": {
+                    "Id": "{{ModId}}_Husky",
+                    "Texture": "Animals/{{ModId}}_Husky",
+                    "IconTexture": "Animals/{{ModId}}_Husky",
+                    "IconSourceRect": {
+                        "X": 104,
+                        "Y": 264,
+                        "Width": 16,
+                        "Height": 16
+                    }
+                },
+                "{{ModId}}_Shepherd": {
+                    "Id": "{{ModId}}_Shepherd",
+                    "Texture": "Animals/{{ModId}}_Shepherd",
+                    "IconTexture": "Animals/{{ModId}}_Shepherd",
+                    "IconSourceRect": {
+                        "X": 104,
+                        "Y": 264,
+                        "Width": 16,
+                        "Height": 16
+                    }
+                },
+                "{{ModId}}_ShibaInu": {
+                    "Id": "{{ModId}}_ShibaInu",
+                    "Texture": "Animals/{{ModId}}_ShibaInu",
+                    "IconTexture": "Animals/{{ModId}}_ShibaInu",
+                    "IconSourceRect": {
+                        "X": 104,
+                        "Y": 264,
+                        "Width": 16,
+                        "Height": 16
+                    }
+                }
+            }
+        },
+
+        // textures
+        {
+            "Action": "Load",
+            "Target": "Animals/{{ModId}}_Husky",
+            "FromFile": "assets/husky.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Animals/{{ModId}}_Shepherd",
+            "FromFile": "assets/shepherd.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Animals/{{ModId}}_ShibaInu",
+            "FromFile": "assets/shibainu.png"
+        }
+    ]
+}
